@@ -26,7 +26,7 @@ HEADERS = {
 TEMPORADA_FOLDER = "data/temporada_25_26"
 
 def obtener_calendario_jornadas(url_calendario):
-    """Escanea el calendario y devuelve un diccionario { 'X': [urls] }"""
+    """Escanea el calendario y devuelve un diccionario { 'Jornada': [urls] }"""
     print(f">>> OBTENIENDO CALENDARIO DESDE: {url_calendario}")
     resp = scraper.get(url_calendario, headers=HEADERS)
     soup = BeautifulSoup(resp.text, 'lxml')
@@ -45,10 +45,18 @@ def obtener_calendario_jornadas(url_calendario):
     return calendario
 
 def extraer_desde_fbref(url):
-    """Extrae datos de un partido individual con lógica de GA para defensas"""
+    """Extrae datos de un partido individual y devuelve el DF y los nombres de los equipos"""
     try:
         resp = scraper.get(url, headers=HEADERS)
         soup = BeautifulSoup(resp.text, 'lxml')
+        
+        # Obtener nombres de equipos reales del título de la página
+        title_text = soup.find('title').get_text()
+        # "Sevilla vs. Barcelona Match Report..." -> [Sevilla, Barcelona]
+        match_info = title_text.split(' vs. ')
+        n_l = match_info[0].strip()
+        n_v = match_info[1].split(' Match')[0].strip()
+
         tablas_raw = pd.read_html(StringIO(resp.text))
 
         goles_en_contra_por_equipo = {}
@@ -100,14 +108,12 @@ def extraer_desde_fbref(url):
                         except: continue
 
         df_final = pd.DataFrame.from_dict(db, orient='index')
-        title_tag = soup.find('title').get_text()
-        n_l, n_v = title_tag.split(' vs. ')[0], title_tag.split(' vs. ')[1].split(' Match')[0]
         df_final['Equipo_propio'], df_final['Equipo_rival'] = n_v, n_l
         if len(tablas_raw) > 3:
             lista_local = list(tablas_raw[3].iloc[:, 0]) 
             df_final.loc[df_final['player'].isin(lista_local), ['Equipo_propio', 'Equipo_rival']] = [n_l, n_v]
         
-        # Sincronización GA
+        # Sincronización Goles encajados
         ga_map = {}
         for p, ga in goles_en_contra_por_equipo.items():
             if p in df_final.index: ga_map[df_final.at[p, 'Equipo_propio']] = ga
@@ -117,13 +123,13 @@ def extraer_desde_fbref(url):
             if row['posicion'] != 'PT':
                 df_final.loc[idx, ['Saves', 'SoTA', 'Save_Pct', 'PSxG_partido']] = 0
 
-        return df_final
+        return df_final, n_l, n_v
     except Exception as e:
         print(f"❌ Error en partido {url}: {e}")
-        return None
+        return None, None, None
 
 def ejecutar_scraper_rango(inicio, fin):
-    """Recorre las jornadas de a a b guardando con formato px_eq1_eq2.csv"""
+    """Descarga de la jornada a a la jornada b"""
     url_base = "https://fbref.com/en/comps/12/schedule/La-Liga-Scores-and-Fixtures"
     calendario = obtener_calendario_jornadas(url_base)
     
@@ -137,30 +143,31 @@ def ejecutar_scraper_rango(inicio, fin):
         if not os.path.exists(jornada_folder): os.makedirs(jornada_folder)
         
         for idx, url in enumerate(partidos, 1):
-            # Obtener nombres de equipos desde la URL para el chequeo de archivo
-            # Formato URL: .../Sevilla-Barcelona-October-5-2025-La-Liga
-            slug = url.split('/')[-1]
-            partes_slug = slug.split('-')
-            eq1_slug = partes_slug[0].lower()
-            eq2_slug = partes_slug[1].lower()
+            # Detección de caché por el prefijo "pX_"
+            prefijo = f"p{idx}_"
+            archivo_existe = any(f.startswith(prefijo) for f in os.listdir(jornada_folder)) if os.path.exists(jornada_folder) else False
             
-            nombre_archivo = f"p{idx}_{eq1_slug}_{eq2_slug}.csv"
-            path_save = os.path.join(jornada_folder, nombre_archivo)
-            
-            # Verificación de existencia antes de llamar a fbref
-            if os.path.exists(path_save):
-                print(f"⏩ Saltando (ya existe): {nombre_archivo}")
+            if archivo_existe:
+                print(f"⏩ Saltando partido {idx} (ya descargado).")
                 continue
 
-            print(f"🔍 Scraping {num_j} - {idx}/10: {eq1_slug} vs {eq2_slug}")
-            df_partido = extraer_desde_fbref(url)
+            print(f"🔍 Descargando {num_j} - Partido {idx}/10...")
+            df_partido, local, visitante = extraer_desde_fbref(url)
             
             if df_partido is not None:
+                # Limpiar nombres de equipos para el nombre de archivo
+                loc_f = re.sub(r'\W+', '', local.replace(' ', '_'))
+                vis_f = re.sub(r'\W+', '', visitante.replace(' ', '_'))
+                
+                nombre_archivo = f"p{idx}_{loc_f}-{vis_f}.csv"
+                path_save = os.path.join(jornada_folder, nombre_archivo)
+                
                 df_partido.to_csv(path_save, index=False, encoding='utf-8-sig')
                 print(f"✅ Guardado: {nombre_archivo}")
-                # Pausa para evitar ban de IP
-                time.sleep(random.uniform(5, 9))
+                
+                # Pausa para evitar baneos
+                time.sleep(random.uniform(5, 10))
 
 if __name__ == "__main__":
-    # Ejemplo: De la jornada 1 a la 38
-    ejecutar_scraper_rango(inicio=1, fin=3)
+    # Define aquí el rango de jornadas (ej: de la 1 a la 8)
+    ejecutar_scraper_rango(inicio=1, fin=2)
