@@ -25,6 +25,9 @@ COLUMNAS_MODELO = [
     'Aerial_won', 'Aerial_lost', 'Aerial_won_pct'
 ]
 
+# lista global para ver jugadores sin match (por ejemplo en P1 y P2)
+JUGADORES_SIN_MATCH = []
+
 scraper = cloudscraper.create_scraper(
     browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True}
 )
@@ -47,10 +50,23 @@ def normalizar_texto(texto):
         if unicodedata.category(c) != 'Mn'
     )
 
+def normalizar_clave_match(s):
+    """
+    Normalización robusta para comparar claves de FBRef y Fantasy:
+    - minúsculas, sin tildes
+    - puntos eliminados
+    - espacios compactados
+    """
+    s = normalizar_texto(s)
+    s = s.replace('.', ' ')
+    s = re.sub(r'\s+', ' ', s).strip()
+    return s
+
 ALIAS_EQUIPOS = {
     "rayo vallecano": "rayo",
     "rayo": "rayo",
-    # añade aquí otros alias si detectas diferencias entre FBRef y FF
+    "villarreal cf": "villarreal",
+    "real oviedo": "oviedo",
 }
 
 def normalizar_equipo(nombre):
@@ -105,7 +121,7 @@ def extraer_puntos_fantasy_jornada(jornada):
     """
     Lee main/html/j{jornada}/puntos.html y devuelve:
       { 'girona-rayo': {...}, 'valencia-las palmas': {...}, ... }
-    Cada dict interno: { nombre_normalizado: {nombre_original, puntos} }.
+    Cada dict interno: { clave_normalizada: {nombre_original, puntos} }.
     """
     path_puntos = os.path.join(BASE_FOLDER_HTML, f"j{jornada}", "puntos.html")
     if not os.path.exists(path_puntos):
@@ -153,11 +169,22 @@ def extraer_puntos_fantasy_jornada(jornada):
                     txt = span_puntos.get_text(strip=True)
                     puntos = int(txt) if txt.lstrip("-").isdigit() else 0
 
-                clave = normalizar_texto(nombre_real)
-                puntos_map[clave] = {
-                    "nombre_original": nombre_real,
-                    "puntos": puntos
-                }
+                # clave normalizada para el match
+                clave_norm = normalizar_clave_match(nombre_real)
+
+                # si hay duplicados de clave (por escrituras distintas), nos quedamos con el valor
+                # de mayor módulo para no machacar puntuaciones altas con 0 o -1
+                if clave_norm in puntos_map:
+                    if abs(puntos) > abs(puntos_map[clave_norm]["puntos"]):
+                        puntos_map[clave_norm] = {
+                            "nombre_original": nombre_real,
+                            "puntos": puntos
+                        }
+                else:
+                    puntos_map[clave_norm] = {
+                        "nombre_original": nombre_real,
+                        "puntos": puntos
+                    }
 
         res[clave_partido] = puntos_map
 
@@ -176,7 +203,7 @@ def obtener_nombres_partido_fbref(html_content):
 
 # ================================ PROCESAR PARTIDO FBREF ================================
 
-def procesar_partido(html_content, puntos_fantasy_dict):
+def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
     soup = BeautifulSoup(html_content, 'lxml')
     scores = soup.find_all('div', class_='score')
     g_l, g_v = (int(scores[0].get_text()), int(scores[1].get_text())) if len(scores) >= 2 else (0, 0)
@@ -188,15 +215,19 @@ def procesar_partido(html_content, puntos_fantasy_dict):
 
     n_l_norm = normalizar_equipo(n_l)
     n_v_norm = normalizar_equipo(n_v)
-    # Debug tanto si Girona es local como si es visitante
-    es_girona_rayo = {'girona', 'rayo'} == {n_l_norm, n_v_norm}
 
-    if es_girona_rayo:
-        print("######## DEBUG GIRONA-RAYO ########")
+    # puntos_fantasy_dict YA viene con claves normalizadas (normalizar_clave_match)
+    puntos_fantasy_match = puntos_fantasy_dict
+
+    # Debug solo para P2
+    es_debug = (idx_partido == 2)
+
+    if es_debug:
+        print("######## DEBUG PARTIDO P2 ########")
         print(f"Título FBRef: '{title}'")
         print(f"Equipos detectados: local='{n_l}' visitante='{n_v}'")
         print("--------- MAPA FANTASY DEL PARTIDO ---------")
-        for k, v in puntos_fantasy_dict.items():
+        for k, v in puntos_fantasy_match.items():
             print(f"  {k} -> ({v['nombre_original']}, {v['puntos']})")
         print("--------------------------------------------")
 
@@ -231,45 +262,71 @@ def procesar_partido(html_content, puntos_fantasy_dict):
                     continue
 
                 fb_norm = normalizar_texto(p_fb)
-                fb_short = fb_norm.split()[-1]
+                partes = fb_norm.split()
+                fb_short = partes[-1] if partes else fb_norm
 
-                # Alias manuales: Isi, Tsygankov, De Frutos
+                # Alias manuales
                 ALIAS_JUGADORES = {
                     'isaac palazon camacho': 'isi',
                     'viktor tsyhankov': 'tsygankov',
                     'jorge de frutos': 'de frutos',
+                    'luiz lucio reis junior': 'luiz junior',
+                    'rahim bonkano': 'alhassane',
                 }
                 if fb_norm in ALIAS_JUGADORES:
                     fb_norm = ALIAS_JUGADORES[fb_norm]
-                    fb_short = fb_norm.split()[-1]
+                    partes = fb_norm.split()
+                    fb_short = partes[-1]
+
+                # --- Construir candidatos en crudo ---
+                candidatos = set()
+                if fb_norm:
+                    candidatos.add(fb_norm)
+                if fb_short:
+                    candidatos.add(fb_short)
+                # penúltimo + último
+                if len(partes) >= 2:
+                    candidatos.add(" ".join(partes[-2:]))
+                # inicial + apellido
+                if len(partes) >= 2:
+                    inicial = partes[0][0]
+                    candidatos.add(f"{inicial} {fb_short}")
+                    candidatos.add(f"{inicial}. {fb_short}")
+                # quitar primer nombre si hay 3+
+                if len(partes) >= 3:
+                    candidatos.add(" ".join(partes[1:]))
+
+                # Normalizar candidatos para compararlos: misma función que en Fantasy
+                candidatos_normm = {normalizar_clave_match(c) for c in candidatos if c}
 
                 n_final, pts_f = p_fb, 0
                 mejor_clave = None
 
-                # 1) match exacto con clave normalizada
-                if fb_norm in puntos_fantasy_dict:
-                    info = puntos_fantasy_dict[fb_norm]
-                    n_final, pts_f = info['nombre_original'], info['puntos']
-                    mejor_clave = fb_norm
+                # 1) match exacto con claves normalizadas
+                for cand_nm in candidatos_normm:
+                    if cand_nm in puntos_fantasy_match:
+                        info = puntos_fantasy_match[cand_nm]
+                        n_final, pts_f = info['nombre_original'], info['puntos']
+                        mejor_clave = cand_nm
+                        break
 
-                # 2) match por apellido corto
-                elif fb_short in puntos_fantasy_dict:
-                    info = puntos_fantasy_dict[fb_short]
-                    n_final, pts_f = info['nombre_original'], info['puntos']
-                    mejor_clave = fb_short
-
-                # 3) fallback prefijo/sufijo
-                else:
-                    for ff_norm, info in puntos_fantasy_dict.items():
-                        if fb_norm.startswith(ff_norm) or ff_norm.startswith(fb_norm):
-                            n_final, pts_f = info['nombre_original'], info['puntos']
-                            mejor_clave = ff_norm
+                # 2) fallback prefijo/sufijo
+                if mejor_clave is None:
+                    for ff_nm, info in puntos_fantasy_match.items():
+                        for cand_nm in candidatos_normm:
+                            if cand_nm and (cand_nm.startswith(ff_nm) or ff_nm.startswith(cand_nm)):
+                                n_final, pts_f = info['nombre_original'], info['puntos']
+                                mejor_clave = ff_nm
+                                break
+                        if mejor_clave is not None:
                             break
 
-                if es_girona_rayo:
+                if es_debug:
                     print(
                         f"DEBUG_MAPEO_JUGADOR: FBREF='{p_fb}' "
                         f"(norm='{fb_norm}', short='{fb_short}') "
+                        f"candidatos={list(candidatos)} "
+                        f"candidatos_normm={list(candidatos_normm)} "
                         f"-> FANTASY='{n_final}' puntos={pts_f} clave_match='{mejor_clave}'"
                     )
 
@@ -296,11 +353,22 @@ def procesar_partido(html_content, puntos_fantasy_dict):
                         pos_val = 'MC'
                     db[n_final]['posicion'] = pos_val
 
-                # Asignar puntos Fantasy si hay match
+                # Asignar puntos Fantasy
                 if mejor_clave is not None:
                     db[n_final]['puntosFantasy'] = pts_f
 
-                # Resto de estadísticas
+                # Guardar sin match (solo los que realmente no encuentran clave)
+                if mejor_clave is None and idx_partido in (1, 2):
+                    JUGADORES_SIN_MATCH.append({
+                        "partido_idx": idx_partido,
+                        "equipo_local": n_l,
+                        "equipo_visitante": n_v,
+                        "nombre_fbref": p_fb,
+                        "fb_norm": fb_norm,
+                        "fb_short": fb_short
+                    })
+
+                # Estadísticas específicas
                 if tipo == 'keepers' and 'GA' in row:
                     db[n_final]['Goles_en_contra'] = limpiar_valor(row['GA'])
 
@@ -309,14 +377,29 @@ def procesar_partido(html_content, puntos_fantasy_dict):
                     if tipo == 'passing' or db[n_final]['Pases_Completados_Pct'] == 0:
                         db[n_final]['Pases_Completados_Pct'] = val_c
 
+                # Mapeos desde todas las tablas (incluida misc)
                 mappings = [
-                    ('Min', 'Min_partido'), ('Gls', 'Gol_partido'), ('Ast', 'Asist_partido'),
-                    ('xG', 'xG_partido'), ('xAG', 'xA_partido'), ('Att', 'Pases_Totales'),
-                    ('CrdY', 'Amarillas'), ('CrdR', 'Rojas'),
-                    ('Tkl', 'Tkl_challenge'), ('Blocks', 'Blocks_total'), ('Clr', 'Clearances'),
-                    ('Succ', 'TakeOn_succ'), ('Won', 'Aerial_won'),
-                    ('Carries', 'Carries_total'), ('TotDist', 'Carries_TotDist'),
-                    ('PrgDist', 'Carries_PrgDist'), ('PrgC', 'Carries_PrgC')
+                    ('Min', 'Min_partido'),
+                    ('Gls', 'Gol_partido'),
+                    ('Ast', 'Asist_partido'),
+                    ('xG', 'xG_partido'),
+                    ('xAG', 'xA_partido'),
+                    ('Sh', 'TiroF_partido'),
+                    ('SoT', 'TiroPuerta_partido'),
+                    ('Att', 'Pases_Totales'),
+                    ('CrdY', 'Amarillas'),
+                    ('CrdR', 'Rojas'),
+                    ('Tkl', 'Tkl_challenge'),
+                    ('Blocks', 'Blocks_total'),
+                    ('Clr', 'Clearances'),
+                    ('Succ', 'TakeOn_succ'),
+                    ('Won', 'Aerial_won'),
+                    ('Lost', 'Aerial_lost'),
+                    ('Won%', 'Aerial_won_pct'),
+                    ('Carries', 'Carries_total'),
+                    ('TotDist', 'Carries_TotDist'),
+                    ('PrgDist', 'Carries_PrgDist'),
+                    ('PrgC', 'Carries_PrgC')
                 ]
                 for fin, fout in mappings:
                     if fin in row:
@@ -328,6 +411,11 @@ def procesar_partido(html_content, puntos_fantasy_dict):
     if not df_final.empty:
         df_final.loc[~df_final['posicion'].isin(['PT', 'DF']), 'Goles_en_contra'] = 0
         df_final.fillna(0, inplace=True)
+
+        # --- ROJA POR DOBLE AMARILLA ---
+        mask_doble_amarilla = df_final['Amarillas'] >= 2
+        df_final.loc[mask_doble_amarilla, 'Rojas'] = 1.0
+
     return df_final, n_l, n_v
 
 # ================================== MAIN ==================================
@@ -347,7 +435,7 @@ def ejecutar_rango(inicio, fin):
         os.makedirs(j_html_dir, exist_ok=True)
         os.makedirs(j_csv_dir, exist_ok=True)
 
-        for idx in range(1, 11):
+        for idx in range(1, 10 + 1):
             path_html = os.path.join(j_html_dir, f"p{idx}.html")
             html_content = ""
 
@@ -377,11 +465,20 @@ def ejecutar_rango(inicio, fin):
             clave_ff = f"{normalizar_equipo(n_l)}-{normalizar_equipo(n_v)}"
             dict_ff = puntos_por_partido.get(clave_ff, {})
 
-            df, loc, vis = procesar_partido(html_content, dict_ff)
+            df, loc, vis = procesar_partido(html_content, dict_ff, idx)
             if df is not None and not df.empty:
                 fname = f"p{idx}_{normalizar_texto(loc)}-{normalizar_texto(vis)}.csv"
                 df.to_csv(os.path.join(j_csv_dir, fname), index=False, encoding='utf-8-sig')
                 print(f"     ✅ CSV generado.")
+
+    # Mostrar jugadores sin match de P1 y P2
+    if JUGADORES_SIN_MATCH:
+        print("\n===== JUGADORES SIN MATCH (P1 y P2) =====")
+        for j in JUGADORES_SIN_MATCH:
+            print(
+                f"[P{j['partido_idx']}] {j['equipo_local']} vs {j['equipo_visitante']} "
+                f"-> FBREF='{j['nombre_fbref']}' (norm='{j['fb_norm']}', short='{j['fb_short']}')"
+            )
 
 if __name__ == "__main__":
     ejecutar_rango(inicio=1, fin=1)
