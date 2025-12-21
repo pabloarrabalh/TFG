@@ -5,204 +5,189 @@ import unicodedata
 import re
 
 ALIAS_EQUIPOS = {
-    "rayo vallecano": "rayo",
-    "rayo": "rayo",
-    "villarreal cf": "villarreal",
-    "villarreal": "villarreal",
-    "real oviedo": "oviedo",
-    "oviedo": "oviedo",
-    "celta vigo": "celta",
-    "celta": "celta",
-    "getafe cf": "getafe",
-    "getafe": "getafe",
-    "alaves": "alavés",
-    "alavés": "alavés",
-    "athletic club": "athletic",
-    "athletic": "athletic",
-    "elche cf": "elche",
-    "elche": "elche",
-    "sevilla fc": "sevilla",
-    "sevilla": "sevilla",
-    "real betis": "betis",
-    "betis": "betis",
-    "levante ud": "levante",
-    "levante": "levante",
-    "osasuna": "osasuna",
-    "espanyol": "espanyol",
-    "esanyol": "espanyol",
-    "atletico": "atletico madrid",
-    "atlético": "atletico madrid",
-    "atletico madrid": "atletico madrid",
-    "atlético madrid": "atletico madrid",
-    "barcelona": "barcelona",
-    "mallorca": "mallorca",
-    "real sociedad": "real sociedad",
-    "valencia": "valencia",
-    "real madrid": "real madrid",
+    "rayo vallecano": "rayo", "villarreal cf": "villarreal", "real oviedo": "oviedo",
+    "celta vigo": "celta", "getafe cf": "getafe", "alaves": "alavés",
+    "athletic club": "athletic", "elche cf": "elche", "sevilla fc": "sevilla",
+    "real betis": "betis", "levante ud": "levante", "atletico": "atletico madrid",
+    "atlético": "atletico madrid", "atletico madrid": "atletico madrid",
 }
+
+ALIAS_JUGADORES = {
+    # Alias problemáticos y variantes con iniciales
+    "a f carreras": "alvaro carreras",
+    "a. f. carreras": "alvaro carreras",
+    "alvaro f carreras": "alvaro carreras",
+    "trent alexander arnold": "alexander arnold",
+    "alexanderarnold": "alexander arnold",
+    "f de jong": "frenkie de jong",
+    "f. de jong": "frenkie de jong",
+    "p gueye": "gueye",
+    "s cardona": "cardona",
+    "javi guerra": "javier guerra",
+    "javier guerra": "javier guerra",
+    "n williams": "nico williams",
+    "n. williams": "nico williams",
+    "i williams": "iñaki williams",
+    "i. williams": "iñaki williams",
+    "leo roman": "leo roman",
+    "joan garcia": "joan garcia",
+    "eric garcia": "eric garcia",
+    "toni martinez": "toni martinez",
+    "carlos vicente": "carlos vicente",
+    "moi gomez": "moi gomez",
+    "unai simon": "unai simon",
+    "stanis idumbo": "stanis idumbo m.",
+    # Añadir más alias según se detecten errores
+}
+
+def normalizar_texto(texto):
+    if not texto: return ""
+    texto = str(texto).lower().strip()
+    texto = ''.join(c for c in unicodedata.normalize('NFD', texto) if unicodedata.category(c) != 'Mn')
+    texto = texto.replace('.', ' ')
+    texto = re.sub(r'[-–—]', '', texto)  # Elimina guiones
+    return re.sub(r'\s+', ' ', texto).strip()
 
 def normalizar_equipo(nombre):
     base = normalizar_texto(nombre)
-    # Aplica alias sobre el texto normalizado y también sobre el texto original
-    return ALIAS_EQUIPOS.get(base, ALIAS_EQUIPOS.get(nombre.lower().strip(), base))
+    return ALIAS_EQUIPOS.get(base, base)
 
-def normalizar_texto(texto):
-    if not texto:
-        return ""
-    texto = str(texto).lower().strip()
-    return ''.join(
-        c for c in unicodedata.normalize('NFD', texto)
-        if unicodedata.category(c) != 'Mn'
-    )
 
-def normalizar_clave_match(s):
-    s = normalizar_texto(s)
-    s = s.replace('.', ' ')
-    s = re.sub(r'\s+', ' ', s).strip()
-    # Aplica alias a cada equipo si es un partido
-    if '-' in s:
-        partes = s.split('-')
-        partes = [normalizar_equipo(p) for p in partes]
-        s = '-'.join(partes)
+# --- UNIFICACIÓN DE CLAVE DE JUGADOR (idéntica a fbref.py) ---
+def clave_jugador(nombre):
+    norm = normalizar_texto(nombre)
+    # Alias primero
+    if norm in ALIAS_JUGADORES:
+        norm = ALIAS_JUGADORES[norm]
+    partes = norm.split()
+    claves = set()
+    if len(partes) == 2:
+        inicial = partes[0][0]
+        apellido = partes[1]
+        claves.add(f"{inicial}-{apellido}")
+        claves.add(f"{inicial}{apellido}")
+        claves.add(f"{partes[0]}{partes[1]}")
+        claves.add(f"{partes[0]} {partes[1]}")
+        claves.add(norm.replace(' ', ''))
+        claves.add(norm)
+        claves.add(partes[0])  # solo nombre
+        claves.add(partes[1])  # solo apellido
+    elif len(partes) == 3:
+        inicial1 = partes[0][0]
+        inicial2 = partes[1][0]
+        apellido = partes[2]
+        claves.add(f"{inicial1}-{inicial2}-{apellido}")
+        claves.add(f"{inicial1}{inicial2}{apellido}")
+        claves.add(f"{partes[0]}{partes[1]}{partes[2]}")
+        claves.add(f"{partes[0]} {partes[1]} {partes[2]}")
+        claves.add(norm.replace(' ', ''))
+        claves.add(norm)
+        claves.add(partes[0])  # solo nombre
+        claves.add(partes[1])  # segundo nombre
+        claves.add(partes[2])  # solo apellido
     else:
-        s = normalizar_equipo(s)
-    return s
+        claves.add(norm)
+        claves.add(norm.replace(' ', ''))
+    return list(claves)
 
 def extraer_puntos_html(path_html):
+    if not os.path.exists(path_html): return {}
     with open(path_html, "r", encoding="utf-8") as f:
-        html = f.read()
-    soup = BeautifulSoup(html, "lxml")
+        soup = BeautifulSoup(f.read(), "lxml")
+    
     puntos_por_partido = {}
     secciones = soup.find_all("section", class_="over fichapartido")
+    
     for seccion in secciones:
         encabezado = seccion.find("header", class_="encabezado-partido")
-        if not encabezado:
-            continue
-        nombre_local = encabezado.select_one(".equipo.local .nombre")
-        nombre_visit = encabezado.select_one(".equipo.visitante .nombre")
-        if not nombre_local or not nombre_visit:
-            continue
-        n_l = nombre_local.get_text(strip=True)
-        n_v = nombre_visit.get_text(strip=True)
-        clave_partido = f"{normalizar_clave_match(n_l)}-{normalizar_clave_match(n_v)}"
-        puntos = {}
-        tablas = seccion.select("table.tablestats")
-        for tabla in tablas:
-            filas = tabla.select("tbody tr.plegado")
-            for fila in filas:
+        if not encabezado: continue
+        
+        n_l = normalizar_equipo(encabezado.select_one(".equipo.local .nombre").get_text())
+        n_v = normalizar_equipo(encabezado.select_one(".equipo.visitante .nombre").get_text())
+        clave_partido = f"{n_l}-{n_v}"
+        
+        puntos_partido = {}
+        # Buscamos las tablas de puntos. Suele haber 2 por sección (local y visitante)
+        tablas = seccion.find_all("table", class_="tablestats")
+        
+        for i, tabla in enumerate(tablas):
+            # En la mayoría de estructuras, la primera tabla es local y la segunda visitante
+            # O intentamos buscar un ancestro que nos diga el equipo
+            parent_box = tabla.find_parent("div", class_=["box-estadisticas", "equipo-stats"])
+            if parent_box:
+                equipo_actual = n_l if "local" in parent_box.get("class", []) else n_v
+            else:
+                equipo_actual = n_l if i == 0 else n_v
+
+            for fila in tabla.select("tbody tr.plegado"):
                 td_name = fila.find("td", class_="name")
-                if not td_name:
-                    continue
-                nombre_real = td_name.get_text(" ", strip=True)
-                nombre_real = nombre_real.replace("+", "").replace("-", "").strip()
-                nombre_real = re.sub(r"\s\d+'?$", "", nombre_real).strip()
-                clave_norm = normalizar_clave_match(nombre_real)
-                # Extrae el valor de la columna de puntos de laliga-fantasy (la primera span con class 'laliga-fantasy')
-                puntos_val = None
-                span_laliga = fila.select_one("span.racha-box.laliga-fantasy")
-                if span_laliga:
-                    txt = span_laliga.get_text(strip=True)
-                    try:
-                        puntos_val = int(float(txt))
-                    except:
-                        puntos_val = 0
-                else:
-                    puntos_val = 0
-                puntos[clave_norm] = puntos_val
-        puntos_por_partido[clave_partido] = puntos
+                span_pts = fila.select_one("span.laliga-fantasy")
+                if not td_name or not span_pts: continue
+                
+                txt_pts = span_pts.get_text(strip=True)
+                # FILTRO CLAVE: Si es '-' o '–', ignoramos al jugador completamente
+                if txt_pts in ["-", "–", ""]: continue
+                
+
+
+                nombre_raw = re.sub(r"\s\d+'?$", "", td_name.get_text(" ", strip=True).replace("+", "").replace("-", "")).strip()
+                claves_generadas = list(clave_jugador(nombre_raw))
+                print(f"[DEBUG-HTML] {equipo_actual}|{nombre_raw} -> {claves_generadas}")
+                for clave_j in claves_generadas:
+                    clave = f"{equipo_actual}|{clave_j}"
+                    puntos_partido[clave] = int(float(txt_pts))
+                        
+        puntos_por_partido[clave_partido] = puntos_partido
     return puntos_por_partido
 
 def extraer_puntos_csv(path_csv):
     df = pd.read_csv(path_csv)
-    puntos = {}
-    for _, row in df.iterrows():
-        nombre = normalizar_clave_match(row['player'])
-        puntos_val = int(float(row['puntosFantasy'])) if not pd.isna(row['puntosFantasy']) else 0
-        puntos[nombre] = puntos_val
-    return puntos
-
-def comparar_puntos(puntos_html, puntos_csv):
-    resultados = {}
-    for nombre, puntos in puntos_html.items():
-        if nombre in puntos_csv:
-            if puntos == puntos_csv[nombre]:
-                resultados[nombre] = f'HTML: {puntos} ---- CSV: {puntos_csv[nombre]} 🟩'
-            else:
-                resultados[nombre] = f'HTML: {puntos} ---- CSV: {puntos_csv[nombre]}'
-        else:
-            resultados[nombre] = f'HTML: {puntos} ---- CSV: -'
-    for nombre, puntos in puntos_csv.items():
-        if nombre not in puntos_html:
-            resultados[nombre] = f'HTML: - ---- CSV: {puntos}'
-    return resultados
+    res = {}
+    for _, r in df.iterrows():
+        if pd.isna(r['puntosFantasy']):
+            continue
+        equipo = normalizar_equipo(r['Equipo_propio'])
+        claves_generadas = list(clave_jugador(r['player']))
+        print(f"[DEBUG-CSV] {equipo}|{r['player']} -> {claves_generadas}")
+        for clave_j in claves_generadas:
+            clave = f"{equipo}|{clave_j}"
+            res[clave] = int(float(r['puntosFantasy']))
+    return res
 
 if __name__ == "__main__":
-    # Configura los paths de los partidos a comparar
     path_html = os.path.join('main', 'html', 'j1', 'puntos.html')
-    # Busca todos los CSVs de la jornada 1 automáticamente
     csv_dir = os.path.join('data', 'temporada_25_26', 'jornada_1')
-    path_csvs = [os.path.join(csv_dir, f) for f in os.listdir(csv_dir) if f.endswith('.csv')]
+    
+    puntos_html_todo = extraer_puntos_html(path_html)
+    csv_files = [f for f in os.listdir(csv_dir) if f.endswith('.csv')]
 
-    puntos_html_por_partido = extraer_puntos_html(path_html)
-    print("\nClaves de partido extraídas de puntos.html:")
-    for k in puntos_html_por_partido.keys():
-        print(f"  - {k}")
+    for f_name in csv_files:
+        match = re.search(r'p\d+_(.+)-(.+)\.csv', f_name)
+        if not match: continue
+        
+        eq1, eq2 = normalizar_equipo(match.group(1)), normalizar_equipo(match.group(2))
+        clave_partido = f"{eq1}-{eq2}"
+        
+        print(f'\n=== PARTIDO: {clave_partido} ===')
+        puntos_csv = extraer_puntos_csv(os.path.join(csv_dir, f_name))
+        puntos_html = puntos_html_todo.get(clave_partido) or puntos_html_todo.get(f"{eq2}-{eq1}")
 
-    for path_csv in path_csvs:
-        nombre_csv = os.path.basename(path_csv)
-        # Detecta el partido por el nombre del archivo CSV y normaliza
-        partido_csv_raw = nombre_csv.replace('.csv', '').replace('p', '').replace('_', '-').replace('--', '-')
-        partes = partido_csv_raw.split('-')
-        if len(partes) >= 2:
-            eq1 = normalizar_clave_match(partes[1])
-            eq2 = normalizar_clave_match(partes[2]) if len(partes) > 2 else ''
-            clave_csv = f"{eq1}-{eq2}"
-        else:
-            clave_csv = normalizar_clave_match(partido_csv_raw)
-
-        print(f'\n=== Comparando partido: {clave_csv} ===')
-        puntos_csv = extraer_puntos_csv(path_csv)
-
-        # Busca el partido correspondiente en puntos_html_por_partido
-        puntos_html = puntos_html_por_partido.get(clave_csv)
-        clave_usada = clave_csv
-        if puntos_html is None:
-            # Busca por substring en ambas direcciones
-            for k in puntos_html_por_partido.keys():
-                if clave_csv in k or k in clave_csv:
-                    puntos_html = puntos_html_por_partido[k]
-                    clave_usada = k
-                    print(f"Usando clave de partido por substring: {k}")
-                    break
-
-        if puntos_html is None:
-            print('No se encontró el partido en puntos.html para este CSV.')
+        if not puntos_html:
+            print(f"❌ No se encontró el partido en el HTML.")
             continue
 
-        resultados = comparar_puntos(puntos_html, puntos_csv)
-
-        # Si el CSV tiene columna 'posicion', ordena por posición
-        try:
-            df = pd.read_csv(path_csv)
-            orden_pos = ['PT', 'DF', 'MC', 'DT']
-            df['nombre_norm'] = df['player'].apply(normalizar_clave_match)
-            df['posicion'] = df['posicion'].fillna('')
-            df['posicion'] = df['posicion'].str.upper()
-            df = df[df['nombre_norm'].isin(resultados.keys())]
-            df['estado'] = df['nombre_norm'].map(resultados)
-            df = df.sort_values(by=['posicion'], key=lambda x: x.map({v: i for i, v in enumerate(orden_pos)}).fillna(99))
-            for _, row in df.iterrows():
-                print(f"{row['nombre_norm']} ({row['posicion']}): {row['estado']}")
-        except Exception as e:
-            for nombre, estado in resultados.items():
-                print(f'{nombre}: {estado}')
-
-        # Mostrar discrepancias al final del partido
-        discrepancias = []
-        for nombre, estado in resultados.items():
-            if '🟩' not in estado:
-                discrepancias.append(f"{nombre}: {estado}")
-        print(f"Discrepancias: {len(discrepancias)} 🟥")
-        if discrepancias:
-            for d in discrepancias:
-                print(d)
+        errores = 0
+        # Normalizar claves para comparación (sin guiones ni espacios)
+        def norm_clave(c):
+            return c.replace('-', '').replace(' ', '').lower()
+        claves_html_norm = {norm_clave(k): v for k, v in puntos_html.items()}
+        for clave, val_csv in puntos_csv.items():
+            n_clave = norm_clave(clave)
+            val_html = claves_html_norm.get(n_clave)
+            if val_html is None:
+                print(f"❓ {clave}: No está en HTML (pero sí en CSV)")
+                errores += 1
+            elif val_html != val_csv:
+                print(f"🟥 {clave}: HTML({val_html}) != CSV({val_csv})")
+                errores += 1
+        print(f"Total errores: {errores}")
