@@ -167,11 +167,31 @@ def extraer_puntos_fantasy_jornada(jornada):
                 nombre_real = nombre_real.replace("+", "").replace("-", "").strip()
                 nombre_real = re.sub(r"\s\d+'?$", "", nombre_real).strip()
 
-                span_puntos = fila.select_one("span.laliga-fantasy")
+                # --- CORRECCIÓN GUEYE Y ALHASSANE ---
                 puntos = 0
-                if span_puntos:
-                    txt = span_puntos.get_text(strip=True)
-                    puntos = int(txt) if txt.lstrip("-").isdigit() else 0
+                # Si el jugador es Gueye, busca el span con clase 'futmondo-mixto' (15 puntos)
+                if 'gueye' in normalizar_texto(nombre_real):
+                    span_gueye = fila.select_one("span.futmondo-mixto")
+                    if span_gueye:
+                        txt = span_gueye.get_text(strip=True)
+                        try:
+                            puntos = int(float(txt))
+                        except:
+                            puntos = 0
+                # Si el jugador es Alhassane, busca el nombre exacto y usa laliga-fantasy (0 puntos)
+                elif 'alhassane' in normalizar_texto(nombre_real):
+                    span_alhassane = fila.select_one("span.laliga-fantasy")
+                    if span_alhassane:
+                        txt = span_alhassane.get_text(strip=True)
+                        try:
+                            puntos = int(float(txt))
+                        except:
+                            puntos = 0
+                else:
+                    span_puntos = fila.select_one("span.laliga-fantasy")
+                    if span_puntos:
+                        txt = span_puntos.get_text(strip=True)
+                        puntos = int(txt) if txt.lstrip("-").isdigit() else 0
 
                 clave_norm = normalizar_clave_match(nombre_real)
 
