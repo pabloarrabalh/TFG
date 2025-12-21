@@ -5,6 +5,7 @@ from io import StringIO
 from bs4 import BeautifulSoup
 import cloudscraper
 
+
 # --- CONFIGURACIÓN ---
 pd.set_option('display.max_columns', None)
 BASE_FOLDER_HTML = os.path.join("main", "html")
@@ -16,16 +17,15 @@ os.makedirs(BASE_FOLDER_CSV, exist_ok=True)
 COLUMNAS_MODELO = [
     'player', 'posicion', 'Equipo_propio', 'Equipo_rival', 'Titular',
     'Min_partido', 'Gol_partido', 'Asist_partido', 'xG_partido', 'xA_partido',
-    'TiroF_partido', 'TiroPuerta_partido', 'Pases_Totales', 'Pases_Completados_Pct',
+    'TiroFallado_partido', 'TiroPuerta_partido', 'Pases_Totales', 'Pases_Completados_Pct',
     'Amarillas', 'Rojas', 'Goles_en_contra', 'puntosFantasy',
-    'Tkl_challenge', 'Att_challenge', 'Tkl_pct_challenge', 'Lost_challenge',
-    'Blocks_total', 'Blocks_sh', 'Blocks_pass', 'Clearances',
-    'TakeOn_att', 'TakeOn_succ', 'TakeOn_tkld',
-    'Carries_total', 'Carries_TotDist', 'Carries_PrgDist', 'Carries_PrgC',
-    'Aerial_won', 'Aerial_lost', 'Aerial_won_pct'
+    'Entradas', 'Duelos', 'DuelosGanados', 'DuelosPerdidos',
+    'Bloqueos', 'BloqueoTiros', 'BloqueoPase', 'Despejes',
+    'Regates', 'RegatesCompletados', 'RegatesFallidos',
+    'Conducciones', 'DistanciaConduccion', 'MetrosAvanzadosConduccion', 'ConduccionesProgresivas',
+    'DuelosAereosGanados', 'DuelosAereosPerdidos', 'DuelosAereosGanadosPct'
 ]
 
-# lista global para ver jugadores sin match (por ejemplo en P1 y P2)
 JUGADORES_SIN_MATCH = []
 
 scraper = cloudscraper.create_scraper(
@@ -73,7 +73,7 @@ def normalizar_equipo(nombre):
     base = normalizar_texto(nombre)
     return ALIAS_EQUIPOS.get(base, base)
 
-def limpiar_valor(val):
+def limpiar_float(val):
     if isinstance(val, pd.Series):
         val = val.iloc[0]
     if pd.isna(val) or val == "" or val == "-":
@@ -83,6 +83,9 @@ def limpiar_valor(val):
         return float(s_val)
     except:
         return 0.0
+
+def limpiar_int(val):
+    return int(round(limpiar_float(val)))
 
 def obtener_calendario_local_o_remoto():
     path_local = "calendario.html"
@@ -172,8 +175,7 @@ def extraer_puntos_fantasy_jornada(jornada):
                 # clave normalizada para el match
                 clave_norm = normalizar_clave_match(nombre_real)
 
-                # si hay duplicados de clave (por escrituras distintas), nos quedamos con el valor
-                # de mayor módulo para no machacar puntuaciones altas con 0 o -1
+                # si hay duplicados de clave, nos quedamos con el valor de mayor módulo
                 if clave_norm in puntos_map:
                     if abs(puntos) > abs(puntos_map[clave_norm]["puntos"]):
                         puntos_map[clave_norm] = {
@@ -213,23 +215,11 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
     except:
         n_l, n_v = "Local", "Visitante"
 
-    n_l_norm = normalizar_equipo(n_l)
-    n_v_norm = normalizar_equipo(n_v)
-
     # puntos_fantasy_dict YA viene con claves normalizadas (normalizar_clave_match)
     puntos_fantasy_match = puntos_fantasy_dict
 
     # Debug solo para P2
     es_debug = (idx_partido == 2)
-
-    if es_debug:
-        print("######## DEBUG PARTIDO P2 ########")
-        print(f"Título FBRef: '{title}'")
-        print(f"Equipos detectados: local='{n_l}' visitante='{n_v}'")
-        print("--------- MAPA FANTASY DEL PARTIDO ---------")
-        for k, v in puntos_fantasy_match.items():
-            print(f"  {k} -> ({v['nombre_original']}, {v['puntos']})")
-        print("--------------------------------------------")
 
     lineup_divs = soup.find_all('div', class_='lineup')
     titulares_nombres = []
@@ -240,175 +230,207 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
 
     equipo_local_nombres = [a.get_text().strip() for a in lineup_divs[0].find_all('a')] if lineup_divs else []
 
-    db = {}
-    tipos = ['summary', 'passing', 'defense', 'possession', 'misc', 'keepers']
-
-    for tipo in tipos:
-        html_t = soup.find_all('table', id=re.compile(f"stats_.*_{tipo}"))
-        for table_obj in html_t:
+    # Leer todas las tablas una vez, por tipo
+    tablas_por_tipo = {}
+    for tipo in ['summary', 'passing', 'defense', 'possession', 'misc', 'keepers']:
+        dic = {}
+        for table_obj in soup.find_all('table', id=re.compile(f"stats_.*_{tipo}")):
             df_raw = pd.read_html(StringIO(str(table_obj)))[0]
             df_raw.columns = [
                 str(col).split(',')[-1].strip(" ()'").replace(' ', '')
                 for col in df_raw.columns.get_level_values(-1)
             ]
-
             for _, row in df_raw.iterrows():
                 p_fb = re.sub(r'\s\(.*\)', '', str(row['Player'])).strip()
-
                 if (
                     p_fb in ['nan', 'Player', 'Total', 'Players'] or
                     re.match(r'^\d+\s+Players$', p_fb)
                 ):
                     continue
+                dic[p_fb] = row
+        tablas_por_tipo[tipo] = dic
 
-                fb_norm = normalizar_texto(p_fb)
-                partes = fb_norm.split()
-                fb_short = partes[-1] if partes else fb_norm
+    db = {}
 
-                # Alias manuales
-                ALIAS_JUGADORES = {
-                    'isaac palazon camacho': 'isi',
-                    'viktor tsyhankov': 'tsygankov',
-                    'jorge de frutos': 'de frutos',
-                    'luiz lucio reis junior': 'luiz junior',
-                    'rahim bonkano': 'alhassane',
-                }
-                if fb_norm in ALIAS_JUGADORES:
-                    fb_norm = ALIAS_JUGADORES[fb_norm]
-                    partes = fb_norm.split()
-                    fb_short = partes[-1]
+    # Recorremos jugadores según summary (todos los que han jugado)
+    for p_fb, row_sum in tablas_por_tipo.get('summary', {}).items():
+        fb_norm = normalizar_texto(p_fb)
+        partes = fb_norm.split()
+        fb_short = partes[-1] if partes else fb_norm
 
-                # --- Construir candidatos en crudo ---
-                candidatos = set()
-                if fb_norm:
-                    candidatos.add(fb_norm)
-                if fb_short:
-                    candidatos.add(fb_short)
-                # penúltimo + último
-                if len(partes) >= 2:
-                    candidatos.add(" ".join(partes[-2:]))
-                # inicial + apellido
-                if len(partes) >= 2:
-                    inicial = partes[0][0]
-                    candidatos.add(f"{inicial} {fb_short}")
-                    candidatos.add(f"{inicial}. {fb_short}")
-                # quitar primer nombre si hay 3+
-                if len(partes) >= 3:
-                    candidatos.add(" ".join(partes[1:]))
+        # Alias manuales
+        ALIAS_JUGADORES = {
+            'isaac palazon camacho': 'isi',
+            'viktor tsyhankov': 'tsygankov',
+            'jorge de frutos': 'de frutos',
+            'luiz lucio reis junior': 'luiz junior',
+            'rahim bonkano': 'alhassane',
+        }
+        if fb_norm in ALIAS_JUGADORES:
+            fb_norm = ALIAS_JUGADORES[fb_norm]
+            partes = fb_norm.split()
+            fb_short = partes[-1]
 
-                # Normalizar candidatos para compararlos: misma función que en Fantasy
-                candidatos_normm = {normalizar_clave_match(c) for c in candidatos if c}
+        # --- Construir candidatos en crudo ---
+        candidatos = set()
+        if fb_norm:
+            candidatos.add(fb_norm)
+        if fb_short:
+            candidatos.add(fb_short)
+        # penúltimo + último
+        if len(partes) >= 2:
+            candidatos.add(" ".join(partes[-2:]))
+        # inicial + apellido
+        if len(partes) >= 2:
+            inicial = partes[0][0]
+            candidatos.add(f"{inicial} {fb_short}")
+            candidatos.add(f"{inicial}. {fb_short}")
+        # quitar primer nombre si hay 3+
+        if len(partes) >= 3:
+            candidatos.add(" ".join(partes[1:]))
 
-                n_final, pts_f = p_fb, 0
-                mejor_clave = None
+        # Normalizar candidatos para compararlos: misma función que en Fantasy
+        candidatos_normm = {normalizar_clave_match(c) for c in candidatos if c}
 
-                # 1) match exacto con claves normalizadas
+        n_final, pts_f = p_fb, 0
+        mejor_clave = None
+
+        # 1) match exacto con claves normalizadas
+        for cand_nm in candidatos_normm:
+            if cand_nm in puntos_fantasy_match:
+                info = puntos_fantasy_match[cand_nm]
+                n_final, pts_f = info['nombre_original'], info['puntos']
+                mejor_clave = cand_nm
+                break
+
+        # 2) fallback prefijo/sufijo
+        if mejor_clave is None:
+            for ff_nm, info in puntos_fantasy_match.items():
                 for cand_nm in candidatos_normm:
-                    if cand_nm in puntos_fantasy_match:
-                        info = puntos_fantasy_match[cand_nm]
+                    if cand_nm and (cand_nm.startswith(ff_nm) or ff_nm.startswith(cand_nm)):
                         n_final, pts_f = info['nombre_original'], info['puntos']
-                        mejor_clave = cand_nm
+                        mejor_clave = ff_nm
                         break
-
-                # 2) fallback prefijo/sufijo
-                if mejor_clave is None:
-                    for ff_nm, info in puntos_fantasy_match.items():
-                        for cand_nm in candidatos_normm:
-                            if cand_nm and (cand_nm.startswith(ff_nm) or ff_nm.startswith(cand_nm)):
-                                n_final, pts_f = info['nombre_original'], info['puntos']
-                                mejor_clave = ff_nm
-                                break
-                        if mejor_clave is not None:
-                            break
-
-                if es_debug:
-                    print(
-                        f"DEBUG_MAPEO_JUGADOR: FBREF='{p_fb}' "
-                        f"(norm='{fb_norm}', short='{fb_short}') "
-                        f"candidatos={list(candidatos)} "
-                        f"candidatos_normm={list(candidatos_normm)} "
-                        f"-> FANTASY='{n_final}' puntos={pts_f} clave_match='{mejor_clave}'"
-                    )
-
-                # Crear entrada si no existe
-                if n_final not in db:
-                    es_local = p_fb in equipo_local_nombres
-                    db[n_final] = {c: 0 for c in COLUMNAS_MODELO}
-                    db[n_final].update({
-                        'player': n_final,
-                        'Equipo_propio': n_l if es_local else n_v,
-                        'Equipo_rival': n_v if es_local else n_l,
-                        'Titular': 1 if p_fb in titulares_nombres else 0,
-                        'Goles_en_contra': g_v if es_local else g_l
-                    })
-
-                    pos_raw = str(row.get('Pos', 'MC')).split(',')[0].strip().upper()
-                    if pos_raw in ['GK']:
-                        pos_val = 'PT'
-                    elif pos_raw in ['DF', 'RB', 'LB', 'CB']:
-                        pos_val = 'DF'
-                    elif pos_raw in ['FW', 'RW', 'LW']:
-                        pos_val = 'DT'
-                    else:
-                        pos_val = 'MC'
-                    db[n_final]['posicion'] = pos_val
-
-                # Asignar puntos Fantasy
                 if mejor_clave is not None:
-                    db[n_final]['puntosFantasy'] = pts_f
+                    break
 
-                # Guardar sin match (solo los que realmente no encuentran clave)
-                if mejor_clave is None and idx_partido in (1, 2):
-                    JUGADORES_SIN_MATCH.append({
-                        "partido_idx": idx_partido,
-                        "equipo_local": n_l,
-                        "equipo_visitante": n_v,
-                        "nombre_fbref": p_fb,
-                        "fb_norm": fb_norm,
-                        "fb_short": fb_short
-                    })
+        if es_debug:
+            print(
+                f"DEBUG_MAPEO_JUGADOR: FBREF='{p_fb}' "
+                f"(norm='{fb_norm}', short='{fb_short}') "
+                f"candidatos={list(candidatos)} "
+                f"candidatos_normm={list(candidatos_normm)} "
+                f"-> FANTASY='{n_final}' puntos={pts_f} clave_match='{mejor_clave}'"
+            )
 
-                # Estadísticas específicas
-                if tipo == 'keepers' and 'GA' in row:
-                    db[n_final]['Goles_en_contra'] = limpiar_valor(row['GA'])
+        # Crear entrada si no existe
+        if n_final not in db:
+            es_local = p_fb in equipo_local_nombres
+            db[n_final] = {c: 0 for c in COLUMNAS_MODELO}
+            db[n_final].update({
+                'player': n_final,
+                'Equipo_propio': n_l if es_local else n_v,
+                'Equipo_rival': n_v if es_local else n_l,
+                'Titular': 1 if p_fb in titulares_nombres else 0,
+                'Goles_en_contra': g_v if es_local else g_l
+            })
 
-                if 'Cmp%' in row:
-                    val_c = limpiar_valor(row['Cmp%'])
-                    if tipo == 'passing' or db[n_final]['Pases_Completados_Pct'] == 0:
-                        db[n_final]['Pases_Completados_Pct'] = val_c
+            pos_raw = str(row_sum.get('Pos', 'MC')).split(',')[0].strip().upper()
+            if pos_raw in ['GK']:
+                pos_val = 'PT'
+            elif pos_raw in ['DF', 'RB', 'LB', 'CB']:
+                pos_val = 'DF'
+            elif pos_raw in ['FW', 'RW', 'LW']:
+                pos_val = 'DT'
+            else:
+                pos_val = 'MC'
+            db[n_final]['posicion'] = pos_val
 
-                # Mapeos desde todas las tablas (incluida misc)
-                mappings = [
-                    ('Min', 'Min_partido'),
-                    ('Gls', 'Gol_partido'),
-                    ('Ast', 'Asist_partido'),
-                    ('xG', 'xG_partido'),
-                    ('xAG', 'xA_partido'),
-                    ('Sh', 'TiroF_partido'),
-                    ('SoT', 'TiroPuerta_partido'),
-                    ('Att', 'Pases_Totales'),
-                    ('CrdY', 'Amarillas'),
-                    ('CrdR', 'Rojas'),
-                    ('Tkl', 'Tkl_challenge'),
-                    ('Blocks', 'Blocks_total'),
-                    ('Clr', 'Clearances'),
-                    ('Succ', 'TakeOn_succ'),
-                    ('Won', 'Aerial_won'),
-                    ('Lost', 'Aerial_lost'),
-                    ('Won%', 'Aerial_won_pct'),
-                    ('Carries', 'Carries_total'),
-                    ('TotDist', 'Carries_TotDist'),
-                    ('PrgDist', 'Carries_PrgDist'),
-                    ('PrgC', 'Carries_PrgC')
-                ]
-                for fin, fout in mappings:
-                    if fin in row:
-                        val = limpiar_valor(row[fin])
-                        if val > float(db[n_final][fout]):
-                            db[n_final][fout] = val
+        # SUMMARY (Performance)
+        db[n_final]['Min_partido'] = limpiar_int(row_sum.get('Min', 0))
+        db[n_final]['Gol_partido'] = limpiar_float(row_sum.get('Gls', 0))
+        db[n_final]['Asist_partido'] = limpiar_float(row_sum.get('Ast', 0))
+        db[n_final]['xG_partido'] = limpiar_float(row_sum.get('xG', 0))
+        db[n_final]['xA_partido'] = limpiar_float(row_sum.get('xAG', 0))
+
+        sh_total = limpiar_float(row_sum.get('Sh', 0))
+        sot = limpiar_float(row_sum.get('SoT', 0))
+        tiros_fallados = max(sh_total - sot, 0)
+
+        db[n_final]['TiroFallado_partido'] = tiros_fallados
+        db[n_final]['TiroPuerta_partido'] = sot
+
+        # PASSING (principal) + fallback SUMMARY
+        cmp_pct = 0.0
+        row_pas = tablas_por_tipo.get('passing', {}).get(p_fb)
+        if row_pas is not None:
+            db[n_final]['Pases_Totales'] = limpiar_int(row_pas.get('Att', 0))
+            if 'Cmp%' in row_pas:
+                cmp_pct = limpiar_float(row_pas['Cmp%'])
+        # si no hay dato en passing, intentamos summary
+        if cmp_pct == 0.0 and 'Cmp%' in row_sum:
+            cmp_pct = limpiar_float(row_sum['Cmp%'])
+        db[n_final]['Pases_Completados_Pct'] = cmp_pct
+
+        # DEFENSE -> Challenges + Blocks
+        row_def = tablas_por_tipo.get('defense', {}).get(p_fb)
+        if row_def is not None:
+            # Challenges
+            db[n_final]['Entradas'] = limpiar_float(row_def.get('Tkl', 0))
+            db[n_final]['Duelos'] = limpiar_float(row_def.get('Att', 0))
+            db[n_final]['DuelosGanados'] = limpiar_float(row_def.get('Tkl%', 0))
+            db[n_final]['DuelosPerdidos'] = limpiar_float(row_def.get('Lost', 0))
+            # Blocks
+            db[n_final]['Bloqueos'] = limpiar_float(row_def.get('Blocks', 0))
+            db[n_final]['BloqueoTiros'] = limpiar_float(row_def.get('Sh', 0))
+            db[n_final]['BloqueoPase'] = limpiar_float(row_def.get('Pass', 0))
+            db[n_final]['Despejes'] = limpiar_float(row_def.get('Clr', 0))
+
+        # POSSESSION -> Take-ons + Carries
+        row_poss = tablas_por_tipo.get('possession', {}).get(p_fb)
+        if row_poss is not None:
+            # Take-ons
+            db[n_final]['Regates'] = limpiar_float(row_poss.get('Att', 0))
+            db[n_final]['RegatesCompletados'] = limpiar_float(row_poss.get('Succ', 0))
+            db[n_final]['RegatesFallidos'] = limpiar_float(row_poss.get('Tkld', 0))
+            # Carries
+            db[n_final]['Conducciones'] = limpiar_float(row_poss.get('Carries', 0))
+            db[n_final]['DistanciaConduccion'] = limpiar_float(row_poss.get('TotDist', 0))
+            db[n_final]['MetrosAvanzadosConduccion'] = limpiar_float(row_poss.get('PrgDist', 0))
+            db[n_final]['ConduccionesProgresivas'] = limpiar_float(row_poss.get('PrgC', 0))
+
+        # MISC -> tarjetas + duelos aéreos
+        row_misc = tablas_por_tipo.get('misc', {}).get(p_fb)
+        if row_misc is not None:
+            db[n_final]['Amarillas'] = limpiar_float(row_misc.get('CrdY', 0))
+            db[n_final]['Rojas'] = limpiar_float(row_misc.get('CrdR', 0))
+            db[n_final]['DuelosAereosGanados'] = limpiar_float(row_misc.get('Won', 0))
+            db[n_final]['DuelosAereosPerdidos'] = limpiar_float(row_misc.get('Lost', 0))
+            db[n_final]['DuelosAereosGanadosPct'] = limpiar_float(row_misc.get('Won%', 0))
+
+        # KEEPERS -> GA solo para porteros
+        row_keep = tablas_por_tipo.get('keepers', {}).get(p_fb)
+        if row_keep is not None:
+            db[n_final]['Goles_en_contra'] = limpiar_float(row_keep.get('GA', 0))
+
+        # puntos Fantasy
+        if mejor_clave is not None:
+            db[n_final]['puntosFantasy'] = pts_f
+
+        # Guardar sin match (solo los que realmente no encuentran clave)
+        if mejor_clave is None and idx_partido in (1, 2):
+            JUGADORES_SIN_MATCH.append({
+                "partido_idx": idx_partido,
+                "equipo_local": n_l,
+                "equipo_visitante": n_v,
+                "nombre_fbref": p_fb,
+                "fb_norm": fb_norm,
+                "fb_short": fb_short
+            })
 
     df_final = pd.DataFrame.from_dict(db, orient='index')
     if not df_final.empty:
+        # Goles en contra solo para PT y DF
         df_final.loc[~df_final['posicion'].isin(['PT', 'DF']), 'Goles_en_contra'] = 0
         df_final.fillna(0, inplace=True)
 
