@@ -1,23 +1,30 @@
-import pandas as pd
-import os, re
-import unicodedata
+# scrapper_fbref.py
+import os
+import re
 from io import StringIO
+
+import pandas as pd
 from bs4 import BeautifulSoup
 import cloudscraper
-from rapidfuzz import process, fuzz  # RapidFuzz
 
+from commons import (
+    ALIAS_EQUIPOS,
+    ALIAS_JUGADORES,
+    normalizar_texto,
+    normalizar_equipo,
+    aplicar_alias,
+)
 
-# ================== CONFIGURACIÓN ==================
+from rapidfuzz import process, fuzz  # solo para intentar_match si quieres mantenerlo
 
 
 pd.set_option('display.max_columns', None)
+
 BASE_FOLDER_HTML = os.path.join("main", "html")
 BASE_FOLDER_CSV = os.path.join("data", "temporada_25_26")
 
-
 os.makedirs(BASE_FOLDER_HTML, exist_ok=True)
 os.makedirs(BASE_FOLDER_CSV, exist_ok=True)
-
 
 COLUMNAS_MODELO = [
     'player', 'posicion', 'Equipo_propio', 'Equipo_rival', 'Titular',
@@ -31,19 +38,13 @@ COLUMNAS_MODELO = [
     'DuelosAereosGanados', 'DuelosAereosPerdidos', 'DuelosAereosGanadosPct'
 ]
 
-
 JUGADORES_SIN_MATCH = []
 
-
-UMBRAL_MATCH = 80.0  # umbral base [web:50]
-
+UMBRAL_MATCH = 80.0
 
 scraper = cloudscraper.create_scraper(
     browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True}
 )
-
-
-# ================== UTILIDADES ==================
 
 
 def get_headers():
@@ -56,102 +57,6 @@ def get_headers():
         "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
         "Referer": "https://www.google.com/"
     }
-
-
-def normalizar_texto(texto):
-    if not texto:
-        return ""
-    texto = str(texto).lower().strip()
-    return ''.join(
-        c for c in unicodedata.normalize('NFD', texto)
-        if unicodedata.category(c) != 'Mn'
-    )
-
-
-# Alias equipos
-ALIAS_EQUIPOS = {
-    "rayo vallecano": "rayo",
-    "villarreal cf": "villarreal",
-    "real oviedo": "oviedo",
-    "celta vigo": "celta",
-    "alaves": "alaves",
-    "alavés": "alaves",
-    "athletic club": "athletic",
-    "elche cf": "elche",
-    "sevilla fc": "sevilla",
-    "real betis": "betis",
-    "atlético": "atletico madrid",
-    "atletico": "atletico madrid",
-}
-
-
-def normalizar_equipo(nombre):
-    base = normalizar_texto(nombre)
-    return ALIAS_EQUIPOS.get(base, base)
-
-
-# Alias jugadores (apodos, nombres cortos)
-ALIAS_JUGADORES = {
-            # Osasuna: Raúl García y Rubén García
-            "raul garcia": "raul garcia",
-            "r. garcia": "raul garcia",
-            "rubén garcia": "ruben garcia",
-            "ruben garcia": "ruben garcia",
-            "rubén": "ruben garcia",
-            "ruben": "ruben garcia",
-            # Mallorca: Antonio Raíllo y Antonio Sánchez
-            "antonio raillo": "antonio raillo",
-            "a. raillo": "antonio raillo",
-            "raillo": "antonio raillo",
-            "antonio sanchez": "antonio sanchez",
-            "a. sanchez": "antonio sanchez",
-            "sanchez": "antonio sanchez",
-            # Elche: Álvaro Rodríguez y Álvaro Núñez
-            "alvaro rodriguez": "alvaro rodriguez",
-            "a. rodriguez": "alvaro rodriguez",
-            "alvaro nunez": "alvaro nunez",
-            "a. nunez": "alvaro nunez",
-            # Por defecto, si solo pone "antonio" o "alvaro", no asignar a ninguno
-            "antonio": "",  # fuerza a no asignar si es ambiguo
-            "alvaro": "",
-        # Hermanos Williams (Athletic)
-        "n. williams": "nico williams",
-        "nico williams": "nico williams",
-        "i. williams": "inaki williams",
-        "iñaki williams": "inaki williams",
-        "inaki williams": "inaki williams",
-        "williams": "nico williams",  # por defecto, el más común
-        # Raúl García (Osasuna)
-        "raul garcia": "raul garcia",
-        "r. garcia": "raul garcia",
-        # Alvaro Rodríguez (Elche)
-        "alvaro r.": "alvaro rodriguez",
-        "alvaro r": "alvaro rodriguez",
-    "isaac palazon camacho": "isi palazon",
-    "isaac palazon": "isi palazon",
-    "isi palazon": "isi palazon",
-    "cristian portugues manzanera": "portu",
-    "cristian portugues": "portu",
-    "jose luis garcia vaya": "pepelu",
-    "jose luis garcia": "pepelu",
-    "ezequiel avila": "chimy avila",
-    "chimy avila": "chimy avila",
-    # Desambiguación Mallorca
-    "antonio raillo": "antonio raillo",
-    "antonio sanchez": "antonio sanchez",
-    "raillo": "antonio raillo",
-    "antonio": "antonio sanchez",  # por defecto, el más común
-    # Desambiguación Barcelona
-    "eric garcia": "eric garcia",
-    "sergi garcia": "sergi garcia",
-    "garcia": "eric garcia",  # por defecto, el más común
-    # Desambiguación Elche
-    "alvaro rodriguez": "alvaro rodriguez",
-    "alvaro": "alvaro rodriguez",
-    # Desambiguación Levante
-    "pablo martinez": "pablo martinez",
-    "pablo": "pablo martinez",  # por defecto
-}
 
 
 def limpiar_float(val):
@@ -170,9 +75,6 @@ def limpiar_int(val):
     return int(round(limpiar_float(val)))
 
 
-# ================== CALENDARIO FBREF ==================
-
-
 def obtener_calendario_local_o_remoto():
     path_local = "calendario.html"
     if os.path.exists(path_local):
@@ -186,13 +88,11 @@ def obtener_calendario_local_o_remoto():
         except:
             return {}
 
-
     soup = BeautifulSoup(html, 'lxml')
     calendario = {}
     tabla = soup.find('table', {'id': re.compile('sched')})
     if not tabla:
         return {}
-
 
     for row in tabla.find_all('tr'):
         wk = row.find('th', {'data-stat': 'gameweek'})
@@ -205,38 +105,29 @@ def obtener_calendario_local_o_remoto():
     return calendario
 
 
-# ================== PUNTOS FANTASY (puntos.html) ==================
-
-
 def extraer_puntos_fantasy_jornada(jornada):
     path_puntos = os.path.join(BASE_FOLDER_HTML, f"j{jornada}", "puntos.html")
     if not os.path.exists(path_puntos):
         print(f"     ⚠️ No se encuentra puntos.html en j{jornada}")
         return {}
 
-
     with open(path_puntos, "r", encoding="utf-8") as f:
         html = f.read()
-
 
     soup = BeautifulSoup(html, "lxml")
     res = {}
 
-
     secciones = soup.find_all("section", class_="over fichapartido")
-
 
     for seccion in secciones:
         encabezado = seccion.find("header", class_="encabezado-partido")
         if not encabezado:
             continue
 
-
         nombre_local = encabezado.select_one(".equipo.local .nombre")
         nombre_visit = encabezado.select_one(".equipo.visitante .nombre")
         if not nombre_local or not nombre_visit:
             continue
-
 
         n_l = nombre_local.get_text(strip=True)
         n_v = nombre_visit.get_text(strip=True)
@@ -244,26 +135,21 @@ def extraer_puntos_fantasy_jornada(jornada):
         n_v_norm = normalizar_equipo(n_v)
         clave_partido = f"{n_l_norm}-{n_v_norm}"
 
-
         puntos_map = {}
-
 
         tablas = seccion.select("table.tablestats")
         for i, tabla in enumerate(tablas):
             filas = tabla.select("tbody tr.plegado")
             equipo_tabla_norm = n_l_norm if i == 0 else n_v_norm
 
-
             for fila in filas:
                 td_name = fila.find("td", class_="name")
                 if not td_name:
                     continue
 
-
                 nombre_real = td_name.get_text(" ", strip=True)
                 nombre_real = nombre_real.replace("+", "").replace("-", "").strip()
                 nombre_real = re.sub(r"\s\d+'?$", "", nombre_real).strip()
-
 
                 puntos = 0
                 span_puntos = fila.select_one("span.laliga-fantasy")
@@ -274,19 +160,16 @@ def extraer_puntos_fantasy_jornada(jornada):
                     except:
                         puntos = 0
 
-
                 equipo_norm = equipo_tabla_norm
                 clave_ff = f"{equipo_norm}|{nombre_real}"
 
-
                 info_jugador = {
                     "nombre_original": nombre_real,
-                    "nombre_norm": normalizar_texto(nombre_real),
+                    "nombre_norm": aplicar_alias(nombre_real),
                     "puntos": puntos,
                     "equipo": equipo_tabla_norm,
                     "equipo_norm": equipo_norm,
                 }
-
 
                 if clave_ff in puntos_map:
                     if abs(puntos) > abs(puntos_map[clave_ff]["puntos"]):
@@ -294,14 +177,9 @@ def extraer_puntos_fantasy_jornada(jornada):
                 else:
                     puntos_map[clave_ff] = info_jugador
 
-
         res[clave_partido] = puntos_map
 
-
     return res
-
-
-# ================== AUXILIAR: NOMBRES PARTIDO FBREF ==================
 
 
 def obtener_nombres_partido_fbref(html_content):
@@ -314,9 +192,6 @@ def obtener_nombres_partido_fbref(html_content):
     return n_l, n_v
 
 
-# ================== PROCESAR PARTIDO ==================
-
-
 def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
     soup = BeautifulSoup(html_content, 'lxml')
     title = soup.find('title').get_text() if soup.find('title') else "Match"
@@ -325,15 +200,11 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
     except:
         n_l, n_v = "Local", "Visitante"
 
-
     n_l_norm = normalizar_equipo(n_l)
     n_v_norm = normalizar_equipo(n_v)
 
+    puntos_fantasy_match = puntos_fantasy_dict
 
-    puntos_fantasy_match = puntos_fantasy_dict  # clave_ff -> info
-
-
-    # Alineaciones
     lineup_divs = soup.find_all('div', class_='lineup')
     titulares_nombres = []
     if lineup_divs:
@@ -341,11 +212,8 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
             titulares_partido = [a.get_text().strip() for a in div.find_all('a')][:11]
             titulares_nombres.extend(titulares_partido)
 
-
     equipo_local_nombres = [a.get_text().strip() for a in lineup_divs[0].find_all('a')] if lineup_divs else []
 
-
-    # Tablas FBRef por tipo
     tablas_por_tipo = {}
     for tipo in ['summary', 'passing', 'defense', 'possession', 'misc', 'keepers']:
         dic = {}
@@ -354,19 +222,16 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
         else:
             table_objs = soup.find_all('table', id=re.compile(f"stats_.*_{tipo}"))
 
-
         for table_obj in table_objs:
             try:
                 df_raw = pd.read_html(StringIO(str(table_obj)))[0]
             except Exception:
                 continue
 
-
             df_raw.columns = [
                 str(col).split(',')[-1].strip(" ()'").replace(' ', '')
                 for col in df_raw.columns.get_level_values(-1)
             ]
-
 
             for _, row in df_raw.iterrows():
                 nombre_raw = re.sub(r'\s\(.*\)', '', str(row['Player'])).strip()
@@ -375,39 +240,26 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
                     re.match(r'^\d+\s+Players$', nombre_raw)
                 ):
                     continue
-                clave_fb = normalizar_texto(nombre_raw)
+                clave_fb = aplicar_alias(nombre_raw)
                 dic[clave_fb] = row
-
 
         tablas_por_tipo[tipo] = dic
 
-
-    # ========= FASE 1: Propuestas de match (texto normalizado, 3 variantes + alias + Williams) =========
-
-
     propuestas_match = []
-
 
     for clave_fb, row_sum in tablas_por_tipo.get('summary', {}).items():
         p_fb = str(row_sum.get('Player', '')).strip()
-
-
-        fb_norm_original = normalizar_texto(p_fb)
-        fb_norm = ALIAS_JUGADORES.get(fb_norm_original, fb_norm_original)  # aplicar alias
-
+        fb_norm = aplicar_alias(p_fb)
 
         partes_fb_norm = fb_norm.split()
         primer_nombre = partes_fb_norm[0] if partes_fb_norm else fb_norm
         ultimo_apellido = partes_fb_norm[-1] if len(partes_fb_norm) >= 2 else ""
-
 
         if len(partes_fb_norm) >= 2:
             nombre_apellido = f"{primer_nombre} {ultimo_apellido}"
         else:
             nombre_apellido = fb_norm
 
-
-        # display especial Williams
         es_williams = fb_norm.endswith('williams')
         nombre_csv_especial = None
         if es_williams:
@@ -417,10 +269,8 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
                 apellido_disp = partes_nombre[-1].capitalize()
                 nombre_csv_especial = f"{inicial}. {apellido_disp}"
 
-
         es_local = p_fb in equipo_local_nombres
         equipo_fb = n_l_norm if es_local else n_v_norm
-
 
         min_fb = limpiar_int(row_sum.get('Min', 0))
         pos_raw = str(row_sum.get('Pos', 'MC')).split(',')[0].strip().upper()
@@ -433,23 +283,18 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
         else:
             pos_val = 'MC'
 
-
-        # candidatos Fantasy del equipo
         candidatos_equipo = {
             k: info for k, info in puntos_fantasy_match.items()
             if info.get("equipo_norm") == equipo_fb
         }
         nombres_ff_norm = [info["nombre_norm"] for info in candidatos_equipo.values()]
 
-
-        # --- CASO ESPECIAL HERMANOS WILLIAMS ---
         inicial_williams = None
         if ultimo_apellido == "williams" and len(partes_fb_norm) >= 1:
-            inicial_williams = partes_fb_norm[0][0]  # n / i (nico / inaki)
+            inicial_williams = partes_fb_norm[0][0]
 
         best_name_norm = None
         best_score = 0.0
-
 
         def intentar_match(cadena, current_best_name, current_best_score):
             if not nombres_ff_norm:
@@ -462,10 +307,8 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
             )
             if not matches:
                 return current_best_name, current_best_score, []
-            # Si hay más de un jugador con ese nombre/apellido en el equipo, solo aceptar si el match es exactamente igual
             posibles = [n for n in nombres_ff_norm if n == cadena]
             if len(posibles) > 1:
-                # Ambigüedad: solo aceptar si el match es exactamente igual
                 cand, score, _ = matches[0]
                 if cand == cadena and score == 100:
                     return cand, score, matches
@@ -477,60 +320,48 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
                     return cand, score, matches
                 else:
                     return current_best_name, current_best_score, matches
-            # Refuerzo: si la cadena es inicial+apellido (ej. "n. williams", "a. r."), solo aceptar si hay match exacto
             if re.match(r"^[a-z]\.[ ]?[a-z]+$", cadena):
                 cand, score, _ = matches[0]
                 if cand == cadena and score == 100:
                     return cand, score, matches
                 else:
                     return current_best_name, current_best_score, matches
-            # Si no hay ambigüedad, usar el mejor match
             cand, score, _ = matches[0]
             if score > current_best_score:
                 return cand, score, matches
             return current_best_name, current_best_score, matches
 
-
         matches_usados = []
 
-
-        # 0) match específico para Williams: "N. Williams"/"I. Williams"
         if inicial_williams:
             cadena_w = f"{inicial_williams}. williams"
             best_name_norm, best_score, matches_usados = intentar_match(
                 cadena_w, best_name_norm, best_score
             )
 
-        # 1) nombre completo normalizado (con alias)
         if best_score < UMBRAL_MATCH:
             best_name_norm, best_score, matches_usados = intentar_match(
                 fb_norm, best_name_norm, best_score
             )
-        # 2) nombre + apellido
         if best_score < UMBRAL_MATCH and nombre_apellido:
             best_name_norm, best_score, matches_usados = intentar_match(
                 nombre_apellido, best_name_norm, best_score
             )
-        # 3) solo apellido
         if best_score < UMBRAL_MATCH and ultimo_apellido:
             best_name_norm, best_score, matches_usados = intentar_match(
                 ultimo_apellido, best_name_norm, best_score
             )
 
-
         if best_score < UMBRAL_MATCH:
             best_name_norm = None
             best_score = 0.0
 
-
-        # traducir nombre_norm ganador a nombre_original
         best_name_original = None
         if best_name_norm is not None:
             for info in candidatos_equipo.values():
                 if info["nombre_norm"] == best_name_norm:
                     best_name_original = info["nombre_original"]
                     break
-
 
         propuestas_match.append({
             "clave_fb": clave_fb,
@@ -546,10 +377,6 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
             "row_sum": row_sum,
         })
 
-
-    # ========= FASE 2: Resolver conflictos por nombre =========
-
-
     fantasy_por_nombre_norm = {}
     for k_ff, info in puntos_fantasy_match.items():
         nombre_norm = info["nombre_norm"]
@@ -559,9 +386,7 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
             "info": info,
         })
 
-
     asignacion_fb_a_ff = {}
-
 
     propuestas_por_nombre_norm = {}
     for prop in propuestas_match:
@@ -571,26 +396,18 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
             continue
         propuestas_por_nombre_norm.setdefault(nombre_norm, []).append(prop)
 
-
     for nombre_norm, props in propuestas_por_nombre_norm.items():
         candidatos_ff = fantasy_por_nombre_norm.get(nombre_norm, [])
         if not candidatos_ff:
             continue
 
-
         props_ordenadas = sorted(props, key=lambda p: p["min_fb"], reverse=True)
         cands_ordenados = sorted(candidatos_ff, key=lambda x: x["puntos"], reverse=True)
-
 
         for prop, cand in zip(props_ordenadas, cands_ordenados):
             asignacion_fb_a_ff[prop["clave_fb"]] = cand["clave_ff"]
 
-
-    # ========= FASE 3: Construir db =========
-
-
     db = {}
-
 
     for prop in propuestas_match:
         clave_fb = prop["clave_fb"]
@@ -602,15 +419,11 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
         nombre_csv_especial = prop["nombre_csv_especial"]
         row_sum = prop["row_sum"]
 
-
         equipo_rival = n_v_norm if equipo_fb == n_l_norm else n_l_norm
-
 
         clave_db = f"{fb_norm}|{equipo_fb}|{min_fb}|{pos_val}"
 
-
         nombre_csv = nombre_csv_especial if nombre_csv_especial else p_fb
-
 
         if clave_db not in db:
             db[clave_db] = {c: 0 for c in COLUMNAS_MODELO}
@@ -625,22 +438,17 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
                 'posicion': pos_val,
             })
 
-
-        # SUMMARY
         db[clave_db]['Min_partido'] = min_fb
         db[clave_db]['Gol_partido'] = limpiar_float(row_sum.get('Gls', 0))
         db[clave_db]['Asist_partido'] = limpiar_float(row_sum.get('Ast', 0))
         db[clave_db]['xG_partido'] = limpiar_float(row_sum.get('xG', 0))
         db[clave_db]['xA_partido'] = limpiar_float(row_sum.get('xAG', 0))
 
-
         sh_total = limpiar_float(row_sum.get('Sh', 0))
         sot = limpiar_float(row_sum.get('SoT', 0))
         db[clave_db]['TiroFallado_partido'] = max(sh_total - sot, 0)
         db[clave_db]['TiroPuerta_partido'] = sot
 
-
-        # PASSING
         row_pas = tablas_por_tipo.get('passing', {}).get(clave_fb)
         cmp_pct = 0.0
         if row_pas is not None:
@@ -651,8 +459,6 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
             cmp_pct = limpiar_float(row_sum['Cmp%'])
         db[clave_db]['Pases_Completados_Pct'] = cmp_pct
 
-
-        # DEFENSE
         row_def = tablas_por_tipo.get('defense', {}).get(clave_fb)
         if row_def is not None:
             db[clave_db]['Entradas'] = limpiar_float(row_def.get('Tkl', 0))
@@ -664,8 +470,6 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
             db[clave_db]['BloqueoPase'] = limpiar_float(row_def.get('Pass', 0))
             db[clave_db]['Despejes'] = limpiar_float(row_def.get('Clr', 0))
 
-
-        # POSSESSION
         row_poss = tablas_por_tipo.get('possession', {}).get(clave_fb)
         if row_poss is not None:
             db[clave_db]['Regates'] = limpiar_float(row_poss.get('Att', 0))
@@ -676,8 +480,6 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
             db[clave_db]['MetrosAvanzadosConduccion'] = limpiar_float(row_poss.get('PrgDist', 0))
             db[clave_db]['ConduccionesProgresivas'] = limpiar_float(row_poss.get('PrgC', 0))
 
-
-        # MISC
         row_misc = tablas_por_tipo.get('misc', {}).get(clave_fb)
         if row_misc is not None:
             db[clave_db]['Amarillas'] = limpiar_float(row_misc.get('CrdY', 0))
@@ -686,8 +488,6 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
             db[clave_db]['DuelosAereosPerdidos'] = limpiar_float(row_misc.get('Lost', 0))
             db[clave_db]['DuelosAereosGanadosPct'] = limpiar_float(row_misc.get('Won%', 0))
 
-
-        # PORTEROS
         if pos_val == 'PT':
             keepers_dict = tablas_por_tipo.get('keepers', {})
             row_keep = keepers_dict.get(clave_fb)
@@ -703,14 +503,11 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
                 db[clave_db]['Porcentaje_paradas'] = sv_val
                 db[clave_db]['PSxG'] = psxg_val
 
-
-        # PUNTOS FANTASY
         clave_ff_asignada = asignacion_fb_a_ff.get(clave_fb)
         if clave_ff_asignada is not None:
             db[clave_db]['puntosFantasy'] = puntos_fantasy_match[clave_ff_asignada]['puntos']
         else:
             db[clave_db]['puntosFantasy'] = 0
-
 
         if clave_ff_asignada is None and idx_partido in (1, 2, 3):
             JUGADORES_SIN_MATCH.append({
@@ -721,7 +518,6 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
                 "fb_norm": fb_norm,
             })
 
-
     df_final = pd.DataFrame.from_dict(db, orient='index')
     if not df_final.empty:
         if 'Equipo_propio' in df_final.columns:
@@ -729,76 +525,63 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
         if 'Equipo_rival' in df_final.columns:
             df_final['Equipo_rival'] = df_final['Equipo_rival'].apply(normalizar_equipo)
 
-
         mask_no_gk = df_final['posicion'] != 'PT'
         df_final.loc[mask_no_gk, 'Goles_en_contra'] = 0.0
         df_final.loc[mask_no_gk, 'Porcentaje_paradas'] = 0.0
         df_final.fillna(0, inplace=True)
 
-
         mask_doble_amarilla = df_final['Amarillas'] >= 2
         df_final.loc[mask_doble_amarilla, 'Rojas'] = 1.0
 
-
     return df_final, n_l, n_v
-
-
-# ================== MAIN ==================
 
 
 def ejecutar_rango(inicio, fin):
     print("🚀 INICIANDO SISTEMA...")
     calendario = obtener_calendario_local_o_remoto()
 
-
     for j_val in range(inicio, fin + 1):
         num_j = str(j_val)
         print(f"\n--- JORNADA {num_j} ---")
 
-
         puntos_por_partido = extraer_puntos_fantasy_jornada(num_j)
-
 
         j_html_dir = os.path.join(BASE_FOLDER_HTML, f"j{j_val}")
         j_csv_dir = os.path.join(BASE_FOLDER_CSV, f"jornada_{num_j}")
         os.makedirs(j_html_dir, exist_ok=True)
         os.makedirs(j_csv_dir, exist_ok=True)
 
-
         jugadores_sin_match_jornada = []
-
 
         for idx in range(1, 11):
             path_html = os.path.join(j_html_dir, f"p{idx}.html")
             if not os.path.exists(path_html):
                 continue
 
-
             print(f"     📂 [P{idx}] Usando local: {path_html}")
             with open(path_html, "r", encoding="utf-8") as f:
                 html_content = f.read()
-
 
             n_l, n_v = obtener_nombres_partido_fbref(html_content)
             n_l_norm = normalizar_equipo(n_l)
             n_v_norm = normalizar_equipo(n_v)
             clave_ff_partido = f"{n_l_norm}-{n_v_norm}"
-            print(f"     [LOG] P{idx}: n_l='{n_l}' n_v='{n_v}' | n_l_norm='{n_l_norm}' n_v_norm='{n_v_norm}' | clave_ff='{clave_ff_partido}'")
-
 
             dict_ff = puntos_por_partido.get(clave_ff_partido, {})
-
 
             global JUGADORES_SIN_MATCH
             JUGADORES_SIN_MATCH = []
             df, loc, vis = procesar_partido(html_content, dict_ff, idx)
 
-
             if df is not None and not df.empty:
                 fname = f"p{idx}_{normalizar_texto(loc)}-{normalizar_texto(vis)}.csv"
                 df.to_csv(os.path.join(j_csv_dir, fname), index=False, encoding='utf-8-sig')
                 print("     ✅ CSV generado.")
+            df_cero = df[df['puntosFantasy'] == 0]
 
+            if not df_cero.empty:
+                for _, row in df_cero.iterrows():
+                    print(f"         - {row['player']}  -> 0 puntos")
 
             if JUGADORES_SIN_MATCH:
                 jugadores_sin_match_jornada.extend(JUGADORES_SIN_MATCH)
@@ -806,3 +589,12 @@ def ejecutar_rango(inicio, fin):
 
 if __name__ == "__main__":
     ejecutar_rango(inicio=1, fin=1)
+
+    if JUGADORES_SIN_MATCH:
+        print("\n[LOG] Jugadores que han quedado sin match en ninguna asignación de puntos:")
+        print("PARTIDO_IDX | EQUIPO_LOCAL | EQUIPO_VISITANTE | NOMBRE_FBREF | FB_NORM")
+        print("-" * 80)
+        for j in JUGADORES_SIN_MATCH:
+            print(f"{j['partido_idx']} | {j['equipo_local']} | {j['equipo_visitante']} | {j['nombre_fbref']} | {j['fb_norm']}")
+    else:
+        print("\n[LOG] Todos los jugadores han sido asignados correctamente.")
