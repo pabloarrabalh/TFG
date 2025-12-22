@@ -274,5 +274,66 @@ def comprobar_jornada(num_jornada):
     path_csv_dir = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
     return comprobar_jornada_paths(path_html, path_csv_dir)
 
+
+# Comparar un partido específico de forma detallada
+def comparar_partido(num_jornada, num_partido):
+    id_partido = f"p{num_partido}"
+    etiqueta_jornada = f"j{num_jornada}"
+    path_html = os.path.join("main", "html", etiqueta_jornada, "puntos.html")
+    csv_dir = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
+    
+    # Buscar el archivo CSV que corresponde al número de partido
+    try:
+        archivos = os.listdir(csv_dir)
+        archivo_csv = next((f for f in archivos if f.startswith(f"{id_partido}_")), None)
+    except FileNotFoundError:
+        print(f"No se encuentra la carpeta: {csv_dir}")
+        return
+
+    if not archivo_csv:
+        print(f"No se encontró el archivo CSV para el partido {id_partido}")
+        return
+
+    # Extraer equipos del nombre del archivo para filtrar el HTML
+    m = re.search(r"p\d+_(.+)-(.+)\.csv", archivo_csv)
+    eq1 = normalizar_equipo(m.group(1))
+    eq2 = normalizar_equipo(m.group(2))
+    
+    # Cargar datos del CSV y del HTML
+    df_partido = pd.read_csv(os.path.join(csv_dir, archivo_csv))
+    df_partido["player_norm"] = df_partido["player"].apply(lambda x: normalizar_texto(aplicar_alias(x)))
+    
+    puntos_html_todo = scrapping(path_html)
+    jugadores_html = puntos_html_todo.get(f"{eq1}-{eq2}") or puntos_html_todo.get(f"{eq2}-{eq1}")
+
+    if not jugadores_html:
+        print(f"No hay datos en el HTML para el enfrentamiento: {eq1} vs {eq2}")
+        return
+
+    # Cabecera de la tabla comparativa
+    print(f"\n--- COMPARATIVA JORNADA {num_jornada} | PARTIDO {id_partido} ({eq1}-{eq2}) ---")
+    print(f"{'JUGADOR':<25} | {'EQUIPO':<15} | {'HTML':<5} | {'CSV':<5} | {'ESTADO'}")
+    print("-" * 80)
+
+    for equipo_html_raw, nombre_html, puntos_html in jugadores_html:
+        nombre_html_norm = normalizar_texto(aplicar_alias(nombre_html))
+        
+        # Intentar encontrar al jugador en el CSV del partido
+        nombres_csv = df_partido["player_norm"].tolist()
+        match_norm, score = obtener_match_nombre(nombre_html_norm, nombres_csv)
+        
+        puntos_csv = "-"
+        estado = "❓ No existe"
+        
+        if match_norm and score >= 85:
+            fila = df_partido[df_partido["player_norm"] == match_norm].iloc[0]
+            puntos_csv = normalizar_puntos(fila["puntosFantasy"])
+            estado = "✅ OK" if puntos_csv == puntos_html else "❌ ERROR"
+
+        # Imprimir fila con anchos fijos para que parezca una tabla
+        print(f"{nombre_html[:25]:<25} | {equipo_html_raw[:15]:<15} | {puntos_html:<5} | {puntos_csv:<5} | {estado}")
+
+
 if __name__ == "__main__":
-    comprobar_jornada(1)
+    #comprobar_jornada(1)
+    comparar_partido(1,2)
