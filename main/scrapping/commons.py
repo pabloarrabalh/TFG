@@ -1,172 +1,140 @@
 # commons.py
 import unicodedata
 import re
-
 from rapidfuzz import process, fuzz
 
+# ==========================================
+# CONFIGURACIÓN Y DICCIONARIOS
+# ==========================================
 
-# Alias equipos (compartido)
 ALIAS_EQUIPOS = {
-    "rayo vallecano": "rayo",
-    "villarreal cf": "villarreal",
-    "real oviedo": "oviedo",
-    "celta vigo": "celta",
-    "getafe cf": "getafe",
-    "alaves": "alaves",
-    "alavés": "alaves",
-    "athletic club": "athletic",
-    "elche cf": "elche",
-    "sevilla fc": "sevilla",
-    "real betis": "betis",
-    "levante ud": "levante",
-    "atlético": "atletico madrid",
-    "atletico": "atletico madrid",
+    "rayo vallecano": "rayo", "villarreal cf": "villarreal", "real oviedo": "oviedo",
+    "celta vigo": "celta", "getafe cf": "getafe", "alaves": "alaves",
+    "alavés": "alaves", "athletic club": "athletic", "elche cf": "elche",
+    "sevilla fc": "sevilla", "real betis": "betis", "levante ud": "levante",
+    "atlético": "atletico madrid", "atletico": "atletico madrid",
     "atletico madrid": "atletico madrid",
 }
 
-
-# Alias jugadores unificado (scrapper + testing)
 ALIAS_JUGADORES = {
-    # Osasuna: Raúl García y Rubén García
-    "raul garcia": "raul garcia",
-    "r. garcia": "raul garcia",
-    "r garcia": "raul garcia",
-    "rubén garcia": "ruben garcia",
-    "ruben garcia": "ruben garcia",
-    "rubén": "ruben garcia",
-    "ruben": "ruben garcia",
-
-    # Mallorca: Antonio Raíllo y Antonio Sánchez
-    "antonio raillo": "antonio raillo",
-    "a. raillo": "antonio raillo",
-    "a raillo": "antonio raillo",
-    "raillo": "antonio raillo",
-    "antonio sanchez": "antonio sanchez",
-    "a. sanchez": "antonio sanchez",
-    "a sanchez": "antonio sanchez",
-    "sanchez": "antonio sanchez",
-
-    # Elche: Álvaro Rodríguez y Álvaro Núñez
-    "alvaro rodriguez": "alvaro rodriguez",
-    "a. rodriguez": "alvaro rodriguez",
-    "a rodriguez": "alvaro rodriguez",
-    "alvaro nunez": "alvaro nunez",
-    "a. nunez": "alvaro nunez",
-    "a nunez": "alvaro nunez",
-
-    # Criterio “por defecto” para nombres sueltos
-    "antonio": "antonio sanchez",
-    "alvaro": "alvaro rodriguez",
-
-    # Hermanos Williams (Athletic)
-    "n. williams": "nico williams",
-    "n williams": "nico williams",
-    "nico williams": "nico williams",
-    "i. williams": "inaki williams",
-    "i williams": "inaki williams",
-    "iñaki williams": "inaki williams",
-    "inaki williams": "inaki williams",
-    "williams": "nico williams",
-
-    # Otros alias “originales”
     "isaac palazon camacho": "isi palazon",
-    "isaac palazon": "isi palazon",
-    "isi palazon": "isi palazon",
-    "cristian portugues manzanera": "portu",
-    "cristian portugues": "portu",
     "jose luis garcia vaya": "pepelu",
-    "jose luis garcia": "pepelu",
     "ezequiel avila": "chimy avila",
-    "chimy avila": "chimy avila",
-
-    # Desambiguación Barcelona
-    "eric garcia": "eric garcia",
-    "sergi garcia": "sergi garcia",
-    "garcia": "eric garcia",
-
-    # Desambiguación Levante
-    "pablo martinez": "pablo martinez",
-    "pablo": "pablo martinez",
-
-    # Alias extra del módulo de testing
-    "tsygankov": "viktor tsyhankov",
-    "s cardona": "sergi cardona",
-    "p gueye": "pape gueye",
-    "elabdellaoui": "el abdellaoui",
-    "sorloth": "alexander sorloth",
-    "caletacar": "caleta car",
     "cunat campos": "pablo cunat",
     "alhassane": "rahim bonkano",
-    "a f carreras": "alvaro carreras",
+    "tsygankov": "viktor tsyhankov",
+    "elabdellaoui": "el abdellaoui",
+    "caletacar": "caleta car",
     "alexanderarnold": "trent alexander arnold",
 }
 
+# Lista de apellidos que sabemos que causan colisiones de hermanos o nombres comunes
+APELLIDOS_CRITICOS = {"williams", "garcia", "rodriguez", "gonzalez", "hernandez"}
 
-APELLIDOS_AMBIGUOS = {"garcia", "williams", "alvaro"}
-
+# ==========================================
+# FUNCIONES DE NORMALIZACIÓN
+# ==========================================
 
 def normalizar_texto(texto):
-    """
-    Normalización común:
-    - str + lower + strip
-    - quita tildes (NFD)
-    - sustituye '.' y guiones por espacios
-    - compacta espacios
-    """
-    if not texto:
-        return ""
+    if not texto: return ""
     texto = str(texto).lower().strip()
-    texto = ''.join(
-        c for c in unicodedata.normalize('NFD', texto)
-        if unicodedata.category(c) != 'Mn'
-    )
+    texto = ''.join(c for c in unicodedata.normalize('NFD', texto) if unicodedata.category(c) != 'Mn')
     texto = texto.replace('.', ' ')
     texto = re.sub(r'[-–—]', ' ', texto)
-    texto = re.sub(r'\s+', ' ', texto).strip()
-    return texto
-
+    return re.sub(r'\s+', ' ', texto).strip()
 
 def normalizar_equipo(nombre_equipo):
-    nombre_normalizado = normalizar_texto(nombre_equipo)
-    return ALIAS_EQUIPOS.get(nombre_normalizado, nombre_normalizado)
-
+    nombre_norm = normalizar_texto(nombre_equipo)
+    return ALIAS_EQUIPOS.get(nombre_norm, nombre_norm)
 
 def aplicar_alias(nombre_jugador):
-    nombre_normalizado = normalizar_texto(nombre_jugador)
-    return ALIAS_JUGADORES.get(nombre_normalizado, nombre_normalizado)
-
+    nombre_norm = normalizar_texto(nombre_jugador)
+    return ALIAS_JUGADORES.get(nombre_norm, nombre_norm)
 
 def normalizar_puntos(valor):
-    if valor in ["-", "–", "", None]:
-        return 0
-    try:
-        return int(float(valor))
-    except Exception:
-        return valor
+    if valor in ["-", "–", "", None]: return 0
+    try: return int(float(valor))
+    except: return valor
 
+# ==========================================
+# GESTIÓN DE CASOS CRÍTICOS (HERMANOS WILLIAMS, ETC.)
+# ==========================================
 
-def es_apellido_ambiguo(nombre_html_norm, nombres_norm_equipo):
+def manejar_caso_especifico(nombre_html_norm, candidatos):
+    """
+    Desempata casos donde el apellido es igual pero la inicial es distinta.
+    """
     tokens = nombre_html_norm.split()
-    return (
-        len(tokens) == 1
-        and tokens[0] in APELLIDOS_AMBIGUOS
-        and sum(n.startswith(tokens[0]) for n in nombres_norm_equipo) > 1
-    )
+    if not tokens: return None, 0
+    
+    # Tomamos la primera letra de la búsqueda (la inicial)
+    inicial_buscada = tokens[0][0] 
 
+    for cand in candidatos:
+        # Buscamos qué candidato real empieza por esa letra
+        if cand.startswith(inicial_buscada):
+            return cand, 100
+            
+    return candidatos[0], 60
 
-def obtener_match_nombre(nombre_html_norm, nombres_norm_equipo, score_cutoff=85):
+def coincide_por_iniciales(nombre_corto, nombre_largo):
     """
-    Helper común para RapidFuzz (comprobador más cómodo).
+    Valida estructuralmente si las iniciales de uno encajan en el otro.
     """
+    tokens_c = nombre_corto.split()
+    tokens_l = nombre_largo.split()
+    
+    if len(tokens_c) < 2 or len(tokens_c) > len(tokens_l): 
+        return False
+    
+    if tokens_c[-1] not in tokens_l: 
+        return False
+
+    for i in range(len(tokens_c) - 1):
+        if not tokens_l[i].startswith(tokens_c[i]):
+            return False
+    return True
+
+# ==========================================
+# FUNCIÓN MAESTRA DE MATCHING
+# ==========================================
+
+def obtener_match_nombre(nombre_html_raw, nombres_norm_equipo, score_cutoff=85):
     if not nombres_norm_equipo:
         return None, 0
+
+    # 1. Normalización y Alias
+    nombre_html_norm = normalizar_texto(nombre_html_raw)
+    nombre_html_norm = aplicar_alias(nombre_html_norm)
+
+    # Limpieza extra para el proceso de tokens
+    nombre_html_norm = nombre_html_norm.replace('.', ' ').strip()
+    nombre_html_norm = re.sub(r'\s+', ' ', nombre_html_norm)
+    tokens = nombre_html_norm.split()
+
+    # 2. PARCHE QUIRÚRGICO PARA WILLIAMS (Y otros con inicial)
+    # Si detectamos una inicial (ej: "n williams") y el apellido es crítico
+    if len(tokens) >= 2 and len(tokens[0]) == 1:
+        apellido_buscado = tokens[-1]
+        if apellido_buscado in APELLIDOS_CRITICOS:
+            candidatos_posibles = [n for n in nombres_norm_equipo if coincide_por_iniciales(nombre_html_norm, n)]
+            if candidatos_posibles:
+                # Si encontramos match por inicial, devolvemos y cortamos aquí
+                return manejar_caso_especifico(nombre_html_norm, candidatos_posibles)
+
+    # 3. MATCH DIFUSO ESTÁNDAR (El resto de jugadores pasan por aquí)
     nombre_match_norm, score_match, _ = process.extractOne(
         nombre_html_norm,
         nombres_norm_equipo,
         scorer=fuzz.WRatio,
     )
-    if nombre_match_norm is None:
-        return None, 0
-    if score_match < score_cutoff:
-        return None, score_match
-    return nombre_match_norm, score_match
+
+    if nombre_match_norm and score_match >= score_cutoff:
+        return nombre_match_norm, score_match
+
+    return None, 0
+
+def es_apellido_ambiguo(nombre_html_norm, nombres_norm_equipo):
+    tokens = nombre_html_norm.split()
+    return (len(tokens) == 1 and tokens[0] in APELLIDOS_CRITICOS and 
+            sum(n.startswith(tokens[0]) for n in nombres_norm_equipo) > 1)
