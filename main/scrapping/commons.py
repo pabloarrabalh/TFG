@@ -96,59 +96,95 @@ def coincide_por_iniciales(nombre_corto, nombre_largo):
             return False
     return True
 
+def es_apellido_ambiguo(nombre_html_norm, nombres_norm_equipo):
+    tokens = nombre_html_norm.split()
+    return (
+        len(tokens) == 1 and tokens[0] in APELLIDOS_CRITICOS and
+        sum(n.startswith(tokens[0]) for n in nombres_norm_equipo) > 1
+    )
+
 # ==========================================
 # FUNCIÓN MAESTRA DE MATCHING
 # ==========================================
 
 def obtener_match_nombre(nombre_html_raw, nombres_norm_equipo, score_cutoff=85):
+    # Caso especial: si el nombre HTML es 'Nombre ApellidoCritico' y en el CSV solo hay 'Nombre', asociar si es único
     if not nombres_norm_equipo:
         return None, 0
+
+    nombre_html_norm = normalizar_texto(nombre_html_raw)
+    nombre_html_norm = aplicar_alias(nombre_html_norm)
+    nombre_html_norm = nombre_html_norm.replace('.', ' ').strip()
+    nombre_html_norm = re.sub(r'\s+', ' ', nombre_html_norm)
+    tokens = nombre_html_norm.split()
+
+    if len(tokens) == 2:
+        nombre, apellido = tokens
+        if apellido.lower() in APELLIDOS_CRITICOS:
+            candidatos_nombre = [n for n in nombres_norm_equipo if normalizar_texto(n) == nombre.lower()]
+            if len(candidatos_nombre) == 1:
+                return candidatos_nombre[0], 100
 
     # 1. Normalización y Alias
     nombre_html_norm = normalizar_texto(nombre_html_raw)
     nombre_html_norm = aplicar_alias(nombre_html_norm)
 
     # Limpieza extra para el proceso de tokens
+    if not nombres_norm_equipo:
+        return None, 0
+
+    nombre_html_norm = normalizar_texto(nombre_html_raw)
     nombre_html_norm = nombre_html_norm.replace('.', ' ').strip()
     nombre_html_norm = re.sub(r'\s+', ' ', nombre_html_norm)
     tokens = nombre_html_norm.split()
 
-    # 2. MATCH POR INICIALES Y APELLIDO (soporta 'A. F. Carreras', 'S. Cardona', 'P. Gueye', etc.)
+    # 1. Apellido crítico: solo un candidato y coincide iniciales y nombre completo
     if len(tokens) >= 2:
-        apellido_buscado = tokens[-1]
-        candidatos_apellido = [n for n in nombres_norm_equipo if n.split()[-1] == apellido_buscado]
+        apellido = tokens[-1]
+        iniciales_html = [tk[0] for tk in tokens[:-1] if tk]
+        apellido_norm = apellido.lower()
+        candidatos_apellido = [n for n in nombres_norm_equipo if n.split()[-1] == apellido]
+        if apellido_norm in APELLIDOS_CRITICOS:
+            if len(candidatos_apellido) == 1:
+                n = candidatos_apellido[0]
+                n_tokens = n.split()
+                iniciales_cand = [tk[0] for tk in n_tokens[:-1] if tk]
+                n_norm = normalizar_texto(n)
+                if iniciales_html == iniciales_cand[:len(iniciales_html)] and n_norm == nombre_html_norm:
+                    return n, 100
+                # Si la inicial no coincide, bloquear fuzzy
+                return None, 0
+            elif len(candidatos_apellido) > 1:
+                for n in candidatos_apellido:
+                    n_tokens = n.split()
+                    iniciales_cand = [tk[0] for tk in n_tokens[:-1] if tk]
+                    n_norm = normalizar_texto(n)
+                    if iniciales_html == iniciales_cand[:len(iniciales_html)] and n_norm == nombre_html_norm:
+                        return n, 100
+                # Si hay colisión de inicial y apellido, pero no coincide el nombre completo, bloquear fuzzy
+                return None, 0
+
+    # 2. Match por iniciales múltiples (ej: 'A. F. Carreras' ≈ 'Álvaro Fernández Carreras')
+    if len(tokens) >= 2:
+        iniciales = [t[0] for t in tokens[:-1] if t]
+        apellido = tokens[-1]
+        for n in nombres_norm_equipo:
+            n_tokens = n.split()
+            if len(n_tokens) >= len(tokens):
+                ape_cand = n_tokens[-1]
+                iniciales_cand = [tk[0] for tk in n_tokens[:-1] if tk]
+                if apellido == ape_cand and iniciales == iniciales_cand[:len(iniciales)]:
+                    return n, 100
+        candidatos_apellido = [n for n in nombres_norm_equipo if n.split()[-1] == apellido]
         if len(candidatos_apellido) == 1:
             return candidatos_apellido[0], 100
-        elif len(candidatos_apellido) > 1:
-            for cand in candidatos_apellido:
-                cand_tokens = cand.split()
-                # Solo comparar iniciales si el número de tokens coincide
-                if len(cand_tokens) == len(tokens):
-                    if all(tokens[i][0].lower() == cand_tokens[i][0].lower() for i in range(len(tokens)-1)):
-                        return cand, 100
-            # Si no hay match exacto, devolver None (no forzar match por iniciales si hay ambigüedad)
-            return None, 0
 
-
-    # 3. CASO ESPECIAL: nombre corto (ej. 'raul') y solo un jugador contiene ese nombre
-    if len(tokens) == 1:
-        posibles = [n for n in nombres_norm_equipo if tokens[0] in n.split() or tokens[0] in n]
-        if len(posibles) == 1:
-            return posibles[0], 100
-
-    # 4. MATCH DIFUSO ESTÁNDAR (El resto de jugadores pasan por aquí)
+    # 3. Match difuso estándar
     nombre_match_norm, score_match, _ = process.extractOne(
         nombre_html_norm,
         nombres_norm_equipo,
         scorer=fuzz.WRatio,
     )
-
     if nombre_match_norm and score_match >= score_cutoff:
         return nombre_match_norm, score_match
-
     return None, 0
-
-def es_apellido_ambiguo(nombre_html_norm, nombres_norm_equipo):
-    tokens = nombre_html_norm.split()
-    return (len(tokens) == 1 and tokens[0] in APELLIDOS_CRITICOS and 
-            sum(n.startswith(tokens[0]) for n in nombres_norm_equipo) > 1)
