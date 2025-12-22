@@ -503,11 +503,19 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
                 db[clave_db]['Porcentaje_paradas'] = sv_val
                 db[clave_db]['PSxG'] = psxg_val
 
+        # --- ASIGNACIÓN DE PUNTOS MEJORADA PARA WILLIAMS ---
         clave_ff_asignada = asignacion_fb_a_ff.get(clave_fb)
-        if clave_ff_asignada is not None:
-            db[clave_db]['puntosFantasy'] = puntos_fantasy_match[clave_ff_asignada]['puntos']
-        else:
-            db[clave_db]['puntosFantasy'] = 0
+        puntos_asignados = 0
+        nombre_debug = nombre_csv.strip().lower()
+        # Si el nombre es "N. Williams" o "I. Williams", buscar explícitamente en puntos_fantasy_match
+        if nombre_debug in ["n. williams", "i. williams"]:
+            for k, info in puntos_fantasy_match.items():
+                if info["nombre_original"].strip().lower() == nombre_debug:
+                    puntos_asignados = info["puntos"]
+                    break
+        elif clave_ff_asignada is not None:
+            puntos_asignados = puntos_fantasy_match[clave_ff_asignada]['puntos']
+        db[clave_db]['puntosFantasy'] = puntos_asignados
 
         if clave_ff_asignada is None and idx_partido in (1, 2, 3):
             JUGADORES_SIN_MATCH.append({

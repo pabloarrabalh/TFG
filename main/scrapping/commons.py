@@ -112,15 +112,41 @@ def obtener_match_nombre(nombre_html_raw, nombres_norm_equipo, score_cutoff=85):
     nombre_html_norm = re.sub(r'\s+', ' ', nombre_html_norm)
     tokens = nombre_html_norm.split()
 
-    # 2. PARCHE QUIRÚRGICO PARA WILLIAMS (Y otros con inicial)
-    # Si detectamos una inicial (ej: "n williams") y el apellido es crítico
-    if len(tokens) >= 2 and len(tokens[0]) == 1:
-        apellido_buscado = tokens[-1]
+    # 2. MATCH EXACTO POR INICIAL Y APELLIDO (hermanos Williams y similares, robusto y universal)
+    if len(tokens) == 2 and len(tokens[1]) > 2:
+        def norm_inicial_apellido(token_inicial, token_apellido):
+            t = token_inicial.replace('.', '').lower()
+            t = ''.join(c for c in unicodedata.normalize('NFD', t) if unicodedata.category(c) != 'Mn')
+            a = token_apellido.lower()
+            a = ''.join(c for c in unicodedata.normalize('NFD', a) if unicodedata.category(c) != 'Mn')
+            return t, a
+
+        inicial_buscada, apellido_buscado = norm_inicial_apellido(tokens[0], tokens[1])
         if apellido_buscado in APELLIDOS_CRITICOS:
-            candidatos_posibles = [n for n in nombres_norm_equipo if coincide_por_iniciales(nombre_html_norm, n)]
-            if candidatos_posibles:
-                # Si encontramos match por inicial, devolvemos y cortamos aquí
-                return manejar_caso_especifico(nombre_html_norm, candidatos_posibles)
+            candidatos_apellido = []
+            for n in nombres_norm_equipo:
+                n_tokens = n.split()
+                if len(n_tokens) >= 2:
+                    ini_cand, ape_cand = norm_inicial_apellido(n_tokens[0], n_tokens[-1])
+                    if ape_cand == apellido_buscado:
+                        candidatos_apellido.append((n, ini_cand))
+            # --- LOG DEBUG ---
+            print("[DEBUG MATCH] Buscando:", nombre_html_raw, "| tokens:", tokens)
+            print("[DEBUG MATCH] Inicial buscada:", inicial_buscada, "Apellido buscado:", apellido_buscado)
+            print("[DEBUG MATCH] Candidatos con ese apellido:")
+            for cand, ini_cand in candidatos_apellido:
+                print(f"    - {cand} | inicial: {ini_cand}")
+            # Si hay más de un candidato con ese apellido, buscar por inicial
+            if len(candidatos_apellido) > 1:
+                for cand, ini_cand in candidatos_apellido:
+                    if ini_cand == inicial_buscada:
+                        print(f"[DEBUG MATCH] ¡MATCH EXACTO! {cand}")
+                        return cand, 100
+                print(f"[DEBUG MATCH] No hay match exacto por inicial, se devuelve el primero: {candidatos_apellido[0][0]}")
+                return candidatos_apellido[0][0], 60
+            elif len(candidatos_apellido) == 1:
+                print(f"[DEBUG MATCH] Solo un candidato, se devuelve: {candidatos_apellido[0][0]}")
+                return candidatos_apellido[0][0], 100
 
     # 3. MATCH DIFUSO ESTÁNDAR (El resto de jugadores pasan por aquí)
     nombre_match_norm, score_match, _ = process.extractOne(
