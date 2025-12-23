@@ -77,8 +77,9 @@ os.makedirs(BASE_FOLDER_CSV, exist_ok=True)
 
 COLUMNAS_MODELO = [
     'player', 'posicion', 'Equipo_propio', 'Equipo_rival', 'Titular',
-    'Min_partido', 'Gol_partido', 'Asist_partido', 'xG_partido', 'xA_partido',
-    'xAG',  # <-- Añadido aquí
+    'Min_partido', 'Gol_partido', 'Asist_partido', 'xG_partido',
+    # 'xA_partido',  # <-- Eliminado
+    'xAG',
     'Tiros', 'TiroFallado_partido', 'TiroPuerta_partido', 'Pases_Totales', 'Pases_Completados_Pct',
     'Amarillas', 'Rojas', 'Goles_en_contra', 'Porcentaje_paradas', 'PSxG', 'puntosFantasy',
     'Entradas', 'Duelos', 'DuelosGanados', 'DuelosPerdidos',
@@ -497,12 +498,7 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
         db[clave_db]['Gol_partido'] = limpiar_int(row_sum.get('Gls', 0))
         db[clave_db]['Asist_partido'] = limpiar_int(row_sum.get('Ast', 0))
         db[clave_db]['xG_partido'] = limpiar_float(row_sum.get('xG', 0))
-        # xA_partido: xA de passing si existe, si no summary
-        row_passing = tablas_por_tipo.get('passing', {}).get(clave_fb)
-        if row_passing is not None and 'xA' in row_passing:
-            db[clave_db]['xA_partido'] = limpiar_float(row_passing['xA'])
-        else:
-            db[clave_db]['xA_partido'] = limpiar_float(row_sum.get('xA', 0))
+        # --- xA_partido eliminado ---
         db[clave_db]['xAG'] = limpiar_float(row_sum.get('xAG', 0))
         db[clave_db]['Tiros'] = limpiar_int(row_sum.get('Sh', 0))
         sh_total = limpiar_int(row_sum.get('Sh', 0))
