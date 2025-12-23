@@ -641,6 +641,6 @@ if __name__ == "__main__":
         print("PARTIDO_IDX | EQUIPO_LOCAL | EQUIPO_VISITANTE | NOMBRE_FBREF | FB_NORM")
         print("-" * 80)
         for j in JUGADORES_SIN_MATCH:
-            print(f"{j['partido_idx']} | {j['equipo_local']} | {j['equipo_visitante']} | {j['nombre_fbref']} | {j['fb_norm']}")
+            print(f" {j['partido_idx']} | {j['equipo_local']} | {j['equipo_visitante']} | {j['nombre_fbref']} | {j['fb_norm']}")
     else:
         print("\n[LOG] Todos los jugadores han sido asignados correctamente.")
