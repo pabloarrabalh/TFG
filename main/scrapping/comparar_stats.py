@@ -9,7 +9,6 @@ from commons import (
     obtener_match_nombre,
 )
 
-
 CAMPOS_MAPEO = [
     ("Min_partido", ["Min", "minutes", "Min"]),
     ("Gol_partido", ["Gls", "Goals", "Gls"]),
@@ -45,7 +44,6 @@ CAMPOS_MAPEO = [
     ("puntosFantasy", ["puntosFantasy"]),
 ]
 
-
 TABLAS_FBREF = {
     "summary": ["_summary"],
     "passing": ["_passing"],
@@ -74,7 +72,7 @@ def limpiar_numero(val):
     Normaliza valores numéricos para comparación:
     - Quita % y saltos de línea.
     - Convierte a float.
-    - Si es NaN o no convertible (incluye 0/0 -> NaN), devuelve 0.0.
+    - Si es NaN o no convertible, devuelve 0.0.
     """
     if isinstance(val, pd.Series):
         val = val.iloc[0]
@@ -167,94 +165,27 @@ def fmt(val):
         return str(val)
 
 
-def mostrar_errores(errores):
-    if errores:
-        print("\nErrores encontrados:")
-        print(f"{'JUGADOR':<25} | {'CAMPO':<25} | {'HTML (correcto)':<15} | {'CSV (tu dato)':<15}")
-        print("-" * 90)
-        for err in errores:
-            print(f"{err['player'][:25]:<25} | {err['campo']:<25} | {err['html']:<15} | {err['csv']:<15}")
-    else:
-        print("\nTodos los campos coinciden correctamente.")
-
-
-def mostrar_comparativa_jugador(info):
+def mostrar_analisis_jugador(resultado):
     """
-    La dejo por si quieres debug visual completo.
-    No se usa en el flujo normal tras tu petición.
+    Imprime solo los campos con error, no toda la comparativa.
     """
-    if info is None:
+    if not resultado["ok"]:
+        print(resultado["motivo"])
         return
-    jugador_objetivo = info["jugador_objetivo"]
-    fila_csv = info["fila_csv"]
-    get_summary = info["get_summary"]
-    get_passing = info["get_passing"]
-    get_misc = info["get_misc"]
-    get_keepers = info["get_keepers"]
-    get_defense = info["get_defense"]
-    get_possession = info["get_possession"]
-    es_portero = info["es_portero"]
 
-    print(f"\nComparativa de campos para {jugador_objetivo.title()}:\n")
-    print(f"{'Campo CSV':<25} | {'Valor CSV':<10} | {'Valor HTML':<10} | {'Tabla/Columna HTML'}")
-    print("-" * 80)
+    nombre = resultado["jugador_objetivo"]
+    campos_mal = resultado["campos_mal"]
+    discrepancias = resultado["discrepancias"]
 
-    print(f"{'Min_partido':<25} | {fmt(fila_csv.get('Min_partido','')):<10} | {fmt(get_summary('Min')):<10} | summary:Min")
-    print(f"{'Gol_partido':<25} | {fmt(fila_csv.get('Gol_partido','')):<10} | {fmt(get_summary('Gls')):<10} | summary:Gls")
-    print(f"{'Asist_partido':<25} | {fmt(fila_csv.get('Asist_partido','')):<10} | {fmt(get_summary('Ast')):<10} | summary:Ast")
-    print(f"{'xG_partido':<25} | {fmt(fila_csv.get('xG_partido','')):<10} | {fmt(get_summary('xG')):<10} | summary:xG")
-    print(f"{'xAG':<25} | {fmt(fila_csv.get('xAG','')):<10} | {fmt(get_summary('xAG')):<10} | summary:xAG")
-    print(f"{'Tiros':<25} | {fmt(fila_csv.get('Tiros','')):<10} | {fmt(get_summary('Sh')):<10} | summary:Sh")
+    if not campos_mal:
+        return
 
-    sh = get_summary('Sh')
-    sot = get_summary('SoT')
-    try:
-        tiro_fallado_html = float(sh) - float(sot)
-    except:
-        tiro_fallado_html = 0.0
-
-    print(f"{'TiroFallado_partido':<25} | {fmt(fila_csv.get('TiroFallado_partido','')):<10} | {fmt(tiro_fallado_html):<10} | summary:Sh-summary:SoT")
-    print(f"{'TiroPuerta_partido':<25} | {fmt(fila_csv.get('TiroPuerta_partido','')):<10} | {fmt(get_summary('SoT')):<10} | summary:SoT")
-    print(f"{'Pases_Totales':<25} | {fmt(fila_csv.get('Pases_Totales','')):<10} | {fmt(get_summary('Att')):<10} | summary:Att")
-
-    cmp_pct = get_passing('Cmp%') if get_passing('Cmp%') != "" else get_summary('Cmp%')
-    print(f"{'Pases_Completados_Pct':<25} | {fmt(fila_csv.get('Pases_Completados_Pct','')):<10} | {fmt(cmp_pct):<10} | passing/summary:Cmp%")
-    print(f"{'Amarillas':<25} | {fmt(fila_csv.get('Amarillas','')):<10} | {fmt(get_misc('CrdY')):<10} | misc:CrdY")
-    print(f"{'Rojas':<25} | {fmt(fila_csv.get('Rojas','')):<10} | {fmt(get_misc('CrdR')):<10} | misc:CrdR")
-
-    ga_html = limpiar_numero(get_keepers('GA') if es_portero else 0)
-    save_html = limpiar_numero(get_keepers('Save%') if es_portero else 0)
-    psxg_html = limpiar_numero(get_keepers('PSxG') if es_portero else 0)
-
-    print(f"{'Goles_en_contra':<25} | {fmt(fila_csv.get('Goles_en_contra','')):<10} | {fmt(ga_html):<10} | keepers:GA")
-    print(f"{'Porcentaje_paradas':<25} | {fmt(fila_csv.get('Porcentaje_paradas','')):<10} | {fmt(save_html):<10} | keepers:Save%")
-    print(f"{'PSxG':<25} | {fmt(fila_csv.get('PSxG','')):<10} | {fmt(psxg_html):<10} | keepers:PSxG")
-
-    print(f"{'Entradas':<25} | {fmt(fila_csv.get('Entradas','')):<10} | {fmt(get_defense('Tkl')):<10} | defense:Tkl")
-    print(f"{'Duelos':<25} | {fmt(fila_csv.get('Duelos','')):<10} | {fmt(get_defense('Att')):<10} | defense:Att")
-
-    duelos_ganados_csv = limpiar_numero(fila_csv.get('DuelosGanados',''))
-    duelos_ganados_html = limpiar_numero(get_defense('Won'))
-    print(f"{'DuelosGanados':<25} | {fmt(duelos_ganados_csv):<10} | {fmt(duelos_ganados_html):<10} | defense:Won")
-    print(f"{'DuelosPerdidos':<25} | {fmt(fila_csv.get('DuelosPerdidos','')):<10} | {fmt(get_defense('Lost')):<10} | defense:Lost")
-    print(f"{'Bloqueos':<25} | {fmt(fila_csv.get('Bloqueos','')):<10} | {fmt(get_defense('Blocks')):<10} | defense:Blocks")
-    print(f"{'BloqueoTiros':<25} | {fmt(fila_csv.get('BloqueoTiros','')):<10} | {fmt(get_defense('Sh')):<10} | defense:Sh (Blocks)")
-    print(f"{'BloqueoPase':<25} | {fmt(fila_csv.get('BloqueoPase','')):<10} | {fmt(get_defense('Pass')):<10} | defense:Pass")
-    print(f"{'Despejes':<25} | {fmt(fila_csv.get('Despejes','')):<10} | {fmt(get_defense('Clr')):<10} | defense:Clr")
-
-    print(f"{'Regates':<25} | {fmt(fila_csv.get('Regates','')):<10} | {fmt(get_possession('Att')):<10} | possession:Att (Take-Ons)")
-    print(f"{'RegatesCompletados':<25} | {fmt(fila_csv.get('RegatesCompletados','')):<10} | {fmt(get_possession('Succ')):<10} | possession:Succ (Take-Ons)")
-    print(f"{'RegatesFallidos':<25} | {fmt(fila_csv.get('RegatesFallidos','')):<10} | {fmt(get_possession('Tkld')):<10} | possession:Tkld (Take-Ons)")
-
-    print(f"{'Conducciones':<25} | {fmt(fila_csv.get('Conducciones','')):<10} | {fmt(get_possession('Carries')):<10} | possession:Carries")
-    print(f"{'DistanciaConduccion':<25} | {fmt(fila_csv.get('DistanciaConduccion','')):<10} | {fmt(get_possession('TotDist')):<10} | possession:TotDist")
-    print(f"{'MetrosAvanzadosConduccion':<25} | {fmt(fila_csv.get('MetrosAvanzadosConduccion','')):<10} | {fmt(get_possession('PrgDist')):<10} | possession:PrgDist")
-    print(f"{'ConduccionesProgresivas':<25} | {fmt(fila_csv.get('ConduccionesProgresivas','')):<10} | {fmt(get_possession('PrgC')):<10} | possession:PrgC")
-
-    wonpct_html = limpiar_numero(get_misc('Won%'))
-    print(f"{'DuelosAereosGanados':<25} | {fmt(fila_csv.get('DuelosAereosGanados','')):<10} | {fmt(get_misc('Won')):<10} | misc:Won")
-    print(f"{'DuelosAereosPerdidos':<25} | {fmt(fila_csv.get('DuelosAereosPerdidos','')):<10} | {fmt(get_misc('Lost')):<10} | misc:Lost")
-    print(f"{'DuelosAereosGanadosPct':<25} | {fmt(fila_csv.get('DuelosAereosGanadosPct','')):<10} | {fmt(wonpct_html):<10} | misc:Won%")
+    print(f"\n[ERROR] {nombre}")
+    for d in discrepancias:
+        campo = d["campo"]
+        csv_val = d["csv"]
+        html_val = d["html"]
+        print(f"  - {campo}: CSV={csv_val} | HTML={html_val}")
 
 
 def comparar_partido_stats(path_html, path_csv, jugador_objetivo="kylian mbappe"):
@@ -267,15 +198,24 @@ def comparar_partido_stats(path_html, path_csv, jugador_objetivo="kylian mbappe"
         lambda row: normalizar_texto(aplicar_alias(row["player"], row["Equipo_propio"])), axis=1
     )
 
-    fila_jugador = df_csv[df_csv["player_norm"].str.lower() == normalizar_texto(jugador_objetivo).lower()]
+    # Buscar fila del CSV
+    fila_jugador = df_csv[df_csv["player_norm"].str.lower() == normalizar_texto(aplicar_alias(jugador_objetivo)).lower()]
     if fila_jugador.empty:
         return None
 
     fila_csv = fila_jugador.iloc[0]
     equipo_jugador = fila_csv["Equipo_propio"]
+
+    # Nombre normalizado directo
     jugador_norm = normalizar_texto(aplicar_alias(jugador_objetivo, equipo_jugador))
+
     if jugador_norm not in jugadores_html:
-        return None
+        # Intentar match inteligente usando obtener_match_nombre
+        nombres_norm_equipo = list(jugadores_html.keys())
+        match_norm, score = obtener_match_nombre(jugador_objetivo, nombres_norm_equipo)
+        if match_norm is None:
+            return None
+        jugador_norm = match_norm
 
     row_html = jugadores_html[jugador_norm]
 
@@ -313,142 +253,9 @@ def comparar_partido_stats(path_html, path_csv, jugador_objetivo="kylian mbappe"
     }
 
 
-def comparar_jornada(num_jornada):
-    carpeta_html = os.path.join("main", "html", f"j{num_jornada}")
-    carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
-    archivos_csv = [n for n in os.listdir(carpeta_csv) if n.endswith(".csv")]
-    errores = []
-    for archivo_csv in archivos_csv:
-        m = re.search(r"p(\d+)_(.+)-(.+)\.csv", archivo_csv)
-        if not m:
-            continue
-        idx = m.group(1)
-        path_html = os.path.join(carpeta_html, f"p{idx}.html")
-        path_csv = os.path.join(carpeta_csv, archivo_csv)
-        if not os.path.exists(path_html):
-            print(f"Falta HTML: {path_html}")
-            continue
-        with open(path_html, "r", encoding="utf-8") as f:
-            html_content = f.read()
-        tablas = extraer_tablas_fbref(html_content)
-        jugadores_html = construir_diccionario_jugadores(tablas)
-        df_csv = pd.read_csv(path_csv)
-        df_csv["player_norm"] = df_csv.apply(
-            lambda row: normalizar_texto(aplicar_alias(row["player"], row["Equipo_propio"])), axis=1
-        )
-        for _, fila_csv in df_csv.iterrows():
-            jugador_objetivo = fila_csv["player"]
-            equipo_jugador = fila_csv["Equipo_propio"]
-            jugador_norm = normalizar_texto(aplicar_alias(jugador_objetivo, equipo_jugador))
-            if jugador_norm not in jugadores_html:
-                errores.append({
-                    "player": jugador_objetivo,
-                    "campo": "NO ENCONTRADO EN HTML",
-                    "html": "-",
-                    "csv": "-"
-                })
-                continue
-            row_html = jugadores_html[jugador_norm]
-            checks = [
-                ("Min_partido",        lambda: (fila_csv.get('Min_partido',''),        row_html.get("summary:Min", ""))),
-                ("Gol_partido",        lambda: (fila_csv.get('Gol_partido',''),        row_html.get("summary:Gls", ""))),
-                ("Asist_partido",      lambda: (fila_csv.get('Asist_partido',''),      row_html.get("summary:Ast", ""))),
-                ("xG_partido",         lambda: (fila_csv.get('xG_partido',''),         row_html.get("summary:xG", ""))),
-                ("Tiros",              lambda: (fila_csv.get('Tiros',''),              row_html.get("summary:Sh", ""))),
-                ("TiroPuerta_partido", lambda: (fila_csv.get('TiroPuerta_partido',''), row_html.get("summary:SoT", ""))),
-                ("Pases_Totales",      lambda: (fila_csv.get('Pases_Totales',''),      row_html.get("summary:Att", ""))),
-                ("Amarillas",          lambda: (fila_csv.get('Amarillas',''),          row_html.get("misc:CrdY", ""))),
-                ("Rojas",              lambda: (fila_csv.get('Rojas',''),              row_html.get("misc:CrdR", ""))),
-            ]
-            for campo, getter in checks:
-                val_csv, val_html = getter()
-                val_csv_n = limpiar_numero(val_csv)
-                val_html_n = limpiar_numero(val_html)
-                if val_csv_n != val_html_n:
-                    errores.append({
-                        "player": jugador_objetivo,
-                        "campo": campo,
-                        "html": fmt(val_html_n),
-                        "csv": fmt(val_csv_n)
-                    })
-    mostrar_errores(errores)
-
-
-def analizar_partido(num_jornada, num_partido):
-    carpeta_html = os.path.join("main", "html", f"j{num_jornada}")
-    carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
-    archivos_csv = [n for n in os.listdir(carpeta_csv) if n.startswith(f"p{num_partido}_") and n.endswith(".csv")]
-    if not archivos_csv:
-        print(f"No se encontró el CSV para el partido {num_partido} de la jornada {num_jornada}")
-        return
-    archivo_csv = archivos_csv[0]
-    path_html = os.path.join(carpeta_html, f"p{num_partido}.html")
-    path_csv = os.path.join(carpeta_csv, archivo_csv)
-    if not os.path.exists(path_html):
-        print(f"Falta HTML: {path_html}")
-        return
-    with open(path_html, "r", encoding="utf-8") as f:
-        html_content = f.read()
-    tablas = extraer_tablas_fbref(html_content)
-    jugadores_html = construir_diccionario_jugadores(tablas)
-    df_csv = pd.read_csv(path_csv)
-    df_csv["player_norm"] = df_csv.apply(
-        lambda row: normalizar_texto(aplicar_alias(row["player"], row["Equipo_propio"])), axis=1
-    )
-
-    errores = []
-    for _, fila_csv in df_csv.iterrows():
-        jugador_objetivo = fila_csv["player"]
-        equipo_jugador = fila_csv["Equipo_propio"]
-        jugador_norm = normalizar_texto(aplicar_alias(jugador_objetivo, equipo_jugador))
-        if jugador_norm not in jugadores_html:
-            errores.append({
-                "player": jugador_objetivo,
-                "campo": "NO ENCONTRADO EN HTML",
-                "html": "-",
-                "csv": "-"
-            })
-            continue
-        row_html = jugadores_html[jugador_norm]
-        checks = [
-            ("Min_partido",        lambda: (fila_csv.get('Min_partido',''),        row_html.get("summary:Min", ""))),
-            ("Gol_partido",        lambda: (fila_csv.get('Gol_partido',''),        row_html.get("summary:Gls", ""))),
-            ("Asist_partido",      lambda: (fila_csv.get('Asist_partido',''),      row_html.get("summary:Ast", ""))),
-            ("xG_partido",         lambda: (fila_csv.get('xG_partido',''),         row_html.get("summary:xG", ""))),
-            ("Tiros",              lambda: (fila_csv.get('Tiros',''),              row_html.get("summary:Sh", ""))),
-            ("TiroPuerta_partido", lambda: (fila_csv.get('TiroPuerta_partido',''), row_html.get("summary:SoT", ""))),
-            ("Pases_Totales",      lambda: (fila_csv.get('Pases_Totales',''),      row_html.get("summary:Att", ""))),
-            ("Amarillas",          lambda: (fila_csv.get('Amarillas',''),          row_html.get("misc:CrdY", ""))),
-            ("Rojas",              lambda: (fila_csv.get('Rojas',''),              row_html.get("misc:CrdR", ""))),
-        ]
-        for campo, getter in checks:
-            val_csv, val_html = getter()
-            val_csv_n = limpiar_numero(val_csv)
-            val_html_n = limpiar_numero(val_html)
-            if val_csv_n != val_html_n:
-                errores.append({
-                    "player": jugador_objetivo,
-                    "campo": campo,
-                    "html": fmt(val_html_n),
-                    "csv": fmt(val_csv_n)
-                })
-    mostrar_errores(errores)
-
-
-# =========================
-# ANALISIS PURO + FUNCION AUXILIAR
-# =========================
+# ========= ANALISIS JUGADOR / PARTIDO =========
 
 def analizar_jugador_interno(num_jornada, num_partido, nombre_jugador):
-    """
-    Analiza un jugador concreto sin imprimir nada.
-    Devuelve dict con:
-      - ok: bool
-      - motivo: str (si ok=False)
-      - info: dict (info de comparar_partido_stats)
-      - campos_mal: lista de campos con discrepancias
-      - discrepancias: lista de dicts {campo, csv, html}
-    """
     carpeta_html = os.path.join("main", "html", f"j{num_jornada}")
     carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
 
@@ -472,12 +279,27 @@ def analizar_jugador_interno(num_jornada, num_partido, nombre_jugador):
             "motivo": f"Falta HTML: {path_html}",
         }
 
+    # Primer intento normal
     info = comparar_partido_stats(path_html, path_csv, nombre_jugador)
     if info is None:
-        return {
-            "ok": False,
-            "motivo": f"No se pudo analizar al jugador '{nombre_jugador}' en j{num_jornada} partido {num_partido}.",
-        }
+        # Intento extra: emparejar nombre con claves del HTML
+        with open(path_html, "r", encoding="utf-8") as f:
+            html_content = f.read()
+        tablas = extraer_tablas_fbref(html_content)
+        jugadores_html = construir_diccionario_jugadores(tablas)
+        nombres_norm_equipo = list(jugadores_html.keys())
+        match_norm, score = obtener_match_nombre(nombre_jugador, nombres_norm_equipo)
+        if match_norm is None:
+            return {
+                "ok": False,
+                "motivo": f"No se pudo analizar al jugador '{nombre_jugador}' en j{num_jornada} partido {num_partido}.",
+            }
+        info = comparar_partido_stats(path_html, path_csv, match_norm)
+        if info is None:
+            return {
+                "ok": False,
+                "motivo": f"No se pudo analizar al jugador '{nombre_jugador}' en j{num_jornada} partido {num_partido}.",
+            }
 
     fila_csv = info["fila_csv"]
     get_summary = info["get_summary"]
@@ -561,38 +383,17 @@ def analizar_jugador_interno(num_jornada, num_partido, nombre_jugador):
     }
 
 
-def mostrar_analisis_jugador(resultado):
-    """
-    Imprime solo los campos con error, no toda la comparativa.
-    """
-    if not resultado["ok"]:
-        print(resultado["motivo"])
-        return
-
-    nombre = resultado["jugador_objetivo"]
-    campos_mal = resultado["campos_mal"]
-    discrepancias = resultado["discrepancias"]
-
-    if not campos_mal:
-        # Si quieres ver también los OK, descomenta la siguiente línea
-        # print(f"[OK] {nombre}")
-        return
-
-    print(f"\n[ERROR] {nombre}")
-    for d in discrepancias:
-        campo = d["campo"]
-        csv_val = d["csv"]
-        html_val = d["html"]
-        print(f"  - {campo}: CSV={csv_val} | HTML={html_val}")
-
-
 def analizar_jugador(num_jornada, num_partido, nombre_jugador):
     print(f"[LOG] Procesando jugador: {nombre_jugador}")
     resultado = analizar_jugador_interno(num_jornada, num_partido, nombre_jugador)
     mostrar_analisis_jugador(resultado)
 
 
-def analizar_partido_completo(num_jornada, num_partido):
+def analizar_partido_completo(num_jornada, num_partido, errores_jornada):
+    """
+    Analiza un partido completo y acumula los jugadores con errores
+    en la lista 'errores_jornada' (lista de dicts).
+    """
     carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
     archivos_csv = [
         n for n in os.listdir(carpeta_csv)
@@ -614,10 +415,67 @@ def analizar_partido_completo(num_jornada, num_partido):
         if not resultado["ok"]:
             print(f"\n[ERROR] {nombre_jugador}")
             print(f"  - {resultado['motivo']}")
+            errores_jornada.append({
+                "jornada": num_jornada,
+                "partido": num_partido,
+                "jugador": nombre_jugador,
+                "tipo": "NO_ANALIZADO",
+                "detalle": resultado["motivo"],
+            })
         elif resultado["campos_mal"]:
             mostrar_analisis_jugador(resultado)
+            errores_jornada.append({
+                "jornada": num_jornada,
+                "partido": num_partido,
+                "jugador": resultado["jugador_objetivo"],
+                "tipo": "CAMPOS_ERRONEOS",
+                "detalle": ", ".join(resultado["campos_mal"]),
+            })
+
+
+def analizar_jornada_completa(num_jornada):
+    """
+    Recorre todos los partidos de la jornada (todos los pX_*.csv)
+    y para cada partido recorre todos los jugadores, mostrando solo
+    los que tienen errores y, al final, un resumen global de la jornada.
+    """
+    carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
+    if not os.path.exists(carpeta_csv):
+        print(f"No existe la carpeta de la jornada {num_jornada}")
+        return
+
+    archivos_csv = sorted(
+        n for n in os.listdir(carpeta_csv)
+        if n.startswith("p") and n.endswith(".csv")
+    )
+
+    if not archivos_csv:
+        print(f"No se encontraron CSVs en jornada {num_jornada}")
+        return
+
+    errores_jornada = []
+
+    for archivo_csv in archivos_csv:
+        m = re.match(r"p(\d+)_", archivo_csv)
+        if not m:
+            continue
+        num_partido = int(m.group(1))
+        print(f"\n[LOG] ===== Procesando partido {num_partido} de la jornada {num_jornada} =====")
+        analizar_partido_completo(num_jornada, num_partido, errores_jornada)
+
+    # RESUMEN FINAL DE JORNADA
+    print("\n" + "=" * 80)
+    print(f"RESUMEN JORNADA {num_jornada}")
+    if not errores_jornada:
+        print("Todos los jugadores han pasado las comprobaciones correctamente.")
+    else:
+        print("Jugadores con errores:")
+        for err in errores_jornada:
+            print(
+                f" - j{err['jornada']} p{err['partido']} | {err['jugador']} | "
+                f"{err['tipo']} | {err['detalle']}"
+            )
 
 
 if __name__ == "__main__":
-    # analizar_jugador(1, 10, "kylian mbappe")
-    analizar_partido_completo(1, 10)
+    analizar_jornada_completa(1)
