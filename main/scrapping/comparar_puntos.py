@@ -174,15 +174,7 @@ def _match_nombre(nombre_html_raw, nombres_norm_equipo, debug_prefix="", score_c
     clave_html = _clave_html(nombre_html_raw)
 
     # 0) caso especial Williams (por seguridad extra)
-    if base == "n williams" and "nico williams" in nombres_norm_equipo:
-        print(f"[MATCH<87] {debug_prefix}")
-        print(f"           HTML='{nombre_html_raw}' clave='{clave_html}' -> 'nico williams' (force)")
-        return "nico williams", 95
-    if base == "i williams" and "inaki williams" in nombres_norm_equipo:
-        print(f"[MATCH<87] {debug_prefix}")
-        print(f"           HTML='{nombre_html_raw}' clave='{clave_html}' -> 'inaki williams' (force)")
-        return "inaki williams", 95
-
+   
     # 1) exacto
     if clave_html in nombres_norm_equipo:
         # log si score implícito <87 no aplica; exacto = 100
