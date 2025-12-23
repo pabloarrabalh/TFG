@@ -49,8 +49,8 @@ def normalizar_equipo(nombre_equipo):
     return ALIAS_EQUIPOS.get(nombre_norm, nombre_norm)
 
 
-def aplicar_alias(nombre_jugador):
-    nombre_norm = normalizar_texto(nombre_jugador)
+def aplicar_alias(nombre, equipo=None):
+    nombre_norm = normalizar_texto(nombre)
     return ALIAS_JUGADORES.get(nombre_norm, nombre_norm)
 
 # Alias contextual: solo para casos como 'Roca' en Espanyol
