@@ -1,3 +1,51 @@
+#############################################################################################################
+#                                                                                                           #
+#   MAPEO DE CAMPOS: DE QUÉ TABLA Y COLUMNA DEL HTML DE FBREF SALE CADA CAMPO DEL CSV FINAL                 #
+#                                                                                                           #
+#   - Min_partido               --> summary: Min                                                            #
+#   - Gol_partido               --> summary: Gls                                                            #
+#   - Asist_partido             --> summary: Ast                                                            #
+#   - xG_partido                --> summary: xG                                                             #
+#   - xA_partido                --> passing: xA  (si no existe, summary: xA)                                #
+#   - xAG                       --> summary: xAG                                                            #
+#   - Tiros                     --> summary: Sh                                                             #
+#   - TiroFallado_partido       --> summary: Sh - summary: SoT                                              #
+#   - TiroPuerta_partido        --> summary: SoT                                                            #
+#   - Pases_Totales             --> summary: Att                                                            #
+#   - Pases_Completados_Pct     --> passing: Cmp%  (si no existe, summary: Cmp%)                            #
+#   - Amarillas                 --> misc: CrdY                                                              #
+#   - Rojas                     --> misc: CrdR                                                              #
+#   - Goles_en_contra           --> keepers: GA  (solo si posicion == 'PT', si no, 0)                       #
+#   - Porcentaje_paradas        --> keepers: Save% (o Sv% o SV%) (solo si posicion == 'PT', si no, 0)       #
+#   - PSxG                      --> keepers: PSxG (solo si posicion == 'PT', si no, 0)                      #
+#   - Entradas                  --> defense: Tkl                                                            #
+#   - Duelos                    --> defense: Att                                                            #
+#   - DuelosGanados             --> defense: Won                                                            #
+#   - DuelosPerdidos            --> defense: Lost                                                           #
+#   - Bloqueos                  --> defense: Blocks                                                         #
+#   - BloqueoTiros              --> defense: Sh (dentro de Blocks)                                          #
+#   - BloqueoPase               --> defense: Pass                                                           #
+#   - Despejes                  --> defense: Clr                                                            #
+#   - Regates                   --> possession: Att (Take-Ons)                                              #
+#   - RegatesCompletados        --> possession: Succ (Take-Ons)                                             #
+#   - RegatesFallidos           --> possession: Tkld (Take-Ons)                                             #
+#   - Conducciones              --> possession: Carries                                                      #
+#   - DistanciaConduccion       --> possession: TotDist                                                     #
+#   - MetrosAvanzadosConduccion --> possession: PrgDist                                                     #
+#   - ConduccionesProgresivas   --> possession: PrgC                                                        #
+#   - DuelosAereosGanados       --> misc: Won                                                               #
+#   - DuelosAereosPerdidos      --> misc: Lost                                                              #
+#   - DuelosAereosGanadosPct    --> misc: Won%                                                              #
+#   - puntosFantasy             --> Solo del fichero puntos.html (no existe en FBref)                       #
+#                                                                                                           #
+#   NOTAS:                                                                                                  #
+#   - Si un campo no existe en la tabla correspondiente, se pone a 0 (excepto puntosFantasy).               #
+#   - Los campos de portero solo se rellenan si la posición es 'PT', si no, se ponen a 0.                   #
+#   - TiroFallado_partido se calcula como Sh - SoT de summary.                                              #
+#   - El resto de campos se extraen directamente de la tabla y columna indicada.                            #
+#                                                                                                           #
+#############################################################################################################
+
 # scrapper_fbref.py
 import os
 import re
@@ -6,6 +54,7 @@ from io import StringIO
 import pandas as pd
 from bs4 import BeautifulSoup
 import cloudscraper
+import numpy as np
 
 from commons import (
     ALIAS_EQUIPOS,
@@ -29,7 +78,8 @@ os.makedirs(BASE_FOLDER_CSV, exist_ok=True)
 COLUMNAS_MODELO = [
     'player', 'posicion', 'Equipo_propio', 'Equipo_rival', 'Titular',
     'Min_partido', 'Gol_partido', 'Asist_partido', 'xG_partido', 'xA_partido',
-    'TiroFallado_partido', 'TiroPuerta_partido', 'Pases_Totales', 'Pases_Completados_Pct',
+    'xAG',  # <-- Añadido aquí
+    'Tiros', 'TiroFallado_partido', 'TiroPuerta_partido', 'Pases_Totales', 'Pases_Completados_Pct',
     'Amarillas', 'Rojas', 'Goles_en_contra', 'Porcentaje_paradas', 'PSxG', 'puntosFantasy',
     'Entradas', 'Duelos', 'DuelosGanados', 'DuelosPerdidos',
     'Bloqueos', 'BloqueoTiros', 'BloqueoPase', 'Despejes',
@@ -63,16 +113,19 @@ def limpiar_float(val):
     if isinstance(val, pd.Series):
         val = val.iloc[0]
     if pd.isna(val) or val == "" or val == "-":
-        return 0.0
+        return np.nan
     s_val = str(val).split('\n')[0].replace('%', '').strip()
     try:
         return float(s_val)
     except:
-        return 0.0
+        return np.nan
 
 
 def limpiar_int(val):
-    return int(round(limpiar_float(val)))
+    f = limpiar_float(val)
+    if pd.isna(f):
+        return np.nan
+    return int(round(f))
 
 
 def obtener_calendario_local_o_remoto():
@@ -428,73 +481,78 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
         nombre_csv = nombre_csv_especial if nombre_csv_especial else p_fb
 
         if clave_db not in db:
-            db[clave_db] = {c: 0 for c in COLUMNAS_MODELO}
+            db[clave_db] = {c: np.nan for c in COLUMNAS_MODELO}
             db[clave_db].update({
                 'player': nombre_csv,
                 'Equipo_propio': equipo_fb,
                 'Equipo_rival': equipo_rival,
                 'Titular': 1 if p_fb in titulares_nombres else 0,
-                'Goles_en_contra': 0.0,
-                'Porcentaje_paradas': 0.0,
-                'PSxG': 0.0,
+                'Goles_en_contra': np.nan,
+                'Porcentaje_paradas': np.nan,
+                'PSxG': np.nan,
                 'posicion': pos_val,
             })
 
-        db[clave_db]['Min_partido'] = min_fb
-        db[clave_db]['Gol_partido'] = limpiar_float(row_sum.get('Gls', 0))
-        db[clave_db]['Asist_partido'] = limpiar_float(row_sum.get('Ast', 0))
+        db[clave_db]['Min_partido'] = limpiar_int(row_sum.get('Min', 0))
+        db[clave_db]['Gol_partido'] = limpiar_int(row_sum.get('Gls', 0))
+        db[clave_db]['Asist_partido'] = limpiar_int(row_sum.get('Ast', 0))
         db[clave_db]['xG_partido'] = limpiar_float(row_sum.get('xG', 0))
-        db[clave_db]['xA_partido'] = limpiar_float(row_sum.get('xAG', 0))
-
-        sh_total = limpiar_float(row_sum.get('Sh', 0))
-        sot = limpiar_float(row_sum.get('SoT', 0))
+        # xA_partido: xA de passing si existe, si no summary
+        row_passing = tablas_por_tipo.get('passing', {}).get(clave_fb)
+        if row_passing is not None and 'xA' in row_passing:
+            db[clave_db]['xA_partido'] = limpiar_float(row_passing['xA'])
+        else:
+            db[clave_db]['xA_partido'] = limpiar_float(row_sum.get('xA', 0))
+        db[clave_db]['xAG'] = limpiar_float(row_sum.get('xAG', 0))
+        db[clave_db]['Tiros'] = limpiar_int(row_sum.get('Sh', 0))
+        sh_total = limpiar_int(row_sum.get('Sh', 0))
+        sot = limpiar_int(row_sum.get('SoT', 0))
         db[clave_db]['TiroFallado_partido'] = max(sh_total - sot, 0)
         db[clave_db]['TiroPuerta_partido'] = sot
+        db[clave_db]['Pases_Totales'] = limpiar_int(row_sum.get('Att', 0))
 
         row_pas = tablas_por_tipo.get('passing', {}).get(clave_fb)
         cmp_pct = 0.0
-        if row_pas is not None:
-            db[clave_db]['Pases_Totales'] = limpiar_int(row_pas.get('Att', 0))
-            if 'Cmp%' in row_pas:
-                cmp_pct = limpiar_float(row_pas['Cmp%'])
-        if cmp_pct == 0.0 and 'Cmp%' in row_sum:
+        if row_pas is not None and 'Cmp%' in row_pas:
+            cmp_pct = limpiar_float(row_pas['Cmp%'])
+        elif 'Cmp%' in row_sum:
             cmp_pct = limpiar_float(row_sum['Cmp%'])
         db[clave_db]['Pases_Completados_Pct'] = cmp_pct
 
         row_def = tablas_por_tipo.get('defense', {}).get(clave_fb)
         if row_def is not None:
-            db[clave_db]['Entradas'] = limpiar_float(row_def.get('Tkl', 0))
-            db[clave_db]['Duelos'] = limpiar_float(row_def.get('Att', 0))
-            db[clave_db]['DuelosGanados'] = limpiar_float(row_def.get('Tkl%', 0))
-            db[clave_db]['DuelosPerdidos'] = limpiar_float(row_def.get('Lost', 0))
-            db[clave_db]['Bloqueos'] = limpiar_float(row_def.get('Blocks', 0))
-            db[clave_db]['BloqueoTiros'] = limpiar_float(row_def.get('Sh', 0))
-            db[clave_db]['BloqueoPase'] = limpiar_float(row_def.get('Pass', 0))
-            db[clave_db]['Despejes'] = limpiar_float(row_def.get('Clr', 0))
+            db[clave_db]['Entradas'] = limpiar_int(row_def.get('Tkl', 0))
+            db[clave_db]['Duelos'] = limpiar_int(row_def.get('Att', 0))
+            db[clave_db]['DuelosGanados'] = limpiar_int(row_def.get('Won', 0))
+            db[clave_db]['DuelosPerdidos'] = limpiar_int(row_def.get('Lost', 0))
+            db[clave_db]['Bloqueos'] = limpiar_int(row_def.get('Blocks', 0))
+            db[clave_db]['BloqueoTiros'] = limpiar_int(row_def.get('Sh', 0))
+            db[clave_db]['BloqueoPase'] = limpiar_int(row_def.get('Pass', 0))
+            db[clave_db]['Despejes'] = limpiar_int(row_def.get('Clr', 0))
 
         row_poss = tablas_por_tipo.get('possession', {}).get(clave_fb)
         if row_poss is not None:
-            db[clave_db]['Regates'] = limpiar_float(row_poss.get('Att', 0))
-            db[clave_db]['RegatesCompletados'] = limpiar_float(row_poss.get('Succ', 0))
-            db[clave_db]['RegatesFallidos'] = limpiar_float(row_poss.get('Tkld', 0))
-            db[clave_db]['Conducciones'] = limpiar_float(row_poss.get('Carries', 0))
+            db[clave_db]['Regates'] = limpiar_int(row_poss.get('Att', 0))
+            db[clave_db]['RegatesCompletados'] = limpiar_int(row_poss.get('Succ', 0))
+            db[clave_db]['RegatesFallidos'] = limpiar_int(row_poss.get('Tkld', 0))
+            db[clave_db]['Conducciones'] = limpiar_int(row_poss.get('Carries', 0))
             db[clave_db]['DistanciaConduccion'] = limpiar_float(row_poss.get('TotDist', 0))
             db[clave_db]['MetrosAvanzadosConduccion'] = limpiar_float(row_poss.get('PrgDist', 0))
-            db[clave_db]['ConduccionesProgresivas'] = limpiar_float(row_poss.get('PrgC', 0))
+            db[clave_db]['ConduccionesProgresivas'] = limpiar_int(row_poss.get('PrgC', 0))
 
         row_misc = tablas_por_tipo.get('misc', {}).get(clave_fb)
         if row_misc is not None:
-            db[clave_db]['Amarillas'] = limpiar_float(row_misc.get('CrdY', 0))
-            db[clave_db]['Rojas'] = limpiar_float(row_misc.get('CrdR', 0))
-            db[clave_db]['DuelosAereosGanados'] = limpiar_float(row_misc.get('Won', 0))
-            db[clave_db]['DuelosAereosPerdidos'] = limpiar_float(row_misc.get('Lost', 0))
+            db[clave_db]['Amarillas'] = limpiar_int(row_misc.get('CrdY', 0))
+            db[clave_db]['Rojas'] = limpiar_int(row_misc.get('CrdR', 0))
+            db[clave_db]['DuelosAereosGanados'] = limpiar_int(row_misc.get('Won', 0))
+            db[clave_db]['DuelosAereosPerdidos'] = limpiar_int(row_misc.get('Lost', 0))
             db[clave_db]['DuelosAereosGanadosPct'] = limpiar_float(row_misc.get('Won%', 0))
 
         if pos_val == 'PT':
             keepers_dict = tablas_por_tipo.get('keepers', {})
             row_keep = keepers_dict.get(clave_fb)
             if row_keep is not None:
-                ga_val = limpiar_float(row_keep.get('GA', 0))
+                ga_val = limpiar_int(row_keep.get('GA', 0))
                 sv_val = 0.0
                 for col_sv in ['Save%', 'Sv%', 'SV%']:
                     if col_sv in row_keep:
@@ -606,7 +664,7 @@ def ejecutar_rango(inicio, fin):
 
 
 if __name__ == "__main__":
-    ejecutar_rango(inicio=2, fin=2)
+    ejecutar_rango(inicio=1, fin=1)
 
     if JUGADORES_SIN_MATCH:
         print("\n[LOG] Jugadores que han quedado sin match en ninguna asignación de puntos:")
