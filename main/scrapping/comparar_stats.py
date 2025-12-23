@@ -394,6 +394,7 @@ def analizar_jugador(num_jornada, num_partido, nombre_jugador):
     """
     Analiza un jugador concreto de un partido concreto de una jornada.
     Solo necesita: número de jornada, número de partido y nombre del jugador.
+    Ahora también muestra una lista de campos mal.
     """
     carpeta_html = os.path.join("main", "html", f"j{num_jornada}")
     carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
@@ -422,10 +423,81 @@ def analizar_jugador(num_jornada, num_partido, nombre_jugador):
 
     mostrar_comparativa_jugador(info)
 
+    # Comprobación de discrepancias
+    fila_csv = info["fila_csv"]
+    get_summary = info["get_summary"]
+    get_passing = info["get_passing"]
+    get_misc = info["get_misc"]
+    get_keepers = info["get_keepers"]
+    get_defense = info["get_defense"]
+    get_possession = info["get_possession"]
+    es_portero = info["es_portero"]
+
+    campos_a_comprobar = [
+        ("Min_partido", lambda: (fila_csv.get('Min_partido',''), get_summary('Min'))),
+        ("Gol_partido", lambda: (fila_csv.get('Gol_partido',''), get_summary('Gls'))),
+        ("Asist_partido", lambda: (fila_csv.get('Asist_partido',''), get_summary('Ast'))),
+        ("xG_partido", lambda: (fila_csv.get('xG_partido',''), get_summary('xG'))),
+        ("Tiros", lambda: (fila_csv.get('Tiros',''), get_summary('Sh'))),
+        ("TiroFallado_partido", lambda: (
+            fila_csv.get('TiroFallado_partido',''),
+            (float(get_summary('Sh')) - float(get_summary('SoT'))) if get_summary('Sh') != "" and get_summary('SoT') != "" else ""
+        )),
+        ("TiroPuerta_partido", lambda: (fila_csv.get('TiroPuerta_partido',''), get_summary('SoT'))),
+        ("Pases_Totales", lambda: (fila_csv.get('Pases_Totales',''), get_summary('Att'))),
+        ("Pases_Completados_Pct", lambda: (
+            fila_csv.get('Pases_Completados_Pct',''),
+            get_passing('Cmp%') if get_passing('Cmp%') != "" else get_summary('Cmp%')
+        )),
+        ("Amarillas", lambda: (fila_csv.get('Amarillas',''), get_misc('CrdY'))),
+        ("Rojas", lambda: (fila_csv.get('Rojas',''), get_misc('CrdR'))),
+        ("Goles_en_contra", lambda: (
+            fila_csv.get('Goles_en_contra',''),
+            get_keepers('GA') if es_portero else 0
+        )),
+        ("Porcentaje_paradas", lambda: (
+            fila_csv.get('Porcentaje_paradas',''),
+            get_keepers('Save%') if es_portero else 0
+        )),
+        ("PSxG", lambda: (
+            fila_csv.get('PSxG',''),
+            get_keepers('PSxG') if es_portero else 0
+        )),
+        ("Entradas", lambda: (fila_csv.get('Entradas',''), get_defense('Tkl'))),
+        ("Duelos", lambda: (fila_csv.get('Duelos',''), get_defense('Att'))),
+        ("DuelosGanados", lambda: (fila_csv.get('DuelosGanados',''), get_defense('Won'))),
+        ("DuelosPerdidos", lambda: (fila_csv.get('DuelosPerdidos',''), get_defense('Lost'))),
+        ("Bloqueos", lambda: (fila_csv.get('Bloqueos',''), get_defense('Blocks'))),
+        ("BloqueoTiros", lambda: (fila_csv.get('BloqueoTiros',''), get_defense('Sh'))),
+        ("BloqueoPase", lambda: (fila_csv.get('BloqueoPase',''), get_defense('Pass'))),
+        ("Despejes", lambda: (fila_csv.get('Despejes',''), get_defense('Clr'))),
+        ("Regates", lambda: (fila_csv.get('Regates',''), get_possession('Att'))),
+        ("RegatesCompletados", lambda: (fila_csv.get('RegatesCompletados',''), get_possession('Succ'))),
+        ("RegatesFallidos", lambda: (fila_csv.get('RegatesFallidos',''), get_possession('Tkld'))),
+        ("Conducciones", lambda: (fila_csv.get('Conducciones',''), get_possession('Carries'))),
+        ("DistanciaConduccion", lambda: (fila_csv.get('DistanciaConduccion',''), get_possession('TotDist'))),
+        ("MetrosAvanzadosConduccion", lambda: (fila_csv.get('MetrosAvanzadosConduccion',''), get_possession('PrgDist'))),
+        ("ConduccionesProgresivas", lambda: (fila_csv.get('ConduccionesProgresivas',''), get_possession('PrgC'))),
+        ("DuelosAereosGanados", lambda: (fila_csv.get('DuelosAereosGanados',''), get_misc('Won'))),
+        ("DuelosAereosPerdidos", lambda: (fila_csv.get('DuelosAereosPerdidos',''), get_misc('Lost'))),
+        ("DuelosAereosGanadosPct", lambda: (fila_csv.get('DuelosAereosGanadosPct',''), get_misc('Won%'))),
+    ]
+
+    campos_mal = []
+    for campo, getter in campos_a_comprobar:
+        val_csv, val_html = getter()
+        if str(fmt(val_csv)) != str(fmt(val_html)):
+            campos_mal.append(campo)
+
+    if campos_mal:
+        print("\nCampos mal:", ", ".join(campos_mal))
+    else:
+        print("\nTodos los campos coinciden correctamente.")
+
 
 if __name__ == "__main__":
     # Ejemplo: analizar solo un jugador
-    analizar_jugador(1, 10, "Federico Valverde")
+    analizar_jugador(1, 10, "kylian mbappe")
 
     # Otros ejemplos:
     # analizar_partido(1, 10)
