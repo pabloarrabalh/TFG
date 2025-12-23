@@ -1,0 +1,41 @@
+#############################################################################################################
+#                                                                                                           #
+#   MAPEO DE CAMPOS: DE QUÉ TABLA Y COLUMNA DEL HTML DE FBREF SALE CADA CAMPO DEL CSV FINAL                #
+#                                                                                                           #
+#   - Min_partido               --> summary: Min                                                            #
+#   - Gol_partido               --> summary: Gls                                                            #
+#   - Asist_partido             --> summary: Ast                                                            #
+#   - xG_partido                --> summary: xG                                                             #
+#   - xA_partido                --> passing: xA  (si no existe, summary: xA)                                #
+#   - xAG                       --> summary: xAG                                                            #
+#   - Tiros                     --> summary: Sh                                                             #
+#   - TiroFallado_partido       --> summary: Sh - summary: SoT                                             #
+#   - TiroPuerta_partido        --> summary: SoT                                                            #
+#   - Pases_Totales             --> summary: Att                                                            #
+#   - Pases_Completados_Pct     --> passing: Cmp%  (si no existe, summary: Cmp%)                            #
+#   - Amarillas                 --> misc: CrdY                                                              #
+#   - Rojas                     --> misc: CrdR                                                              #
+#   - Goles_en_contra           --> keepers: GA  (solo si posicion == 'PT', si no, 0)                       #
+#   - Porcentaje_paradas        --> keepers: Save% (o Sv% o SV%) (solo si posicion == 'PT', si no, 0)       #
+#   - PSxG                      --> keepers: PSxG (solo si posicion == 'PT', si no, 0)                      #
+#   - Entradas                  --> defense: Tkl                                                            #
+#   - Duelos                    --> defense: Att                                                            #
+#   - DuelosGanados             --> defense: Won                                                            #
+#   - DuelosPerdidos            --> defense: Lost                                                           #
+#   - Bloqueos                  --> defense: Blocks                                                         #
+#   - BloqueoTiros              --> defense: Sh (dentro de Blocks)                                         #
+#   - BloqueoPase               --> defense: Pass                                                           #
+#   - Despejes                  --> defense: Clr                                                            #
+#   - Regates                   --> possession: Att (Take-Ons)                                             #
+#   - RegatesCompletados        --> possession: Succ (Take-Ons)                                            #
+#   - RegatesFallidos           --> possession: Tkld (Take-Ons)                                            #
+#   - Conducciones              --> possession: Carries                                                     #
+#   - DistanciaConduccion       --> possession: TotDist                                                     #
+#   - MetrosAvanzadosConduccion --> possession: PrgDist                                                     #
+#   - ConduccionesProgresivas   --> possession: PrgC                                                        #
+#   - DuelosAereosGanados       --> misc: Won                                                               #
+#   - DuelosAereosPerdidos      --> misc: Lost                                                              #
+#   - DuelosAereosGanadosPct    --> misc: Won%                                                              #
+#   - puntosFantasy             --> Solo del fichero puntos.html (no existe en FBref)                      #
+#                                                                                                           #
+#############################################################################################################
