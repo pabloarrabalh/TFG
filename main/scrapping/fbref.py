@@ -13,10 +13,10 @@ from commons import (
     normalizar_texto,
     normalizar_equipo,
     aplicar_alias,
+    aplicar_alias_contextual,
 )
 
-from rapidfuzz import process, fuzz  # solo para intentar_match si quieres mantenerlo
-
+from rapidfuzz import process, fuzz  
 
 pd.set_option('display.max_columns', None)
 
@@ -249,7 +249,10 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
 
     for clave_fb, row_sum in tablas_por_tipo.get('summary', {}).items():
         p_fb = str(row_sum.get('Player', '')).strip()
-        fb_norm = aplicar_alias(p_fb)
+        # Alias contextual: si es Espanyol y el nombre es 'Roca', usar 'Antoniu'
+        es_local = p_fb in equipo_local_nombres
+        equipo_fb = n_l_norm if es_local else n_v_norm
+        fb_norm = aplicar_alias_contextual(p_fb, equipo_fb)
 
         partes_fb_norm = fb_norm.split()
         primer_nombre = partes_fb_norm[0] if partes_fb_norm else fb_norm
@@ -269,8 +272,7 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
                 apellido_disp = partes_nombre[-1].capitalize()
                 nombre_csv_especial = f"{inicial}. {apellido_disp}"
 
-        es_local = p_fb in equipo_local_nombres
-        equipo_fb = n_l_norm if es_local else n_v_norm
+
 
         min_fb = limpiar_int(row_sum.get('Min', 0))
         pos_raw = str(row_sum.get('Pos', 'MC')).split(',')[0].strip().upper()
@@ -287,7 +289,7 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
             k: info for k, info in puntos_fantasy_match.items()
             if info.get("equipo_norm") == equipo_fb
         }
-        nombres_ff_norm = [info["nombre_norm"] for info in candidatos_equipo.values()]
+        nombres_ff_norm = [aplicar_alias_contextual(info["nombre_original"], equipo_fb) for info in candidatos_equipo.values()]
 
         inicial_williams = None
         if ultimo_apellido == "williams" and len(partes_fb_norm) >= 1:
@@ -504,11 +506,19 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
                 db[clave_db]['PSxG'] = psxg_val
 
         # --- ASIGNACIÓN DE PUNTOS MEJORADA PARA WILLIAMS ---
+
         clave_ff_asignada = asignacion_fb_a_ff.get(clave_fb)
         puntos_asignados = 0
         nombre_debug = nombre_csv.strip().lower()
+        # Caso especial: si el nombre es 'Roca' y el equipo es Espanyol, buscar puntos como 'Antoniu' usando alias contextual
+        if nombre_debug == "roca" and equipo_fb == "espanyol":
+            for k, info in puntos_fantasy_match.items():
+                nombre_alias = aplicar_alias_contextual(info["nombre_original"], equipo_fb)
+                if nombre_alias == "antoniu":
+                    puntos_asignados = info["puntos"]
+                    break
         # Si el nombre es "N. Williams" o "I. Williams", buscar explícitamente en puntos_fantasy_match
-        if nombre_debug in ["n. williams", "i. williams"]:
+        elif nombre_debug in ["n. williams", "i. williams"]:
             for k, info in puntos_fantasy_match.items():
                 if info["nombre_original"].strip().lower() == nombre_debug:
                     puntos_asignados = info["puntos"]
@@ -596,7 +606,7 @@ def ejecutar_rango(inicio, fin):
 
 
 if __name__ == "__main__":
-    ejecutar_rango(inicio=1, fin=1)
+    ejecutar_rango(inicio=2, fin=2)
 
     if JUGADORES_SIN_MATCH:
         print("\n[LOG] Jugadores que han quedado sin match en ninguna asignación de puntos:")

@@ -148,17 +148,29 @@ def comprobar_jornada_paths(path_html, csv_dir):
 
             nombres_norm_equipo = df_candidatos_equipo["player_norm"].tolist()
 
-            if es_apellido_ambiguo(nombre_html_norm, nombres_norm_equipo):
-                registrar_error(errores, clave_partido, equipo_html_norm,
-                                nombre_html, puntos_html, None, None, 0)
-                partido_ok = False
-                continue
+            # === CASO ESPECIAL ROCA (Antoniu Roca en Espanyol) ===
+            if nombre_html_norm == "roca" and equipo_html_norm == "espanyol":
+                candidatos_antoniu = [
+                    n for n in nombres_norm_equipo
+                    if n.startswith("antoniu")
+                ]
+                if len(candidatos_antoniu) == 1:
+                    nombre_match_norm = candidatos_antoniu[0]
+                    score_match = 100
+                else:
+                    nombre_match_norm, score_match = None, 0
+            else:
+                if es_apellido_ambiguo(nombre_html_norm, nombres_norm_equipo):
+                    registrar_error(errores, clave_partido, equipo_html_norm,
+                                    nombre_html, puntos_html, None, None, 0)
+                    partido_ok = False
+                    continue
 
-            nombre_match_norm, score_match = obtener_match_nombre(
-                nombre_html_norm, nombres_norm_equipo, score_cutoff=85
-            )
+                nombre_match_norm, score_match = obtener_match_nombre(
+                    nombre_html_norm, nombres_norm_equipo, score_cutoff=85
+                )
 
-            if nombre_match_norm is None:
+            if nombre_match_norm is None or score_match < 85:
                 registrar_error(errores, clave_partido, equipo_html_norm,
                                 nombre_html, puntos_html, None, None, score_match)
                 partido_ok = False
@@ -252,11 +264,19 @@ def comparar_partido(num_jornada, num_partido):
 
     for equipo_html_raw, nombre_html, puntos_html in jugadores_html:
         nombre_html_norm = normalizar_texto(aplicar_alias(nombre_html))
-
         nombres_csv = df_partido["player_norm"].tolist()
-        match_norm, score = obtener_match_nombre(
-            nombre_html_norm, nombres_csv, score_cutoff=85
-        )
+
+        # mismo caso especial en la comparativa
+        if nombre_html_norm == "roca" and normalizar_equipo(equipo_html_raw) == "espanyol":
+            candidatos_antoniu = [n for n in nombres_csv if n.startswith("antoniu")]
+            if len(candidatos_antoniu) == 1:
+                match_norm, score = candidatos_antoniu[0], 100
+            else:
+                match_norm, score = None, 0
+        else:
+            match_norm, score = obtener_match_nombre(
+                nombre_html_norm, nombres_csv, score_cutoff=85
+            )
 
         puntos_csv = "-"
         estado = "❓ No existe"
@@ -271,4 +291,4 @@ def comparar_partido(num_jornada, num_partido):
 
 if __name__ == "__main__":
     comprobar_jornada(1)
-    #comparar_partido(1, 2)
+    # comparar_partido(2, 1)

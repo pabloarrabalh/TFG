@@ -48,9 +48,17 @@ def normalizar_equipo(nombre_equipo):
     nombre_norm = normalizar_texto(nombre_equipo)
     return ALIAS_EQUIPOS.get(nombre_norm, nombre_norm)
 
+
 def aplicar_alias(nombre_jugador):
     nombre_norm = normalizar_texto(nombre_jugador)
     return ALIAS_JUGADORES.get(nombre_norm, nombre_norm)
+
+# Alias contextual: solo para casos como 'Roca' en Espanyol
+def aplicar_alias_contextual(nombre_jugador, equipo_norm=None):
+    nombre_norm = normalizar_texto(nombre_jugador)
+    if nombre_norm == "roca" and equipo_norm == "espanyol":
+        return "antoniu"
+    return aplicar_alias(nombre_jugador)
 
 def normalizar_puntos(valor):
     if valor in ["-", "–", "", None]: return 0
