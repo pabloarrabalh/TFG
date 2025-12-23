@@ -20,7 +20,7 @@ ALIAS_EQUIPOS = {
 ALIAS_JUGADORES = {
     "isaac palazon camacho": "isi palazon",
     "jose luis garcia vaya": "pepelu",
-    "ezequiel avila": "chimy avila",
+    "ezequiel avila": "chimy",
     "cunat campos": "pablo cunat",
     "alhassane": "rahim bonkano",
     "tsygankov": "viktor tsyhankov",

@@ -9,7 +9,7 @@
 #   - xA_partido                --> passing: xA  (si no existe, summary: xA)                                #
 #   - xAG                       --> summary: xAG                                                            #
 #   - Tiros                     --> summary: Sh                                                             #
-#   - TiroFallado_partido       --> summary: Sh - summary: SoT                                              #
+#   - TiroFallado_partido       --> summary: Sh - summary: SoT                                             #
 #   - TiroPuerta_partido        --> summary: SoT                                                            #
 #   - Pases_Totales             --> summary: Att                                                            #
 #   - Pases_Completados_Pct     --> passing: Cmp%  (si no existe, summary: Cmp%)                            #
@@ -39,7 +39,6 @@
 #   - puntosFantasy             --> Solo del fichero puntos.html (no existe en FBref)                      #
 #                                                                                                           #
 #############################################################################################################
-
 
 # scrapper_fbref.py
 import os
@@ -73,7 +72,6 @@ os.makedirs(BASE_FOLDER_CSV, exist_ok=True)
 COLUMNAS_MODELO = [
     'player', 'posicion', 'Equipo_propio', 'Equipo_rival', 'Titular',
     'Min_partido', 'Gol_partido', 'Asist_partido', 'xG_partido',
-    # 'xA_partido',
     'xAG',
     'Tiros', 'TiroFallado_partido', 'TiroPuerta_partido', 'Pases_Totales', 'Pases_Completados_Pct',
     'Amarillas', 'Rojas', 'Goles_en_contra', 'Porcentaje_paradas', 'PSxG', 'puntosFantasy',
@@ -92,7 +90,6 @@ scraper = cloudscraper.create_scraper(
     browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True}
 )
 
-
 def get_headers():
     return {
         "User-Agent": (
@@ -103,7 +100,6 @@ def get_headers():
         "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
         "Referer": "https://www.google.com/"
     }
-
 
 def limpiar_float(val):
     if isinstance(val, pd.Series):
@@ -116,13 +112,11 @@ def limpiar_float(val):
     except:
         return np.nan
 
-
 def limpiar_int(val):
     f = limpiar_float(val)
     if pd.isna(f):
         return np.nan
     return int(round(f))
-
 
 def obtener_calendario_local_o_remoto():
     path_local = "calendario.html"
@@ -152,7 +146,6 @@ def obtener_calendario_local_o_remoto():
             link = "https://fbref.com" + href if not href.startswith('http') else href
             calendario.setdefault(j_num, []).append(link)
     return calendario
-
 
 def extraer_puntos_fantasy_jornada(jornada):
     path_puntos = os.path.join(BASE_FOLDER_HTML, f"j{jornada}", "puntos.html")
@@ -223,6 +216,13 @@ def extraer_puntos_fantasy_jornada(jornada):
                     "equipo_norm": equipo_norm,
                 }
 
+                # LOG DEBUG para Pepelu y hermanos Williams
+                base_norm = normalizar_texto(nombre_real)
+                if base_norm in ("pepelu", "n williams", "i williams"):
+                    print(f"[FF_DEBUG] puntos.html -> partido={clave_partido} "
+                          f"equipo={equipo_tabla_norm} orig='{nombre_real}' "
+                          f"norm='{nombre_norm}' puntos={puntos}")
+
                 if clave_ff in puntos_map:
                     if abs(puntos) > abs(puntos_map[clave_ff]["puntos"]):
                         puntos_map[clave_ff] = info_jugador
@@ -233,7 +233,6 @@ def extraer_puntos_fantasy_jornada(jornada):
 
     return res
 
-
 def obtener_nombres_partido_fbref(html_content):
     soup = BeautifulSoup(html_content, 'lxml')
     title = soup.find('title').get_text() if soup.find('title') else "Match"
@@ -242,7 +241,6 @@ def obtener_nombres_partido_fbref(html_content):
     except:
         n_l, n_v = "Local", "Visitante"
     return n_l, n_v
-
 
 def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
     soup = BeautifulSoup(html_content, 'lxml')
@@ -412,6 +410,14 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
             "row_sum": row_sum,
         })
 
+        # LOG de matching para Pepelu y hermanos Williams
+        base_fb = normalizar_texto(p_fb)
+        if base_fb in ("pepelu", "nico williams", "iñaki williams"):
+            print(f"[FB_DEBUG] partido_idx={idx_partido} equipo_fb={equipo_fb} "
+                  f"p_fb='{p_fb}' fb_norm='{fb_norm}' "
+                  f"best_norm='{best_name_norm}' best_orig='{best_name_original}' "
+                  f"score={best_score}")
+
     fantasy_por_nombre_norm = {}
     for k_ff, info in puntos_fantasy_match.items():
         nombre_norm = info["nombre_norm"]
@@ -536,12 +542,20 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
                 db[clave_db]['Porcentaje_paradas'] = sv_val
                 db[clave_db]['PSxG'] = psxg_val
 
-        # ASIGNACIÓN DE PUNTOS FANTASY (solo por asignación_fb_a_ff)
+        # ASIGNACIÓN DE PUNTOS FANTASY (solo por asignacion_fb_a_ff)
         clave_ff_asignada = asignacion_fb_a_ff.get(clave_fb)
         puntos_asignados = 0
         if clave_ff_asignada is not None:
             puntos_asignados = puntos_fantasy_match[clave_ff_asignada]['puntos']
         db[clave_db]['puntosFantasy'] = puntos_asignados
+
+        # LOG de asignación para Pepelu y hermanos Williams
+        base_fb = normalizar_texto(p_fb)
+        if base_fb in ("pepelu", "nico williams", "iñaki williams"):
+            print(f"[ASIG_DEBUG] partido_idx={idx_partido} equipo_fb={equipo_fb} "
+                  f"p_fb='{p_fb}' fb_norm='{fb_norm}' "
+                  f"clave_ff_asignada={clave_ff_asignada} "
+                  f"puntosFantasy={puntos_asignados}")
 
         if clave_ff_asignada is None and idx_partido in (1, 2, 3):
             JUGADORES_SIN_MATCH.append({
@@ -568,7 +582,6 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
         df_final.loc[mask_doble_amarilla, 'Rojas'] = 1.0
 
     return df_final, n_l, n_v
-
 
 def ejecutar_rango(inicio, fin):
     print("🚀 INICIANDO SISTEMA...")
@@ -619,7 +632,6 @@ def ejecutar_rango(inicio, fin):
 
             if JUGADORES_SIN_MATCH:
                 jugadores_sin_match_jornada.extend(JUGADORES_SIN_MATCH)
-
 
 if __name__ == "__main__":
     ejecutar_rango(inicio=1, fin=1)
