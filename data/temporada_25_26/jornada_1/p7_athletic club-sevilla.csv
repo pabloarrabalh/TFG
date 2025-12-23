@@ -1,9 +1,9 @@
 ﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
 Maroan Sannadi,DT,athletic,sevilla,1,66,1,0,0.9,0.5,2,1,1,18,77.8,0,0,0.0,0.0,0.0,10,0,1,0,1,0,0,0,0,1,0,1,14,49.0,11.0,0,0,2,0.0
 Gorka Guruzeta,DT,athletic,sevilla,0,24,0,0,0.0,0.0,0,0,0,10,80.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,9,29.0,6.0,0,0,2,0.0
-N. Williams,DT,athletic,sevilla,1,82,1,1,1.4,0.3,3,3,0,37,75.7,0,0,0.0,0.0,0.0,18,0,1,0,1,0,0,0,0,14,8,6,30,295.0,188.0,9,0,0,0.0
+Nico Williams,DT,athletic,sevilla,1,82,1,1,1.4,0.3,3,3,0,37,75.7,0,0,0.0,0.0,0.0,18,0,1,0,1,0,0,0,0,14,8,6,30,295.0,188.0,9,0,0,0.0
 Alejandro Rego,MC,athletic,sevilla,0,8,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,2,1,1,0,0,1,1,0,0,0,0,0,2,25.0,17.0,1,0,0,0.0
-I. Williams,DT,athletic,sevilla,1,90,0,0,0.0,0.1,1,1,0,19,78.9,0,0,0.0,0.0,0.0,2,1,1,0,1,0,0,0,0,2,0,1,18,93.0,52.0,1,0,1,0.0
+Iñaki Williams,DT,athletic,sevilla,1,90,0,0,0.0,0.1,1,1,0,19,78.9,0,0,0.0,0.0,0.0,2,1,1,0,1,0,0,0,0,2,0,1,18,93.0,52.0,1,0,1,0.0
 Álex Berenguer,MC,athletic,sevilla,1,66,0,0,0.1,0.1,2,2,0,25,64.0,0,0,0.0,0.0,0.0,5,1,0,0,0,1,0,1,0,4,2,1,13,99.0,75.0,1,0,3,0.0
 Roberto Navarro,MC,athletic,sevilla,0,24,1,0,0.2,0.0,1,0,1,8,62.5,0,0,0.0,0.0,0.0,9,0,0,0,0,1,0,1,0,1,0,1,10,48.0,23.0,1,1,0,100.0
 Mikel Jauregizar,MC,athletic,sevilla,1,90,0,0,0.0,0.0,0,0,0,38,84.2,0,0,0.0,0.0,0.0,3,2,1,0,0,1,0,1,0,2,0,2,20,100.0,36.0,0,0,0,0.0
