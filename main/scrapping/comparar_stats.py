@@ -50,10 +50,8 @@ TABLAS_FBREF = {
     "defense": ["_defense"],
     "possession": ["_possession"],
     "misc": ["_misc"],
-    # Adaptado para tablas de portero tipo keeper_stats_XXXX
     "keepers": ["keeper_stats_"],
 }
-
 
 def limpiar_float(val):
     if isinstance(val, pd.Series):
@@ -66,13 +64,9 @@ def limpiar_float(val):
     except:
         return 0.0
 
-
 def limpiar_numero(val):
     """
-    Normaliza valores numéricos para comparación:
-    - Quita % y saltos de línea.
-    - Convierte a float.
-    - Si es NaN o no convertible, devuelve 0.0.
+    Normaliza valores numéricos para comparación.
     """
     if isinstance(val, pd.Series):
         val = val.iloc[0]
@@ -85,7 +79,6 @@ def limpiar_numero(val):
     if pd.isna(num):
         return 0.0
     return float(num)
-
 
 def extraer_tablas_fbref(html_content):
     soup = BeautifulSoup(html_content, 'lxml')
@@ -119,7 +112,6 @@ def extraer_tablas_fbref(html_content):
             tablas[tipo] = pd.concat(dfs, ignore_index=True)
     return tablas
 
-
 def construir_diccionario_jugadores(tablas):
     jugadores = {}
     for tipo, df in tablas.items():
@@ -129,6 +121,7 @@ def construir_diccionario_jugadores(tablas):
                 continue
             equipo = str(row.get('Squad', '')).strip() if 'Squad' in row else None
             equipo_norm = normalizar_equipo(equipo) if equipo else None
+            # alias por equipo
             nombre_norm = normalizar_texto(aplicar_alias(nombre, equipo_norm))
             if nombre_norm not in jugadores:
                 jugadores[nombre_norm] = {}
@@ -143,7 +136,6 @@ def construir_diccionario_jugadores(tablas):
                     jugadores[nombre_norm][key] = val
     return jugadores
 
-
 def buscar_valor(jugador_dict, posibles_campos, preferencia_tipo=None):
     if preferencia_tipo is None:
         preferencia_tipo = list(TABLAS_FBREF.keys())
@@ -154,7 +146,6 @@ def buscar_valor(jugador_dict, posibles_campos, preferencia_tipo=None):
                 return jugador_dict[key]
     return None
 
-
 def fmt(val):
     try:
         f = float(val)
@@ -163,7 +154,6 @@ def fmt(val):
         return str(f)
     except:
         return str(val)
-
 
 def mostrar_analisis_jugador(resultado):
     """
@@ -187,32 +177,46 @@ def mostrar_analisis_jugador(resultado):
         html_val = d["html"]
         print(f"  - {campo}: CSV={csv_val} | HTML={html_val}")
 
-
 def comparar_partido_stats(path_html, path_csv, jugador_objetivo="kylian mbappe"):
     with open(path_html, "r", encoding="utf-8") as f:
         html_content = f.read()
     tablas = extraer_tablas_fbref(html_content)
     jugadores_html = construir_diccionario_jugadores(tablas)
+
     df_csv = pd.read_csv(path_csv)
+    # player_norm con alias por equipo
     df_csv["player_norm"] = df_csv.apply(
-        lambda row: normalizar_texto(aplicar_alias(row["player"], row["Equipo_propio"])), axis=1
+        lambda row: normalizar_texto(
+            aplicar_alias(row["player"], normalizar_equipo(row["Equipo_propio"]))
+        ),
+        axis=1,
     )
 
     # Buscar fila del CSV
-    fila_jugador = df_csv[df_csv["player_norm"].str.lower() == normalizar_texto(aplicar_alias(jugador_objetivo)).lower()]
+    # primero normalizamos objetivo con equipo real del CSV
+    jugador_norm_busqueda = normalizar_texto(jugador_objetivo)
+    fila_jugador = df_csv[df_csv["player_norm"] == jugador_norm_busqueda]
     if fila_jugador.empty:
-        return None
+        # fallback: usar alias sin equipo (compatibilidad)
+        fila_jugador = df_csv[
+            df_csv["player_norm"]
+            == normalizar_texto(aplicar_alias(jugador_objetivo, None))
+        ]
+        if fila_jugador.empty:
+            return None
 
     fila_csv = fila_jugador.iloc[0]
-    equipo_jugador = fila_csv["Equipo_propio"]
+    equipo_jugador = normalizar_equipo(fila_csv["Equipo_propio"])
 
-    # Nombre normalizado directo
+    # Nombre normalizado para HTML/FBref usando alias por equipo
     jugador_norm = normalizar_texto(aplicar_alias(jugador_objetivo, equipo_jugador))
 
     if jugador_norm not in jugadores_html:
-        # Intentar match inteligente usando obtener_match_nombre
+        # Intentar match inteligente usando obtener_match_nombre (pasando equipo)
         nombres_norm_equipo = list(jugadores_html.keys())
-        match_norm, score = obtener_match_nombre(jugador_objetivo, nombres_norm_equipo)
+        match_norm, score = obtener_match_nombre(
+            jugador_objetivo, nombres_norm_equipo, equipo_norm=equipo_jugador
+        )
         if match_norm is None:
             return None
         jugador_norm = match_norm
@@ -252,7 +256,6 @@ def comparar_partido_stats(path_html, path_csv, jugador_objetivo="kylian mbappe"
         "es_portero": es_portero,
     }
 
-
 # ========= ANALISIS JUGADOR / PARTIDO =========
 
 def analizar_jugador_interno(num_jornada, num_partido, nombre_jugador):
@@ -288,7 +291,9 @@ def analizar_jugador_interno(num_jornada, num_partido, nombre_jugador):
         tablas = extraer_tablas_fbref(html_content)
         jugadores_html = construir_diccionario_jugadores(tablas)
         nombres_norm_equipo = list(jugadores_html.keys())
-        match_norm, score = obtener_match_nombre(nombre_jugador, nombres_norm_equipo)
+        match_norm, score = obtener_match_nombre(
+            nombre_jugador, nombres_norm_equipo
+        )
         if match_norm is None:
             return {
                 "ok": False,
@@ -382,18 +387,12 @@ def analizar_jugador_interno(num_jornada, num_partido, nombre_jugador):
         "discrepancias": discrepancias,
     }
 
-
 def analizar_jugador(num_jornada, num_partido, nombre_jugador):
     print(f"[LOG] Procesando jugador: {nombre_jugador}")
     resultado = analizar_jugador_interno(num_jornada, num_partido, nombre_jugador)
     mostrar_analisis_jugador(resultado)
 
-
 def analizar_partido_completo(num_jornada, num_partido, errores_jornada):
-    """
-    Analiza un partido completo y acumula los jugadores con errores
-    en la lista 'errores_jornada' (lista de dicts).
-    """
     carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
     archivos_csv = [
         n for n in os.listdir(carpeta_csv)
@@ -432,13 +431,7 @@ def analizar_partido_completo(num_jornada, num_partido, errores_jornada):
                 "detalle": ", ".join(resultado["campos_mal"]),
             })
 
-
 def analizar_jornada_completa(num_jornada):
-    """
-    Recorre todos los partidos de la jornada (todos los pX_*.csv)
-    y para cada partido recorre todos los jugadores, mostrando solo
-    los que tienen errores y, al final, un resumen global de la jornada.
-    """
     carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
     if not os.path.exists(carpeta_csv):
         print(f"No existe la carpeta de la jornada {num_jornada}")
@@ -463,7 +456,6 @@ def analizar_jornada_completa(num_jornada):
         print(f"\n[LOG] ===== Procesando partido {num_partido} de la jornada {num_jornada} =====")
         analizar_partido_completo(num_jornada, num_partido, errores_jornada)
 
-    # RESUMEN FINAL DE JORNADA
     print("\n" + "=" * 80)
     print(f"RESUMEN JORNADA {num_jornada}")
     if not errores_jornada:
@@ -475,7 +467,6 @@ def analizar_jornada_completa(num_jornada):
                 f" - j{err['jornada']} p{err['partido']} | {err['jugador']} | "
                 f"{err['tipo']} | {err['detalle']}"
             )
-
 
 if __name__ == "__main__":
     analizar_jornada_completa(1)

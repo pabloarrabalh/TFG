@@ -1,46 +1,7 @@
 #############################################################################################################
-#                                                                                                           #
-#   MAPEO DE CAMPOS: DE QUÉ TABLA Y COLUMNA DEL HTML DE FBREF SALE CADA CAMPO DEL CSV FINAL                #
-#                                                                                                           #
-#   - Min_partido               --> summary: Min                                                            #
-#   - Gol_partido               --> summary: Gls                                                            #
-#   - Asist_partido             --> summary: Ast                                                            #
-#   - xG_partido                --> summary: xG                                                             #
-#   - xA_partido                --> passing: xA  (si no existe, summary: xA)                                #
-#   - xAG                       --> summary: xAG                                                            #
-#   - Tiros                     --> summary: Sh                                                             #
-#   - TiroFallado_partido       --> summary: Sh - summary: SoT                                             #
-#   - TiroPuerta_partido        --> summary: SoT                                                            #
-#   - Pases_Totales             --> summary: Att                                                            #
-#   - Pases_Completados_Pct     --> passing: Cmp%  (si no existe, summary: Cmp%)                            #
-#   - Amarillas                 --> misc: CrdY                                                              #
-#   - Rojas                     --> misc: CrdR                                                              #
-#   - Goles_en_contra           --> keepers: GA  (solo si posicion == 'PT', si no, 0)                       #
-#   - Porcentaje_paradas        --> keepers: Save% (o Sv% o SV%) (solo si posicion == 'PT', si no, 0)       #
-#   - PSxG                      --> keepers: PSxG (solo si posicion == 'PT', si no, 0)                      #
-#   - Entradas                  --> defense: Tkl                                                            #
-#   - Duelos                    --> defense: Att                                                            #
-#   - DuelosGanados             --> defense: Won                                                            #
-#   - DuelosPerdidos            --> defense: Lost                                                           #
-#   - Bloqueos                  --> defense: Blocks                                                         #
-#   - BloqueoTiros              --> defense: Sh (dentro de Blocks)                                         #
-#   - BloqueoPase               --> defense: Pass                                                           #
-#   - Despejes                  --> defense: Clr                                                            #
-#   - Regates                   --> possession: Att (Take-Ons)                                             #
-#   - RegatesCompletados        --> possession: Succ (Take-Ons)                                            #
-#   - RegatesFallidos           --> possession: Tkld (Take-Ons)                                            #
-#   - Conducciones              --> possession: Carries                                                     #
-#   - DistanciaConduccion       --> possession: TotDist                                                     #
-#   - MetrosAvanzadosConduccion --> possession: PrgDist                                                     #
-#   - ConduccionesProgresivas   --> possession: PrgC                                                        #
-#   - DuelosAereosGanados       --> misc: Won                                                               #
-#   - DuelosAereosPerdidos      --> misc: Lost                                                              #
-#   - DuelosAereosGanadosPct    --> misc: Won%                                                              #
-#   - puntosFantasy             --> Solo del fichero puntos.html (no existe en FBref)                      #
-#                                                                                                           #
+#   scrapper_fbref.py  (versión con LOGS extra + equipo desde caption tabla FBref)
 #############################################################################################################
 
-# scrapper_fbref.py
 import os
 import re
 from io import StringIO
@@ -90,6 +51,18 @@ scraper = cloudscraper.create_scraper(
     browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True}
 )
 
+DEBUG_NOMBRES = (
+    "isi", "isi palazon", "isaac palazon camacho",
+    "pepelu", "jose luis garcia vaya",
+    "chimy", "ezequiel avila",
+    "nico williams", "iñaki williams"
+)
+
+
+def es_debug_nombre(nombre):
+    return normalizar_texto(nombre) in DEBUG_NOMBRES
+
+
 def get_headers():
     return {
         "User-Agent": (
@@ -100,6 +73,7 @@ def get_headers():
         "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
         "Referer": "https://www.google.com/"
     }
+
 
 def limpiar_float(val):
     if isinstance(val, pd.Series):
@@ -112,11 +86,13 @@ def limpiar_float(val):
     except:
         return np.nan
 
+
 def limpiar_int(val):
     f = limpiar_float(val)
     if pd.isna(f):
         return np.nan
     return int(round(f))
+
 
 def obtener_calendario_local_o_remoto():
     path_local = "calendario.html"
@@ -146,6 +122,7 @@ def obtener_calendario_local_o_remoto():
             link = "https://fbref.com" + href if not href.startswith('http') else href
             calendario.setdefault(j_num, []).append(link)
     return calendario
+
 
 def extraer_puntos_fantasy_jornada(jornada):
     path_puntos = os.path.join(BASE_FOLDER_HTML, f"j{jornada}", "puntos.html")
@@ -205,8 +182,9 @@ def extraer_puntos_fantasy_jornada(jornada):
                 equipo_norm = equipo_tabla_norm
                 clave_ff = f"{equipo_norm}|{nombre_real}"
 
-                # Nombre normalizado + alias contextual (clave común con FBref)
-                nombre_norm = normalizar_texto(aplicar_alias_contextual(nombre_real, equipo_tabla_norm))
+                nombre_norm = normalizar_texto(
+                    aplicar_alias_contextual(nombre_real, equipo_tabla_norm)
+                )
 
                 info_jugador = {
                     "nombre_original": nombre_real,
@@ -216,12 +194,11 @@ def extraer_puntos_fantasy_jornada(jornada):
                     "equipo_norm": equipo_norm,
                 }
 
-                # LOG DEBUG para Pepelu y hermanos Williams
-                base_norm = normalizar_texto(nombre_real)
-                if base_norm in ("pepelu", "n williams", "i williams"):
+                if es_debug_nombre(nombre_real):
                     print(f"[FF_DEBUG] puntos.html -> partido={clave_partido} "
                           f"equipo={equipo_tabla_norm} orig='{nombre_real}' "
-                          f"norm='{nombre_norm}' puntos={puntos}")
+                          f"nombre_norm='{nombre_norm}' puntos={puntos} "
+                          f"clave_ff='{clave_ff}'")
 
                 if clave_ff in puntos_map:
                     if abs(puntos) > abs(puntos_map[clave_ff]["puntos"]):
@@ -233,6 +210,7 @@ def extraer_puntos_fantasy_jornada(jornada):
 
     return res
 
+
 def obtener_nombres_partido_fbref(html_content):
     soup = BeautifulSoup(html_content, 'lxml')
     title = soup.find('title').get_text() if soup.find('title') else "Match"
@@ -241,6 +219,7 @@ def obtener_nombres_partido_fbref(html_content):
     except:
         n_l, n_v = "Local", "Visitante"
     return n_l, n_v
+
 
 def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
     soup = BeautifulSoup(html_content, 'lxml')
@@ -254,6 +233,15 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
     n_v_norm = normalizar_equipo(n_v)
 
     puntos_fantasy_match = puntos_fantasy_dict
+
+    if any(es_debug_nombre(info["nombre_original"]) for info in puntos_fantasy_match.values()):
+        print(f"[DBG_PARTIDO] idx={idx_partido} n_l='{n_l}' n_v='{n_v}' "
+              f"clave_ff_partido='{n_l_norm}-{n_v_norm}'")
+        for k_ff, info in puntos_fantasy_match.items():
+            if es_debug_nombre(info["nombre_original"]):
+                print(f"[DBG_PARTIDO_FF] idx={idx_partido} clave_ff='{k_ff}' "
+                      f"orig='{info['nombre_original']}' nom_norm='{info['nombre_norm']}' "
+                      f"puntos={info['puntos']} equipo_norm='{info['equipo_norm']}'")
 
     lineup_divs = soup.find_all('div', class_='lineup')
     titulares_nombres = []
@@ -273,6 +261,13 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
             table_objs = soup.find_all('table', id=re.compile(f"stats_.*_{tipo}"))
 
         for table_obj in table_objs:
+            caption = table_obj.find('caption')
+            caption_text = caption.get_text(strip=True) if caption else ""
+            equipo_tabla_from_caption = None
+            if caption_text.endswith("Player Stats Table"):
+                nombre_equipo_caption = caption_text.replace(" Player Stats Table", "").strip()
+                equipo_tabla_from_caption = nombre_equipo_caption
+
             try:
                 df_raw = pd.read_html(StringIO(str(table_obj)))[0]
             except Exception:
@@ -283,6 +278,8 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
                 for col in df_raw.columns.get_level_values(-1)
             ]
 
+            table_id = table_obj.get('id', '')
+
             for _, row in df_raw.iterrows():
                 nombre_raw = re.sub(r'\s\(.*\)', '', str(row['Player'])).strip()
                 if (
@@ -291,9 +288,31 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
                 ):
                     continue
 
-                equipo = str(row.get('Squad', '')).strip() if 'Squad' in row else None
+                equipo = str(row.get('Squad', '')).strip() if 'Squad' in row else ""
+
+                if not equipo:
+                    if equipo_tabla_from_caption:
+                        equipo = equipo_tabla_from_caption
+                    elif "_home_" in table_id:
+                        equipo = n_l
+                    elif "_away_" in table_id:
+                        equipo = n_v
+
                 equipo_norm = normalizar_equipo(equipo) if equipo else None
-                fb_norm = normalizar_texto(aplicar_alias_contextual(nombre_raw, equipo_norm))
+
+                fb_norm = normalizar_texto(
+                    aplicar_alias_contextual(nombre_raw, equipo_norm)
+                )
+
+                if equipo_norm in ("valencia", "betis"):
+                    print(f"[FBREF_VALBET] tipo={tipo} partido_idx={idx_partido} "
+                          f"table_id='{table_id}' equipo='{equipo}' equipo_norm='{equipo_norm}' "
+                          f"player_raw='{nombre_raw}' fb_norm='{fb_norm}'")
+
+                if es_debug_nombre(nombre_raw) or es_debug_nombre(fb_norm):
+                    print(f"[FBREF_DEBUG] tipo={tipo} partido_idx={idx_partido} "
+                          f"table_id='{table_id}' equipo='{equipo}' equipo_norm='{equipo_norm}' "
+                          f"player_raw='{nombre_raw}' fb_norm='{fb_norm}'")
 
                 dic[fb_norm] = row
 
@@ -373,7 +392,6 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
 
         matches_usados = []
 
-        # Intentos de matching por diferentes variantes
         best_name_norm, best_score, matches_usados = intentar_match(
             fb_norm, best_name_norm, best_score
         )
@@ -410,13 +428,19 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
             "row_sum": row_sum,
         })
 
-        # LOG de matching para Pepelu y hermanos Williams
-        base_fb = normalizar_texto(p_fb)
-        if base_fb in ("pepelu", "nico williams", "iñaki williams"):
-            print(f"[FB_DEBUG] partido_idx={idx_partido} equipo_fb={equipo_fb} "
+        if equipo_fb in ("valencia", "betis"):
+            print(f"[MATCH_VALBET] partido_idx={idx_partido} equipo_fb={equipo_fb} "
                   f"p_fb='{p_fb}' fb_norm='{fb_norm}' "
+                  f"candidatos={nombres_ff_norm} "
                   f"best_norm='{best_name_norm}' best_orig='{best_name_original}' "
-                  f"score={best_score}")
+                  f"score={best_score} matches={matches_usados}")
+
+        if es_debug_nombre(p_fb) or es_debug_nombre(fb_norm):
+            print(f"[MATCH_DEBUG] partido_idx={idx_partido} equipo_fb={equipo_fb} "
+                  f"p_fb='{p_fb}' fb_norm='{fb_norm}' "
+                  f"candidatos={nombres_ff_norm} "
+                  f"best_norm='{best_name_norm}' best_orig='{best_name_original}' "
+                  f"score={best_score} matches={matches_usados}")
 
     fantasy_por_nombre_norm = {}
     for k_ff, info in puntos_fantasy_match.items():
@@ -426,6 +450,11 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
             "puntos": info["puntos"],
             "info": info,
         })
+
+    for nombre_norm, lista in fantasy_por_nombre_norm.items():
+        if nombre_norm in ("isi palazon", "pepelu", "chimy"):
+            print(f"[DBG_FF_GROUP] partido_idx={idx_partido} nombre_norm='{nombre_norm}' "
+                  f"candidatos_ff={[ (x['clave_ff'], x['puntos']) for x in lista ]}")
 
     asignacion_fb_a_ff = {}
 
@@ -440,6 +469,8 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
     for nombre_norm, props in propuestas_por_nombre_norm.items():
         candidatos_ff = fantasy_por_nombre_norm.get(nombre_norm, [])
         if not candidatos_ff:
+            if nombre_norm in ("isi palazon", "pepelu", "chimy"):
+                print(f"[DBG_ASIG] sin candidatos_ff para nombre_norm='{nombre_norm}'")
             continue
 
         props_ordenadas = sorted(props, key=lambda p: p["min_fb"], reverse=True)
@@ -447,6 +478,10 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
 
         for prop, cand in zip(props_ordenadas, cands_ordenados):
             asignacion_fb_a_ff[prop["clave_fb"]] = cand["clave_ff"]
+            if nombre_norm in ("isi palazon", "pepelu", "chimy"):
+                print(f"[DBG_ASIG] nombre_norm='{nombre_norm}' "
+                      f"clave_fb='{prop['clave_fb']}' -> clave_ff='{cand['clave_ff']}' "
+                      f"puntos={cand['puntos']}")
 
     db = {}
 
@@ -542,20 +577,21 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
                 db[clave_db]['Porcentaje_paradas'] = sv_val
                 db[clave_db]['PSxG'] = psxg_val
 
-        # ASIGNACIÓN DE PUNTOS FANTASY (solo por asignacion_fb_a_ff)
         clave_ff_asignada = asignacion_fb_a_ff.get(clave_fb)
         puntos_asignados = 0
         if clave_ff_asignada is not None:
             puntos_asignados = puntos_fantasy_match[clave_ff_asignada]['puntos']
         db[clave_db]['puntosFantasy'] = puntos_asignados
 
-        # LOG de asignación para Pepelu y hermanos Williams
-        base_fb = normalizar_texto(p_fb)
-        if base_fb in ("pepelu", "nico williams", "iñaki williams"):
+        if equipo_fb in ("valencia", "betis"):
+            print(f"[ASIG_VALBET] partido_idx={idx_partido} equipo_fb={equipo_fb} "
+                  f"p_fb='{p_fb}' fb_norm='{fb_norm}' clave_db='{clave_db}' "
+                  f"clave_ff_asignada={clave_ff_asignada} puntosFantasy={puntos_asignados}")
+
+        if es_debug_nombre(p_fb) or es_debug_nombre(fb_norm):
             print(f"[ASIG_DEBUG] partido_idx={idx_partido} equipo_fb={equipo_fb} "
-                  f"p_fb='{p_fb}' fb_norm='{fb_norm}' "
-                  f"clave_ff_asignada={clave_ff_asignada} "
-                  f"puntosFantasy={puntos_asignados}")
+                  f"p_fb='{p_fb}' fb_norm='{fb_norm}' clave_db='{clave_db}' "
+                  f"clave_ff_asignada={clave_ff_asignada} puntosFantasy={puntos_asignados}")
 
         if clave_ff_asignada is None and idx_partido in (1, 2, 3):
             JUGADORES_SIN_MATCH.append({
@@ -581,7 +617,13 @@ def procesar_partido(html_content, puntos_fantasy_dict, idx_partido):
         mask_doble_amarilla = df_final['Amarillas'] >= 2
         df_final.loc[mask_doble_amarilla, 'Rojas'] = 1.0
 
+        debug_rows = df_final[df_final['player'].apply(es_debug_nombre)]
+        if not debug_rows.empty:
+            print(f"[DF_DEBUG] idx={idx_partido} filas debug antes de to_csv:")
+            print(debug_rows[['player', 'Equipo_propio', 'puntosFantasy', 'Min_partido']])
+
     return df_final, n_l, n_v
+
 
 def ejecutar_rango(inicio, fin):
     print("🚀 INICIANDO SISTEMA...")
@@ -632,6 +674,7 @@ def ejecutar_rango(inicio, fin):
 
             if JUGADORES_SIN_MATCH:
                 jugadores_sin_match_jornada.extend(JUGADORES_SIN_MATCH)
+
 
 if __name__ == "__main__":
     ejecutar_rango(inicio=1, fin=1)

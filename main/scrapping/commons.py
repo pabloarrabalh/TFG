@@ -3,7 +3,6 @@ import unicodedata
 import re
 from rapidfuzz import process, fuzz
 
-
 # ==========================================
 # CONFIGURACIÓN Y DICCIONARIOS
 # ==========================================
@@ -17,25 +16,49 @@ ALIAS_EQUIPOS = {
     "atletico madrid": "atletico madrid",
 }
 
+# ALIAS_JUGADORES por equipo (claves normalizadas)
 ALIAS_JUGADORES = {
-    "isaac palazon camacho": "isi palazon",
-    "jose luis garcia vaya": "pepelu",
-    "ezequiel avila": "chimy",
-    "cunat campos": "pablo cunat",
-    "alhassane": "rahim bonkano",
-    "tsygankov": "viktor tsyhankov",
-    "elabdellaoui": "el abdellaoui",
-    "caletacar": "caleta car",
-    "alexanderarnold": "trent alexander arnold",
-    "sorloth": "alexander sorloth",
-    "n williams": "nico williams",
-    "i williams": "iñaki williams",
+    "rayo": {
+        "isaac palazon camacho": "isi palazon", 
+        "isi":"isi palazón"
+    },
+    "valencia": {
+        "jose luis garcia vaya": "pepelu", 
+        "pepelu": "pepelu",
+    },
+    "betis": {
+        "ezequiel avila": "chimy",
+        "chimy": "chimy",
+    },
+    "levante": {
+        "cunat campos": "pablo cunat",           # levante
+    },
+    "oviedo": {
+        "alhassane": "rahim bonkano",           # oviedo
+    },
+    "girona": {
+        "tsygankov": "viktor tsyhankov",        # girona
+    },
+    "celta": {
+        "elabdellaoui": "el abdellaoui",        # celta
+    },
+    "real sociedad": {
+        "caletacar": "caleta car",              # real sociedad
+    },
+    "real madrid": {
+        "alexanderarnold": "trent alexander arnold",  # madrid
+    },
+    "atletico madrid": {
+        "sorloth": "alexander sorloth",         # atletico madrid
+    },
+    "athletic": {
+        "n williams": "nico williams",          # athletic club
+        "i williams": "iñaki williams",         # athletic club
+    },
 }
-
 
 # Lista de apellidos que sabemos que causan colisiones de hermanos o nombres comunes
 APELLIDOS_CRITICOS = {"williams", "garcia", "rodriguez", "gonzalez", "hernandez"}
-
 
 # ==========================================
 # FUNCIONES DE NORMALIZACIÓN
@@ -45,35 +68,42 @@ def normalizar_texto(texto):
     if not texto:
         return ""
     texto = str(texto).lower().strip()
-    texto = ''.join(c for c in unicodedata.normalize('NFD', texto)
-                    if unicodedata.category(c) != 'Mn')
+    texto = ''.join(
+        c for c in unicodedata.normalize('NFD', texto)
+        if unicodedata.category(c) != 'Mn'
+    )
     texto = texto.replace('.', ' ')
     texto = re.sub(r'[-.]', ' ', texto)
     return re.sub(r'\s+', ' ', texto).strip()
-
 
 def normalizar_equipo(nombre_equipo):
     nombre_norm = normalizar_texto(nombre_equipo)
     return ALIAS_EQUIPOS.get(nombre_norm, nombre_norm)
 
-
 def aplicar_alias(nombre, equipo=None):
     """
-    Devuelve el alias canónico si existe, si no el nombre original.
+    Devuelve el alias canónico si existe para ese equipo, si no el nombre original.
     El normalizado se hace fuera con normalizar_texto.
     """
     nombre_norm = normalizar_texto(nombre)
-    alias = ALIAS_JUGADORES.get(nombre_norm)
-    return alias if alias is not None else nombre
+    equipo_norm = normalizar_texto(equipo) if equipo else None
 
+    if equipo_norm:
+        alias_equipo = ALIAS_JUGADORES.get(equipo_norm, {})
+        alias = alias_equipo.get(nombre_norm)
+        if alias is not None:
+            return alias
+
+    return nombre
 
 # Alias contextual: solo para casos como 'Roca' en Espanyol
 def aplicar_alias_contextual(nombre_jugador, equipo_norm=None):
     nombre_norm = normalizar_texto(nombre_jugador)
+
     if nombre_norm == "roca" and equipo_norm == "espanyol":
         return "antoniu"
-    return aplicar_alias(nombre_jugador)
 
+    return aplicar_alias(nombre_jugador, equipo=equipo_norm)
 
 def normalizar_puntos(valor):
     if valor in ["-", "–", "", None]:
@@ -82,7 +112,6 @@ def normalizar_puntos(valor):
         return int(float(valor))
     except:
         return valor
-
 
 # ==========================================
 # GESTIÓN DE CASOS CRÍTICOS (HERMANOS WILLIAMS, ETC.)
@@ -97,7 +126,6 @@ def manejar_caso_especifico(nombre_html_norm, candidatos):
         if cand.startswith(inicial_buscada):
             return cand, 100
     return candidatos[0], 60
-
 
 def coincide_por_iniciales(nombre_corto, nombre_largo):
     tokens_c = nombre_corto.split()
@@ -114,7 +142,6 @@ def coincide_por_iniciales(nombre_corto, nombre_largo):
             return False
     return True
 
-
 def es_apellido_ambiguo(nombre_html_norm, nombres_norm_equipo):
     tokens = nombre_html_norm.split()
     return (
@@ -122,22 +149,24 @@ def es_apellido_ambiguo(nombre_html_norm, nombres_norm_equipo):
         sum(n.startswith(tokens[0]) for n in nombres_norm_equipo) > 1
     )
 
-
 # ==========================================
 # FUNCIÓN MAESTRA DE MATCHING
 # ==========================================
 
-def obtener_match_nombre(nombre_html_raw, nombres_norm_equipo, score_cutoff=85):
+def obtener_match_nombre(nombre_html_raw, nombres_norm_equipo, equipo_norm=None, score_cutoff=85):
     """
-    Recibe el nombre tal como viene (con iniciales, tildes, etc.)
-    y una lista de nombres ya normalizados del equipo (claves de jugadores_html).
+    Recibe el nombre tal como viene (con iniciales, tildes, etc.),
+    una lista de nombres ya normalizados del equipo (claves de jugadores_html),
+    y el equipo_norm para aplicar alias por equipo.
     Devuelve (nombre_match_norm, score).
     """
     if not nombres_norm_equipo:
         return None, 0
 
-    # Normalizar y aplicar alias al nombre de entrada
-    nombre_html_norm = normalizar_texto(aplicar_alias(nombre_html_raw))
+    # Normalizar y aplicar alias al nombre de entrada usando equipo
+    nombre_html_norm = normalizar_texto(
+        aplicar_alias(nombre_html_raw, equipo=equipo_norm)
+    )
     tokens = nombre_html_norm.split()
 
     # 1. Caso especial 'Nombre ApellidoCritico'

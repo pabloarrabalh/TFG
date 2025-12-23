@@ -3,37 +3,13 @@ import os
 import re
 import pandas as pd
 from bs4 import BeautifulSoup
-from rapidfuzz import process, fuzz
 
 from commons import (
     normalizar_texto,
     normalizar_equipo,
-    aplicar_alias,
     normalizar_puntos,
-    ALIAS_JUGADORES,
+    obtener_match_nombre,
 )
-
-# ============================
-# ALIAS INVERTIDOS PARA CSV
-# ============================
-
-# ALIAS_JUGADORES: canónico -> forma abreviada (pepelu, chimy, tsvgankov, n williams, etc.)
-# Para mapear desde HTML al CSV, generamos un mapa invertido:
-#   alias_invertidos["pepelu"] = "jose luis garcia vaya"
-#   alias_invertidos["chimy"]  = "ezequiel avila"
-#   alias_invertidos["tsygankov"] = "viktor tsyhankov"
-#   alias_invertidos["n williams"] = "nico williams", etc.
-ALIAS_INVERTIDOS = {}
-for canonic, alias in ALIAS_JUGADORES.items():
-    can_norm = normalizar_texto(canonic)
-    alias_norm = normalizar_texto(alias)
-    # si hay colisiones, nos quedamos con el canónico más largo
-    if alias_norm in ALIAS_INVERTIDOS:
-        if len(can_norm) > len(ALIAS_INVERTIDOS[alias_norm]):
-            ALIAS_INVERTIDOS[alias_norm] = can_norm
-    else:
-        ALIAS_INVERTIDOS[alias_norm] = can_norm
-
 
 def registrar_error(errores, partido, equipo, nombre_html, puntos_html,
                     nombre_csv=None, puntos_csv=None, score=0):
@@ -46,7 +22,6 @@ def registrar_error(errores, partido, equipo, nombre_html, puntos_html,
         "puntos_csv": puntos_csv,
         "score": score,
     })
-
 
 def scrapping(path_html):
     if not os.path.exists(path_html):
@@ -89,7 +64,9 @@ def scrapping(path_html):
                 else:
                     equipo_actual_norm = equipo_visitante_norm
             else:
-                equipo_actual_norm = equipo_local_norm if indice_tabla == 0 else equipo_visitante_norm
+                equipo_actual_norm = (
+                    equipo_local_norm if indice_tabla == 0 else equipo_visitante_norm
+                )
 
             jugadores = tabla.select("tbody tr.plegado")
             for fila in jugadores:
@@ -116,104 +93,27 @@ def scrapping(path_html):
                 except ValueError:
                     continue
 
-                lista_jugadores_html.append((equipo_actual_norm, nombre_completo, puntos_int))
+                lista_jugadores_html.append(
+                    (equipo_actual_norm, nombre_completo, puntos_int)
+                )
 
         puntos_por_partido[clave_partido] = lista_jugadores_html
 
     return puntos_por_partido
 
-
 # -------------------------------
-# Claves y matching local
+# Claves CSV
 # -------------------------------
 
 def _clave_csv(nombre: str) -> str:
     # CSV ya está en nombre real -> solo normalizar
     return normalizar_texto(nombre)
 
-
-def _clave_html(nombre_html: str) -> str:
-    """
-    Clave HTML:
-      1) normalizar_html
-      2) si coincide con alias invertido (pepelu, chimy, tsvygankov, isi, n williams, etc.)
-         usar el canónico del CSV
-      3) si no, aplicar_alias normal (por si quieres mantener lógica extra)
-      4) normalizar de nuevo
-    """
-    base = normalizar_texto(nombre_html)
-
-    # 2) alias invertido
-    if base in ALIAS_INVERTIDOS:
-        return ALIAS_INVERTIDOS[base]
-
-    # 3) alias directo (por si añades más cosas en commons)
-    alias = aplicar_alias(base)
-    return normalizar_texto(alias)
-
-
-def _match_por_apellido(clave_html, nombres_norm_equipo):
-    tokens = clave_html.split()
-    if not tokens:
-        return None, 0
-    ape = tokens[-1]
-    candidatos = [n for n in nombres_norm_equipo if n.split() and n.split()[-1] == ape]
-    if len(candidatos) == 1:
-        return candidatos[0], 80
-    if len(candidatos) > 1:
-        return max(candidatos, key=len), 75
-    return None, 0
-
-
-def _match_nombre(nombre_html_raw, nombres_norm_equipo, debug_prefix="", score_cutoff=70):
-    if not nombres_norm_equipo:
-        print(f"[MATCH] {debug_prefix} sin candidatos en CSV")
-        return None, 0
-
-    base = normalizar_texto(nombre_html_raw)
-    clave_html = _clave_html(nombre_html_raw)
-
-    # 0) caso especial Williams (por seguridad extra)
-   
-    # 1) exacto
-    if clave_html in nombres_norm_equipo:
-        # log si score implícito <87 no aplica; exacto = 100
-        return clave_html, 100
-
-    # 2) fuzzy
-    match, score, _ = process.extractOne(
-        clave_html,
-        nombres_norm_equipo,
-        scorer=fuzz.WRatio,
-    )
-
-    if not match or score < score_cutoff:
-        # 3) fallback apellido
-        ape_match, ape_score = _match_por_apellido(clave_html, nombres_norm_equipo)
-        if ape_match:
-            if ape_score < 87:
-                print(f"[MATCH<87] {debug_prefix}")
-                print(f"           HTML='{nombre_html_raw}' clave='{clave_html}' "
-                      f"apellido -> '{ape_match}' score={ape_score}")
-            return ape_match, ape_score
-
-        print(f"[MATCH_FAIL] {debug_prefix}")
-        print(f"             HTML='{nombre_html_raw}' clave='{clave_html}' best='{match}' score={score}")
-        return None, score or 0
-
-    # fuzzy aceptado: log solo si score<87
-    if score < 87:
-        print(f"[MATCH<87] {debug_prefix}")
-        print(f"           HTML='{nombre_html_raw}' clave='{clave_html}' best='{match}' score={score}")
-
-    return match, score
-
-
 # -------------------------------
 # Flujo principal
 # -------------------------------
 
-def comprobar_jornada_paths(path_html, csv_dir):
+def comprobar_jornada_paths(path_html, csv_dir, score_cutoff=70):
     puntos_html_por_partido = scrapping(path_html)
     archivos_csv = [n for n in os.listdir(csv_dir) if n.endswith(".csv")]
 
@@ -254,18 +154,25 @@ def comprobar_jornada_paths(path_html, csv_dir):
             nombres_norm_equipo = df_candidatos_equipo["player_norm"].tolist()
 
             debug_prefix = f"{clave_partido} | eq={equipo_html_norm} | HTML='{nombre_html}'"
-            match_norm, score_match = _match_nombre(
-                nombre_html, nombres_norm_equipo, debug_prefix=debug_prefix, score_cutoff=70
+            nombre_match_norm, score_match = obtener_match_nombre(
+                nombre_html,
+                nombres_norm_equipo,
+                equipo_norm=equipo_html_norm,
+                score_cutoff=score_cutoff,
             )
 
-            if match_norm is None or score_match < 70:
+            if not nombre_match_norm or score_match < score_cutoff:
+                print(f"[MATCH_FAIL] {debug_prefix} score={score_match}")
                 registrar_error(errores, clave_partido, equipo_html_norm,
                                 nombre_html, puntos_html, None, None, score_match)
                 partido_ok = False
                 continue
 
+            if score_match < 87:
+                print(f"[MATCH<87] {debug_prefix} -> '{nombre_match_norm}' score={score_match}")
+
             fila_match = df_candidatos_equipo[
-                df_candidatos_equipo["player_norm"] == match_norm
+                df_candidatos_equipo["player_norm"] == nombre_match_norm
             ].iloc[0]
 
             nombre_csv = fila_match["player"]
@@ -284,7 +191,6 @@ def comprobar_jornada_paths(path_html, csv_dir):
     mostrar_errores(errores)
     return errores
 
-
 def mostrar_errores(errores):
     if errores:
         print("\nErrores encontrados:")
@@ -299,13 +205,11 @@ def mostrar_errores(errores):
     else:
         print("\nTodos los jugadores tienen los puntos bien asignados.")
 
-
 def comprobar_jornada(num_jornada):
     etiqueta_jornada = f"j{num_jornada}"
     path_html = os.path.join("main", "html", etiqueta_jornada, "puntos.html")
     path_csv_dir = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
     return comprobar_jornada_paths(path_html, path_csv_dir)
-
 
 def comparar_partido(num_jornada, num_partido):
     id_partido = f"p{num_partido}"
@@ -352,8 +256,11 @@ def comparar_partido(num_jornada, num_partido):
         nombres_norm_equipo = df_candidatos_equipo["player_norm"].tolist()
 
         debug_prefix = f"{eq1}-{eq2} | eq={equipo_html_norm} | HTML='{nombre_html}'"
-        match_norm, score = _match_nombre(
-            nombre_html, nombres_norm_equipo, debug_prefix=debug_prefix, score_cutoff=70
+        match_norm, score = obtener_match_nombre(
+            nombre_html,
+            nombres_norm_equipo,
+            equipo_norm=equipo_html_norm,
+            score_cutoff=70,
         )
 
         puntos_csv = "-"
@@ -364,8 +271,12 @@ def comparar_partido(num_jornada, num_partido):
             puntos_csv = normalizar_puntos(fila["puntosFantasy"])
             estado = "✅ OK" if puntos_csv == puntos_html else "❌ ERROR"
 
-        print(f"{nombre_html[:25]:<25} | {equipo_html_raw[:15]:<15} | {puntos_html:<5} | {puntos_csv:<5} | {estado}")
+        if not match_norm:
+            print(f"[MATCH_FAIL] {debug_prefix} score={score}")
+        elif score < 87:
+            print(f"[MATCH<87] {debug_prefix} -> '{match_norm}' score={score}")
 
+        print(f"{nombre_html[:25]:<25} | {equipo_html_raw[:15]:<15} | {puntos_html:<5} | {puntos_csv:<5} | {estado}")
 
 if __name__ == "__main__":
     comprobar_jornada(1)
