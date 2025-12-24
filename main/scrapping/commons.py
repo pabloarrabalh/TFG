@@ -18,6 +18,9 @@ ALIAS_EQUIPOS = {
 }
 
 ALIAS_JUGADORES = {
+     "espanyol": {
+        "roca": "antoniu roca",
+    },
     "rayo": {
         "isaac palazón camacho": "isi palazon",
         "isi": "isi palazón",

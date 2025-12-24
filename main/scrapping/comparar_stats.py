@@ -705,5 +705,5 @@ def comparar_jugador_completo(num_jornada, num_partido, nombre_jugador):
 
 
 if __name__ == "__main__":
-    analizar_jornada_completa(1)
+    analizar_jornada_completa(2)
     #comparar_jugador_completo(1,5,"Jose Luis Garcia Vaya")

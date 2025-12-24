@@ -292,5 +292,5 @@ def comparar_partido(num_jornada, num_partido):
 
 
 if __name__ == "__main__":
-    comprobar_jornada(1)
+    comprobar_jornada(2)
     # comparar_partido(1, 1)
