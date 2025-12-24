@@ -3,6 +3,7 @@ import unicodedata
 import re
 from rapidfuzz import process, fuzz
 
+
 # ==========================================
 # CONFIGURACIÓN Y DICCIONARIOS
 # ==========================================
@@ -16,15 +17,14 @@ ALIAS_EQUIPOS = {
     "atletico madrid": "atletico madrid",
 }
 
-# ALIAS_JUGADORES por equipo (claves normalizadas)
 ALIAS_JUGADORES = {
     "rayo": {
-        "isaac palazón camacho": "isi palazon", 
-        "isi":"isi palazón"
+        "isaac palazón camacho": "isi palazon",
+        "isi": "isi palazón",
     },
     "valencia": {
-        "jose luis garcia vaya": "pepelu", 
-        "jose luis garcia vayá": "pepelu", 
+        "jose luis garcia vaya": "pepelu",
+        "jose luis garcia vayá": "pepelu",
         "pepelu": "pepelu",
     },
     "betis": {
@@ -35,34 +35,34 @@ ALIAS_JUGADORES = {
         "ezequiel chimy avila": "chimy",
     },
     "levante": {
-        "cunat campos": "pablo cunat",           # levante
+        "cunat campos": "pablo cunat",
     },
     "oviedo": {
-        "alhassane": "rahim bonkano",           # oviedo
+        "alhassane": "rahim bonkano",
     },
     "girona": {
-        "tsygankov": "viktor tsyhankov",        # girona
+        "tsygankov": "viktor tsyhankov",
     },
     "celta": {
-        "elabdellaoui": "el abdellaoui",        # celta
+        "elabdellaoui": "el abdellaoui",
     },
     "real sociedad": {
-        "caletacar": "caleta car",              # real sociedad
+        "caletacar": "caleta car",
     },
     "real madrid": {
-        "alexanderarnold": "trent alexander arnold",  # madrid
+        "alexanderarnold": "trent alexander arnold",
     },
     "atletico madrid": {
-        "sorloth": "alexander sorloth",         # atletico madrid
+        "sorloth": "alexander sorloth",
     },
     "athletic": {
-        "n williams": "nico williams",          # athletic club
-        "i williams": "iñaki williams",         # athletic club
+        "n williams": "nico williams",
+        "i williams": "iñaki williams",
     },
 }
 
-# Lista de apellidos que sabemos que causan colisiones de hermanos o nombres comunes
 APELLIDOS_CRITICOS = {"williams", "garcia", "rodriguez", "gonzalez", "hernandez"}
+
 
 # ==========================================
 # FUNCIONES DE NORMALIZACIÓN
@@ -73,21 +73,22 @@ def normalizar_texto(texto):
         return ""
     texto = str(texto).lower().strip()
     texto = ''.join(
-        c for c in unicodedata.normalize('NFD', texto)
-        if unicodedata.category(c) != 'Mn'
+        caracter for caracter in unicodedata.normalize('NFD', texto)
+        if unicodedata.category(caracter) != 'Mn'
     )
     texto = texto.replace('.', ' ')
     texto = re.sub(r'[-.]', ' ', texto)
     return re.sub(r'\s+', ' ', texto).strip()
 
+
 def normalizar_equipo(nombre_equipo):
     nombre_norm = normalizar_texto(nombre_equipo)
     return ALIAS_EQUIPOS.get(nombre_norm, nombre_norm)
 
+
 def aplicar_alias(nombre, equipo=None):
     """
     Devuelve el alias canónico si existe para ese equipo, si no el nombre original.
-    El normalizado se hace fuera con normalizar_texto.
     """
     nombre_norm = normalizar_texto(nombre)
     equipo_norm = normalizar_texto(equipo) if equipo else None
@@ -100,7 +101,7 @@ def aplicar_alias(nombre, equipo=None):
 
     return nombre
 
-# Alias contextual: solo para casos como 'Roca' en Espanyol
+
 def aplicar_alias_contextual(nombre_jugador, equipo_norm=None):
     nombre_norm = normalizar_texto(nombre_jugador)
 
@@ -108,6 +109,7 @@ def aplicar_alias_contextual(nombre_jugador, equipo_norm=None):
         return "antoniu"
 
     return aplicar_alias(nombre_jugador, equipo=equipo_norm)
+
 
 def normalizar_puntos(valor):
     if valor in ["-", "–", "", None]:
@@ -117,8 +119,9 @@ def normalizar_puntos(valor):
     except:
         return valor
 
+
 # ==========================================
-# GESTIÓN DE CASOS CRÍTICOS (HERMANOS WILLIAMS, ETC.)
+# GESTIÓN DE CASOS CRÍTICOS
 # ==========================================
 
 def manejar_caso_especifico(nombre_html_norm, candidatos):
@@ -126,51 +129,58 @@ def manejar_caso_especifico(nombre_html_norm, candidatos):
     if not tokens:
         return None, 0
     inicial_buscada = tokens[0][0]
-    for cand in candidatos:
-        if cand.startswith(inicial_buscada):
-            return cand, 100
-    return candidatos[0], 60
+    for candidato in candidatos:
+        if candidato.startswith(inicial_buscada):
+            return candidato, 100
+    primer_candidato = candidatos[0]
+    return primer_candidato, 60
+
 
 def coincide_por_iniciales(nombre_corto, nombre_largo):
-    tokens_c = nombre_corto.split()
-    tokens_l = nombre_largo.split()
+    tokens_corto = nombre_corto.split()
+    tokens_largo = nombre_largo.split()
 
-    if len(tokens_c) < 2 or len(tokens_c) > len(tokens_l):
+    if len(tokens_corto) < 2 or len(tokens_corto) > len(tokens_largo):
         return False
 
-    if tokens_c[-1] not in tokens_l:
+    if tokens_corto[-1] not in tokens_largo:
         return False
 
-    for i in range(len(tokens_c) - 1):
-        if not tokens_l[i].startswith(tokens_c[i]):
+    for indice in range(len(tokens_corto) - 1):
+        if not tokens_largo[indice].startswith(tokens_corto[indice]):
             return False
     return True
+
 
 def es_apellido_ambiguo(nombre_html_norm, nombres_norm_equipo):
     tokens = nombre_html_norm.split()
     return (
-        len(tokens) == 1 and tokens[0] in APELLIDOS_CRITICOS and
-        sum(n.startswith(tokens[0]) for n in nombres_norm_equipo) > 1
+        len(tokens) == 1
+        and tokens[0] in APELLIDOS_CRITICOS
+        and sum(nombre.startswith(tokens[0]) for nombre in nombres_norm_equipo) > 1
     )
 
+
 # ==========================================
-# FUNCIÓN MAESTRA DE MATCHING
+# MATCHING PRINCIPAL DE NOMBRES
 # ==========================================
 
 def obtener_match_nombre(nombre_html_raw, nombres_norm_equipo, equipo_norm=None, score_cutoff=85):
     """
-    Recibe el nombre tal como viene (con iniciales, tildes, etc.),
-    una lista de nombres ya normalizados del equipo (claves de jugadores_html),
-    y el equipo_norm para aplicar alias por equipo.
-    Devuelve (nombre_match_norm, score).
+    nombre_html_raw debe venir ya normalizado (normalizar_texto) desde fuera
+    o bien se normalizará aquí si hay alias de equipo. [web:35]
     """
     if not nombres_norm_equipo:
         return None, 0
 
-    # Normalizar y aplicar alias al nombre de entrada usando equipo
-    nombre_html_norm = normalizar_texto(
-        aplicar_alias(nombre_html_raw, equipo=equipo_norm)
-    )
+    # si se pasa equipo, aplicamos alias y normalizamos; si no, asumimos ya normalizado
+    if equipo_norm is not None:
+        nombre_html_norm = normalizar_texto(
+            aplicar_alias(nombre_html_raw, equipo=equipo_norm)
+        )
+    else:
+        nombre_html_norm = nombre_html_raw
+
     tokens = nombre_html_norm.split()
 
     # 1. Caso especial 'Nombre ApellidoCritico'
@@ -178,50 +188,64 @@ def obtener_match_nombre(nombre_html_raw, nombres_norm_equipo, equipo_norm=None,
         nombre, apellido = tokens
         if apellido in APELLIDOS_CRITICOS:
             candidatos_nombre = [
-                n for n in nombres_norm_equipo
-                if normalizar_texto(n) == nombre
+                nombre_equipo for nombre_equipo in nombres_norm_equipo
+                if normalizar_texto(nombre_equipo) == nombre
             ]
             if len(candidatos_nombre) == 1:
-                return candidatos_nombre[0], 100
+                unico = candidatos_nombre[0]
+                return unico, 100
 
     # 2. Apellido crítico con iniciales
     if len(tokens) >= 2:
         apellido = tokens[-1]
-        iniciales_html = [tk[0] for tk in tokens[:-1] if tk]
+        iniciales_html = [token[0] for token in tokens[:-1] if token]
         apellido_norm = apellido
-        candidatos_apellido = [n for n in nombres_norm_equipo if n.split()[-1] == apellido]
+        candidatos_apellido = [
+            nombre_equipo for nombre_equipo in nombres_norm_equipo
+            if nombre_equipo.split()[-1] == apellido
+        ]
         if apellido_norm in APELLIDOS_CRITICOS:
             if len(candidatos_apellido) == 1:
-                n = candidatos_apellido[0]
-                n_tokens = n.split()
-                iniciales_cand = [tk[0] for tk in n_tokens[:-1] if tk]
-                n_norm = normalizar_texto(n)
-                if iniciales_html == iniciales_cand[:len(iniciales_html)] and n_norm == nombre_html_norm:
-                    return n, 100
+                candidato = candidatos_apellido[0]
+                tokens_cand = candidato.split()
+                iniciales_cand = [token[0] for token in tokens_cand[:-1] if token]
+                candidato_norm = normalizar_texto(candidato)
+                if (
+                    iniciales_html == iniciales_cand[:len(iniciales_html)]
+                    and candidato_norm == nombre_html_norm
+                ):
+                    return candidato, 100
                 return None, 0
             elif len(candidatos_apellido) > 1:
-                for n in candidatos_apellido:
-                    n_tokens = n.split()
-                    iniciales_cand = [tk[0] for tk in n_tokens[:-1] if tk]
-                    n_norm = normalizar_texto(n)
-                    if iniciales_html == iniciales_cand[:len(iniciales_html)] and n_norm == nombre_html_norm:
-                        return n, 100
+                for candidato in candidatos_apellido:
+                    tokens_cand = candidato.split()
+                    iniciales_cand = [token[0] for token in tokens_cand[:-1] if token]
+                    candidato_norm = normalizar_texto(candidato)
+                    if (
+                        iniciales_html == iniciales_cand[:len(iniciales_html)]
+                        and candidato_norm == nombre_html_norm
+                    ):
+                        return candidato, 100
                 return None, 0
 
-    # 3. Match por iniciales múltiples (A. F. Carreras ≈ Álvaro Fernández Carreras)
+    # 3. Match por iniciales múltiples
     if len(tokens) >= 2:
-        iniciales = [t[0] for t in tokens[:-1] if t]
+        iniciales = [token[0] for token in tokens[:-1] if token]
         apellido = tokens[-1]
-        for n in nombres_norm_equipo:
-            n_tokens = n.split()
-            if len(n_tokens) >= len(tokens):
-                ape_cand = n_tokens[-1]
-                iniciales_cand = [tk[0] for tk in n_tokens[:-1] if tk]
-                if apellido == ape_cand and iniciales == iniciales_cand[:len(iniciales)]:
-                    return n, 100
-        candidatos_apellido = [n for n in nombres_norm_equipo if n.split()[-1] == apellido]
+        for candidato in nombres_norm_equipo:
+            tokens_cand = candidato.split()
+            if len(tokens_cand) >= len(tokens):
+                apellido_cand = tokens_cand[-1]
+                iniciales_cand = [token[0] for token in tokens_cand[:-1] if token]
+                if apellido == apellido_cand and iniciales == iniciales_cand[:len(iniciales)]:
+                    return candidato, 100
+        candidatos_apellido = [
+            nombre_equipo for nombre_equipo in nombres_norm_equipo
+            if nombre_equipo.split()[-1] == apellido
+        ]
         if len(candidatos_apellido) == 1:
-            return candidatos_apellido[0], 100
+            unico = candidatos_apellido[0]
+            return unico, 100
 
     # 4. Fuzzy estándar
     nombre_match_norm, score_match, _ = process.extractOne(
