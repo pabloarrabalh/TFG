@@ -19,16 +19,20 @@ ALIAS_EQUIPOS = {
 # ALIAS_JUGADORES por equipo (claves normalizadas)
 ALIAS_JUGADORES = {
     "rayo": {
-        "isaac palazon camacho": "isi palazon", 
+        "isaac palazón camacho": "isi palazon", 
         "isi":"isi palazón"
     },
     "valencia": {
         "jose luis garcia vaya": "pepelu", 
+        "jose luis garcia vayá": "pepelu", 
         "pepelu": "pepelu",
     },
     "betis": {
         "ezequiel avila": "chimy",
+        "ezequiel ávila": "chimy",
         "chimy": "chimy",
+        "chimy avila": "chimy",
+        "ezequiel chimy avila": "chimy",
     },
     "levante": {
         "cunat campos": "pablo cunat",           # levante
