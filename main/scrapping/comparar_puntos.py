@@ -10,6 +10,7 @@ from commons import (
     normalizar_puntos,
     obtener_match_nombre,
     aplicar_alias_contextual,
+    añadir_equipo_y_player_norm,
 )
 
 
@@ -105,11 +106,6 @@ def scrapping(path_html):
     return puntos_por_partido
 
 
-# -------------------------------
-# Flujo principal
-# -------------------------------
-
-
 def comprobar_jornada_paths(path_html, csv_dir, score_cutoff=70):
     puntos_html_por_partido = scrapping(path_html)
     archivos_csv = [n for n in os.listdir(csv_dir) if n.endswith(".csv")]
@@ -128,15 +124,7 @@ def comprobar_jornada_paths(path_html, csv_dir, score_cutoff=70):
         ruta_csv = os.path.join(csv_dir, nombre_archivo_csv)
         df_partido = pd.read_csv(ruta_csv)
 
-        df_partido["equipo_norm"] = df_partido["Equipo_propio"].apply(normalizar_equipo)
-
-        # IMPORTANTE: usar alias contextual como en el script de stats
-        df_partido["player_norm"] = df_partido.apply(
-            lambda row: normalizar_texto(
-                aplicar_alias_contextual(row["player"], row["equipo_norm"])
-            ),
-            axis=1,
-        )
+        df_partido = añadir_equipo_y_player_norm(df_partido)
 
         jugadores_html_partido = (
             puntos_html_por_partido.get(clave_partido)
@@ -240,13 +228,7 @@ def comparar_partido(num_jornada, num_partido):
     eq2 = normalizar_equipo(m.group(2))
 
     df_partido = pd.read_csv(os.path.join(csv_dir, archivo_csv))
-    df_partido["equipo_norm"] = df_partido["Equipo_propio"].apply(normalizar_equipo)
-    df_partido["player_norm"] = df_partido.apply(
-        lambda row: normalizar_texto(
-            aplicar_alias_contextual(row["player"], row["equipo_norm"])
-        ),
-        axis=1,
-    )
+    df_partido = añadir_equipo_y_player_norm(df_partido)
 
     puntos_html_todo = scrapping(path_html)
     jugadores_html = (
