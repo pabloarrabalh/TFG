@@ -1,18 +1,36 @@
+"""
+Pipeline de scraping y procesado de jornadas:
+
+- Lee HTML de FBref por partido y jornada.
+- Extrae estadísticas avanzadas por tipo (summary, passing, defense, etc.).
+- Matchea jugadores con los puntos de Fantasy (puntos.html).
+- Genera un CSV por partido con todas las columnas del modelo.
+"""
+
 import os
 import re
 from io import StringIO
 
 import numpy as np
 import pandas as pd
-from bs4 import BeautifulSoup, NavigableString
+from bs4 import BeautifulSoup
 import cloudscraper
 
 from commons import (
     normalizar_texto,
     normalizar_equipo,
-    aplicar_alias_contextual,
+    aplicar_alias,
     obtener_match_nombre,
+    to_float,
+    to_int,
+    mapear_posicion,
+    limpiar_minuto,
+    extraer_nombre_jugador,
 )
+
+# ==========================================
+# CONFIGURACIÓN GENERAL
+# ==========================================
 
 CARPETA_HTML = os.path.join("main", "html")
 CARPETA_CSV = os.path.join("data", "temporada_25_26")
@@ -33,68 +51,21 @@ COLUMNAS_MODELO = [
     'DuelosAereosGanados', 'DuelosAereosPerdidos', 'DuelosAereosGanadosPct'
 ]
 
-JUGADORES_SIN_MATCH = []
 UMBRAL_MATCH = 75.0
 
 scraper = cloudscraper.create_scraper(
     browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True}
 )
 
-# ======================
-# Helpers
-# ======================
-
-def limpiar_minuto(nombre):
-    if not nombre:
-        return nombre
-    nombre = nombre.replace("+", "").replace("-", "").strip()
-    nombre = re.sub(r"\s*\d+(?:\+\d+)?'?$", "", nombre).strip()
-    return nombre
-
-def extraer_nombre_base(td_nombre):
+def capitalizar_nombre(nombre_norm):
     """
-    Devuelve el texto del jugador dentro del <td class="name">
-    ignorando spans de minuto e iconos.
+    Convierte 'marcos alonso' -> 'Marcos Alonso'.
     """
-    textos = []
-    for hijo in td_nombre.children:
-        if isinstance(hijo, NavigableString):
-            txt = hijo.strip()
-            if txt:
-                textos.append(txt)
-    return " ".join(textos)
+    return " ".join(parte.capitalize() for parte in str(nombre_norm).split())
 
-def to_float(valor):
-    if isinstance(valor, pd.Series):
-        valor = valor.iloc[0]
-    if pd.isna(valor) or valor == "" or valor == "-":
-        return np.nan
-    texto = str(valor).split('\n')[0].replace('%', '').strip()
-    try:
-        return float(texto)
-    except:
-        return np.nan
-
-def to_int(valor):
-    v = to_float(valor)
-    if pd.isna(v):
-        return np.nan
-    return int(round(v))
-
-POSICION_MAP = {
-    "GK": "PT",
-    "DF": "DF",
-    "RB": "DF",
-    "LB": "DF",
-    "CB": "DF",
-    "FW": "DT",
-    "RW": "DT",
-    "LW": "DT",
-}
-
-def mapear_posicion(pos_raw):
-    pos_raw = (pos_raw or "MC").upper()
-    return POSICION_MAP.get(pos_raw, "MC")
+# ==========================================
+# PARSE FBREF: TABLAS DE STATS
+# ==========================================
 
 def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante):
     caption = tabla_html.find('caption')
@@ -125,8 +96,8 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante):
             continue
 
         nombre_crudo = limpiar_minuto(nombre_crudo)
-        equipo_fila = str(fila.get('Squad', '')).strip() if 'Squad' in fila else ""
 
+        equipo_fila = str(fila.get('Squad', '')).strip() if 'Squad' in fila else ""
         if not equipo_fila:
             if equipo_caption:
                 equipo_fila = equipo_caption
@@ -136,8 +107,9 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante):
                 equipo_fila = equipo_visitante
 
         equipo_norm = normalizar_equipo(equipo_fila) if equipo_fila else None
+
         nombre_norm = normalizar_texto(
-            aplicar_alias_contextual(nombre_crudo, equipo_norm)
+            aplicar_alias(nombre_crudo, equipo_norm)
         )
 
         jugadores[nombre_norm] = fila
@@ -239,23 +211,41 @@ def rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val):
 def postprocesar_df_partido(df):
     if df.empty:
         return df
+
     if 'Equipo_propio' in df.columns:
         df['Equipo_propio'] = df['Equipo_propio'].apply(normalizar_equipo)
     if 'Equipo_rival' in df.columns:
         df['Equipo_rival'] = df['Equipo_rival'].apply(normalizar_equipo)
 
+    # Jugadores de campo sin stats de portero
     mask_no_portero = df['posicion'] != 'PT'
     df.loc[mask_no_portero, 'Goles_en_contra'] = 0.0
     df.loc[mask_no_portero, 'Porcentaje_paradas'] = 0.0
-    df.fillna(0, inplace=True)
 
+    # Asegurar Amarillas / Rojas presentes y sin NaN antes de la lógica
+    if 'Amarillas' not in df.columns:
+        df['Amarillas'] = 0
+    if 'Rojas' not in df.columns:
+        df['Rojas'] = 0
+
+    df['Amarillas'] = df['Amarillas'].fillna(0)
+    df['Rojas'] = df['Rojas'].fillna(0)
+
+    # Doble amarilla -> roja, sin borrar rojas directas
     mask_doble_amarilla = df['Amarillas'] >= 2
-    df.loc[mask_doble_amarilla, 'Rojas'] = 1.0
+    df['Rojas'] = np.maximum(df['Rojas'].astype(int), mask_doble_amarilla.astype(int))
+
+    # Rellenar resto de NaN con 0
+    df = df.fillna(0)
+
+    df['Amarillas'] = df['Amarillas'].astype(int)
+    df['Rojas'] = df['Rojas'].astype(int)
+
     return df
 
-# ======================
-# Scraping
-# ======================
+# ==========================================
+# SCRAPING FBREF: CALENDARIO
+# ==========================================
 
 def obtener_calendario():
     ruta_local = "calendario.html"
@@ -267,7 +257,7 @@ def obtener_calendario():
         try:
             resp = scraper.get(url)
             html = resp.text
-        except:
+        except Exception:
             return {}
 
     soup = BeautifulSoup(html, 'lxml')
@@ -285,7 +275,12 @@ def obtener_calendario():
             href = enlace['href']
             url_partido = "https://fbref.com" + href if not href.startswith('http') else href
             calendario.setdefault(j, []).append(url_partido)
+
     return calendario
+
+# ==========================================
+# PARSE FANTASY (puntos.html)
+# ==========================================
 
 def obtener_fantasy_jornada(jornada):
     ruta_puntos = os.path.join(CARPETA_HTML, f"j{jornada}", "puntos.html")
@@ -329,8 +324,7 @@ def obtener_fantasy_jornada(jornada):
                 if not td_nombre:
                     continue
 
-                # Nombre base sin minutos ni iconos
-                nombre_raw_sin_min = extraer_nombre_base(td_nombre)
+                nombre_raw_sin_min = extraer_nombre_jugador(td_nombre)
                 nombre_raw_sin_min = limpiar_minuto(nombre_raw_sin_min)
 
                 pos_fantasy_raw = td_nombre.get("data-posicion-laliga-fantasy", "") or ""
@@ -345,17 +339,17 @@ def obtener_fantasy_jornada(jornada):
                 pos_fantasy = pos_map_fantasy.get(pos_fantasy_raw, "MC")
 
                 puntos = 0
-                span_pts = fila.select_one("span.laliga-fantasy")
-                if span_pts is None:
-                    span_pts = fila.select_one("span.fantasy-points") or \
-                               fila.select_one("span.puntos") or \
-                               fila.select_one("span.points")
-
+                span_pts = (
+                    fila.select_one("span.laliga-fantasy")
+                    or fila.select_one("span.fantasy-points")
+                    or fila.select_one("span.puntos")
+                    or fila.select_one("span.points")
+                )
                 if span_pts:
                     txt = span_pts.get_text(strip=True)
                     try:
                         puntos = int(float(txt.replace(',', '.')))
-                    except:
+                    except Exception:
                         puntos = 0
 
                 td_events = fila.find("td", class_="events")
@@ -373,11 +367,10 @@ def obtener_fantasy_jornada(jornada):
 
                 equipo_norm = equipo_tabla_norm
 
-                # clave_ff interna basada en nombre sin minuto (coherente con FBref)
                 clave_ff = f"{equipo_norm}|{nombre_raw_sin_min}"
 
                 nombre_norm = normalizar_texto(
-                    aplicar_alias_contextual(nombre_raw_sin_min, equipo_tabla_norm)
+                    aplicar_alias(nombre_raw_sin_min, equipo_tabla_norm)
                 )
 
                 info = {
@@ -401,21 +394,31 @@ def obtener_fantasy_jornada(jornada):
 
     return resultado
 
+# ==========================================
+# PARSE NOMBRES PARTIDO FBREF
+# ==========================================
+
 def obtener_nombres_partido(html_partido):
     soup = BeautifulSoup(html_partido, 'lxml')
     title = soup.find('title').get_text() if soup.find('title') else "Match"
     try:
-        local, visitante = title.split(' vs. ')[0], title.split(' vs. ')[1].split(' Match')[0]
-    except:
-        local, visitante = "Local", "Visitante"
-    return local, visitante
+        equipo_local = title.split(' vs. ')[0]
+        equipo_visitante = title.split(' vs. ')[1].split(' Match')[0]
+    except Exception:
+        equipo_local, equipo_visitante = "Local", "Visitante"
+    return equipo_local, equipo_visitante
+
+# ==========================================
+# PROCESAR UN PARTIDO COMPLETO
+# ==========================================
 
 def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
     soup = BeautifulSoup(html_partido, 'lxml')
     title = soup.find('title').get_text() if soup.find('title') else "Match"
     try:
-        equipo_local, equipo_visitante = title.split(' vs. ')[0], title.split(' vs. ')[1].split(' Match')[0]
-    except:
+        equipo_local = title.split(' vs. ')[0]
+        equipo_visitante = title.split(' vs. ')[1].split(' Match')[0]
+    except Exception:
         equipo_local, equipo_visitante = "Local", "Visitante"
 
     local_norm = normalizar_equipo(equipo_local)
@@ -427,7 +430,10 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
     titulares = []
     if divs_alineacion:
         for div_lineup in divs_alineacion:
-            nombres_equipo = [limpiar_minuto(a.get_text().strip()) for a in div_lineup.find_all('a')][:11]
+            nombres_equipo = [
+                limpiar_minuto(a.get_text().strip())
+                for a in div_lineup.find_all('a')
+            ][:11]
             titulares.extend(nombres_equipo)
 
     nombres_local = (
@@ -468,23 +474,22 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         }
         nombres_fantasy_norm = [info["nombre_norm"] for info in candidatos_equipo.values()]
 
-        nombre_fb_norm_local = normalizar_texto(
-            aplicar_alias_contextual(nombre_fb, equipo_fb_norm)
-        )
-
         mejor_norm, mejor_score = obtener_match_nombre(
-            nombre_fb_norm_local,
+            nombre_fb,
             nombres_fantasy_norm,
             equipo_norm=equipo_fb_norm,
             score_cutoff=UMBRAL_MATCH,
         )
 
+        nombre_html_norm = normalizar_texto(
+            aplicar_alias(nombre_fb, equipo_fb_norm)
+        )
         if mejor_norm is None or mejor_score < UMBRAL_MATCH:
-            from rapidfuzz import process, fuzz
-            mejor_basico = process.extractOne(
-                nombre_fb_norm_local,
+            from rapidfuzz import process as rf_process, fuzz as rf_fuzz
+            mejor_basico = rf_process.extractOne(
+                nombre_html_norm,
                 nombres_fantasy_norm,
-                scorer=fuzz.WRatio,
+                scorer=rf_fuzz.WRatio,
             )
             if mejor_basico is not None:
                 candidato_norm, score_basico, _ = mejor_basico
@@ -577,26 +582,86 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
             puntos = fantasy_partido[clave_ff]['puntos']
         fila_salida['puntosFantasy'] = puntos
 
-        if clave_ff is None and idx_partido in (1, 2, 3):
-            JUGADORES_SIN_MATCH.append({
-                "partido_idx": idx_partido,
-                "equipo_local": equipo_local,
-                "equipo_visitante": equipo_visitante,
-                "nombre_fbref": nombre_fb,
-                "fb_norm": nombre_fb_norm,
-            })
+    # === BLOQUE QUE EVITA DUPLICADOS TIPO "M Alonso" / "Marcos Alonso" ===
 
     usadas_ff = set(asignacion_fbref_a_fantasy.values())
 
-    nombres_norm_en_bd = set()
-    for clave in bd_partido.keys():
-        nombre_fb_norm = clave.split("|")[0]
-        nombres_norm_en_bd.add(nombre_fb_norm)
+    claves_canonicas_presentes = set()
+    nombres_canonicos_presentes = dict()  # (equipo, pos) -> set de nombres canónicos
+    for clave_registro, fila in bd_partido.items():
+        nombre_fb = fila['player']
+        equipo_fb_norm = fila['Equipo_propio']
+        pos_fb = fila['posicion']
+        nombre_canonico_fb = normalizar_texto(
+            aplicar_alias(nombre_fb, equipo_fb_norm)
+        )
+        claves_canonicas_presentes.add((nombre_canonico_fb, equipo_fb_norm, pos_fb))
+        nombres_canonicos_presentes.setdefault((equipo_fb_norm, pos_fb), set()).add(nombre_canonico_fb)
+
+    def coincide_inicial_apellido(nombre1, nombre2):
+        # Solo matching si uno es abreviado (1-2 letras o 'R. Garcia') y el otro es nombre completo
+        partes1 = nombre1.split()
+        partes2 = nombre2.split()
+        if len(partes1) < 2 or len(partes2) < 2:
+            return False
+        apellido1 = partes1[-1]
+        apellido2 = partes2[-1]
+        if apellido1 != apellido2:
+            return False
+        nombre1_pila = partes1[0]
+        nombre2_pila = partes2[0]
+        # Si uno es abreviado (1-2 letras o termina en punto)
+        def es_abreviado(n):
+            return len(n) <= 2 or n.endswith('.')
+        # Si ambos son abreviados, no emparejar
+        if es_abreviado(nombre1_pila) and es_abreviado(nombre2_pila):
+            return False
+        # Si uno es abreviado y el otro es nombre completo, comparar inicial y nombre completo
+        if es_abreviado(nombre1_pila):
+            return nombre1_pila[0] == nombre2_pila[0]
+        if es_abreviado(nombre2_pila):
+            return nombre2_pila[0] == nombre1_pila[0]
+        # Si ambos son nombre completo, solo emparejar si son iguales
+        return nombre1_pila == nombre2_pila
 
     for clave_ff, info in fantasy_partido.items():
-        nombre_norm = info["nombre_norm"]
+        nombre_original = info["nombre_original"]      # ej. "M Alonso"
+        equipo_norm = info["equipo_norm"]
+        pos_val = info.get("posicion", "MC")
 
-        if nombre_norm in nombres_norm_en_bd:
+        # nombre canónico desde Fantasy usando mismo pipeline
+        nombre_canonico_ff = normalizar_texto(
+            aplicar_alias(nombre_original, equipo_norm)
+        )
+
+        # si ya hay una fila con ese nombre canónico+equipo+pos, no crear fantasy_only
+        if (nombre_canonico_ff, equipo_norm, pos_val) in claves_canonicas_presentes:
+            continue
+
+        # comprobar si hay algún nombre canónico presente que coincida por inicial y apellido
+        nombres_presentes = nombres_canonicos_presentes.get((equipo_norm, pos_val), set())
+        coincidencia = None
+        for n in nombres_presentes:
+            if coincide_inicial_apellido(nombre_canonico_ff, n):
+                coincidencia = n
+                break
+        if coincidencia:
+            # fusionar puntos y tarjetas en la fila existente
+            for clave_registro, fila in bd_partido.items():
+                if (
+                    normalizar_texto(aplicar_alias(fila['player'], fila['Equipo_propio'])) == coincidencia
+                    and fila['Equipo_propio'] == equipo_norm
+                    and fila['posicion'] == pos_val
+                ):
+                    fila['puntosFantasy'] = info['puntos']
+                    # Solo sumar amarillas/rojas si Fantasy aporta más
+                    amarillas_fantasy = info.get('amarillas', 0)
+                    amarillas_fbref = fila.get('Amarillas', 0)
+                    fila['Amarillas'] = max(amarillas_fbref, amarillas_fantasy)
+                    rojas_fantasy = info.get('rojas', 0)
+                    rojas_fbref = fila.get('Rojas', 0)
+                    fila['Rojas'] = max(rojas_fbref, rojas_fantasy)
+                    break
             continue
 
         if clave_ff in usadas_ff:
@@ -606,20 +671,18 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         if puntos == 0:
             continue
 
-        equipo_norm = info["equipo_norm"]
         equipo_rival_norm = visit_norm if equipo_norm == local_norm else local_norm
-        nombre_original = info["nombre_original"]
         amarillas = info.get("amarillas", 0)
         rojas = info.get("rojas", 0)
-        pos_val = info.get("posicion", "MC")
 
+        nombre_norm = info["nombre_norm"]
         clave_registro = f"{nombre_norm}|{equipo_norm}|0|{pos_val}|fantasy_only"
         if clave_registro in bd_partido:
             continue
 
         fila = {columna: 0 for columna in COLUMNAS_MODELO}
         fila.update({
-            'player': nombre_original,
+            'player': capitalizar_nombre(nombre_canonico_ff),
             'posicion': pos_val,
             'Equipo_propio': equipo_norm,
             'Equipo_rival': equipo_rival_norm,
@@ -635,6 +698,10 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
     df_partido = postprocesar_df_partido(df_partido)
     return df_partido, equipo_local, equipo_visitante
 
+# ==========================================
+# PROCESAR JORNADAS COMPLETAS
+# ==========================================
+
 def procesar_jornada(jornada: int):
     sj = str(jornada)
     print(f"\n=== JORNADA {sj} ===")
@@ -646,12 +713,12 @@ def procesar_jornada(jornada: int):
     os.makedirs(carpeta_html_j, exist_ok=True)
     os.makedirs(carpeta_csv_j, exist_ok=True)
 
-    for idx_partido in range(1, 11):
+    for idx_partido in range(1, 10 + 1):
         ruta_html = os.path.join(carpeta_html_j, f"p{idx_partido}.html")
         if not os.path.exists(ruta_html):
             continue
 
-        print(f"   📂 [P{idx_partido}] {ruta_html}")
+        print(f"    📂 [P{idx_partido}] {ruta_html}")
         with open(ruta_html, "r", encoding="utf-8") as f:
             html_partido = f.read()
 
@@ -662,35 +729,30 @@ def procesar_jornada(jornada: int):
 
         fantasy_partido = fantasy_por_partido.get(clave_partido, {})
 
-        global JUGADORES_SIN_MATCH
-        JUGADORES_SIN_MATCH = []
         df_partido, eq_loc_csv, eq_vis_csv = procesar_partido(
             html_partido, fantasy_partido, idx_partido
         )
 
         if df_partido is not None and not df_partido.empty:
             nombre_csv = f"p{idx_partido}_{normalizar_texto(eq_loc_csv)}-{normalizar_texto(eq_vis_csv)}.csv"
-            df_partido.to_csv(os.path.join(carpeta_csv_j, nombre_csv), index=False, encoding='utf-8-sig')
-            print("   ✅ CSV generado.")
-        df_cero = df_partido[df_partido['puntosFantasy'] == 0]
-
-        if not df_cero.empty:
-            for _, fila in df_cero.iterrows():
-                print(f"      - {fila['player']} -> 0 puntos")
+            df_partido.to_csv(
+                os.path.join(carpeta_csv_j, nombre_csv),
+                index=False,
+                encoding='utf-8-sig'
+            )
+            print("✅ CSV generado.")
 
     return
 
-# ======================
-# NUEVA FUNCIÓN: rango de jornadas
-# ======================
-
 def procesar_rango_jornadas(jornada_inicio: int, jornada_fin: int):
-    """
-    Procesa todas las jornadas en el rango [jornada_inicio, jornada_fin].
-    """
     for j in range(jornada_inicio, jornada_fin + 1):
         procesar_jornada(j)
 
+# ==========================================
+# ENTRY POINT
+# ==========================================
+
 if __name__ == "__main__":
-    # Ejemplo: procesar de la jornada 1 a la 10
-    procesar_rango_jornadas(1, 17)
+    # Ejecutar solo la jornada 11
+   #procesar_jornada(11)
+   procesar_rango_jornadas(1,17)
