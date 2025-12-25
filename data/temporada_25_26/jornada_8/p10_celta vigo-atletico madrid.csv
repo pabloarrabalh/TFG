@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Borja Iglesias,DT,celta,atletico madrid,1,83,0,0,1.1,0.0,6,3,3,15,66.7,1,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,2,1,1,10,28.0,2.0,0,1,0,100.0
+Pablo Durán,DT,celta,atletico madrid,0,7,0,0,0.1,0.0,1,1,0,1,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,0,1,2,19.0,0.0,0,0,0,0.0
+Williot Swedberg,MC,celta,atletico madrid,1,62,0,0,0.0,0.0,0,0,0,18,88.9,0,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,1,2,0,1,18,74.0,27.0,0,0,1,0.0
+Bryan Zaragoza,MC,celta,atletico madrid,0,28,0,0,0.0,0.0,1,1,0,20,80.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,1,0,1,18,94.0,30.0,1,0,0,0.0
+Ferran Jutglà,MC,celta,atletico madrid,1,62,0,0,0.0,0.4,1,1,0,25,76.0,0,0,0.0,0.0,0.0,4,0,1,0,1,1,0,1,0,5,0,3,26,166.0,88.0,3,0,1,0.0
+Iago Aspas,MC,celta,atletico madrid,0,28,1,0,0.7,0.0,2,1,1,37,89.2,0,0,0.0,0.0,0.0,8,0,0,0,0,1,0,1,0,0,0,0,30,199.0,125.0,3,0,0,0.0
+Fran Beltrán,MC,celta,atletico madrid,1,54,0,0,0.0,0.0,1,1,0,35,88.6,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,1,1,0,26,98.0,36.0,0,0,1,0.0
+Hugo Álvarez,MC,celta,atletico madrid,0,36,0,0,0.0,0.0,0,0,0,30,90.0,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,1,0,0,0,25,88.0,31.0,2,0,0,0.0
+Damián Rodríguez,MC,celta,atletico madrid,1,90,0,0,0.1,0.1,3,3,0,93,91.4,0,0,0.0,0.0,0.0,4,0,1,0,1,1,0,1,1,0,0,0,66,323.0,205.0,2,0,0,0.0
+Sergio Carreira,MC,celta,atletico madrid,1,83,0,0,0.0,0.0,0,0,0,65,87.7,0,0,0.0,0.0,0.0,3,4,2,0,0,1,0,1,2,2,1,1,41,233.0,133.0,4,1,2,33.3
+Ilaix Moriba,MC,celta,atletico madrid,0,7,0,0,0.0,0.0,0,0,0,7,85.7,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,1,0,1,5,9.0,0.0,0,0,2,0.0
+Óscar Mingueza,MC,celta,atletico madrid,1,90,0,0,0.0,0.5,1,1,0,93,82.8,0,0,0.0,0.0,0.0,4,2,1,0,1,2,0,2,0,0,0,0,63,280.0,128.0,1,0,0,0.0
+Marcos Alonso,DF,celta,atletico madrid,1,90,0,0,0.0,0.4,1,1,0,129,90.7,0,0,0.0,0.0,0.0,9,4,2,0,1,1,0,1,4,2,2,0,105,699.0,463.0,9,1,3,25.0
+Carl Starfelt,DF,celta,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,74,98.6,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,3,0,0,0,55,176.0,63.0,0,0,1,0.0
+Javi Rodríguez,DF,celta,atletico madrid,1,90,0,0,0.0,0.1,1,1,0,116,94.0,0,0,0.0,0.0,0.0,6,3,2,0,0,1,1,0,3,0,0,0,97,473.0,262.0,1,1,2,33.3
+Ionuț Radu,PT,celta,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,17,82.4,0,0,1.0,0.0,0.2,2,0,0,0,0,0,0,0,1,0,0,0,8,26.0,20.0,0,0,0,0.0
+Julián Álvarez,DT,atletico madrid,celta,1,80,0,0,0.0,0.1,0,0,0,32,84.4,0,0,0.0,0.0,0.0,5,0,1,0,1,2,0,2,0,1,0,1,26,226.0,111.0,4,0,0,0.0
+Alexander Sørloth,DT,atletico madrid,celta,0,10,0,0,0.0,0.0,0,0,0,9,22.2,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,3.0,1.0,0,3,0,100.0
+Antoine Griezmann,DT,atletico madrid,celta,1,45,0,0,0.0,0.1,1,1,0,38,86.8,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,1,2,1,1,28,108.0,33.0,0,0,0,0.0
+Javi Galán,DF,atletico madrid,celta,0,30,0,0,0.0,0.0,0,0,0,15,93.3,0,0,0.0,0.0,0.0,0,1,1,0,0,1,0,1,3,0,0,0,12,43.0,22.0,1,1,0,100.0
+Alex Baena,MC,atletico madrid,celta,0,15,0,0,0.0,0.0,0,0,0,5,40.0,1,0,0.0,0.0,0.0,0,1,1,0,0,0,0,0,1,0,0,0,6,23.0,6.0,0,0,0,0.0
+Nicolás González,MC,atletico madrid,celta,1,90,0,0,0.1,0.0,2,2,0,41,78.0,0,0,0.0,0.0,0.0,3,0,0,0,0,1,0,1,3,2,0,2,37,112.0,42.0,1,3,0,100.0
+Koke,MC,atletico madrid,celta,1,76,0,0,0.0,0.2,0,0,0,59,94.9,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,1,0,0,0,46,214.0,106.0,0,0,0,0.0
+Conor Gallagher,MC,atletico madrid,celta,0,14,0,0,0.0,0.0,0,0,0,3,33.3,0,0,0.0,0.0,0.0,1,0,1,0,1,1,1,0,0,1,0,1,4,37.0,6.0,1,0,0,0.0
+Pablo Barrios,MC,atletico madrid,celta,1,90,0,0,0.0,0.0,0,0,0,60,86.7,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,1,3,2,0,41,177.0,70.0,1,3,0,100.0
+Giuliano Simeone,MC,atletico madrid,celta,1,81,0,0,0.0,0.0,1,1,0,35,85.7,0,0,0.0,0.0,0.0,4,3,3,0,1,0,0,0,0,1,0,0,27,83.0,35.0,2,1,2,33.3
+Nahuel Molina,DF,atletico madrid,celta,0,9,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,1,0,0,0,1,6.0,1.0,0,0,0,0.0
+Dávid Hancko,DF,atletico madrid,celta,1,90,0,0,0.1,0.0,1,0,1,45,84.4,0,0,0.0,0.0,0.0,4,2,1,0,0,1,0,1,4,1,1,0,36,124.0,53.0,1,1,0,100.0
+Clément Lenglet,DF,atletico madrid,celta,1,39,0,0,0.0,0.0,0,0,0,36,91.7,2,1,0.0,0.0,0.0,-1,0,0,0,0,1,1,0,0,0,0,0,28,166.0,93.0,1,0,1,0.0
+Robin Le Normand,DF,atletico madrid,celta,1,90,0,0,0.1,0.0,1,1,0,35,88.6,0,0,0.0,0.0,0.0,4,4,3,0,1,1,0,1,7,1,0,1,29,128.0,42.0,0,1,0,100.0
+Marcos Llorente,DF,atletico madrid,celta,1,90,0,0,0.0,0.0,0,0,0,62,91.9,0,0,0.0,0.0,0.0,7,2,2,0,0,2,1,1,5,1,0,1,45,258.0,114.0,4,0,1,0.0
+Jan Oblak,PT,atletico madrid,celta,1,90,0,0,0.0,0.0,0,0,0,44,84.1,0,0,1.0,75.0,1.3,7,0,0,0,0,0,0,0,1,0,0,0,27,90.0,48.0,0,0,0,0.0

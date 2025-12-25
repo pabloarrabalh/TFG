@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Cucho,DT,betis,atletico madrid,1,75,0,0,0.1,0.1,2,2,0,27,85.2,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,2,3,2,1,26,174.0,75.0,3,4,0,100.0
+Cédric Bakambu,DT,betis,atletico madrid,0,15,0,0,0.2,0.0,2,1,1,2,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,1.0,0.0,0,1,0,100.0
+Abde Ezzalzouli,DT,betis,atletico madrid,1,90,0,0,0.5,0.2,3,1,2,43,67.4,0,0,0.0,0.0,0.0,5,2,3,0,2,3,0,3,0,5,2,3,36,225.0,58.0,4,0,1,0.0
+Antony,DT,betis,atletico madrid,1,90,0,0,0.1,0.0,3,3,0,58,84.5,0,0,0.0,0.0,0.0,5,1,1,0,0,2,0,2,1,6,2,2,45,352.0,229.0,9,1,3,25.0
+Pablo Fornals,MC,betis,atletico madrid,1,75,0,0,0.0,0.0,1,1,0,55,70.9,0,0,0.0,0.0,0.0,1,3,2,0,1,1,0,1,1,3,0,3,43,202.0,94.0,2,0,1,0.0
+Nelson Deossa,MC,betis,atletico madrid,0,15,0,0,0.0,0.0,0,0,0,13,100.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,3,3,0,9,61.0,22.0,0,0,0,0.0
+Marc Roca,MC,betis,atletico madrid,1,45,0,0,0.0,0.0,0,0,0,34,94.1,0,0,0.0,0.0,0.0,0,2,0,0,0,0,0,0,0,1,0,1,22,126.0,56.0,1,1,0,100.0
+Giovani Lo Celso,MC,betis,atletico madrid,0,45,0,0,0.2,0.4,4,2,2,37,73.0,1,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,2,1,0,27,182.0,99.0,3,1,0,100.0
+Sofyan Amrabat,MC,betis,atletico madrid,1,90,0,0,0.0,0.1,0,0,0,78,87.2,1,0,0.0,0.0,0.0,2,2,0,0,0,0,0,0,1,0,0,0,57,235.0,147.0,2,0,0,0.0
+Ricardo Rodríguez,DF,betis,atletico madrid,1,68,0,0,0.0,0.0,1,1,0,40,85.0,0,0,0.0,0.0,0.0,0,2,0,0,0,1,0,1,1,0,0,0,32,144.0,59.0,2,0,0,0.0
+Junior Firpo,DF,betis,atletico madrid,0,22,0,0,0.0,0.0,0,0,0,14,92.9,0,0,0.0,0.0,0.0,2,1,1,0,0,2,0,2,0,0,0,0,9,23.0,10.0,0,0,0,0.0
+Natan,DF,betis,atletico madrid,1,90,0,0,0.0,0.0,1,1,0,52,90.4,0,0,0.0,0.0,0.0,3,1,2,0,1,0,0,0,3,1,1,0,40,207.0,111.0,1,1,1,50.0
+Marc Bartra,DF,betis,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,60,78.3,0,0,0.0,0.0,0.0,1,5,6,0,4,1,1,0,5,1,1,0,50,240.0,163.0,1,0,1,0.0
+Héctor Bellerín,DF,betis,atletico madrid,1,68,0,0,0.0,0.1,0,0,0,48,95.8,0,0,0.0,0.0,0.0,7,1,0,0,0,1,0,1,7,2,2,0,35,129.0,95.0,0,2,2,50.0
+Aitor Ruibal,DF,betis,atletico madrid,0,22,0,0,0.0,0.0,0,0,0,15,73.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,1,0,1,11,28.0,14.0,1,1,0,100.0
+Pau López,PT,betis,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,25,92.0,0,0,2.0,50.0,1.5,3,0,0,0,0,0,0,0,0,0,0,0,16,34.0,25.0,0,0,0,0.0
+Julián Álvarez,DT,atletico madrid,betis,1,59,0,1,0.2,0.2,1,1,0,11,81.8,0,0,0.0,0.0,0.0,10,1,0,0,0,0,0,0,0,2,2,0,18,92.0,32.0,2,0,0,0.0
+Alexander Sørloth,DT,atletico madrid,betis,0,31,0,0,0.0,0.0,0,0,0,12,50.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,1,3,1,2,10,34.0,19.0,1,1,1,50.0
+Nicolás González,DT,atletico madrid,betis,1,90,0,0,0.1,0.0,3,1,2,20,65.0,1,0,0.0,0.0,0.0,7,3,4,0,2,1,1,0,3,1,0,1,20,62.0,50.0,2,3,2,60.0
+Giuliano Simeone,DT,atletico madrid,betis,1,81,1,0,0.0,0.3,1,0,1,42,76.2,0,0,0.0,0.0,0.0,13,2,3,0,3,0,0,0,1,2,2,0,41,182.0,75.0,3,0,1,0.0
+Nahuel Molina,DF,atletico madrid,betis,0,9,0,0,0.0,0.0,0,0,0,7,71.4,0,0,0.0,0.0,0.0,1,2,1,0,1,0,0,0,0,0,0,0,2,2.0,0.0,0,0,0,0.0
+Alex Baena,MC,atletico madrid,betis,1,59,1,0,0.2,0.0,1,0,1,28,71.4,0,0,0.0,0.0,0.0,11,2,1,0,1,1,0,1,0,4,1,1,26,171.0,121.0,3,0,1,0.0
+Antoine Griezmann,DT,atletico madrid,betis,0,31,0,0,0.0,0.0,0,0,0,18,94.4,0,0,0.0,0.0,0.0,3,1,1,0,0,0,0,0,0,0,0,0,15,30.0,8.0,0,0,0,0.0
+Koke,MC,atletico madrid,betis,1,81,0,1,0.0,0.0,1,1,0,46,89.1,0,0,0.0,0.0,0.0,10,2,1,0,1,2,0,2,1,1,0,1,35,88.0,25.0,0,1,0,100.0
+Thiago Almada,DF,atletico madrid,betis,0,9,0,0,0.0,0.0,0,0,0,8,62.5,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,4,11.0,0.0,0,0,0,0.0
+Pablo Barrios,MC,atletico madrid,betis,1,54,0,0,0.0,0.0,1,1,0,27,88.9,0,0,0.0,0.0,0.0,4,1,0,0,0,2,0,2,1,2,2,0,20,99.0,44.0,0,0,0,0.0
+Conor Gallagher,MC,atletico madrid,betis,0,36,0,0,0.0,0.0,0,0,0,19,89.5,0,0,0.0,0.0,0.0,2,1,2,0,2,0,0,0,1,1,0,1,17,64.0,5.0,0,0,0,0.0
+Dávid Hancko,DF,atletico madrid,betis,1,90,0,0,0.1,0.0,1,1,0,43,81.4,0,0,0.0,0.0,0.0,7,2,1,0,0,1,1,0,3,1,0,1,28,112.0,76.0,1,3,1,75.0
+José María Giménez,DF,atletico madrid,betis,1,90,0,0,0.0,0.0,0,0,0,46,87.0,0,0,0.0,0.0,0.0,9,4,5,0,2,1,1,0,6,0,0,0,23,46.0,16.0,0,0,5,0.0
+Robin Le Normand,DF,atletico madrid,betis,1,90,0,0,0.0,0.0,0,0,0,32,84.4,0,0,0.0,0.0,0.0,8,3,2,0,0,2,2,0,9,0,0,0,30,97.0,57.0,0,0,0,0.0
+Marcos Llorente,DF,atletico madrid,betis,1,90,0,0,0.0,0.0,0,0,0,53,86.8,0,0,0.0,0.0,0.0,9,5,4,0,2,1,0,1,4,0,0,0,37,84.0,38.0,1,1,1,50.0
+Jan Oblak,PT,atletico madrid,betis,1,90,0,0,0.0,0.0,0,0,0,41,56.1,0,0,0.0,100.0,1.3,13,0,0,0,0,0,0,0,1,0,0,0,24,124.0,95.0,0,0,0,0.0

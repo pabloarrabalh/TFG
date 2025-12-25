@@ -268,9 +268,71 @@ def comparar_partido_stats(path_html, path_csv, jugador_objetivo):
         "es_portero": es_portero,
     }
 
+def analizar_rango_jornadas(jornada_inicio, jornada_fin):
+    """
+    Recorre de jornada_inicio a jornada_fin (ambas incluidas),
+    analiza todos los partidos y jugadores y al final muestra
+    un resumen global de errores con jornada y partido.
+    """
+    errores_globales = []
 
-def _comparar_campos_stats(fila_csv, es_portero, get_summary, get_passing,
-                           get_misc, get_keepers, get_defense, get_possession):
+    for j in range(jornada_inicio, jornada_fin + 1):
+        carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{j}")
+        if not os.path.exists(carpeta_csv):
+            print(f"No existe la carpeta de la jornada {j}")
+            continue
+
+        archivos_csv = sorted(
+            n for n in os.listdir(carpeta_csv) if n.startswith("p") and n.endswith(".csv")
+        )
+        if not archivos_csv:
+            print(f"No se encontraron CSVs en jornada {j}")
+            continue
+
+        print("\n" + "=" * 80)
+        print(f"[LOG] ===== Analizando jornada {j} =====")
+
+        # lista de errores específica de la jornada (para logs por jornada si quieres)
+        errores_jornada = []
+
+        for archivo_csv in archivos_csv:
+            m = re.match(r"p(\d+)_", archivo_csv)
+            if not m:
+                continue
+            num_partido = int(m.group(1))
+            print(f"\n[LOG] ===== Procesando partido {num_partido} de la jornada {j} =====")
+            analizar_partido_completo(j, num_partido, errores_jornada)
+
+        # log resumen por jornada (opcional)
+        print("\n" + "-" * 80)
+        print(f"RESUMEN JORNADA {j}")
+        if not errores_jornada:
+            print("Todos los jugadores han pasado las comprobaciones correctamente.")
+        else:
+            print("Jugadores con errores en esta jornada:")
+            for err in errores_jornada:
+                print(
+                    f" - j{err['jornada']} p{err['partido']} | {err['jugador']} | "
+                    f"{err['tipo']} | {err['detalle']}"
+                )
+
+        # acumular en el global
+        errores_globales.extend(errores_jornada)
+
+    # resumen global de todo el rango
+    print("\n" + "=" * 80)
+    print(f"RESUMEN GLOBAL JORNADAS {jornada_inicio}-{jornada_fin}")
+    if not errores_globales:
+        print("Todos los jugadores han pasado las comprobaciones correctamente en todo el rango.")
+    else:
+        print("Jugadores con errores en el rango:")
+        for err in errores_globales:
+            print(
+                f" - j{err['jornada']} p{err['partido']} | {err['jugador']} | "
+                f"{err['tipo']} | {err['detalle']}"
+            )
+
+def _comparar_campos_stats(fila_csv, es_portero, get_summary, get_passing, get_misc, get_keepers, get_defense, get_possession):
     """
     Devuelve (campos_mal, discrepancias) usando siempre limpiar_numero_generico/fmt_generico.
     """
@@ -439,7 +501,7 @@ def analizar_jugador_interno(num_jornada, num_partido, nombre_jugador):
 
 
 def analizar_jugador(num_jornada, num_partido, nombre_jugador):
-    print(f"[LOG] Procesando jugador: {nombre_jugador}")
+    #print(f"[LOG] Procesando jugador: {nombre_jugador}")
     resultado = analizar_jugador_interno(num_jornada, num_partido, nombre_jugador)
     mostrar_analisis_jugador(resultado)
 
@@ -605,5 +667,6 @@ def comparar_jugador_completo(num_jornada, num_partido, nombre_jugador):
 
 
 if __name__ == "__main__":
-    analizar_jornada_completa(6)
+    #analizar_jornada_completa(6)
     # comparar_jugador_completo(1, 5, "Jose Luis Garcia Vaya")
+    analizar_rango_jornadas(5, 17)

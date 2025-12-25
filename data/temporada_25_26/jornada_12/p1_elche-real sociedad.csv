@@ -1,0 +1,35 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Álvaro Rodríguez,DT,elche,real sociedad,1,73,1,0,0.3,0.0,3,2,1,23,69.6,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,3,1,2,20,51.0,10.0,0,7,4,63.6
+Germán Valera,MC,elche,real sociedad,0,17,0,0,0.0,0.0,0,0,0,7,71.4,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,1,0,0,0,5,13.0,7.0,0,1,0,100.0
+Rafa Mir,MC,elche,real sociedad,1,89,0,0,0.3,0.0,3,1,2,33,87.9,0,0,0.0,0.0,0.0,5,0,1,0,1,1,0,1,1,2,1,1,26,166.0,76.0,3,1,3,25.0
+André Silva,DT,elche,real sociedad,0,1,0,0,0.0,0.0,0,0,0,3,33.3,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,1.0,0.0,0,1,0,100.0
+Rodrigo Mendoza,MC,elche,real sociedad,1,89,0,0,0.2,0.0,2,2,0,45,86.7,0,0,0.0,0.0,0.0,2,0,0,0,0,2,0,2,1,2,0,2,33,129.0,69.0,2,0,2,0.0
+Federico Redondo,MC,elche,real sociedad,0,1,0,0,0.0,0.0,0,0,0,6,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,4,21.0,2.0,0,0,0,0.0
+Aleix Febas,MC,elche,real sociedad,1,90,0,0,0.0,0.0,0,0,0,73,90.4,0,0,0.0,0.0,0.0,6,5,2,0,1,0,0,0,1,6,4,1,42,220.0,149.0,4,0,2,0.0
+Josan,MC,elche,real sociedad,1,73,0,0,0.0,0.5,0,0,0,41,85.4,0,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,1,4,1,3,27,109.0,53.0,2,0,0,0.0
+Héctor Fort,MC,elche,real sociedad,0,17,0,0,0.0,0.0,0,0,0,8,62.5,0,0,0.0,0.0,0.0,1,1,1,0,0,0,0,0,1,0,0,0,4,31.0,6.0,0,0,0,0.0
+Marc Aguado,MC,elche,real sociedad,1,83,0,0,0.0,0.0,0,0,0,45,95.6,0,0,0.0,0.0,0.0,5,0,1,0,1,2,2,0,2,0,0,0,26,60.0,33.0,0,0,2,0.0
+John Donald,MC,elche,real sociedad,0,7,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,1,2,1,0,0,0,0,0,1,0,0,0,2,14.0,11.0,1,0,0,0.0
+Adrià Pedrosa,DF,elche,real sociedad,1,90,0,0,0.1,0.1,3,3,0,63,85.7,0,0,0.0,0.0,0.0,7,3,3,0,0,2,1,1,4,4,2,1,36,134.0,62.0,0,0,0,0.0
+Víctor Chust,DF,elche,real sociedad,1,83,0,0,0.1,0.0,1,1,0,48,93.8,0,0,0.0,0.0,0.0,8,2,0,0,0,0,0,0,3,0,0,0,29,116.0,72.0,0,3,0,100.0
+Léo Pétrot,DF,elche,real sociedad,0,7,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,2,0,0,0,2,5.0,2.0,0,1,0,100.0
+David Affengruber,DF,elche,real sociedad,1,90,0,0,0.0,0.1,0,0,0,67,88.1,1,0,0.0,0.0,0.0,2,1,2,0,1,0,0,0,7,0,0,0,42,197.0,142.0,1,3,1,75.0
+Álvaro Núñez,DF,elche,real sociedad,1,90,0,1,0.0,0.2,0,0,0,84,86.9,0,0,0.0,0.0,0.0,11,1,2,0,2,1,0,1,5,1,1,0,42,216.0,133.0,2,1,1,50.0
+Matías Dituro,PT,elche,real sociedad,1,90,0,0,0.0,0.0,0,0,0,61,80.3,0,0,1.0,100.0,1.5,9,0,0,0,0,0,0,0,1,0,0,0,45,170.0,87.0,0,0,0,0.0
+Mikel Oyarzabal,DT,real sociedad,elche,1,90,1,0,1.0,0.0,4,3,1,23,78.3,0,0,0.0,0.0,0.0,9,0,1,0,1,1,0,1,1,1,1,0,24,92.0,51.0,3,1,4,20.0
+Gonçalo Guedes,MC,real sociedad,elche,1,63,0,0,0.0,0.1,1,1,0,15,73.3,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,0,0,0,0,14,60.0,22.0,1,1,1,50.0
+Umar Sadiq,DT,real sociedad,elche,0,27,0,0,0.1,0.0,2,2,0,3,66.7,0,0,0.0,0.0,0.0,6,0,0,0,0,0,0,0,0,4,0,2,6,26.0,12.0,0,1,1,50.0
+Carlos Soler,MC,real sociedad,elche,1,74,0,0,0.0,0.1,0,0,0,31,83.9,0,0,0.0,0.0,0.0,3,1,1,0,1,0,0,0,0,1,1,0,24,119.0,33.0,1,1,0,100.0
+Aihen Muñoz,DF,real sociedad,elche,0,16,0,0,0.0,0.0,0,0,0,7,57.1,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,5,6.0,4.0,0,0,0,0.0
+Brais Méndez,MC,real sociedad,elche,1,74,0,0,0.0,0.1,1,0,1,33,72.7,0,0,0.0,0.0,0.0,4,4,2,0,1,2,0,2,0,2,2,0,23,99.0,36.0,2,2,0,100.0
+Pablo Marín,MC,real sociedad,elche,0,16,0,0,0.0,0.0,0,0,0,3,33.3,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,3,0,3,6,18.0,4.0,0,0,0,0.0
+Takefusa Kubo,MC,real sociedad,elche,1,63,0,0,0.1,0.0,2,1,1,23,65.2,0,0,0.0,0.0,0.0,4,2,1,0,0,0,0,0,1,4,1,2,27,181.0,102.0,4,0,1,0.0
+Arsen Zakharyan,MC,real sociedad,elche,0,27,0,0,0.0,0.0,0,0,0,11,54.5,1,0,0.0,0.0,0.0,0,1,0,0,0,0,0,0,0,0,0,0,10,43.0,0.0,0,0,0,0.0
+Jon Gorrotxategi,MC,real sociedad,elche,1,90,0,0,0.1,0.0,1,1,0,41,70.7,1,0,0.0,0.0,0.0,1,2,1,0,0,2,0,2,0,0,0,0,27,121.0,66.0,1,2,1,66.7
+Sergio Gómez,DF,real sociedad,elche,1,80,0,0,0.0,0.1,0,0,0,38,78.9,0,0,0.0,0.0,0.0,3,3,5,0,2,0,0,0,3,0,0,0,18,102.0,46.0,2,0,0,0.0
+Luka Sučić,MC,real sociedad,elche,0,10,0,0,0.0,0.0,0,0,0,11,63.6,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,1,0,0,0,7,66.0,40.0,2,0,1,0.0
+Igor Zubeldia,DF,real sociedad,elche,1,90,0,0,0.0,0.0,0,0,0,35,88.6,0,0,0.0,0.0,0.0,5,2,2,0,0,2,0,2,8,0,0,0,22,131.0,90.0,0,1,5,16.7
+Jon Martin,DF,real sociedad,elche,1,90,0,0,0.0,0.0,0,0,0,24,91.7,0,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,4,0,0,0,16,143.0,129.0,0,1,2,33.3
+Jon Aramburu,DF,real sociedad,elche,1,89,0,0,0.0,0.0,1,0,1,29,72.4,1,0,0.0,0.0,0.0,2,2,4,0,3,1,1,0,4,1,1,0,20,101.0,68.0,1,4,2,66.7
+Aritz Elustondo,DF,real sociedad,elche,0,1,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0
+Álex Remiro,PT,real sociedad,elche,1,90,0,0,0.0,0.0,0,0,0,39,66.7,0,0,1.0,66.7,0.9,5,0,0,0,0,0,0,0,0,0,0,0,26,146.0,82.0,0,1,0,100.0

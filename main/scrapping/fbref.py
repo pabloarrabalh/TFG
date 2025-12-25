@@ -598,7 +598,7 @@ def ejecutar_rango_jornadas(j_ini, j_fin):
 
 
 if __name__ == "__main__":
-    ejecutar_rango_jornadas(j_ini=1, j_fin=2)
+    ejecutar_rango_jornadas(j_ini=1, j_fin=17)
 
     if JUGADORES_SIN_MATCH:
         print("\n[LOG] Jugadores que han quedado sin match en ninguna asignación de puntos:")
