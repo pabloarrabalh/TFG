@@ -160,9 +160,7 @@ def comprobar_jornada_paths(path_html, csv_dir, score_cutoff=70):
                 partido_ok = False
                 continue
 
-            if score_match < 87:
-                print(f"[MATCH<87] {debug_prefix} -> '{nombre_match_norm}' score={score_match}")
-
+            
             fila_match = df_candidatos_equipo[
                 df_candidatos_equipo["player_norm"] == nombre_match_norm
             ].iloc[0]
@@ -204,6 +202,48 @@ def comprobar_jornada(num_jornada):
     path_html = os.path.join("main", "html", etiqueta_jornada, "puntos.html")
     path_csv_dir = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
     return comprobar_jornada_paths(path_html, path_csv_dir)
+
+
+def comprobar_rango_jornadas(jornada_inicio, jornada_fin, score_cutoff=70):
+    """
+    Recorre de jornada_inicio a jornada_fin (incluidas),
+    llama a comprobar_jornada y acumula todos los errores.
+    """
+    errores_globales = []
+
+    for j in range(jornada_inicio, jornada_fin + 1):
+        print("\n" + "=" * 80)
+        print(f"[LOG] ===== Comprobando jornada {j} =====")
+
+        etiqueta_jornada = f"j{j}"
+        path_html = os.path.join("main", "html", etiqueta_jornada, "puntos.html")
+        path_csv_dir = os.path.join("data", "temporada_25_26", f"jornada_{j}")
+
+        if not os.path.exists(path_html):
+            print(f"No existe el HTML de puntos para la jornada {j}: {path_html}")
+            continue
+        if not os.path.exists(path_csv_dir):
+            print(f"No existe la carpeta CSV de la jornada {j}: {path_csv_dir}")
+            continue
+
+        errores_jornada = comprobar_jornada_paths(path_html, path_csv_dir, score_cutoff=score_cutoff)
+        if errores_jornada:
+            errores_globales.extend(errores_jornada)
+
+    print("\n" + "=" * 80)
+    print(f"RESUMEN GLOBAL JORNADAS {jornada_inicio}-{jornada_fin}")
+    if not errores_globales:
+        print("Todos los jugadores tienen los puntos bien asignados en todo el rango.")
+    else:
+        print("Errores encontrados en el rango:")
+        print("PARTIDO | EQUIPO | NOMBRE_HTML | NOMBRE_MATCH | PUNTOS_HTML | PUNTOS_CSV | SCORE")
+        print("-" * 80)
+        for err in errores_globales:
+            print(
+                f"{err['partido']} | {err['equipo']} | {err['nombre_html']} | "
+                f"{err['nombre_csv']} | {err['puntos_html']} | {err['puntos_csv']} | "
+                f"{err['score']}"
+            )
 
 
 def comparar_partido(num_jornada, num_partido):
@@ -274,5 +314,9 @@ def comparar_partido(num_jornada, num_partido):
 
 
 if __name__ == "__main__":
-    comprobar_jornada(2)
+    # una jornada
+    # comprobar_jornada(2)
+
+    # rango de jornadas (por ejemplo, de la 1 a la 10)
+    comprobar_rango_jornadas(1, 17)
     # comparar_partido(1, 1)

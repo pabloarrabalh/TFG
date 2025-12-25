@@ -40,6 +40,7 @@ scraper = cloudscraper.create_scraper(
     browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True}
 )
 
+
 # ======================
 # Helpers básicos
 # ======================
@@ -211,7 +212,6 @@ def rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val):
         fila_salida['Pases_Completados_Pct'] = to_float(fila_summary['Cmp%'])
 
     if pos_val == 'PT':
-        tablas_portero = tablas_por_tipo.get('keepers', {})
         fila_portero = tablas_por_tipo.get('keepers', {}).get(clave_fbref)
         if fila_portero is not None:
             goles_contra = to_int(fila_portero.get('GA', 0))
@@ -325,6 +325,19 @@ def obtener_fantasy_jornada(jornada):
                 nombre_raw = nombre_raw.replace("+", "").replace("-", "").strip()
                 nombre_raw = re.sub(r"\s\d+'?$", "", nombre_raw).strip()
 
+                # POSICIÓN desde Fantasy
+                pos_fantasy_raw = td_nombre.get("data-posicion-laliga-fantasy", "") or ""
+                pos_fantasy_raw = pos_fantasy_raw.strip()
+                pos_map_fantasy = {
+                    "Portero": "PT",
+                    "Defensa": "DF",
+                    "Mediocampista": "MC",
+                    "Centrocampista": "MC",
+                    "Delantero": "DT",
+                }
+                pos_fantasy = pos_map_fantasy.get(pos_fantasy_raw, "MC")
+
+                # PUNTOS Fantasy (LaLiga Fantasy Oficial)
                 puntos = 0
                 span_pts = fila.select_one("span.laliga-fantasy")
                 if span_pts:
@@ -333,6 +346,20 @@ def obtener_fantasy_jornada(jornada):
                         puntos = int(float(txt))
                     except:
                         puntos = 0
+
+                # TARJETAS DESDE FANTASY (amarilla/roja, también en banquillo)
+                td_events = fila.find("td", class_="events")
+                amarillas = 0
+                rojas = 0
+                if td_events:
+                    for img in td_events.find_all("img"):
+                        tooltip = (img.get("data-tooltip") or "").strip().lower()
+                        alt = (img.get("alt") or "").strip().lower()
+                        texto = tooltip or alt
+                        if "amarilla" in texto:
+                            amarillas += 1
+                        elif "roja" in texto:
+                            rojas += 1
 
                 equipo_norm = equipo_tabla_norm
                 clave_ff = f"{equipo_norm}|{nombre_raw}"
@@ -347,6 +374,9 @@ def obtener_fantasy_jornada(jornada):
                     "puntos": puntos,
                     "equipo": equipo_tabla_norm,
                     "equipo_norm": equipo_norm,
+                    "amarillas": amarillas,
+                    "rojas": rojas,
+                    "posicion": pos_fantasy,
                 }
 
                 if clave_ff in mapa_puntos:
@@ -436,7 +466,7 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
             score_cutoff=UMBRAL_MATCH,
         )
 
-        # Fallback si el matching avanzado falla: RapidFuzz directo [web:35][web:99]
+        # Fallback básico con RapidFuzz si el matching avanzado falla
         if mejor_norm is None or mejor_score < UMBRAL_MATCH:
             from rapidfuzz import process, fuzz
             mejor_basico = process.extractOne(
@@ -543,6 +573,49 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
                 "nombre_fbref": nombre_fb,
                 "fb_norm": nombre_fb_norm,
             })
+
+    # ============================================================
+    # AÑADIR JUGADORES SOLO FANTASY (TARJETAS EN EL BANQUILLO)
+    # ============================================================
+    # Jugadores que tienen puntos en Fantasy pero no aparecen en FBref
+    # (no han jugado minutos pero han recibido tarjeta desde el banquillo).
+    # Se crean filas con todas las stats a 0 salvo puntosFantasy y tarjetas.
+    usadas_ff = set(asignacion_fbref_a_fantasy.values())
+    for clave_ff, info in fantasy_partido.items():
+        if clave_ff in usadas_ff:
+            continue  # ya asignado a algún jugador FBref
+
+        puntos = info["puntos"]
+        if puntos == 0:
+            continue  # ignorar suplentes sin puntos
+
+        equipo_norm = info["equipo_norm"]
+        equipo_rival_norm = visit_norm if equipo_norm == local_norm else local_norm
+        nombre_original = info["nombre_original"]
+        nombre_norm = info["nombre_norm"]
+        amarillas = info.get("amarillas", 0)
+        rojas = info.get("rojas", 0)
+        pos_val = info.get("posicion", "MC")
+
+        # clave específica para jugadores solo fantasy (evita pisar filas FBref)
+        clave_registro = f"{nombre_norm}|{equipo_norm}|0|{pos_val}|fantasy_only"
+        if clave_registro in bd_partido:
+            continue
+
+        fila = {columna: 0 for columna in COLUMNAS_MODELO}
+        fila.update({
+            'player': nombre_original,
+            'posicion': pos_val,
+            'Equipo_propio': equipo_norm,
+            'Equipo_rival': equipo_rival_norm,
+            'Titular': 0,
+            'Min_partido': 0,
+            'puntosFantasy': puntos,
+            'Amarillas': amarillas,
+            'Rojas': rojas,
+        })
+        bd_partido[clave_registro] = fila
+    # ============================================================
 
     df_partido = pd.DataFrame.from_dict(bd_partido, orient='index')
     df_partido = postprocesar_df_partido(df_partido)
