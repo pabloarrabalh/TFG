@@ -24,7 +24,6 @@ scraper = cloudscraper.create_scraper(
     }
 )
 
-
 def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante):
     caption = tabla_html.find('caption')
     if caption:
@@ -91,7 +90,6 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante):
 
     return jugadores
 
-
 def rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val):
     for tipo, cfg in MAPEO_STATS.items():
         mapa_tipo = tablas_por_tipo.get(tipo, {})
@@ -148,7 +146,6 @@ def rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val):
             fila_salida['Porcentaje_paradas'] = pct_paradas
             fila_salida['PSxG'] = psxg
 
-
 def postprocesar_df_partido(df):
     if df.empty:
         return df
@@ -175,7 +172,6 @@ def postprocesar_df_partido(df):
     df = df.fillna(0)
 
     return df
-
 
 def obtener_calendario():
     ruta_local = "calendario.html"
@@ -231,7 +227,6 @@ def obtener_calendario():
         calendario[jornada].append(url_partido)
 
     return calendario
-
 
 def obtener_fantasy_jornada(jornada):
     ruta_puntos = os.path.join(CARPETA_HTML, f"j{jornada}", "puntos.html")
@@ -329,14 +324,10 @@ def obtener_fantasy_jornada(jornada):
                 if td_events:
                     imagenes_evento = td_events.find_all("img")
                     for img_evento in imagenes_evento:
-                        tooltip = img_evento.get("data-tooltip")
-                        if tooltip is None:
-                            tooltip = ""
+                        tooltip = img_evento.get("data-tooltip") or ""
                         tooltip = tooltip.strip().lower()
 
-                        alt = img_evento.get("alt")
-                        if alt is None:
-                            alt = ""
+                        alt = img_evento.get("alt") or ""
                         alt = alt.strip().lower()
 
                         texto = tooltip if tooltip else alt
@@ -375,7 +366,6 @@ def obtener_fantasy_jornada(jornada):
 
     return resultado
 
-
 def obtener_nombres_partido(html_partido):
     soup = BeautifulSoup(html_partido, 'lxml')
     tag_title = soup.find('title')
@@ -393,7 +383,6 @@ def obtener_nombres_partido(html_partido):
         equipo_visitante = "Visitante"
 
     return equipo_local, equipo_visitante
-
 
 def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
     soup = BeautifulSoup(html_partido, 'lxml')
@@ -676,6 +665,7 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
             aplicar_alias(nombre_original, equipo_norm)
         )
 
+        # Si ya hay fila FBref para este jugador+equipo+pos, ignorar tarjetas Fantasy
         if (nombre_canonico_ff, equipo_norm, pos_val) in claves_canonicas_presentes:
             continue
 
@@ -689,6 +679,8 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
                 break
 
         if coincidencia:
+            # Hay fila FBref (coincidencia por nombre): solo añadimos puntos,
+            # NO tocamos Amarillas/Rojas (se quedan solo con FBref / misc).
             for clave_registro, fila in bd_partido.items():
                 nombre_canonico_fila = normalizar_texto(
                     aplicar_alias(fila['player'], fila['Equipo_propio'])
@@ -699,32 +691,26 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
                     and fila['posicion'] == pos_val
                 ):
                     fila['puntosFantasy'] = info['puntos']
-
-                    amarillas_fantasy = info.get('amarillas', 0)
-                    amarillas_fbref = fila.get('Amarillas', 0)
-                    fila['Amarillas'] = max(amarillas_fbref, amarillas_fantasy)
-
-                    rojas_fantasy = info.get('rojas', 0)
-                    rojas_fbref = fila.get('Rojas', 0)
-                    fila['Rojas'] = max(rojas_fbref, rojas_fantasy)
                     break
 
             continue
 
+        # Desde aquí: jugadores que no tienen fila FBref (no han jugado)
         if clave_ff in usadas_ff:
             continue
 
         puntos = info["puntos"]
-        if puntos == 0:
+        amarillas_banquillo = info.get("amarillas", 0)
+        rojas_banquillo = info.get("rojas", 0)
+
+        # Solo nos interesan si han recibido alguna tarjeta desde el banquillo
+        if amarillas_banquillo == 0 and rojas_banquillo == 0:
             continue
 
         if equipo_norm == local_norm:
             equipo_rival_norm = visit_norm
         else:
             equipo_rival_norm = local_norm
-
-        amarillas = info.get("amarillas", 0)
-        rojas = info.get("rojas", 0)
 
         nombre_norm = info["nombre_norm"]
         clave_registro = f"{nombre_norm}|{equipo_norm}|0|{pos_val}|fantasy_only"
@@ -743,8 +729,9 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         fila['Titular'] = 0
         fila['Min_partido'] = 0
         fila['puntosFantasy'] = puntos
-        fila['Amarillas'] = amarillas
-        fila['Rojas'] = rojas
+        # Aquí sí usamos tarjetas Fantasy: suplente con tarjeta
+        fila['Amarillas'] = amarillas_banquillo
+        fila['Rojas'] = rojas_banquillo
 
         bd_partido[clave_registro] = fila
 
@@ -752,7 +739,6 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
     df_partido = postprocesar_df_partido(df_partido)
 
     return df_partido, equipo_local, equipo_visitante
-
 
 def procesar_jornada(jornada: int):
     sj = str(jornada)
@@ -807,11 +793,9 @@ def procesar_jornada(jornada: int):
 
             print("✅ CSV generado.")
 
-
 def procesar_rango_jornadas(jornada_inicio: int, jornada_fin: int):
     for j in range(jornada_inicio, jornada_fin + 1):
         procesar_jornada(j)
-
 
 if __name__ == "__main__":
     procesar_rango_jornadas(1, 17)
