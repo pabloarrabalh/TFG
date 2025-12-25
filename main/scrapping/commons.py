@@ -16,13 +16,13 @@ ALIAS_EQUIPOS = {
     "atlético": "atletico madrid", "atletico": "atletico madrid",
     "atletico madrid": "atletico madrid",
 }
-
 ALIAS_JUGADORES = {
     "espanyol": {
         "roca": "antoniu roca",
     },
     "rayo": {
         "isaac palazón camacho": "isi palazon",
+        "isaac palazon camacho": "isi palazon",
         "isi": "isi palazon",
     },
     "valencia": {
@@ -36,14 +36,22 @@ ALIAS_JUGADORES = {
         "chimy": "chimy",
         "chimy avila": "chimy",
         "ezequiel chimy avila": "chimy",
+        # Dani Pérez: mismo nombre en FBref y puntos, pero unificamos tildes
+        "dani perez": "dani perez",
+        "dani pérez": "dani perez",
     },
     "levante": {
         "cunat campos": "pablo cunat",
     },
     "oviedo": {
+        # Fantasy: Alhassane -> CSV/FBref: Rahim Bonkano
         "alhassane": "rahim bonkano",
     },
     "girona": {
+        # Fantasy: Lass -> FBref: Lancinet Kourouma
+        "lass": "lancinet kourouma",
+        "lancinet kourouma": "lancinet kourouma",
+        # Tsygankov abreviado
         "tsygankov": "viktor tsyhankov",
     },
     "celta": {
@@ -57,12 +65,20 @@ ALIAS_JUGADORES = {
     },
     "atletico madrid": {
         "sorloth": "alexander sorloth",
+        "sörloth": "alexander sorloth",
+        "alexander sorloth": "alexander sorloth",
     },
     "athletic": {
         "n williams": "nico williams",
         "i williams": "iñaki williams",
     },
+    "sevilla": {
+        # Fantasy: Oso -> FBref: Joaquín Martínez Gauna
+        "oso": "joaquin martinez gauna",
+        "joaquin martinez gauna": "joaquin martinez gauna",
+    },
 }
+
 
 APELLIDOS_CRITICOS = {"williams", "garcia", "rodriguez", "gonzalez", "hernandez"}
 

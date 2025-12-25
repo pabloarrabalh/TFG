@@ -1,7 +1,7 @@
 ﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
 Akor Adams,DT,sevilla,betis,1,90,0,0,0.1,0.0,2,2,0,15,60.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,2,3,3,0,7,39.0,9.0,0,5,3,62.5
 Alfon,DT,sevilla,betis,1,60,0,0,0.0,0.0,1,0,1,9,100.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,4,1,3,11,77.0,4.0,0,0,0,0.0
-Isaac Romero,DT,sevilla,betis,0,23,0,0,0.0,0.0,0,0,0,6,33.3,0,1,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,7,60.0,42.0,1,0,0,0.0
+Isaac Romero,DT,sevilla,betis,0,23,0,0,0.0,0.0,0,0,0,6,33.3,0,1,0.0,0.0,0.0,-2,0,0,0,0,0,0,0,0,0,0,0,7,60.0,42.0,1,0,0,0.0
 Chidera Ejuke,DT,sevilla,betis,1,78,0,0,0.0,0.0,1,1,0,27,85.2,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,6,3,3,30,161.0,73.0,2,0,0,0.0
 Miguel Ángel Sierra,DT,sevilla,betis,0,12,0,0,0.0,0.0,1,1,0,9,55.6,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,1,1,0,5,26.0,20.0,0,0,0,0.0
 Peque,MC,sevilla,betis,1,90,0,0,0.1,0.1,1,0,1,51,62.7,0,0,0.0,0.0,0.0,5,2,1,0,0,3,0,3,1,2,2,0,29,323.0,245.0,5,3,1,75.0
