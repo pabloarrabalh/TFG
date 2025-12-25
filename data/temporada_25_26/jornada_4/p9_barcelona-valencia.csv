@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Ferrán Torres,DT,barcelona,valencia,1,67,0,1,1.5,0.2,5,4,1,11,72.7,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,3,0,3,12,42.0,21.0,0,0,0,0.0
+Robert Lewandowski,DT,barcelona,valencia,0,23,2,0,1.2,0.1,2,0,2,7,100.0,0,0,0.0,0.0,0.0,13,0,0,0,0,0,0,0,0,0,0,0,7,25.0,11.0,0,0,0,0.0
+Marcus Rashford,DT,barcelona,valencia,1,67,0,1,0.1,0.6,2,2,0,30,83.3,0,0,0.0,0.0,0.0,12,0,0,0,0,0,0,0,0,5,0,4,28,199.0,99.0,6,0,0,0.0
+Dani Olmo,MC,barcelona,valencia,0,23,0,1,0.1,0.6,1,1,0,14,71.4,0,0,0.0,0.0,0.0,9,1,1,0,0,0,0,0,0,1,0,1,10,72.0,26.0,0,1,0,100.0
+Roony Bardghji,DT,barcelona,valencia,1,45,0,0,0.0,0.2,2,1,1,15,80.0,0,0,0.0,0.0,0.0,0,1,1,0,0,0,0,0,0,1,0,1,14,50.0,32.0,0,0,0,0.0
+Raphinha,DT,barcelona,valencia,0,45,2,0,0.8,0.0,4,2,2,19,84.2,0,0,0.0,0.0,0.0,14,0,1,0,1,1,0,1,2,2,1,1,16,132.0,94.0,5,0,1,0.0
+Fermin López,MC,barcelona,valencia,1,90,2,0,0.2,1.1,5,1,4,52,80.8,0,0,0.0,0.0,0.0,23,2,1,0,1,1,0,1,0,5,3,2,46,206.0,130.0,4,1,1,50.0
+Marc Casado,MC,barcelona,valencia,1,90,0,1,0.0,0.0,1,1,0,87,94.3,0,0,0.0,0.0,0.0,12,0,0,0,0,2,0,2,3,0,0,0,60,233.0,129.0,1,0,1,0.0
+Pedri,MC,barcelona,valencia,1,80,0,0,0.0,0.1,1,1,0,102,92.2,0,0,0.0,0.0,0.0,9,2,2,0,0,3,0,3,1,2,2,0,85,454.0,282.0,4,0,0,0.0
+Marc Bernal,MC,barcelona,valencia,0,10,0,1,0.0,0.6,0,0,0,8,100.0,0,0,0.0,0.0,0.0,8,1,0,0,0,0,0,0,1,0,0,0,5,9.0,3.0,0,1,0,100.0
+Gerard Martín,DF,barcelona,valencia,1,73,0,0,0.0,0.2,0,0,0,64,85.9,0,0,0.0,0.0,0.0,9,3,1,0,0,0,0,0,6,1,0,0,40,166.0,74.0,1,3,1,75.0
+Jofre Torrents,DF,barcelona,valencia,0,17,0,0,0.0,0.0,0,0,0,17,88.2,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,13,34.0,17.0,0,0,1,0.0
+Pau Cubarsí,DF,barcelona,valencia,1,90,0,0,0.0,0.0,0,0,0,93,89.2,0,0,0.0,0.0,0.0,8,4,3,0,0,0,0,0,6,0,0,0,60,253.0,108.0,0,6,2,75.0
+Eric García,DF,barcelona,valencia,1,90,0,0,0.1,0.1,1,1,0,83,94.0,0,0,0.0,0.0,0.0,8,2,2,0,0,0,0,0,3,1,0,1,63,209.0,124.0,0,1,2,33.3
+Jules Koundé,DF,barcelona,valencia,1,90,0,0,0.0,0.0,0,0,0,80,92.5,0,0,0.0,0.0,0.0,8,1,0,0,0,0,0,0,1,1,1,0,61,250.0,148.0,1,2,2,50.0
+Joan García,PT,barcelona,valencia,1,90,0,0,0.0,0.0,0,0,0,36,100.0,0,0,0.0,100.0,0.3,10,0,0,0,0,0,0,0,0,0,0,0,25,99.0,48.0,0,0,0,0.0
+Arnaut Danjuma,DT,valencia,barcelona,1,56,0,0,0.0,0.0,0,0,0,11,63.6,0,0,0.0,0.0,0.0,0,3,2,0,1,0,0,0,0,1,0,1,6,23.0,16.0,0,0,0,0.0
+Largie Ramazani,DT,valencia,barcelona,0,34,0,0,0.0,0.0,1,1,0,4,50.0,0,0,0.0,0.0,0.0,0,1,0,0,0,0,0,0,0,2,0,2,6,44.0,12.0,1,0,2,0.0
+Hugo Duro,DT,valencia,barcelona,1,76,0,0,0.0,0.0,0,0,0,21,71.4,0,0,0.0,0.0,0.0,0,1,3,0,2,2,0,2,0,1,0,1,8,35.0,27.0,1,3,5,37.5
+Lucas Beltrán,DT,valencia,barcelona,0,14,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,6,13.0,4.0,0,0,2,0.0
+Baptiste Santamaria,MC,valencia,barcelona,1,90,0,0,0.0,0.0,0,0,0,21,61.9,0,0,0.0,0.0,0.0,-1,0,0,0,0,0,0,0,5,2,0,2,15,36.0,11.0,0,0,0,0.0
+Javier Guerra,MC,valencia,barcelona,1,56,0,0,0.0,0.0,0,0,0,17,64.7,0,0,0.0,0.0,0.0,0,0,1,0,1,1,0,1,1,1,0,1,7,32.0,18.0,1,0,1,0.0
+Filip Ugrinic,MC,valencia,barcelona,0,34,0,0,0.0,0.0,0,0,0,15,100.0,0,0,0.0,0.0,0.0,0,2,1,0,0,0,0,0,0,0,0,0,5,6.0,1.0,0,1,0,100.0
+Diego López,MC,valencia,barcelona,1,56,0,0,0.0,0.0,0,0,0,7,14.3,0,0,0.0,0.0,0.0,0,1,1,0,0,0,0,0,0,3,0,2,10,48.0,17.0,0,1,0,100.0
+Luis Rioja,MC,valencia,barcelona,0,34,0,0,0.1,0.0,1,0,1,6,16.7,0,0,0.0,0.0,0.0,0,0,2,0,2,0,0,0,0,2,1,1,5,44.0,14.0,1,0,0,0.0
+José Luis Gayà,DF,valencia,barcelona,1,90,0,0,0.0,0.1,0,0,0,27,63.0,0,0,0.0,0.0,0.0,-4,1,1,0,0,2,1,1,3,0,0,0,11,39.0,28.0,1,2,1,66.7
+Copete,DF,valencia,barcelona,1,90,0,0,0.0,0.0,0,0,0,22,72.7,0,0,0.0,0.0,0.0,-2,4,4,0,1,2,1,1,3,0,0,0,13,53.0,7.0,0,1,1,50.0
+Mouctar Diakhaby,DF,valencia,barcelona,1,64,0,0,0.0,0.0,0,0,0,11,81.8,1,0,0.0,0.0,0.0,0,2,2,0,0,2,2,0,5,0,0,0,6,20.0,11.0,0,1,0,100.0
+Thierry Correia,DF,valencia,barcelona,0,26,0,0,0.0,0.0,0,0,0,12,66.7,0,0,0.0,0.0,0.0,-1,0,0,0,0,0,0,0,0,0,0,0,5,32.0,14.0,1,1,0,100.0
+César Tárrega,DF,valencia,barcelona,1,90,0,0,0.0,0.0,0,0,0,31,64.5,0,0,0.0,0.0,0.0,-5,3,2,0,0,0,0,0,2,0,0,0,14,44.0,10.0,0,0,1,0.0
+Dimitri Foulquier,DF,valencia,barcelona,1,90,0,0,0.0,0.0,0,0,0,45,77.8,0,0,0.0,0.0,0.0,-4,1,1,0,0,0,0,0,2,1,1,0,24,147.0,67.0,1,0,2,0.0
+Julen Agirrezabala,PT,valencia,barcelona,1,90,0,0,0.0,0.0,0,0,0,40,57.5,0,0,6.0,40.0,2.5,-2,0,0,0,0,0,0,0,0,0,0,0,20,91.0,66.0,0,1,0,100.0

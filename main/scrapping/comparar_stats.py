@@ -39,7 +39,8 @@ def extraer_tablas_fbref(html_content):
                 if not any(tid.endswith(suf) for suf in sufijos):
                     continue
             try:
-                df = pd.read_html(str(tabla))[0]
+                    from io import StringIO
+                    df = pd.read_html(StringIO(str(tabla)))[0]
             except Exception:
                 df = None
             if df is None:
@@ -604,5 +605,5 @@ def comparar_jugador_completo(num_jornada, num_partido, nombre_jugador):
 
 
 if __name__ == "__main__":
-    analizar_jornada_completa(2)
+    analizar_jornada_completa(6)
     # comparar_jugador_completo(1, 5, "Jose Luis Garcia Vaya")
