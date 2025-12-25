@@ -18,7 +18,6 @@ from commons import (
     normalizar_clave_html,
 )
 
-
 def mostrar_analisis_jugador(resultado):
     if not resultado["ok"]:
         print(resultado["motivo"])
@@ -37,7 +36,6 @@ def mostrar_analisis_jugador(resultado):
         csv_val = d["csv"]
         html_val = d["html"]
         print(f"  - {campo}: CSV={csv_val} | HTML={html_val}")
-
 
 def comparar_partido_stats_precalculado(jugadores_html, df_csv, jugador_objetivo):
     """
@@ -152,7 +150,6 @@ def comparar_partido_stats_precalculado(jugadores_html, df_csv, jugador_objetivo
         "es_portero": es_portero,
     }
 
-
 def _comparar_campos_stats(
     fila_csv,
     es_portero,
@@ -194,7 +191,7 @@ def _comparar_campos_stats(
             ),
         ),
         ("Amarillas", lambda: (fila_csv.get("Amarillas", ""), get_misc("CrdY"))),
-        ("Rojas", lambda: (fila_csv.get("Rojas", ""), get_misc("CrdR"))),
+        ("Rojas",     lambda: (fila_csv.get("Rojas", ""),     get_misc("CrdR"))),
         (
             "Goles_en_contra",
             lambda: (
@@ -274,7 +271,6 @@ def _comparar_campos_stats(
 
     return campos_mal, discrepancias
 
-
 def analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador):
     """
     Versión rápida: usa jugadores_html y df_csv ya preparados para el partido.
@@ -307,7 +303,6 @@ def analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador
         "campos_mal": campos_mal,
         "discrepancias": discrepancias,
     }
-
 
 def analizar_jugador(num_jornada, num_partido, nombre_jugador):
     """
@@ -343,7 +338,6 @@ def analizar_jugador(num_jornada, num_partido, nombre_jugador):
 
     resultado = analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador)
     mostrar_analisis_jugador(resultado)
-
 
 def analizar_partido_completo(num_jornada, num_partido, errores_jornada, no_analizados_jornada):
     carpeta_html = os.path.join("main", "html", f"j{num_jornada}")
@@ -406,7 +400,6 @@ def analizar_partido_completo(num_jornada, num_partido, errores_jornada, no_anal
                 }
             )
 
-
 def analizar_jornada_completa(num_jornada):
     carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
     if not os.path.exists(carpeta_csv):
@@ -449,6 +442,49 @@ def analizar_jornada_completa(num_jornada):
                     f"{err['tipo']} | {err['detalle']}"
                 )
 
+def imprimir_resumen_global(errores_globales, no_analizados_globales):
+    """
+    Imprime el resumen global:
+      - Lista de NO_ANALIZADO con jornada y partido.
+      - Mensaje de 'no hay discrepancias' si no hay CAMPOS_ERRONEOS.
+      - Tabla de errores si los hay.
+    """
+    print("\n" + "=" * 80)
+    print("RESUMEN GLOBAL")
+
+    # NO_ANALIZADO con jornada y partido
+    if no_analizados_globales:
+        print("Jugadores NO analizados (revisa si han recibido tarjetas desde el banquillo):")
+        vistos = set()
+        for err in no_analizados_globales:
+            clave = (err["jornada"], err["partido"], err["jugador"])
+            if clave in vistos:
+                continue
+            vistos.add(clave)
+            print(f" - {err['jugador']} (j{err['jornada']} p{err['partido']})")
+        print()
+    else:
+        print("No hay jugadores marcados como NO_ANALIZADO.\n")
+
+    # Sin discrepancias de stats
+    if not errores_globales:
+        print("No hay discrepancias de ninguna stat.")
+        return
+
+    # Tabla de errores de stats
+    cabecera = f"{'Jornada':7s} | {'Partido':7s} | {'Equipo':15s} | {'Jugador':25s} | {'Tipo':15s} | Detalle"
+    print("Jugadores con errores de stats:")
+    print(cabecera)
+    print("-" * len(cabecera))
+
+    for err in errores_globales:
+        jornada = f"j{err['jornada']}"
+        partido = f"p{err['partido']}"
+        equipo = str(err.get("equipo", "-"))[:15]
+        jugador = str(err['jugador'])[:25]
+        tipo = str(err['tipo'])[:15]
+        detalle = err['detalle']
+        print(f"{jornada:7s} | {partido:7s} | {equipo:15s} | {jugador:25s} | {tipo:15s} | {detalle}")
 
 def analizar_rango_jornadas(jornada_inicio, jornada_fin):
     errores_globales = []        # solo CAMPOS_ERRONEOS
@@ -501,38 +537,8 @@ def analizar_rango_jornadas(jornada_inicio, jornada_fin):
         errores_globales.extend(errores_jornada)
         no_analizados_globales.extend(no_analizados_jornada)
 
-    print("\n" + "=" * 80)
-    print(f"RESUMEN GLOBAL JORNADAS {jornada_inicio}-{jornada_fin}")
-
-    # 1) Lista de no analizados (tarjetas desde banquillo, etc.)
-    if no_analizados_globales:
-        print("Revisa si estos jugadores han recibido tarjetas desde el banquillo (no se pudieron analizar):")
-        nombres_unicos = sorted({err["jugador"] for err in no_analizados_globales})
-        for nombre in nombres_unicos:
-            print(f" - {nombre}")
-        print()
-    else:
-        print("No hay jugadores marcados como NO_ANALIZADO.\n")
-
-    # 2) Tabla solo con CAMPOS_ERRONEOS
-    if not errores_globales:
-        print("No hay jugadores con discrepancias de stats en el rango.")
-        return
-
-    cabecera = f"{'Jornada':7s} | {'Partido':7s} | {'Equipo':15s} | {'Jugador':25s} | {'Tipo':15s} | Detalle"
-    print("Jugadores con errores de stats en el rango:")
-    print(cabecera)
-    print("-" * len(cabecera))
-
-    for err in errores_globales:
-        jornada = f"j{err['jornada']}"
-        partido = f"p{err['partido']}"
-        equipo = str(err.get("equipo", "-"))[:15]
-        jugador = str(err['jugador'])[:25]
-        tipo = str(err['tipo'])[:15]
-        detalle = err['detalle']
-        print(f"{jornada:7s} | {partido:7s} | {equipo:15s} | {jugador:25s} | {tipo:15s} | {detalle}")
-
+    # Resumen global con la nueva función
+    imprimir_resumen_global(errores_globales, no_analizados_globales)
 
 def comparar_jugador_completo(num_jornada, num_partido, nombre_jugador):
     """
@@ -618,7 +624,6 @@ def comparar_jugador_completo(num_jornada, num_partido, nombre_jugador):
             html_v = "-"
             ok = "✓"
         print(f"{campo:35s} | {csv_v:>10s} | {html_v:>10s} | {ok:>3s}")
-
 
 if __name__ == "__main__":
     analizar_rango_jornadas(1, 17)
