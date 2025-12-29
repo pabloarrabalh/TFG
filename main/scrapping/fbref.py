@@ -7,14 +7,46 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import cloudscraper
 
-from commons import *
-from alias import *
+from commons import (
+    normalizar_texto,
+    normalizar_equipo,
+    limpiar_minuto,
+    extraer_nombre_jugador,
+    to_int,
+    to_float,
+    mapear_posicion,
+    nombre_a_mayus,
+    coincide_inicial_apellido,
+    obtener_match_nombre,
+)
+from alias import (
+    MAPEO_STATS,
+    COLUMNAS_MODELO,
+    POSICION_MAP,
+    APELLIDOS_CRITICOS,
+    UMBRAL_MATCH,
+    ALIAS_EQUIPOS,
+    get_alias_jugadores,
+)
 
-CARPETA_HTML = os.path.join("main", "html")
-CARPETA_CSV = os.path.join("data", "temporada_25_26")
+# =====================================================
+# CONFIG GLOBAL DEPENDIENTE DE TEMPORADA
+# =====================================================
 
-os.makedirs(CARPETA_HTML, exist_ok=True)
-os.makedirs(CARPETA_CSV, exist_ok=True)
+TEMPORADA_ACTUAL = "25_26"   # valor por defecto
+
+def _build_rutas_temporada(temporada: str):
+    """
+    HTML: main/html/temporada_25_26/j1/p1.html, puntos.html
+    CSV:  data/temporada_25_26/jornada_1/*.csv
+    """
+    carpeta_html = os.path.join("main", "html", f"temporada_{temporada}")
+    carpeta_csv = os.path.join("data", f"temporada_{temporada}")
+    os.makedirs(carpeta_html, exist_ok=True)
+    os.makedirs(carpeta_csv, exist_ok=True)
+    return carpeta_html, carpeta_csv
+
+CARPETA_HTML, CARPETA_CSV = _build_rutas_temporada(TEMPORADA_ACTUAL)
 
 scraper = cloudscraper.create_scraper(
     browser={
@@ -23,6 +55,35 @@ scraper = cloudscraper.create_scraper(
         'desktop': True,
     }
 )
+
+# =====================================================
+# HELPERS ALIAS / NORMALIZACIÓN
+# =====================================================
+
+def normalizar_equipo_temporada(nombre: str) -> str:
+    """
+    Normaliza texto base + aplica ALIAS_EQUIPOS (global, sin temporada).
+    """
+    nombre_norm = normalizar_texto(nombre)
+    return ALIAS_EQUIPOS.get(nombre_norm, nombre_norm)
+
+
+def aplicar_alias_jugador_temporada(nombre: str, equipo_norm: str) -> str:
+    """
+    Aplica ALIAS_JUGADORES para la temporada actual.
+    """
+    alias_jug = get_alias_jugadores(TEMPORADA_ACTUAL)
+    equipo_norm = equipo_norm or ""
+    equipo_norm = normalizar_texto(equipo_norm)
+
+    mapa_equipo = alias_jug.get(equipo_norm, {})
+    nombre_norm = normalizar_texto(nombre)
+    return mapa_equipo.get(nombre_norm, nombre)
+
+
+# =====================================================
+# LÓGICA FBREF + FANTASY
+# =====================================================
 
 def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante):
     caption = tabla_html.find('caption')
@@ -79,16 +140,17 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante):
                 equipo_fila = equipo_visitante
 
         if equipo_fila:
-            equipo_norm = normalizar_equipo(equipo_fila)
+            equipo_norm = normalizar_equipo_temporada(equipo_fila)
         else:
             equipo_norm = None
 
-        nombre_con_alias = aplicar_alias(nombre, equipo_norm)
+        nombre_con_alias = aplicar_alias_jugador_temporada(nombre, equipo_norm)
         nombre_norm = normalizar_texto(nombre_con_alias)
 
         jugadores[nombre_norm] = fila
 
     return jugadores
+
 
 def rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val):
     for tipo, cfg in MAPEO_STATS.items():
@@ -146,15 +208,16 @@ def rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val):
             fila_salida['Porcentaje_paradas'] = pct_paradas
             fila_salida['PSxG'] = psxg
 
+
 def postprocesar_df_partido(df):
     if df.empty:
         return df
 
     if 'Equipo_propio' in df.columns:
-        df['Equipo_propio'] = df['Equipo_propio'].apply(normalizar_equipo)
+        df['Equipo_propio'] = df['Equipo_propio'].apply(normalizar_equipo_temporada)
 
     if 'Equipo_rival' in df.columns:
-        df['Equipo_rival'] = df['Equipo_rival'].apply(normalizar_equipo)
+        df['Equipo_rival'] = df['Equipo_rival'].apply(normalizar_equipo_temporada)
 
     mask_no_portero = df['posicion'] != 'PT'
     df.loc[mask_no_portero, 'Goles_en_contra'] = 0.0
@@ -172,6 +235,7 @@ def postprocesar_df_partido(df):
     df = df.fillna(0)
 
     return df
+
 
 def obtener_calendario():
     ruta_local = "calendario.html"
@@ -228,7 +292,9 @@ def obtener_calendario():
 
     return calendario
 
+
 def obtener_fantasy_jornada(jornada):
+    # main/html/temporada_25_26/j1/puntos.html
     ruta_puntos = os.path.join(CARPETA_HTML, f"j{jornada}", "puntos.html")
 
     if not os.path.exists(ruta_puntos):
@@ -259,8 +325,8 @@ def obtener_fantasy_jornada(jornada):
         nombre_local = div_local.get_text(strip=True)
         nombre_visit = div_visit.get_text(strip=True)
 
-        local_norm = normalizar_equipo(nombre_local)
-        visit_norm = normalizar_equipo(nombre_visit)
+        local_norm = normalizar_equipo_temporada(nombre_local)
+        visit_norm = normalizar_equipo_temporada(nombre_visit)
 
         clave_partido = f"{local_norm}-{visit_norm}"
 
@@ -341,7 +407,7 @@ def obtener_fantasy_jornada(jornada):
 
                 clave_ff = f"{equipo_norm}|{nombre_sin_min}"
 
-                nombre_con_alias = aplicar_alias(nombre_sin_min, equipo_tabla_norm)
+                nombre_con_alias = aplicar_alias_jugador_temporada(nombre_sin_min, equipo_tabla_norm)
                 nombre_norm = normalizar_texto(nombre_con_alias)
 
                 info = {
@@ -366,6 +432,7 @@ def obtener_fantasy_jornada(jornada):
 
     return resultado
 
+
 def obtener_nombres_partido(html_partido):
     soup = BeautifulSoup(html_partido, 'lxml')
     tag_title = soup.find('title')
@@ -384,6 +451,7 @@ def obtener_nombres_partido(html_partido):
 
     return equipo_local, equipo_visitante
 
+
 def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
     soup = BeautifulSoup(html_partido, 'lxml')
     tag_title = soup.find('title')
@@ -400,8 +468,8 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         equipo_local = "Local"
         equipo_visitante = "Visitante"
 
-    local_norm = normalizar_equipo(equipo_local)
-    visit_norm = normalizar_equipo(equipo_visitante)
+    local_norm = normalizar_equipo_temporada(equipo_local)
+    visit_norm = normalizar_equipo_temporada(equipo_visitante)
 
     fantasy_partido = mapa_fantasy_partido
 
@@ -484,15 +552,15 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         for info in candidatos_equipo.values():
             nombres_fantasy_norm.append(info["nombre_norm"])
 
+        # === clave: alias temporada + normalizar ANTES de matchear ===
+        nombre_fb_aliased = aplicar_alias_jugador_temporada(nombre_fb, equipo_fb_norm)
+        nombre_html_norm = normalizar_texto(nombre_fb_aliased)
+
         mejor_norm, mejor_score = obtener_match_nombre(
-            nombre_fb,
+            nombre_html_norm,
             nombres_fantasy_norm,
             equipo_norm=equipo_fb_norm,
             score_cutoff=UMBRAL_MATCH,
-        )
-
-        nombre_html_norm = normalizar_texto(
-            aplicar_alias(nombre_fb, equipo_fb_norm)
         )
 
         if mejor_norm is None or mejor_score < UMBRAL_MATCH:
@@ -646,7 +714,7 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         pos_fb = fila['posicion']
 
         nombre_canonico_fb = normalizar_texto(
-            aplicar_alias(nombre_fb, equipo_fb_norm)
+            aplicar_alias_jugador_temporada(nombre_fb, equipo_fb_norm)
         )
 
         claves_canonicas_presentes.add((nombre_canonico_fb, equipo_fb_norm, pos_fb))
@@ -662,10 +730,9 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         pos_val = info.get("posicion", "MC")
 
         nombre_canonico_ff = normalizar_texto(
-            aplicar_alias(nombre_original, equipo_norm)
+            aplicar_alias_jugador_temporada(nombre_original, equipo_norm)
         )
 
-        # Si ya hay fila FBref para este jugador+equipo+pos, ignorar tarjetas Fantasy
         if (nombre_canonico_ff, equipo_norm, pos_val) in claves_canonicas_presentes:
             continue
 
@@ -679,11 +746,9 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
                 break
 
         if coincidencia:
-            # Hay fila FBref (coincidencia por nombre): solo añadimos puntos,
-            # NO tocamos Amarillas/Rojas (se quedan solo con FBref / misc).
             for clave_registro, fila in bd_partido.items():
                 nombre_canonico_fila = normalizar_texto(
-                    aplicar_alias(fila['player'], fila['Equipo_propio'])
+                    aplicar_alias_jugador_temporada(fila['player'], fila['Equipo_propio'])
                 )
                 if (
                     nombre_canonico_fila == coincidencia
@@ -695,7 +760,6 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
 
             continue
 
-        # Desde aquí: jugadores que no tienen fila FBref (no han jugado)
         if clave_ff in usadas_ff:
             continue
 
@@ -703,7 +767,6 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         amarillas_banquillo = info.get("amarillas", 0)
         rojas_banquillo = info.get("rojas", 0)
 
-        # Solo nos interesan si han recibido alguna tarjeta desde el banquillo
         if amarillas_banquillo == 0 and rojas_banquillo == 0:
             continue
 
@@ -729,7 +792,6 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         fila['Titular'] = 0
         fila['Min_partido'] = 0
         fila['puntosFantasy'] = puntos
-        # Aquí sí usamos tarjetas Fantasy: suplente con tarjeta
         fila['Amarillas'] = amarillas_banquillo
         fila['Rojas'] = rojas_banquillo
 
@@ -740,9 +802,10 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
 
     return df_partido, equipo_local, equipo_visitante
 
+
 def procesar_jornada(jornada: int):
     sj = str(jornada)
-    print(f"\n=== JORNADA {sj} ===")
+    print(f"\n=== JORNADA {sj} (temp {TEMPORADA_ACTUAL}) ===")
 
     fantasy_por_partido = obtener_fantasy_jornada(sj)
 
@@ -765,8 +828,8 @@ def procesar_jornada(jornada: int):
 
         equipo_local, equipo_visitante = obtener_nombres_partido(html_partido)
 
-        local_norm = normalizar_equipo(equipo_local)
-        visit_norm = normalizar_equipo(equipo_visitante)
+        local_norm = normalizar_equipo_temporada(equipo_local)
+        visit_norm = normalizar_equipo_temporada(equipo_visitante)
 
         clave_partido = f"{local_norm}-{visit_norm}"
 
@@ -793,9 +856,31 @@ def procesar_jornada(jornada: int):
 
             print("✅ CSV generado.")
 
+
 def procesar_rango_jornadas(jornada_inicio: int, jornada_fin: int):
     for j in range(jornada_inicio, jornada_fin + 1):
         procesar_jornada(j)
 
+
+# =====================================================
+# NUEVO: analizar_temporada(x)
+# =====================================================
+
+def analizar_temporada(codigo_temporada: str, j_ini: int = 1, j_fin: int = 38):
+    """
+    codigo_temporada: '25_26', '24_25', etc.
+    Usa alias de jugadores de esa temporada y rutas:
+    - main/html/temporada_<temporada>/jX/puntos.html, p1.html...
+    - data/temporada_<temporada>/jornada_X/*.csv
+    """
+    global TEMPORADA_ACTUAL, CARPETA_HTML, CARPETA_CSV
+
+    TEMPORADA_ACTUAL = codigo_temporada
+    CARPETA_HTML, CARPETA_CSV = _build_rutas_temporada(codigo_temporada)
+
+    print(f"\n=== ANALIZANDO TEMPORADA {codigo_temporada} ===")
+    procesar_rango_jornadas(j_ini, j_fin)
+
+
 if __name__ == "__main__":
-    procesar_rango_jornadas(1, 17)
+    analizar_temporada("25_26", 1, 17)

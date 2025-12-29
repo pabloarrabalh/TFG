@@ -1,5 +1,6 @@
 import re
 
+# Alias de equipos, válidos para todas las temporadas
 ALIAS_EQUIPOS = {
     "rayo vallecano": "rayo", "villarreal cf": "villarreal", "real oviedo": "oviedo",
     "celta vigo": "celta", "getafe cf": "getafe", "alaves": "alaves",
@@ -9,20 +10,28 @@ ALIAS_EQUIPOS = {
     "atletico madrid": "atletico madrid",
 }
 
-ALIAS_JUGADORES = {
-    "espanyol": { "roca": "antoniu roca" },
-    "rayo": { "isaac palazon camacho": "isi palazon"},
-    "valencia": { "jose luis garcia vaya": "pepelu"},
-    "betis": {"ezequiel avila": "chimy", "dani perez": "dani perez" },
-    "levante": {"cunat campos": "pablo cunat"},
-    "oviedo": {"alhassane": "rahim bonkano"},
-    "girona": {"lass": "lancinet kourouma", "tsygankov": "viktor tsyhankov"},
-    "celta": { "elabdellaoui": "el abdellaoui"},
-    "real sociedad": { "caletacar": "caleta car"},
-    "real madrid": { "alexanderarnold": "trent alexander arnold"},
-    "atletico madrid": { "sorloth": "alexander sorloth"},
-    "athletic": { "n williams": "nico williams", "i williams": "iñaki williams" },
-    "sevilla": {"oso": "joaquin martinez gauna"},
+# Solo ALIAS_JUGADORES cambia por temporada
+ALIAS_JUGADORES_POR_TEMPORADA = {
+    "25_26": {
+        "espanyol": { "roca": "antoniu roca" },
+        "rayo": { "isaac palazon camacho": "isi palazon"},
+        "valencia": { "jose luis garcia vaya": "pepelu"},
+        "betis": {"ezequiel avila": "chimy", "dani perez": "dani perez" },
+        "levante": {"cunat campos": "pablo cunat"},
+        "oviedo": {"alhassane": "rahim bonkano"},
+        "girona": {"lass": "lancinet kourouma", "tsygankov": "viktor tsyhankov"},
+        "celta": { "elabdellaoui": "el abdellaoui"},
+        "real sociedad": { "caletacar": "caleta car","duje caletacar": "caleta car",},
+        "real madrid": { "alexanderarnold": "trent alexander arnold"},
+        "atletico madrid": { "sorloth": "alexander sorloth"},
+        "athletic": { "n williams": "nico williams", "i williams": "iñaki williams" },
+        "sevilla": {"oso": "joaquin martinez gauna"},
+    },
+
+    # Ejemplo de otra temporada, ya la irás rellenando
+    "24_25": {
+        # "rayo": {"jugador x": "nombre canonico"},
+    },
 }
 
 APELLIDOS_CRITICOS = {"garcia", "rodriguez", "gonzalez"}
@@ -104,4 +113,8 @@ COLUMNAS_MODELO = [
     'DuelosAereosGanados', 'DuelosAereosPerdidos', 'DuelosAereosGanadosPct'
 ]
 
-UMBRAL_MATCH = 75.0
+UMBRAL_MATCH = 77.0
+
+
+def get_alias_jugadores(temporada: str) -> dict:
+    return ALIAS_JUGADORES_POR_TEMPORADA.get(temporada, {})

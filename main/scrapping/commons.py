@@ -7,8 +7,14 @@ import pandas as pd
 from bs4 import NavigableString, BeautifulSoup
 from rapidfuzz import process, fuzz
 
-from alias import *
-
+from alias import (
+    ALIAS_EQUIPOS,
+    APELLIDOS_CRITICOS,
+    POSICION_MAP,
+    MAPEO_STATS,
+    COLUMNAS_MODELO,
+    UMBRAL_MATCH,
+)
 
 # ==========================
 # Normalización básica
@@ -25,24 +31,26 @@ def normalizar_texto(texto):
 
 
 def normalizar_equipo(nombre_equipo):
+    """
+    Normaliza nombre de equipo y aplica ALIAS_EQUIPOS global.
+    """
     nombre_norm = normalizar_texto(nombre_equipo)
     return ALIAS_EQUIPOS.get(nombre_norm, nombre_norm)
 
 
 def aplicar_alias(nombre, equipo=None):
-    nombre_norm = normalizar_texto(nombre)
-    equipo_norm = normalizar_texto(equipo) if equipo else None
-
-    if equipo_norm:
-        alias_equipo = ALIAS_JUGADORES.get(equipo_norm, {})
-        alias = alias_equipo.get(nombre_norm)
-        if alias is not None:
-            return alias
+    """
+    Versión neutra: NO usa ALIAS_JUGADORES global.
+    El alias de jugadores por temporada se aplica en fbref.py
+    (aplicar_alias_jugador_temporada).
+    """
     return nombre
 
 
 def aplicar_alias_contextual(nombre, equipo_norm):
-    """Alias contextual = mismo comportamiento que aplicar_alias, pero con nombre semántico."""
+    """
+    Wrapper semántico. De momento hace lo mismo que aplicar_alias.
+    """
     return aplicar_alias(nombre, equipo_norm)
 
 
@@ -129,8 +137,6 @@ def formatear_numero(valor):
         return str(valor)
 
 
-# Normalización numérica genérica para comparaciones CSV vs HTML
-
 def limpiar_numero_generico(valor):
     """
     Limpia cualquier valor numérico para comparaciones CSV vs HTML:
@@ -171,6 +177,10 @@ def mapear_posicion(pos):
 
 
 def añadir_equipo_y_player_norm(df, col_equipo="Equipo_propio", col_player="player"):
+    """
+    Ojo: aplicar_alias aquí ya no mete alias de jugadores.
+    Si necesitas alias por temporada en CSV, aplícalo fuera (fbref) antes.
+    """
     df["equipo_norm"] = df[col_equipo].apply(normalizar_equipo)
     df["player_norm"] = df.apply(
         lambda row: normalizar_texto(
@@ -218,18 +228,18 @@ def es_apellido_conflictivo(nombre_normalizado_html, nombres_normalizados_equipo
     return len(jugadores_con_mismo_apellido) > 1
 
 
-def obtener_match_nombre(nombre_html_raw, nombres_norm_equipo, equipo_norm=None, score_cutoff=85):
+def obtener_match_nombre(nombre_html_norm, nombres_norm_equipo, equipo_norm=None, score_cutoff=85):
+    """
+    nombre_html_norm debe venir YA normalizado (lower, sin acentos, sin guiones)
+    y con alias aplicado si corresponde. Aquí solo se aplican reglas de apellidos
+    y fuzzy matching sobre nombres_norm_equipo, que también deben estar normalizados.
+    """
     if not nombres_norm_equipo:
         return None, 0
 
-    equipo_norm = normalizar_equipo(equipo_norm) if equipo_norm else None
-
-    nombre_html_norm = normalizar_texto(
-        aplicar_alias(nombre_html_raw, equipo_norm)
-    )
     partes = nombre_html_norm.split()
 
-    # 1. Apellidos críticos
+    # 1. Apellidos críticos (dos palabras)
     if len(partes) == 2:
         nombre = partes[0]
         apellido = partes[1]
@@ -244,7 +254,7 @@ def obtener_match_nombre(nombre_html_raw, nombres_norm_equipo, equipo_norm=None,
                 unico = candidatos_nombre[0]
                 return unico, 100
 
-    # 2. Apodos (una sola palabra)
+    # 2. Apodos (una sola palabra) — la mantenemos pero podrías comentarla si molesta
     if len(partes) == 1:
         palabra = partes[0]
 
@@ -314,10 +324,9 @@ def coincide_inicial_apellido(nombre1, nombre2):
 
 def normalizar_clave_html(nombre_raw, equipo_norm, jugadores_html):
     """
-    Devuelve la clave adecuada para jugadores_html:
-    - Usa alias contextual si existe en HTML.
-    - Si no, usa el nombre normalizado sin alias.
-    - Si ninguno existe, devuelve el alias (para fuzzy).
+    Devuelve la clave adecuada para jugadores_html.
+    Nota: aplicar_alias_contextual es neutro; si quieres alias por temporada,
+    pásale nombre_raw ya aliaseado desde fbref.
     """
     equipo_norm_n = normalizar_equipo(equipo_norm) if equipo_norm else None
 
