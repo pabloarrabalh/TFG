@@ -545,3 +545,90 @@ def mostrar_errores(errores):
             )
     else:
         print("\nTodos los jugadores tienen los puntos bien asignados.")
+
+import os
+import time
+import random
+import requests
+
+def descargar_puntos(temporada: int, jornada_inicio: int = 1, jornada_fin: int = 38):
+    """
+    Descarga el HTML de puntos de cada jornada de la temporada indicada.
+    Guarda como puntos.html en la carpeta:
+        html/temporada_XX_YY/j{jornada}/puntos.html
+
+    temporada: año de la segunda parte de la temporada (ej: 25 -> 24_25)
+    jornada_inicio, jornada_fin: rango de jornadas (incluyendo ambos).
+    """
+
+    carpeta_temporada = f"temporada_{temporada-1:02d}_{temporada:02d}"
+    base_url = (
+        f"https://www.futbolfantasy.com/laliga/puntos/20{temporada}"
+        + "/{}/laliga-fantasy"
+    )
+
+    base_dir = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)),
+        "html",
+        carpeta_temporada
+    )
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/120.0.0.0 Safari/537.36",
+        "Accept-Language": "es-ES,es;q=0.9",
+    }
+
+    jornadas = list(range(jornada_inicio, jornada_fin + 1))
+
+    for idx, jornada in enumerate(jornadas, start=1):
+        url = base_url.format(jornada)
+        folder = os.path.join(base_dir, f"j{jornada}")
+        os.makedirs(folder, exist_ok=True)
+        file_path = os.path.join(folder, "puntos.html")
+
+        exito = False
+        delay_base = 5  # base para backoff
+
+        for intento in range(4):  # hasta 4 intentos
+            try:
+                print(f"Jornada {jornada} - intento {intento+1}...")
+                resp = requests.get(url, headers=headers, timeout=20)
+                resp.raise_for_status()
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(resp.text)
+                print(f"Guardado en {file_path}")
+                exito = True
+                break
+            except (requests.exceptions.ReadTimeout,
+                    requests.exceptions.ConnectionError) as e:
+                # backoff exponencial con jitter
+                espera = min(delay_base * (2 ** intento), 120)
+                espera = espera * random.uniform(0.5, 1.5)
+                print(f"Timeout/conexión en jornada {jornada}: {e}. "
+                      f"Esperando {espera:.1f}s antes de reintentar...")
+                time.sleep(espera)
+            except Exception as e:
+                print(f"Error en jornada {jornada}: {e}. No reintento más.")
+                break
+
+        if not exito:
+            print(f"No se pudo descargar la jornada {jornada}, la salto.")
+            # pausa más larga antes de seguir, por si hay rate limiting
+            time.sleep(random.uniform(30, 90))
+            continue
+
+        # Pausa normal "humana" entre jornadas
+        pausa = random.uniform(8, 40)
+        print(f"Pausa entre jornadas: {pausa:.1f}s")
+        time.sleep(pausa)
+
+        # Cada 6 jornadas, descanso largo
+        if idx % 6 == 0:
+            siesta = random.uniform(120, 400)
+            print(f"Descanso largo tras jornada {jornada}: {siesta:.1f}s")
+            time.sleep(siesta)
+
+if __name__ == "__main__":
+    descargar_puntos(25, jornada_inicio=22, jornada_fin=38)
