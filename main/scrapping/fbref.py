@@ -883,4 +883,4 @@ def analizar_temporada(codigo_temporada: str, j_ini: int = 1, j_fin: int = 38):
 
 
 if __name__ == "__main__":
-    analizar_temporada("25_26", 1, 17)
+    analizar_temporada("24_24", 1, 10)
