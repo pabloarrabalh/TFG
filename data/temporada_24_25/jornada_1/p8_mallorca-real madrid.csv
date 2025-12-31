@@ -1,0 +1,31 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Vedat Muriqi,DT,mallorca,real madrid,1,90,1,0,0.4,0.0,3,0,3,19,73.7,0,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,3,3,0,3,11,68.0,1.0,0,6,5,54.5
+Dani Rodríguez,DT,mallorca,real madrid,1,66,0,1,0.1,0.1,2,2,0,28,67.9,0,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,1,0,0,0,16,63.0,28.0,0,0,0,0.0
+Antonio Sánchez,DT,mallorca,real madrid,0,24,0,0,0.4,0.0,3,3,0,4,0.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,0,0,0,3,41.0,18.0,0,0,0,0.0
+Takuma Asano,DT,mallorca,real madrid,1,71,0,0,0.0,0.0,1,0,1,12,58.3,0,0,0.0,0.0,0.0,4,3,2,0,1,1,0,1,0,1,1,0,14,117.0,78.0,3,0,2,0.0
+Cyle Larin,DT,mallorca,real madrid,0,19,0,0,0.0,0.0,0,0,0,10,70.0,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,1,1,1,0,6,72.0,59.0,1,0,0,0.0
+Samu Costa,MC,mallorca,real madrid,1,90,0,0,0.0,0.0,2,1,1,41,90.2,0,0,0.0,0.0,0.0,3,7,7,0,5,1,0,1,1,2,0,2,28,83.0,33.0,0,2,1,66.7
+Omar Mascarell,MC,mallorca,real madrid,1,89,0,0,0.0,0.0,0,0,0,44,93.2,0,0,0.0,0.0,0.0,5,1,2,0,1,1,0,1,3,0,0,0,26,139.0,46.0,1,0,2,0.0
+Copete,MC,mallorca,real madrid,0,1,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,3,0,0,0,0,0.0,0.0,0,0,0,0.0
+Sergi Darder,MC,mallorca,real madrid,1,71,0,0,0.0,0.0,0,0,0,29,75.9,0,0,0.0,0.0,0.0,4,0,0,0,0,1,0,1,1,0,0,0,18,90.0,30.0,0,0,0,0.0
+Manu Morlanes,MC,mallorca,real madrid,0,19,0,0,0.0,0.0,0,0,0,11,90.9,0,0,0.0,0.0,0.0,2,0,0,0,0,1,1,0,0,0,0,0,8,92.0,57.0,1,0,0,0.0
+Johan Mojica,DF,mallorca,real madrid,1,90,0,0,0.0,0.1,1,1,0,55,80.0,0,0,0.0,0.0,0.0,8,1,2,0,1,0,0,0,2,6,4,2,45,307.0,152.0,3,0,0,0.0
+Antonio Raillo,DF,mallorca,real madrid,1,90,0,0,0.0,0.0,0,0,0,40,97.5,0,0,0.0,0.0,0.0,3,0,0,0,0,2,2,0,2,0,0,0,17,79.0,57.0,0,2,0,100.0
+Martin Valjent,DF,mallorca,real madrid,1,90,0,0,0.0,0.0,0,0,0,18,83.3,0,0,0.0,0.0,0.0,5,0,0,0,0,2,0,2,6,0,0,0,8,40.0,8.0,0,0,0,0.0
+Pablo Maffeo,DF,mallorca,real madrid,1,90,0,0,0.0,0.1,0,0,0,36,72.2,1,0,0.0,0.0,0.0,2,5,5,0,2,1,0,1,5,2,0,2,19,83.0,36.0,1,0,0,0.0
+Dominik Greif,PT,mallorca,real madrid,1,90,0,0,0.0,0.0,0,0,0,15,40.0,0,0,1.0,80.0,1.2,5,0,0,0,0,0,0,0,1,0,0,0,9,41.0,14.0,0,0,0,0.0
+Kylian Mbappé,DT,real madrid,mallorca,1,90,0,0,0.3,0.0,4,2,2,32,78.1,0,0,0.0,0.0,0.0,6,0,0,0,0,0,0,0,0,5,3,2,26,243.0,91.0,5,0,0,0.0
+Vinicius Júnior,DT,real madrid,mallorca,1,87,0,1,0.1,0.3,2,2,0,44,75.0,0,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,0,8,3,5,41,322.0,175.0,4,0,1,0.0
+Brahim Díaz,DT,real madrid,mallorca,0,3,0,0,0.0,0.0,0,0,0,5,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,5,24.0,13.0,0,0,0,0.0
+Rodrygo,DT,real madrid,mallorca,1,90,1,0,0.2,0.0,3,1,2,69,87.0,0,0,0.0,0.0,0.0,13,1,1,0,0,2,0,2,0,4,2,1,50,280.0,134.0,5,0,0,0.0
+Jude Bellingham,MC,real madrid,mallorca,1,87,0,0,0.0,0.1,0,0,0,73,86.3,0,0,0.0,0.0,0.0,4,6,3,0,0,2,0,2,0,1,1,0,57,260.0,119.0,2,0,3,0.0
+Arda Güler,MC,real madrid,mallorca,0,3,0,0,0.0,0.0,0,0,0,4,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,1,1,0,3,22.0,12.0,0,0,0,0.0
+Aurélien Tchouaméni,MC,real madrid,mallorca,1,62,0,0,0.0,0.0,0,0,0,58,98.3,0,0,0.0,0.0,0.0,4,4,2,0,1,0,0,0,1,0,0,0,42,180.0,72.0,0,1,1,50.0
+Luka Modrić,MC,real madrid,mallorca,0,28,0,0,0.0,0.0,2,1,1,44,81.8,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,33,173.0,61.0,0,0,0,0.0
+Federico Valverde,MC,real madrid,mallorca,1,90,0,0,0.0,0.0,0,0,0,78,88.5,0,0,0.0,0.0,0.0,5,1,1,0,0,0,0,0,4,0,0,0,54,290.0,148.0,1,2,0,100.0
+Ferland Mendy,DF,real madrid,mallorca,1,89,0,0,0.0,0.0,0,0,0,72,98.6,0,1,0.0,0.0,0.0,2,1,1,0,0,1,0,1,4,0,0,0,46,132.0,42.0,0,1,0,100.0
+Antonio Rüdiger,DF,real madrid,mallorca,1,90,0,0,0.0,0.0,1,1,0,73,89.0,0,0,0.0,0.0,0.0,5,0,1,0,1,1,1,0,6,1,1,0,50,262.0,157.0,1,4,1,80.0
+Éder Militão,DF,real madrid,mallorca,1,90,0,0,0.0,0.0,1,1,0,60,96.7,0,0,0.0,0.0,0.0,6,2,5,0,3,0,0,0,5,0,0,0,51,253.0,135.0,1,2,4,33.3
+Dani Carvajal,DF,real madrid,mallorca,1,86,0,0,0.0,0.0,0,0,0,59,84.7,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,3,0,0,0,36,144.0,68.0,0,0,0,0.0
+Lucas Vázquez,DF,real madrid,mallorca,0,4,0,0,0.0,0.0,0,0,0,4,50.0,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,0,0,0,1,1.0,0.0,0,0,0,0.0
+Thibaut Courtois,PT,real madrid,mallorca,1,90,0,0,0.0,0.0,0,0,0,26,92.3,0,0,1.0,80.0,0.6,7,0,0,0,0,0,0,0,0,0,0,0,17,106.0,62.0,0,0,0,0.0

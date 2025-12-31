@@ -1,14 +1,3 @@
-def contar_tarjetas_banquillo(df):
-    """
-    Devuelve un DataFrame con jugadores que tienen amarillas o rojas y 0 minutos.
-    Añade columna 'banquillo' True/False.
-    """
-    if df is None or df.empty:
-        return pd.DataFrame()
-    mask = ((df["Amarillas"].fillna(0) > 0) | (df["Rojas"].fillna(0) > 0)) & (df["Min_partido"].fillna(0) == 0)
-    df_banquillo = df[mask].copy()
-    df_banquillo["banquillo"] = True
-    return df_banquillo
 import os
 import re
 from io import StringIO
@@ -40,11 +29,30 @@ from alias import (
     get_alias_jugadores,
 )
 
+
+def contar_tarjetas_banquillo(df):
+    """
+    Devuelve un DataFrame con jugadores que tienen amarillas o rojas y 0 minutos.
+    Añade columna 'banquillo' True.
+    """
+    if df is None or df.empty:
+        return pd.DataFrame()
+    mask = (
+        (df["Amarillas"].fillna(0) > 0)
+        | (df["Rojas"].fillna(0) > 0)
+    ) & (df["Min_partido"].fillna(0) == 0)
+    df_banquillo = df[mask].copy()
+    df_banquillo["banquillo"] = True
+    return df_banquillo
+
+
 # =====================================================
 # CONFIG GLOBAL DEPENDIENTE DE TEMPORADA
 # =====================================================
 
+
 TEMPORADA_ACTUAL = "25_26"  # valor por defecto
+
 
 def _build_rutas_temporada(temporada: str):
     carpeta_html = os.path.join("main", "html", f"temporada_{temporada}")
@@ -53,7 +61,9 @@ def _build_rutas_temporada(temporada: str):
     os.makedirs(carpeta_csv, exist_ok=True)
     return carpeta_html, carpeta_csv
 
+
 CARPETA_HTML, CARPETA_CSV = _build_rutas_temporada(TEMPORADA_ACTUAL)
+
 
 scraper = cloudscraper.create_scraper(
     browser={
@@ -63,13 +73,16 @@ scraper = cloudscraper.create_scraper(
     }
 )
 
+
 # =====================================================
 # HELPERS ALIAS / NORMALIZACIÓN
 # =====================================================
 
+
 def normalizar_equipo_temporada(nombre: str) -> str:
     nombre_norm = normalizar_texto(nombre)
     return ALIAS_EQUIPOS.get(nombre_norm, nombre_norm)
+
 
 def aplicar_alias_jugador_temporada(nombre: str, equipo_norm: str) -> str:
     alias_jug = get_alias_jugadores(TEMPORADA_ACTUAL)
@@ -84,9 +97,11 @@ def aplicar_alias_jugador_temporada(nombre: str, equipo_norm: str) -> str:
         return alias_corto
     return nombre
 
+
 # =====================================================
 # LÓGICA FBREF + FANTASY
 # =====================================================
+
 
 def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo=None):
     caption = tabla_html.find("caption")
@@ -167,6 +182,7 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo=None):
                 jugadores[nombre_base_norm] = fila
 
     return jugadores
+
 
 def rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val):
     for tipo, cfg in MAPEO_STATS.items():
@@ -250,6 +266,7 @@ def rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val):
             fila_salida["PSxG"] = psxg
     # ======== FIN BLOQUE PORTEROS ========
 
+
 def postprocesar_df_partido(df):
     if df.empty:
         return df
@@ -276,6 +293,7 @@ def postprocesar_df_partido(df):
     df = df.fillna(0)
 
     return df
+
 
 def obtener_calendario():
     ruta_local = "calendario.html"
@@ -331,6 +349,7 @@ def obtener_calendario():
         calendario[jornada].append(url_partido)
 
     return calendario
+
 
 def obtener_fantasy_jornada(jornada):
     ruta_puntos = os.path.join(CARPETA_HTML, f"j{jornada}", "puntos.html")
@@ -472,6 +491,7 @@ def obtener_fantasy_jornada(jornada):
 
     return resultado
 
+
 def obtener_nombres_partido(html_partido):
     soup = BeautifulSoup(html_partido, "lxml")
     tag_title = soup.find("title")
@@ -489,6 +509,7 @@ def obtener_nombres_partido(html_partido):
         equipo_visitante = "Visitante"
 
     return equipo_local, equipo_visitante
+
 
 def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
     soup = BeautifulSoup(html_partido, "lxml")
@@ -846,7 +867,20 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
     df_partido = pd.DataFrame.from_dict(bd_partido, orient="index")
     df_partido = postprocesar_df_partido(df_partido)
 
+    # LOG: jugadores con 0 puntosFantasy en este partido
+    mask_cero = df_partido["puntosFantasy"].fillna(0) == 0
+    df_cero = df_partido[mask_cero].copy()
+    if not df_cero.empty:
+        print(f"[LOG 0 PUNTOS] {equipo_local} vs {equipo_visitante}")
+        for _, fila in df_cero.iterrows():
+            print(
+                f"  - {fila.get('player','')} | equipo={fila.get('Equipo_propio','')} | "
+                f"min={fila.get('Min_partido',0)} | amarillas={fila.get('Amarillas',0)} "
+                f"| rojas={fila.get('Rojas',0)} | pos={fila.get('posicion','')}"
+            )
+
     return df_partido, equipo_local, equipo_visitante
+
 
 def procesar_jornada(jornada: int):
     sj = str(jornada)
@@ -891,16 +925,22 @@ def procesar_jornada(jornada: int):
             # Añadir jugadores con tarjetas y 0 minutos a la lista de no analizados
             df_banquillo = contar_tarjetas_banquillo(df_partido)
             if not df_banquillo.empty:
-                jugadores_no_analizados.extend(df_banquillo.to_dict('records'))
+                jugadores_no_analizados.extend(df_banquillo.to_dict("records"))
     # Mostrar resumen de jugadores no analizados con tarjetas desde el banquillo
     if jugadores_no_analizados:
         print("\nJugadores con tarjetas y 0 minutos (banquillo):")
         for jugador in jugadores_no_analizados:
-            print(f"- {jugador.get('player','')} ({jugador.get('Equipo_propio','')}) | Amarillas: {jugador.get('Amarillas',0)}, Rojas: {jugador.get('Rojas',0)} [banquillo]")
+            print(
+                f"- {jugador.get('player','')} ({jugador.get('Equipo_propio','')}) | "
+                f"Amarillas: {jugador.get('Amarillas',0)}, "
+                f"Rojas: {jugador.get('Rojas',0)} [banquillo]"
+            )
+
 
 def procesar_rango_jornadas(jornada_inicio: int, jornada_fin: int):
     for j in range(jornada_inicio, jornada_fin + 1):
         procesar_jornada(j)
+
 
 def analizar_temporada(codigo_temporada: str, j_ini: int = 1, j_fin: int = 38):
     global TEMPORADA_ACTUAL, CARPETA_HTML, CARPETA_CSV
@@ -911,5 +951,6 @@ def analizar_temporada(codigo_temporada: str, j_ini: int = 1, j_fin: int = 38):
     print(f"\n=== ANALIZANDO TEMPORADA {codigo_temporada} ===")
     procesar_rango_jornadas(j_ini, j_fin)
 
+
 if __name__ == "__main__":
-    analizar_temporada("25_26", 1, 17)
+    analizar_temporada("24_25", 2, 2)
