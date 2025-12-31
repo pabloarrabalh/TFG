@@ -1,3 +1,14 @@
+def contar_tarjetas_banquillo(df):
+    """
+    Devuelve un DataFrame con jugadores que tienen amarillas o rojas y 0 minutos.
+    Añade columna 'banquillo' True/False.
+    """
+    if df is None or df.empty:
+        return pd.DataFrame()
+    mask = ((df["Amarillas"].fillna(0) > 0) | (df["Rojas"].fillna(0) > 0)) & (df["Min_partido"].fillna(0) == 0)
+    df_banquillo = df[mask].copy()
+    df_banquillo["banquillo"] = True
+    return df_banquillo
 import os
 import re
 from io import StringIO
@@ -849,44 +860,43 @@ def procesar_jornada(jornada: int):
     os.makedirs(carpeta_html_j, exist_ok=True)
     os.makedirs(carpeta_csv_j, exist_ok=True)
 
+    jugadores_no_analizados = []
     for idx_partido in range(1, 10 + 1):
         ruta_html = os.path.join(carpeta_html_j, f"p{idx_partido}.html")
-
         if not os.path.exists(ruta_html):
             continue
-
         with open(ruta_html, "r", encoding="utf-8") as f:
             html_partido = f.read()
-
         equipo_local, equipo_visitante = obtener_nombres_partido(html_partido)
-
         local_norm = normalizar_equipo_temporada(equipo_local)
         visit_norm = normalizar_equipo_temporada(equipo_visitante)
-
         clave_partido = f"{local_norm}-{visit_norm}"
-
         fantasy_partido = fantasy_por_partido.get(clave_partido, {})
-
         df_partido, eq_loc_csv, eq_vis_csv = procesar_partido(
             html_partido,
             fantasy_partido,
             idx_partido,
         )
-
         if df_partido is not None and not df_partido.empty:
             eq_loc_norm = normalizar_texto(eq_loc_csv)
             eq_vis_norm = normalizar_texto(eq_vis_csv)
-
             nombre_csv = f"p{idx_partido}_{eq_loc_norm}-{eq_vis_norm}.csv"
-
             ruta_salida = os.path.join(carpeta_csv_j, nombre_csv)
             df_partido.to_csv(
                 ruta_salida,
                 index=False,
                 encoding="utf-8-sig",
             )
-
             print(f"✅ CSV generado: J{sj} P{idx_partido} {eq_loc_norm}-{eq_vis_norm}")
+            # Añadir jugadores con tarjetas y 0 minutos a la lista de no analizados
+            df_banquillo = contar_tarjetas_banquillo(df_partido)
+            if not df_banquillo.empty:
+                jugadores_no_analizados.extend(df_banquillo.to_dict('records'))
+    # Mostrar resumen de jugadores no analizados con tarjetas desde el banquillo
+    if jugadores_no_analizados:
+        print("\nJugadores con tarjetas y 0 minutos (banquillo):")
+        for jugador in jugadores_no_analizados:
+            print(f"- {jugador.get('player','')} ({jugador.get('Equipo_propio','')}) | Amarillas: {jugador.get('Amarillas',0)}, Rojas: {jugador.get('Rojas',0)} [banquillo]")
 
 def procesar_rango_jornadas(jornada_inicio: int, jornada_fin: int):
     for j in range(jornada_inicio, jornada_fin + 1):
