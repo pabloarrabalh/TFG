@@ -1,62 +1,68 @@
 import re
 
-
 # Alias de equipos, válidos para todas las temporadas
 ALIAS_EQUIPOS = {
-    "rayo vallecano": "rayo", "villarreal cf": "villarreal", "real oviedo": "oviedo",
-    "celta vigo": "celta", "getafe cf": "getafe", "alaves": "alaves",
-    "alavés": "alaves", "athletic club": "athletic", "elche cf": "elche",
-    "sevilla fc": "sevilla", "real betis": "betis", "levante ud": "levante",
-    "atlético": "atletico madrid", "atletico": "atletico madrid",
+    "rayo vallecano": "rayo",
+    "villarreal cf": "villarreal",
+    "real oviedo": "oviedo",
+    "celta vigo": "celta",
+    "getafe cf": "getafe",
+    "alaves": "alaves",
+    "alavés": "alaves",
+    "athletic club": "athletic",
+    "elche cf": "elche",
+    "sevilla fc": "sevilla",
+    "real betis": "betis",
+    "levante ud": "levante",
+    "atlético": "atletico madrid",
+    "atletico": "atletico madrid",
     "atletico madrid": "atletico madrid",
 }
-
 
 # Solo ALIAS_JUGADORES cambia por temporada
 # Dirección: nombre_largo_norm (CSV/FBRef) -> alias_corto_norm (Fantasy/HTML)
 ALIAS_JUGADORES_POR_TEMPORADA = {
     "25_26": {
-        "espanyol": { "antoniu roca": "roca" },
-        "rayo": { "isaac palazon camacho": "isi palazon" },
-        "valencia": { "jose luis garcia vaya": "pepelu" },
+        "espanyol": {"antoniu": "roca"},
+        "rayo": {"isaac palazon camacho": "isi palazon"},
+        "valencia": {"jose luis garcia vaya": "pepelu"},
         "betis": {
             "ezequiel avila": "chimy",
             "daniel guerrero": "dani perez",
         },
-        "levante": { "pablo cunat": "cunat campos" },
-        "oviedo": { "rahim bonkano": "alhassane" },
+        "levante": {"pablo cunat": "cunat campos"},
+        "oviedo": {"rahim bonkano": "alhassane"},
         "girona": {
             "lancinet kourouma": "lass",
             "viktor tsyhankov": "tsygankov",
         },
-        "celta": { "el abdellaoui": "elabdellaoui" },
+        "celta": {"el abdellaoui": "elabdellaoui"},
         "real sociedad": {
             "caleta car": "caletacar",
             "duje caleta car": "duje caletacar",
         },
-        "real madrid": { "trent alexander arnold": "alexanderarnold" },
-        "atletico madrid": { "alexander sorloth": "sorloth" },
+        "real madrid": {"trent alexander arnold": "alexanderarnold"},
+        "atletico madrid": {"alexander sorloth": "sorloth"},
         "athletic": {
             "nico williams": "n williams",
-            "iñaki williams": "i williams",
+            "inaki williams": "i williams",
         },
-        "sevilla": { "joaquin martinez gauna": "oso" },
+        "sevilla": {"joaquin martinez gauna": "oso"},
     },
-
     "24_25": {
         "athletic": {
             "nico williams": "n williams",
-            "iñaki williams": "i williams",
+            "inaki williams": "i williams",
         },
-        "rayo": { "isaac palazon camacho": "isi palazon" },
-        "valencia": { "jose luis garcia vaya": "pepelu" },
+        "rayo": {"isaac palazon camacho": "isi palazon"},
+        "valencia": {"jose luis garcia vaya": "pepelu"},
         "betis": {
             "ezequiel avila": "chimy",
             "dani perez": "dani perez",
         },
-        "espanyol": { "antoniu roca": "roca" },
-        "mallorca": { "antonio sanchez": "antonio" },
-        "girona": { "arnau martinez": "arnau" },
+        "espanyol": {"antoniu roca": "roca"},
+        "mallorca": {"antonio sanchez": "antonio"},
+        "girona": {"arnau martinez": "arnau"},
         "getafe": {
             "bertug yildirim": "yildirim",
             "john joe finn": "patrick finn",
@@ -86,7 +92,6 @@ def get_alias_jugadores_reverse(temporada: str) -> dict:
 
 APELLIDOS_CRITICOS = {"garcia", "rodriguez", "gonzalez"}
 
-
 POSICION_MAP = {
     "GK": "PT",
     "DF": "DF",
@@ -97,7 +102,6 @@ POSICION_MAP = {
     "RW": "DT",
     "LW": "DT",
 }
-
 
 MAPEO_STATS = {
     "summary": {
@@ -152,20 +156,47 @@ MAPEO_STATS = {
     },
 }
 
-
 COLUMNAS_MODELO = [
-    'player', 'posicion', 'Equipo_propio', 'Equipo_rival', 'Titular',
-    'Min_partido', 'Gol_partido', 'Asist_partido', 'xG_partido',
-    'xAG',
-    'Tiros', 'TiroFallado_partido', 'TiroPuerta_partido', 'Pases_Totales', 'Pases_Completados_Pct',
-    'Amarillas', 'Rojas', 'Goles_en_contra', 'Porcentaje_paradas', 'PSxG', 'puntosFantasy',
-    'Entradas', 'Duelos', 'DuelosGanados', 'DuelosPerdidos',
-    'Bloqueos', 'BloqueoTiros', 'BloqueoPase', 'Despejes',
-    'Regates', 'RegatesCompletados', 'RegatesFallidos',
-    'Conducciones', 'DistanciaConduccion', 'MetrosAvanzadosConduccion', 'ConduccionesProgresivas',
-    'DuelosAereosGanados', 'DuelosAereosPerdidos', 'DuelosAereosGanadosPct'
+    "player",
+    "posicion",
+    "Equipo_propio",
+    "Equipo_rival",
+    "Titular",
+    "Min_partido",
+    "Gol_partido",
+    "Asist_partido",
+    "xG_partido",
+    "xAG",
+    "Tiros",
+    "TiroFallado_partido",
+    "TiroPuerta_partido",
+    "Pases_Totales",
+    "Pases_Completados_Pct",
+    "Amarillas",
+    "Rojas",
+    "Goles_en_contra",
+    "Porcentaje_paradas",
+    "PSxG",
+    "puntosFantasy",
+    "Entradas",
+    "Duelos",
+    "DuelosGanados",
+    "DuelosPerdidos",
+    "Bloqueos",
+    "BloqueoTiros",
+    "BloqueoPase",
+    "Despejes",
+    "Regates",
+    "RegatesCompletados",
+    "RegatesFallidos",
+    "Conducciones",
+    "DistanciaConduccion",
+    "MetrosAvanzadosConduccion",
+    "ConduccionesProgresivas",
+    "DuelosAereosGanados",
+    "DuelosAereosPerdidos",
+    "DuelosAereosGanadosPct",
 ]
-
 
 UMBRAL_MATCH = 77.0
 
