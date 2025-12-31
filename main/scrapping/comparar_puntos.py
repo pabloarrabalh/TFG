@@ -22,6 +22,12 @@ from alias import get_alias_jugadores_reverse  # usamos alias invertidos
 # =====================================================
 
 def _build_rutas_temporada(codigo_temporada: str):
+    """
+    codigo_temporada: '24_25', '25_26', etc.
+
+    HTML puntos: main/html/temporada_<codigo>/jX/puntos.html
+    CSV       : data/temporada_<codigo>/jornada_X/*.csv
+    """
     carpeta_html = os.path.join("main", "html", f"temporada_{codigo_temporada}")
     carpeta_csv = os.path.join("data", f"temporada_{codigo_temporada}")
     return carpeta_html, carpeta_csv
@@ -45,12 +51,17 @@ def _log_claves_partido(clave_partido, puntos_html_por_partido, df_partido):
 # =====================================================
 
 CASOS_DEBUG_ESPECIALES = {
-    ("levante", "cuñat campos"),
-    ("betis", "dani pérez"),
+    ("levante", "cunat campos"),
+    ("betis", "dani perez"),
     ("betis", "chimy"),
 }
 
 def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cutoff=70):
+    """
+    path_html: ruta a puntos.html de la jornada
+    csv_dir  : carpeta con los CSV de esa jornada
+    codigo_temporada: '24_25', '25_26', etc. (para cargar alias de jugadores)
+    """
     puntos_html_por_partido = scrapear_puntos_fantasy(path_html)
     archivos_csv = [n for n in os.listdir(csv_dir) if n.endswith(".csv")]
 
@@ -71,8 +82,10 @@ def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cut
         ruta_csv = os.path.join(csv_dir, nombre_archivo_csv)
         df_partido = pd.read_csv(ruta_csv)
 
+        # añade equipo_norm y player_norm a partir del CSV
         df_partido = añadir_equipo_y_player_norm(df_partido)
 
+        # Log ligero (silenciado)
         _log_claves_partido(clave_partido, puntos_html_por_partido, df_partido)
 
         jugadores_html_partido = (
@@ -102,11 +115,17 @@ def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cut
                 partido_ok = False
                 continue
 
+            # 1) limpiar minuto
             nombre_html_limpio = limpiar_minuto(nombre_html)
+            # 2) normalizar HTML
             nombre_html_norm_original = normalizar_texto(nombre_html_limpio)
 
+            # 3) aplicar alias invertido (Pepelu -> jose luis garcia vaya, etc.)
             alias_equipo = alias_temp.get(equipo_html_norm, {})
-            nombre_html_norm = alias_equipo.get(nombre_html_norm_original, nombre_html_norm_original)
+            nombre_html_norm = alias_equipo.get(
+                nombre_html_norm_original,
+                nombre_html_norm_original,
+            )
 
             # LOG ESPECIAL PARA CASOS JODIDOS
             if (equipo_html_norm, nombre_html_norm_original) in CASOS_DEBUG_ESPECIALES:
@@ -180,6 +199,10 @@ def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cut
 # =====================================================
 
 def comprobar_jornada(codigo_temporada: str, num_jornada: int, score_cutoff=70):
+    """
+    codigo_temporada: '24_25', '25_26', etc.
+    num_jornada: número de jornada (1..38)
+    """
     carpeta_html, carpeta_csv = _build_rutas_temporada(codigo_temporada)
     etiqueta_jornada = f"j{num_jornada}"
 
@@ -193,6 +216,10 @@ def comprobar_rango_jornadas(codigo_temporada: str,
                              jornada_inicio: int,
                              jornada_fin: int,
                              score_cutoff=70):
+    """
+    Recorre de jornada_inicio a jornada_fin (incluidas) para una temporada dada,
+    llama a comprobar_jornada_paths y acumula todos los errores.
+    """
     carpeta_html, carpeta_csv = _build_rutas_temporada(codigo_temporada)
     errores_globales = []
 
@@ -234,12 +261,23 @@ def comprobar_rango_jornadas(codigo_temporada: str,
                 f"{err['nombre_csv']} | {err['puntos_html']} | {err['puntos_csv']} | "
                 f"{err['score']}"
             )
+        print(
+            "\nNota: es posible que alguno de los jugadores listados con 0 minutos "
+            "haya recibido tarjeta desde el banquillo; en esos casos este "
+            "comportamiento es esperado y no indica un fallo de scraping."
+        )
 
 
 def comparar_partido(codigo_temporada: str,
                      num_jornada: int,
                      num_partido: int,
                      score_cutoff=70):
+    """
+    Comparativa detallada de un partido concreto:
+    - codigo_temporada: '24_25', '25_26', ...
+    - num_jornada: nº de jornada
+    - num_partido: índice pX (1..10)
+    """
     carpeta_html, carpeta_csv = _build_rutas_temporada(codigo_temporada)
 
     alias_temp = get_alias_jugadores_reverse(codigo_temporada)
@@ -292,7 +330,10 @@ def comparar_partido(codigo_temporada: str,
         nombre_html_limpio = limpiar_minuto(nombre_html)
         nombre_html_norm_original = normalizar_texto(nombre_html_limpio)
         alias_equipo = alias_temp.get(equipo_html_norm, {})
-        nombre_html_norm = alias_equipo.get(nombre_html_norm_original, nombre_html_norm_original)
+        nombre_html_norm = alias_equipo.get(
+            nombre_html_norm_original,
+            nombre_html_norm_original,
+        )
 
         debug_prefix = f"{eq1}-{eq2} | eq={equipo_html_norm} | HTML='{nombre_html}'"
         match_norm, score = obtener_match_nombre(
