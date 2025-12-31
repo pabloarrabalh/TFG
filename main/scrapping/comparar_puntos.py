@@ -16,7 +16,6 @@ from commons import (
 )
 from alias import get_alias_jugadores_reverse  # usamos alias invertidos
 
-
 # =====================================================
 # RUTAS POR TEMPORADA
 # =====================================================
@@ -32,7 +31,6 @@ def _build_rutas_temporada(codigo_temporada: str):
     carpeta_csv = os.path.join("data", f"temporada_{codigo_temporada}")
     return carpeta_html, carpeta_csv
 
-
 # =====================================================
 # LOG LIGERO DE CLAVES POR PARTIDO (DESACTIVADO)
 # =====================================================
@@ -45,16 +43,9 @@ def _log_claves_partido(clave_partido, puntos_html_por_partido, df_partido):
     # print(f"  CSV equipos_norm : {equipos_csv}")
     pass
 
-
 # =====================================================
 # LÓGICA DE COMPROBACIÓN
 # =====================================================
-
-CASOS_DEBUG_ESPECIALES = {
-    ("levante", "cunat campos"),
-    ("betis", "dani perez"),
-    ("betis", "chimy"),
-}
 
 def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cutoff=70):
     """
@@ -127,21 +118,6 @@ def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cut
                 nombre_html_norm_original,
             )
 
-            # LOG ESPECIAL PARA CASOS JODIDOS
-            if (equipo_html_norm, nombre_html_norm_original) in CASOS_DEBUG_ESPECIALES:
-                print("\n[DEBUG_ALIAS_ESPECIAL]")
-                print(f"  Partido     : {clave_partido}")
-                print(f"  Equipo_norm : {equipo_html_norm}")
-                print(f"  HTML bruto  : '{nombre_html}'")
-                print(f"  HTML limpio : '{nombre_html_limpio}'")
-                print(f"  HTML norm   : '{nombre_html_norm_original}'")
-                print(f"  Alias equipo: {alias_equipo}")
-                print(f"  Tras alias  : '{nombre_html_norm}'")
-                print("  CSV player_norm equipo:")
-                ejemplos = df_candidatos_equipo["player_norm"].tolist()
-                for e in ejemplos:
-                    print(f"    - {e}")
-
             nombres_norm_equipo = df_candidatos_equipo["player_norm"].tolist()
 
             debug_prefix = f"{clave_partido} | eq={equipo_html_norm} | HTML='{nombre_html}'"
@@ -193,7 +169,6 @@ def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cut
     mostrar_errores(errores)
     return errores
 
-
 # =====================================================
 # API PÚBLICA: TEMPORADA + JORNADA(S)
 # =====================================================
@@ -210,7 +185,6 @@ def comprobar_jornada(codigo_temporada: str, num_jornada: int, score_cutoff=70):
     path_csv_dir = os.path.join(carpeta_csv, f"jornada_{num_jornada}")
 
     return comprobar_jornada_paths(path_html, path_csv_dir, codigo_temporada, score_cutoff=score_cutoff)
-
 
 def comprobar_rango_jornadas(codigo_temporada: str,
                              jornada_inicio: int,
@@ -253,7 +227,7 @@ def comprobar_rango_jornadas(codigo_temporada: str,
         print("Todos los jugadores tienen los puntos bien asignados en todo el rango.")
     else:
         print("Errores encontrados en el rango:")
-        print("PARTIDO | EQUIPO | NOMBRE_HTML | NOMBRE_MATCH | PUNTOS_HTML | PUNTOS_CSV | SCORE")
+        print("PARTIDO | EQUIIPO | NOMBRE_HTML | NOMBRE_MATCH | PUNTOS_HTML | PUNTOS_CSV | SCORE")
         print("-" * 80)
         for err in errores_globales:
             print(
@@ -266,7 +240,6 @@ def comprobar_rango_jornadas(codigo_temporada: str,
             "haya recibido tarjeta desde el banquillo; en esos casos este "
             "comportamiento es esperado y no indica un fallo de scraping."
         )
-
 
 def comparar_partido(codigo_temporada: str,
                      num_jornada: int,
@@ -363,6 +336,5 @@ def comparar_partido(codigo_temporada: str,
             f"{puntos_html:<5} | {puntos_csv:<5} | {estado}"
         )
 
-
 if __name__ == "__main__":
-    comprobar_rango_jornadas("25_26", 1, 10)
+    comprobar_rango_jornadas("25_26", 1, 17)

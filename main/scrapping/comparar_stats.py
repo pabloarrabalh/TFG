@@ -18,6 +18,22 @@ from commons import (
     normalizar_clave_html,
 )
 
+# =====================================================
+# HELPERS DE RUTAS POR TEMPORADA
+# =====================================================
+
+def _carpeta_html_partidos(codigo_temporada: str, num_jornada: int) -> str:
+    # main/html/temporada_<temp>/jX/pY.html
+    return os.path.join("main", "html", f"temporada_{codigo_temporada}", f"j{num_jornada}")
+
+def _carpeta_csv_jornada(codigo_temporada: str, num_jornada: int) -> str:
+    # data/temporada_<temp>/jornada_X/*.csv
+    return os.path.join("data", f"temporada_{codigo_temporada}", f"jornada_{num_jornada}")
+
+# =====================================================
+# LÓGICA PRINCIPAL
+# =====================================================
+
 def mostrar_analisis_jugador(resultado):
     if not resultado["ok"]:
         print(resultado["motivo"])
@@ -304,12 +320,88 @@ def analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador
         "discrepancias": discrepancias,
     }
 
-def analizar_jugador(num_jornada, num_partido, nombre_jugador):
+# =====================================================
+# CLASIFICAR NO_ANALIZADOS SEGÚN TARJETA DESDE BANQUILLO
+# =====================================================
+
+def clasificar_no_analizados_tarjetas(codigo_temporada: str, no_analizados_globales):
     """
-    Analizar un jugador concreto cargando HTML/CSV de ese partido.
+    Para cada jugador NO_ANALIZADO mira su CSV (jornada/partido) y comprueba:
+    - Min_partido == 0
+    - Amarillas + Rojas > 0
+    Devuelve dos listas:
+      - con_tarjeta_banquillo: los que cumplen esas condiciones
+      - otros: el resto de NO_ANALIZADO
     """
-    carpeta_html = os.path.join("main", "html", f"j{num_jornada}")
-    carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
+    con_tarjeta_banquillo = []
+    otros = []
+
+    cache_partidos = {}
+
+    for err in no_analizados_globales:
+        j = err["jornada"]
+        p = err["partido"]
+        jugador = err["jugador"]
+
+        clave_partido = (j, p)
+        if clave_partido not in cache_partidos:
+            carpeta_csv = _carpeta_csv_jornada(codigo_temporada, j)
+            archivos_csv = [
+                n for n in os.listdir(carpeta_csv)
+                if n.startswith(f"p{p}_") and n.endswith(".csv")
+            ]
+            if not archivos_csv:
+                cache_partidos[clave_partido] = None
+            else:
+                path_csv = os.path.join(carpeta_csv, archivos_csv[0])
+                df = pd.read_csv(path_csv)
+                cache_partidos[clave_partido] = df
+
+        df_partido = cache_partidos.get(clave_partido)
+        if df_partido is None:
+            otros.append(err)
+            continue
+
+        fila_jug = df_partido[df_partido["player"] == jugador]
+        if fila_jug.empty:
+            otros.append(err)
+            continue
+
+        fila = fila_jug.iloc[0]
+        try:
+            min_partido = float(fila.get("Min_partido", 0) or 0)
+        except Exception:
+            min_partido = 0.0
+
+        try:
+            amar = float(fila.get("Amarillas", 0) or 0)
+        except Exception:
+            amar = 0.0
+
+        try:
+            roj = float(fila.get("Rojas", 0) or 0)
+        except Exception:
+            roj = 0.0
+
+        if min_partido == 0 and (amar + roj) > 0:
+            err2 = dict(err)
+            err2["tarjeta_banquillo"] = True
+            con_tarjeta_banquillo.append(err2)
+        else:
+            otros.append(err)
+
+    return con_tarjeta_banquillo, otros
+
+# =====================================================
+# FUNCIONES PÚBLICAS CON MULTI‑TEMPORADA
+# =====================================================
+
+def analizar_jugador(codigo_temporada: str, num_jornada: int, num_partido: int, nombre_jugador: str):
+    """
+    Analizar un jugador concreto cargando HTML/CSV de ese partido para la temporada dada.
+    """
+    carpeta_html = _carpeta_html_partidos(codigo_temporada, num_jornada)
+    carpeta_csv = _carpeta_csv_jornada(codigo_temporada, num_jornada)
 
     archivos_csv = [
         n
@@ -339,11 +431,11 @@ def analizar_jugador(num_jornada, num_partido, nombre_jugador):
     resultado = analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador)
     mostrar_analisis_jugador(resultado)
 
-def analizar_partido_completo(num_jornada, num_partido, errores_jornada, no_analizados_jornada):
-    carpeta_html = os.path.join("main", "html", f"j{num_jornada}")
-    carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
+def analizar_partido_completo(codigo_temporada: str, num_jornada: int, num_partido: int,
+                              errores_jornada, no_analizados_jornada):
+    carpeta_html = _carpeta_html_partidos(codigo_temporada, num_jornada)
+    carpeta_csv = _carpeta_csv_jornada(codigo_temporada, num_jornada)
 
-    # 1) cargar HTML + jugadores_html solo una vez
     path_html = os.path.join(carpeta_html, f"p{num_partido}.html")
     if not os.path.exists(path_html):
         print(f"Falta HTML: {path_html}")
@@ -354,7 +446,6 @@ def analizar_partido_completo(num_jornada, num_partido, errores_jornada, no_anal
     tablas = extraer_tablas_fbref(html_content)
     jugadores_html = construir_diccionario_jugadores(tablas)
 
-    # 2) cargar CSV + normalizar solo una vez
     archivos_csv = [
         n
         for n in os.listdir(carpeta_csv)
@@ -369,7 +460,6 @@ def analizar_partido_completo(num_jornada, num_partido, errores_jornada, no_anal
     df_csv = pd.read_csv(path_csv)
     df_csv = añadir_equipo_y_player_norm(df_csv)
 
-    # 3) iterar jugadores usando versión precalculada
     for _, fila in df_csv.iterrows():
         nombre_jugador = fila["player"]
         resultado = analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador)
@@ -400,8 +490,8 @@ def analizar_partido_completo(num_jornada, num_partido, errores_jornada, no_anal
                 }
             )
 
-def analizar_jornada_completa(num_jornada):
-    carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
+def analizar_jornada_completa(codigo_temporada: str, num_jornada: int):
+    carpeta_csv = _carpeta_csv_jornada(codigo_temporada, num_jornada)
     if not os.path.exists(carpeta_csv):
         print(f"No existe la carpeta de la jornada {num_jornada}")
         return
@@ -423,7 +513,8 @@ def analizar_jornada_completa(num_jornada):
             continue
         num_partido = int(m.group(1))
         print(f"\n[LOG] ===== Procesando partido {num_partido} de la jornada {num_jornada} =====")
-        analizar_partido_completo(num_jornada, num_partido, errores_jornada, no_analizados_jornada)
+        analizar_partido_completo(codigo_temporada, num_jornada, num_partido,
+                                  errores_jornada, no_analizados_jornada)
 
     print("\n" + "=" * 80)
     print(f"RESUMEN JORNADA {num_jornada}")
@@ -442,36 +533,35 @@ def analizar_jornada_completa(num_jornada):
                     f"{err['tipo']} | {err['detalle']}"
                 )
 
-def imprimir_resumen_global(errores_globales, no_analizados_globales):
+def imprimir_resumen_global(errores_globales, no_analizados_globales, codigo_temporada: str):
     """
     Imprime el resumen global:
-      - Lista de NO_ANALIZADO con jornada y partido.
+      - Lista de NO_ANALIZADO indicando si es tarjeta desde banquillo.
       - Mensaje de 'no hay discrepancias' si no hay CAMPOS_ERRONEOS.
       - Tabla de errores si los hay.
     """
     print("\n" + "=" * 80)
     print("RESUMEN GLOBAL")
 
-    # NO_ANALIZADO con jornada y partido
-    if no_analizados_globales:
-        print("Jugadores NO analizados (revisa si han recibido tarjetas desde el banquillo):")
-        vistos = set()
-        for err in no_analizados_globales:
-            clave = (err["jornada"], err["partido"], err["jugador"])
-            if clave in vistos:
-                continue
-            vistos.add(clave)
-            print(f" - {err['jugador']} (j{err['jornada']} p{err['partido']})")
+    # Clasificar NO_ANALIZADO según tarjetas desde banquillo
+    con_tarjeta_banquillo, otros_no_analizados = clasificar_no_analizados_tarjetas(
+        codigo_temporada, no_analizados_globales
+    )
+
+    if con_tarjeta_banquillo or otros_no_analizados:
+        print("Jugadores NO analizados (comprobación tarjetas desde banquillo):")
+        for err in con_tarjeta_banquillo:
+            print(f" - {err['jugador']} (j{err['jornada']} p{err['partido']})  -> TARJETA BANQUILLO")
+        for err in otros_no_analizados:
+            print(f" - {err['jugador']} (j{err['jornada']} p{err['partido']})  -> SIN TARJETA/NO ENCONTRADO")
         print()
     else:
         print("No hay jugadores marcados como NO_ANALIZADO.\n")
 
-    # Sin discrepancias de stats
     if not errores_globales:
         print("No hay discrepancias de ninguna stat.")
         return
 
-    # Tabla de errores de stats
     cabecera = f"{'Jornada':7s} | {'Partido':7s} | {'Equipo':15s} | {'Jugador':25s} | {'Tipo':15s} | Detalle"
     print("Jugadores con errores de stats:")
     print(cabecera)
@@ -486,12 +576,12 @@ def imprimir_resumen_global(errores_globales, no_analizados_globales):
         detalle = err['detalle']
         print(f"{jornada:7s} | {partido:7s} | {equipo:15s} | {jugador:25s} | {tipo:15s} | {detalle}")
 
-def analizar_rango_jornadas(jornada_inicio, jornada_fin):
+def analizar_rango_jornadas(codigo_temporada: str, jornada_inicio: int, jornada_fin: int):
     errores_globales = []        # solo CAMPOS_ERRONEOS
     no_analizados_globales = []  # solo NO_ANALIZADO
 
     for j in range(jornada_inicio, jornada_fin + 1):
-        carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{j}")
+        carpeta_csv = _carpeta_csv_jornada(codigo_temporada, j)
         if not os.path.exists(carpeta_csv):
             print(f"No existe la carpeta de la jornada {j}")
             continue
@@ -504,7 +594,7 @@ def analizar_rango_jornadas(jornada_inicio, jornada_fin):
             continue
 
         print("\n" + "=" * 80)
-        print(f"[LOG] ===== Analizando jornada {j} =====")
+        print(f"[LOG] ===== Analizando temporada {codigo_temporada} | jornada {j} =====")
 
         errores_jornada = []
         no_analizados_jornada = []
@@ -515,7 +605,8 @@ def analizar_rango_jornadas(jornada_inicio, jornada_fin):
                 continue
             num_partido = int(m.group(1))
             print(f"\n[LOG] ===== Procesando partido {num_partido} de la jornada {j} =====")
-            analizar_partido_completo(j, num_partido, errores_jornada, no_analizados_jornada)
+            analizar_partido_completo(codigo_temporada, j, num_partido,
+                                      errores_jornada, no_analizados_jornada)
 
         print("\n" + "-" * 80)
         print(f"RESUMEN JORNADA {j}")
@@ -537,16 +628,16 @@ def analizar_rango_jornadas(jornada_inicio, jornada_fin):
         errores_globales.extend(errores_jornada)
         no_analizados_globales.extend(no_analizados_jornada)
 
-    # Resumen global con la nueva función
-    imprimir_resumen_global(errores_globales, no_analizados_globales)
+    imprimir_resumen_global(errores_globales, no_analizados_globales, codigo_temporada)
 
-def comparar_jugador_completo(num_jornada, num_partido, nombre_jugador):
+def comparar_jugador_completo(codigo_temporada: str, num_jornada: int,
+                              num_partido: int, nombre_jugador: str):
     """
     Muestra por consola una comparativa CSV vs HTML de todas las stats
     para un jugador concreto en un partido concreto.
     """
-    carpeta_html = os.path.join("main", "html", f"j{num_jornada}")
-    carpeta_csv = os.path.join("data", "temporada_25_26", f"jornada_{num_jornada}")
+    carpeta_html = _carpeta_html_partidos(codigo_temporada, num_jornada)
+    carpeta_csv = _carpeta_csv_jornada(codigo_temporada, num_jornada)
 
     archivos_csv = [
         n
@@ -587,7 +678,7 @@ def comparar_jugador_completo(num_jornada, num_partido, nombre_jugador):
     get_possession = info["get_possession"]
     es_portero = info["es_portero"]
 
-    print(f"\n=== COMPARATIVA J{num_jornada} P{num_partido} | {nombre_jugador} ===")
+    print(f"\n=== COMPARATIVA {codigo_temporada} | J{num_jornada} P{num_partido} | {nombre_jugador} ===")
 
     campos_mal, discrepancias = _comparar_campos_stats(
         fila_csv, es_portero, get_summary, get_passing,
@@ -626,4 +717,5 @@ def comparar_jugador_completo(num_jornada, num_partido, nombre_jugador):
         print(f"{campo:35s} | {csv_v:>10s} | {html_v:>10s} | {ok:>3s}")
 
 if __name__ == "__main__":
-    analizar_rango_jornadas(1, 17)
+    # ejemplo: temporada "25_26", jornadas 1-17
+    analizar_rango_jornadas("25_26", 1, 17)
