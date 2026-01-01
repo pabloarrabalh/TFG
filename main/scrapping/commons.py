@@ -29,30 +29,15 @@ def normalizar_texto(texto):
     texto = re.sub(r'[-.]', ' ', texto)
     return re.sub(r'\s+', ' ', texto).strip()
 
-
 def normalizar_equipo(nombre_equipo):
-    """
-    Normaliza nombre de equipo y aplica ALIAS_EQUIPOS global.
-    """
     nombre_norm = normalizar_texto(nombre_equipo)
     return ALIAS_EQUIPOS.get(nombre_norm, nombre_norm)
 
-
 def aplicar_alias(nombre, equipo=None):
-    """
-    Versión neutra: NO usa ALIAS_JUGADORES global.
-    El alias de jugadores por temporada se aplica en fbref.py
-    (aplicar_alias_jugador_temporada).
-    """
     return nombre
 
-
 def aplicar_alias_contextual(nombre, equipo_norm):
-    """
-    Wrapper semántico. De momento hace lo mismo que aplicar_alias.
-    """
     return aplicar_alias(nombre, equipo_norm)
-
 
 def normalizar_puntos(valor):
     if valor in ["-", "–", "", None]:
@@ -62,14 +47,12 @@ def normalizar_puntos(valor):
     except Exception:
         return 0
 
-
 def limpiar_minuto(nombre):
     if not nombre:
         return nombre
     nombre = nombre.replace("+", "").replace("-", "").strip()
     nombre = re.sub(r"\s*\d+(?:\+\d+)?'?$", "", nombre).strip()
     return nombre
-
 
 def extraer_nombre_jugador(td_nombre):
     textos = []
@@ -79,7 +62,6 @@ def extraer_nombre_jugador(td_nombre):
             if txt:
                 textos.append(txt)
     return " ".join(textos)
-
 
 # ==========================
 # Conversión numérica genérica
@@ -97,10 +79,8 @@ def _convertir_a_numero(valor):
         return nan
     return float(num)
 
-
 def to_float(valor):
     return _convertir_a_numero(valor)
-
 
 def to_int(valor):
     v = _convertir_a_numero(valor)
@@ -108,12 +88,7 @@ def to_int(valor):
         return nan
     return int(round(v))
 
-
 def limpiar_numero(valor):
-    """
-    Versión antigua (devuelve 0.0 en vez de nan).
-    La puedes ir reemplazando por limpiar_numero_generico si quieres unificar.
-    """
     if isinstance(valor, pd.Series):
         valor = valor.iloc[0]
     if valor is None:
@@ -125,7 +100,6 @@ def limpiar_numero(valor):
     if pd.isna(num):
         return 0.0
     return float(num)
-
 
 def formatear_numero(valor):
     try:
@@ -136,13 +110,7 @@ def formatear_numero(valor):
     except Exception:
         return str(valor)
 
-
 def limpiar_numero_generico(valor):
-    """
-    Limpia cualquier valor numérico para comparaciones CSV vs HTML:
-    - quita saltos de línea y '%'
-    - convierte a float, devolviendo 0.0 si no es numérico
-    """
     if isinstance(valor, pd.Series):
         valor = valor.iloc[0]
     if valor is None:
@@ -155,9 +123,7 @@ def limpiar_numero_generico(valor):
         return 0.0
     return float(num)
 
-
 def fmt_generico(valor):
-    """Formatea un número para mostrar en logs de comparativa."""
     try:
         f = float(valor)
         if f.is_integer():
@@ -165,7 +131,6 @@ def fmt_generico(valor):
         return str(f)
     except Exception:
         return str(valor)
-
 
 # ==========================
 # Posiciones y mapping
@@ -175,12 +140,7 @@ def mapear_posicion(pos):
     pos = (pos or "MC").upper()
     return POSICION_MAP.get(pos, "MC")
 
-
 def añadir_equipo_y_player_norm(df, col_equipo="Equipo_propio", col_player="player"):
-    """
-    Ojo: aplicar_alias aquí ya no mete alias de jugadores.
-    Si necesitas alias por temporada en CSV, aplícalo fuera (fbref) antes.
-    """
     df["equipo_norm"] = df[col_equipo].apply(normalizar_equipo)
     df["player_norm"] = df.apply(
         lambda row: normalizar_texto(
@@ -190,23 +150,19 @@ def añadir_equipo_y_player_norm(df, col_equipo="Equipo_propio", col_player="pla
     )
     return df
 
-
 def _posicion_csv_es_medio(fila_csv):
     pos = str(fila_csv.get("posicion", "")).upper()
     return any(p in pos for p in ["MC", "MD", "MI", "MCD", "MCO", "MF", "DM", "CM"])
 
-
 def _posicion_csv_es_defensa(fila_csv):
     pos = str(fila_csv.get("posicion", "")).upper()
     return any(p in pos for p in ["DF", "DC", "LD", "LI", "CB", "LB", "RB"])
-
 
 def _posicion_html(row_html):
     for key in ["summary:Pos", "summary:position", "Pos", "position"]:
         if key in row_html:
             return str(row_html[key]).upper()
     return ""
-
 
 # ==========================
 # Matching de nombres
@@ -227,12 +183,10 @@ def es_apellido_conflictivo(nombre_normalizado_html, nombres_normalizados_equipo
     ]
     return len(jugadores_con_mismo_apellido) > 1
 
-
 def obtener_match_nombre(nombre_html_norm, nombres_norm_equipo, equipo_norm=None, score_cutoff=85):
     """
-    nombre_html_norm debe venir YA normalizado (lower, sin acentos, sin guiones)
-    y con alias aplicado si corresponde. Aquí solo se aplican reglas de apellidos
-    y fuzzy matching sobre nombres_norm_equipo, que también deben estar normalizados.
+    nombre_html_norm y nombres_norm_equipo deben estar ya normalizados.
+    Se endurece el comportamiento para APELLIDOS_CRITICOS (incluye herrera).
     """
     if not nombres_norm_equipo:
         return None, 0
@@ -254,17 +208,19 @@ def obtener_match_nombre(nombre_html_norm, nombres_norm_equipo, equipo_norm=None
                 unico = candidatos_nombre[0]
                 return unico, 100
 
-    # 2. Apodos (una sola palabra) — la mantenemos pero podrías comentarla si molesta
+    # 2. Apodos (una sola palabra), PERO no se aplica para apellidos conflictivos
     if len(partes) == 1:
         palabra = partes[0]
 
-        candidatos = []
-        for nombre_equipo in nombres_norm_equipo:
-            if nombre_equipo.startswith(palabra) or nombre_equipo.endswith(palabra):
-                candidatos.append(nombre_equipo)
+        # si la palabra es un apellido conflictivo (herrera, garcia, etc.), no hagas apodo
+        if palabra not in APELLIDOS_CRITICOS:
+            candidatos = []
+            for nombre_equipo in nombres_norm_equipo:
+                if nombre_equipo.startswith(palabra) or nombre_equipo.endswith(palabra):
+                    candidatos.append(nombre_equipo)
 
-        if len(candidatos) == 1:
-            return candidatos[0], 95
+            if len(candidatos) == 1:
+                return candidatos[0], 95
 
     # 3. Fuzzy normal
     mejor, score, _ = process.extractOne(
@@ -278,12 +234,10 @@ def obtener_match_nombre(nombre_html_norm, nombres_norm_equipo, equipo_norm=None
 
     return None, 0
 
-
 def nombre_a_mayus(nombre_norm):
     partes = str(nombre_norm).split()
     partes_capitalizadas = [p.capitalize() for p in partes]
     return " ".join(partes_capitalizadas)
-
 
 def coincide_inicial_apellido(nombre1, nombre2):
     partes1 = nombre1.split()
@@ -321,13 +275,7 @@ def coincide_inicial_apellido(nombre1, nombre2):
 
     return nombre1_pila == nombre2_pila
 
-
 def normalizar_clave_html(nombre_raw, equipo_norm, jugadores_html):
-    """
-    Devuelve la clave adecuada para jugadores_html.
-    Nota: aplicar_alias_contextual es neutro; si quieres alias por temporada,
-    pásale nombre_raw ya aliaseado desde fbref.
-    """
     equipo_norm_n = normalizar_equipo(equipo_norm) if equipo_norm else None
 
     nombre_alias = normalizar_texto(
@@ -340,295 +288,3 @@ def normalizar_clave_html(nombre_raw, equipo_norm, jugadores_html):
     if nombre_sin_alias in jugadores_html:
         return nombre_sin_alias
     return nombre_alias
-
-
-# ==========================
-# FBref: tablas y diccionario jugadores
-# ==========================
-
-TABLAS_FBREF = {
-    "summary": ["_summary"],
-    "passing": ["_passing"],
-    "defense": ["_defense"],
-    "possession": ["_possession"],
-    "misc": ["_misc"],
-    "keepers": ["keeper_stats_"],
-}
-
-
-def extraer_tablas_fbref(html_content):
-    soup = BeautifulSoup(html_content, "lxml")
-    tablas = {}
-    from io import StringIO
-
-    for tipo, sufijos in TABLAS_FBREF.items():
-        dfs = []
-        for tabla in soup.find_all("table"):
-            tid = tabla.get("id") or ""
-            if tipo == "keepers":
-                if not any(suf in tid for suf in sufijos):
-                    continue
-            else:
-                if not any(tid.endswith(suf) for suf in sufijos):
-                    continue
-            try:
-                df = pd.read_html(StringIO(str(tabla)))[0]
-            except Exception:
-                df = None
-            if df is None:
-                continue
-            try:
-                cols = df.columns.get_level_values(-1)
-            except Exception:
-                cols = df.columns
-            df.columns = [
-                str(col).split(",")[-1].strip(" ()'").replace(" ", "")
-                for col in cols
-            ]
-            dfs.append(df)
-        if dfs:
-            tablas[tipo] = pd.concat(dfs, ignore_index=True)
-    return tablas
-
-
-def construir_diccionario_jugadores(tablas):
-    jugadores = {}
-    for tipo, df in tablas.items():
-        posibles_cols_squad = ["Squad", "Team", "Equipo", "Club"]
-        col_squad = next((c for c in posibles_cols_squad if c in df.columns), None)
-
-        for _, row in df.iterrows():
-            nombre = str(row.get("Player", "")).strip()
-            if nombre in ["nan", "Player", "Total", "Players"] or re.match(
-                r"^\d+\s+Players$", nombre
-            ):
-                continue
-
-            equipo = str(row.get(col_squad, "")).strip() if col_squad else None
-            equipo_norm = normalizar_equipo(equipo) if equipo else None
-
-            nombre_norm = normalizar_texto(
-                aplicar_alias_contextual(nombre, equipo_norm)
-            )
-
-            if nombre_norm not in jugadores:
-                jugadores[nombre_norm] = {}
-            for col in row.index:
-                key = f"{tipo}:{col}"
-                if key not in jugadores[nombre_norm]:
-                    val = row[col]
-                    if isinstance(val, pd.Series):
-                        val = val.iloc[0]
-                    if isinstance(val, str):
-                        val = val.split("\n")[0].strip()
-                    jugadores[nombre_norm][key] = val
-    return jugadores
-
-
-# ==========================
-# Scraping de puntos Fantasy
-# ==========================
-
-def scrapear_puntos_fantasy(path_html):
-    """
-    Lee puntos.html y devuelve:
-    dict['equipoLocal-equipoVisitante'] = [(equipo_norm, nombre_completo_limpio, puntos_int)]
-    """
-    if not os.path.exists(path_html):
-        print(f"[SCRAPPING] No existe {path_html}")
-        return {}
-
-    with open(path_html, "r", encoding="utf-8") as f:
-        contenido_html = f.read()
-
-    soup = BeautifulSoup(contenido_html, "lxml")
-    puntos_por_partido = {}
-    secciones_partido = soup.find_all("section", class_="over fichapartido")
-
-    for section_partido in secciones_partido:
-        header_partido = section_partido.find("header", class_="encabezado-partido")
-        if not header_partido:
-            continue
-
-        div_local = header_partido.select_one(".equipo.local .nombre")
-        div_visit = header_partido.select_one(".equipo.visitante .nombre")
-        if not div_local or not div_visit:
-            continue
-
-        nombre_local = div_local.get_text(strip=True)
-        nombre_visit = div_visit.get_text(strip=True)
-
-        equipo_local_norm = normalizar_equipo(nombre_local)
-        equipo_visitante_norm = normalizar_equipo(nombre_visit)
-        clave_partido = f"{equipo_local_norm}-{equipo_visitante_norm}"
-
-        lista_jugadores_html = []
-        tablas_estadisticas = section_partido.find_all("table", class_="tablestats")
-
-        for indice_tabla, tabla_stats in enumerate(tablas_estadisticas):
-            div_contenedor = tabla_stats.find_parent(
-                "div", class_=["box-estadisticas", "equipo-stats"]
-            )
-
-            if div_contenedor:
-                clases = div_contenedor.get("class", [])
-                if any("local" in c for c in clases):
-                    equipo_actual_norm = equipo_local_norm
-                else:
-                    equipo_actual_norm = equipo_visitante_norm
-            else:
-                equipo_actual_norm = (
-                    equipo_local_norm if indice_tabla == 0 else equipo_visitante_norm
-                )
-
-            filas_jugadores = tabla_stats.select("tbody tr.plegado")
-            for tr_jugador in filas_jugadores:
-                td_nombre = tr_jugador.find("td", class_="name")
-                span_puntos = tr_jugador.select_one("span.laliga-fantasy")
-                if not td_nombre or not span_puntos:
-                    continue
-
-                texto_puntos = span_puntos.get_text(strip=True)
-                if texto_puntos in ["-", "–", ""]:
-                    continue
-
-                nombre_visible = td_nombre.get_text(" ", strip=True)
-                nombre_visible = limpiar_minuto(nombre_visible)
-
-                nombre_completo = nombre_visible
-                if td_nombre.has_attr("title"):
-                    nombre_completo = limpiar_minuto(td_nombre["title"].strip())
-                elif td_nombre.has_attr("data-fullname"):
-                    nombre_completo = limpiar_minuto(td_nombre["data-fullname"].strip())
-
-                try:
-                    puntos_int = int(float(texto_puntos))
-                except ValueError:
-                    continue
-
-                lista_jugadores_html.append(
-                    (equipo_actual_norm, nombre_completo, puntos_int)
-                )
-
-        puntos_por_partido[clave_partido] = lista_jugadores_html
-
-    return puntos_por_partido
-
-
-# ==========================
-# Registro y salida de errores genéricos
-# ==========================
-
-def registrar_error(errores, partido, equipo, nombre_html, puntos_html,
-                    nombre_csv=None, puntos_csv=None, score=0):
-    errores.append({
-        "partido": partido,
-        "equipo": equipo,
-        "nombre_html": nombre_html,
-        "nombre_csv": nombre_csv,
-        "puntos_html": puntos_html,
-        "puntos_csv": puntos_csv,
-        "score": score,
-    })
-
-
-def mostrar_errores(errores):
-    if errores:
-        print("\nErrores encontrados:")
-        print("PARTIDO | EQUIPO | NOMBRE_HTML | NOMBRE_MATCH | PUNTOS_HTML | PUNTOS_CSV | SCORE")
-        print("-" * 80)
-        for err in errores:
-            print(
-                f"{err['partido']} | {err['equipo']} | {err['nombre_html']} | "
-                f"{err['nombre_csv']} | {err['puntos_html']} | {err['puntos_csv']} | "
-                f"{err['score']}"
-            )
-    else:
-        print("\nTodos los jugadores tienen los puntos bien asignados.")
-
-import os
-import time
-import random
-import requests
-
-def descargar_puntos(temporada: int, jornada_inicio: int = 1, jornada_fin: int = 38):
-    """
-    Descarga el HTML de puntos de cada jornada de la temporada indicada.
-    Guarda como puntos.html en la carpeta:
-        html/temporada_XX_YY/j{jornada}/puntos.html
-
-    temporada: año de la segunda parte de la temporada (ej: 25 -> 24_25)
-    jornada_inicio, jornada_fin: rango de jornadas (incluyendo ambos).
-    """
-
-    carpeta_temporada = f"temporada_{temporada-1:02d}_{temporada:02d}"
-    base_url = (
-        f"https://www.futbolfantasy.com/laliga/puntos/20{temporada}"
-        + "/{}/laliga-fantasy"
-    )
-
-    base_dir = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)),
-        "html",
-        carpeta_temporada
-    )
-
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                      "AppleWebKit/537.36 (KHTML, like Gecko) "
-                      "Chrome/120.0.0.0 Safari/537.36",
-        "Accept-Language": "es-ES,es;q=0.9",
-    }
-
-    jornadas = list(range(jornada_inicio, jornada_fin + 1))
-
-    for idx, jornada in enumerate(jornadas, start=1):
-        url = base_url.format(jornada)
-        folder = os.path.join(base_dir, f"j{jornada}")
-        os.makedirs(folder, exist_ok=True)
-        file_path = os.path.join(folder, "puntos.html")
-
-        exito = False
-        delay_base = 5  # base para backoff
-
-        for intento in range(4):  # hasta 4 intentos
-            try:
-                print(f"Jornada {jornada} - intento {intento+1}...")
-                resp = requests.get(url, headers=headers, timeout=20)
-                resp.raise_for_status()
-                with open(file_path, "w", encoding="utf-8") as f:
-                    f.write(resp.text)
-                print(f"Guardado en {file_path}")
-                exito = True
-                break
-            except (requests.exceptions.ReadTimeout,
-                    requests.exceptions.ConnectionError) as e:
-                # backoff exponencial con jitter
-                espera = min(delay_base * (2 ** intento), 120)
-                espera = espera * random.uniform(0.5, 1.5)
-                print(f"Timeout/conexión en jornada {jornada}: {e}. "
-                      f"Esperando {espera:.1f}s antes de reintentar...")
-                time.sleep(espera)
-            except Exception as e:
-                print(f"Error en jornada {jornada}: {e}. No reintento más.")
-                break
-
-        if not exito:
-            print(f"No se pudo descargar la jornada {jornada}, la salto.")
-            # pausa más larga antes de seguir, por si hay rate limiting
-            time.sleep(random.uniform(30, 90))
-            continue
-
-        # Pausa normal "humana" entre jornadas
-        pausa = random.uniform(8, 40)
-        print(f"Pausa entre jornadas: {pausa:.1f}s")
-        time.sleep(pausa)
-
-        # Cada 6 jornadas, descanso largo
-        if idx % 6 == 0:
-            siesta = random.uniform(120, 400)
-            print(f"Descanso largo tras jornada {jornada}: {siesta:.1f}s")
-            time.sleep(siesta)
-
-if __name__ == "__main__":
-    descargar_puntos(25, jornada_inicio=22, jornada_fin=38)
