@@ -81,7 +81,7 @@ def get_alias_jugadores_reverse(temporada: str) -> dict:
     return invertido
 
 
-APELLIDOS_CRITICOS = {"garcia", "rodriguez", "gonzalez","herrera"}
+APELLIDOS_CRITICOS = { "rodriguez", "gonzalez","herrera"}
 
 POSICION_MAP = {
     "GK": "PT",
@@ -189,7 +189,7 @@ COLUMNAS_MODELO = [
     "DuelosAereosGanadosPct",
 ]
 
-UMBRAL_MATCH = 77.0
+UMBRAL_MATCH = 72.0
 
 
 def get_alias_jugadores(temporada: str) -> dict:

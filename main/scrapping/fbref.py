@@ -2,6 +2,7 @@ import os
 import re
 from io import StringIO
 import logging
+from collections import defaultdict
 
 import numpy as np
 import pandas as pd
@@ -135,7 +136,7 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo=None):
 
     for _, fila in df_tabla.iterrows():
         nombre = str(fila["Player"])
-        nombre = re.sub(r"\s\(.*\)", "", nombre).strip()
+        nombre = re.sub(r"\s\(.*\)\s*", "", nombre).strip()
 
         if nombre in ["nan", "Player", "Total", "Players"]:
             continue
@@ -214,6 +215,8 @@ def rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val):
         fila_salida["Pases_Completados_Pct"] = to_float(fila_pases["Cmp%"])
     elif fila_summary is not None and "Cmp%" in fila_summary:
         fila_salida["Pases_Completados_Pct"] = to_float(fila_summary["Cmp%"])
+    else:
+        fila_salida["Pases_Completados_Pct"] = 0.0
 
     if pos_val == "PT":
         keepers = tablas_por_tipo.get("keepers", {})
@@ -286,6 +289,16 @@ def postprocesar_df_partido(df):
     df = df.fillna(0)
 
     return df
+
+
+def normalizar_pos_clave(pos_val: str) -> str:
+    if pos_val == "PT":
+        return "PT"
+    if pos_val in ("MC", "DT"):
+        return "MDT"
+    if pos_val in ("MC", "DF"):
+        return "MDF"
+    return pos_val
 
 
 def obtener_calendario():
@@ -367,9 +380,7 @@ def obtener_fantasy_jornada(jornada):
         div_local = header_partido.select_one(".equipo.local .nombre")
         div_visit = header_partido.select_one(".equipo.visitante .nombre")
 
-        if not div_local:
-            continue
-        if not div_visit:
+        if not div_local or not div_visit:
             continue
 
         nombre_local = div_local.get_text(strip=True)
@@ -386,10 +397,7 @@ def obtener_fantasy_jornada(jornada):
         for indice_tabla, tabla_stats in enumerate(tablas_stats):
             filas_jugadores = tabla_stats.select("tbody tr.plegado")
 
-            if indice_tabla == 0:
-                equipo_tabla_norm = local_norm
-            else:
-                equipo_tabla_norm = visit_norm
+            equipo_tabla_norm = local_norm if indice_tabla == 0 else visit_norm
 
             for tr_jugador in filas_jugadores:
                 td_nombre = tr_jugador.find("td", class_="name")
@@ -399,9 +407,7 @@ def obtener_fantasy_jornada(jornada):
                 nombre_sin_min = extraer_nombre_jugador(td_nombre)
                 nombre_sin_min = limpiar_minuto(nombre_sin_min)
 
-                pos_fantasy_raw = td_nombre.get("data-posicion-laliga-fantasy", "")
-                if not pos_fantasy_raw:
-                    pos_fantasy_raw = ""
+                pos_fantasy_raw = td_nombre.get("data-posicion-laliga-fantasy", "") or ""
                 pos_fantasy_raw = pos_fantasy_raw.strip()
 
                 pos_map_fantasy = {
@@ -412,19 +418,15 @@ def obtener_fantasy_jornada(jornada):
                     "Delantero": "DT",
                 }
 
-                if pos_fantasy_raw in pos_map_fantasy:
-                    pos_fantasy = pos_map_fantasy[pos_fantasy_raw]
-                else:
-                    pos_fantasy = "MC"
+                pos_fantasy = pos_map_fantasy.get(pos_fantasy_raw, "MC")
 
                 puntos = 0
-                span_pts = tr_jugador.select_one("span.laliga-fantasy")
-                if not span_pts:
-                    span_pts = tr_jugador.select_one("span.fantasy-points")
-                if not span_pts:
-                    span_pts = tr_jugador.select_one("span.puntos")
-                if not span_pts:
-                    span_pts = tr_jugador.select_one("span.points")
+                span_pts = (
+                    tr_jugador.select_one("span.laliga-fantasy")
+                    or tr_jugador.select_one("span.fantasy-points")
+                    or tr_jugador.select_one("span.puntos")
+                    or tr_jugador.select_one("span.points")
+                )
 
                 if span_pts:
                     txt = span_pts.get_text(strip=True)
@@ -440,21 +442,15 @@ def obtener_fantasy_jornada(jornada):
                 if td_events:
                     imagenes_evento = td_events.find_all("img")
                     for img_evento in imagenes_evento:
-                        tooltip = img_evento.get("data-tooltip") or ""
-                        tooltip = tooltip.strip().lower()
-
-                        alt = img_evento.get("alt") or ""
-                        alt = alt.strip().lower()
-
+                        tooltip = (img_evento.get("data-tooltip") or "").strip().lower()
+                        alt = (img_evento.get("alt") or "").strip().lower()
                         texto = tooltip if tooltip else alt
-
                         if "amarilla" in texto:
                             amarillas += 1
                         elif "roja" in texto:
                             rojas += 1
 
                 equipo_norm = equipo_tabla_norm
-
                 clave_ff = f"{equipo_norm}|{nombre_sin_min}"
 
                 nombre_con_alias = aplicar_alias_jugador_temporada(
@@ -473,7 +469,6 @@ def obtener_fantasy_jornada(jornada):
                     "posicion": pos_fantasy,
                 }
 
-                # logs para depurar alias/matching
                 if equipo_norm in ("girona", "osasuna"):
                     logger.debug(
                         f"[DEBUG FANTASY NOMBRE] equipo={equipo_norm}, "
@@ -540,6 +535,22 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
 
     fantasy_partido = mapa_fantasy_partido
 
+    if isinstance(fantasy_partido, list):
+        logger.error(
+            "[ERROR] fantasy_partido es list para idx_partido=%s, corrigiendo a dict. valor=%s",
+            idx_partido,
+            fantasy_partido,
+        )
+        fantasy_partido = fantasy_partido[0] if fantasy_partido else {}
+    elif not isinstance(fantasy_partido, dict):
+        logger.error(
+            "[ERROR] fantasy_partido tipo inesperado para idx_partido=%s, tipo=%s, valor=%s",
+            idx_partido,
+            type(fantasy_partido).__name__,
+            fantasy_partido,
+        )
+        fantasy_partido = {}
+
     divs_alineacion = soup.find_all("div", class_="lineup")
     titulares = []
 
@@ -547,15 +558,12 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         for div_lineup in divs_alineacion:
             anclas = div_lineup.find_all("a")
             nombres_equipo = []
-
             for a_jugador in anclas:
                 texto_jugador = a_jugador.get_text().strip()
                 texto_jugador = limpiar_minuto(texto_jugador)
                 nombres_equipo.append(texto_jugador)
-
             nombres_equipo = nombres_equipo[:11]
-            for nombre_j in nombres_equipo:
-                titulares.append(nombre_j)
+            titulares.extend(nombres_equipo)
 
     if divs_alineacion:
         anclas_local = divs_alineacion[0].find_all("a")
@@ -600,33 +608,21 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         nombre_fb = str(fila_sum.get("Player", "")).strip()
         nombre_fb = limpiar_minuto(nombre_fb)
 
-        es_local = False
-        for n_loc in nombres_local:
-            if n_loc == nombre_fb:
-                es_local = True
-                break
-
-        if es_local:
-            equipo_fb_norm = local_norm
-        else:
-            equipo_fb_norm = visit_norm
+        es_local = any(n_loc == nombre_fb for n_loc in nombres_local)
+        equipo_fb_norm = local_norm if es_local else visit_norm
 
         minutos = to_int(fila_sum.get("Min", 0))
 
-        pos_raw = str(fila_sum.get("Pos", "MC"))
-        pos_raw = pos_raw.split(",")[0]
-        pos_raw = pos_raw.strip()
+        pos_raw = str(fila_sum.get("Pos", "MC")).split(",")[0].strip()
         pos_val = mapear_posicion(pos_raw)
 
-        candidatos_equipo = {}
-        for clave, info in fantasy_partido.items():
-            if info.get("equipo_norm") == equipo_fb_norm:
-                candidatos_equipo[clave] = info
+        candidatos_equipo = {
+            clave: info
+            for clave, info in fantasy_partido.items()
+            if info.get("equipo_norm") == equipo_fb_norm
+        }
 
-        nombres_fantasy_norm = []
-        for info in candidatos_equipo.values():
-            nombres_fantasy_norm.append(info["nombre_norm"])
-
+        nombres_fantasy_norm = [info["nombre_norm"] for info in candidatos_equipo.values()]
         nombre_html_norm = nombre_fb_norm
 
         mejor_norm, mejor_score = obtener_match_nombre(
@@ -645,17 +641,13 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
 
         if mejor_norm is None or mejor_score < UMBRAL_MATCH:
             from rapidfuzz import process as rf_process, fuzz as rf_fuzz
-
             mejor_basico = rf_process.extractOne(
                 nombre_html_norm,
                 nombres_fantasy_norm,
                 scorer=rf_fuzz.WRatio,
             )
-
             if mejor_basico is not None:
-                candidato_norm = mejor_basico[0]
-                score_basico = mejor_basico[1]
-
+                candidato_norm, score_basico, _ = mejor_basico
                 if score_basico >= UMBRAL_MATCH:
                     mejor_norm = candidato_norm
                     mejor_score = score_basico
@@ -680,6 +672,19 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         }
         propuestas.append(propuesta)
 
+        if equipo_fb_norm == "barcelona":
+            logger.debug(
+                "[DEBUG BARCELONA PROP] fb_name=%s, fb_norm=%s, eq=%s, "
+                "min=%s, pos=%s, mejor_norm=%s, mejor_score=%.2f",
+                nombre_fb,
+                nombre_fb_norm,
+                equipo_fb_norm,
+                minutos,
+                pos_val,
+                mejor_norm,
+                mejor_score if mejor_score is not None else -1.0,
+            )
+
         if "herrera" in normalizar_texto(nombre_fb):
             logger.debug(
                 f"[DEBUG HERRERA] FBREF PROPUESTA - nombre_fb={nombre_fb}, "
@@ -688,36 +693,65 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
                 f"score={mejor_score}"
             )
 
-    # ========== MATCHING FBREF ↔ FANTASY por clave (nombre_norm, equipo, pos_relajada) ==========
-    fantasy_por_norm = {}
+    # ========== MATCHING FBREF ↔ FANTASY ==========
+    jugadores_por_apellido_equipo = defaultdict(list)
     for clave_ff, info in fantasy_partido.items():
         nombre_norm = info["nombre_norm"]
         equipo_norm = info["equipo_norm"]
-        pos_val = info.get("posicion", "MC")
+        apellido = nombre_norm.split()[-1]
+        jugadores_por_apellido_equipo[(apellido, equipo_norm)].append((clave_ff, info))
 
-        # relajamos MC / DT en la clave
-        if pos_val in ("MC", "DT"):
-            pos_clave = "MDT"
-        else:
-            pos_clave = pos_val
-
-        clave_norm = (nombre_norm, equipo_norm, pos_clave)
-
-        if clave_norm not in fantasy_por_norm:
-            fantasy_por_norm[clave_norm] = []
-
-        entrada = {
-            "clave_ff": clave_ff,
-            "puntos": info["puntos"],
-            "info": info,
-        }
-        fantasy_por_norm[clave_norm].append(entrada)
-
-        if "herrera" in nombre_norm:
+    for (apellido, equipo_norm), lista_jug in jugadores_por_apellido_equipo.items():
+        if equipo_norm == "barcelona":
             logger.debug(
-                f"[DEBUG HERRERA] FANTASY AGRUPADO - clave_norm={clave_norm}, "
-                f"clave_ff={clave_ff}, puntos={info['puntos']}"
+                "[DEBUG BARCELONA AGRUP] apellido=%s, equipo=%s, jugadores=%s",
+                apellido,
+                equipo_norm,
+                [(cf, inf["nombre_norm"], inf["posicion"], inf["puntos"]) for cf, inf in lista_jug],
             )
+
+    fantasy_por_norm = {}
+    for (apellido, equipo_norm), lista_jugadores in jugadores_por_apellido_equipo.items():
+        for clave_ff, info in lista_jugadores:
+            nombre_norm = info["nombre_norm"]
+            pos_val = info.get("posicion", "MC")
+
+            if apellido not in APELLIDOS_CRITICOS:
+                clave_norm = (nombre_norm, equipo_norm)
+            else:
+                if len(lista_jugadores) == 1:
+                    clave_norm = (nombre_norm, equipo_norm)
+                else:
+                    pos_clave = normalizar_pos_clave(pos_val)
+                    clave_norm = (nombre_norm, equipo_norm, pos_clave)
+
+            if clave_norm not in fantasy_por_norm:
+                fantasy_por_norm[clave_norm] = []
+
+            entrada = {
+                "clave_ff": clave_ff,
+                "puntos": info["puntos"],
+                "info": info,
+            }
+            fantasy_por_norm[clave_norm].append(entrada)
+
+            if equipo_norm == "barcelona":
+                logger.debug(
+                    "[DEBUG BARCELONA FANTASY_NORM] apellido=%s, nombre_norm=%s, "
+                    "pos=%s, clave_norm=%s, clave_ff=%s, puntos=%s",
+                    apellido,
+                    nombre_norm,
+                    pos_val,
+                    clave_norm,
+                    clave_ff,
+                    info["puntos"],
+                )
+
+            if "herrera" in nombre_norm:
+                logger.debug(
+                    f"[DEBUG HERRERA] FANTASY AGRUPADO - clave_norm={clave_norm}, "
+                    f"clave_ff={clave_ff}, puntos={info['puntos']}"
+                )
 
     asignacion_fbref_a_fantasy = {}
 
@@ -728,22 +762,43 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         pos_val = propuesta["posicion"]
         score = propuesta["score"]
 
-        if not nombre_norm:
-            continue
-        if score < UMBRAL_MATCH:
+        if not nombre_norm or score < UMBRAL_MATCH:
             continue
 
-        # misma relajación MC/DT en la clave
-        if pos_val in ("MC", "DT"):
-            pos_clave = "MDT"
+        apellido = nombre_norm.split()[-1]
+        clave_ap = (apellido, equipo_fb_norm)
+        lista_fantasy_mismo_ap = jugadores_por_apellido_equipo.get(clave_ap, [])
+        hay_duplicados = (
+            apellido in APELLIDOS_CRITICOS and len(lista_fantasy_mismo_ap) > 1
+        )
+
+        if not lista_fantasy_mismo_ap:
+            clave_norm = (nombre_norm, equipo_fb_norm)
         else:
-            pos_clave = pos_val
+            if not hay_duplicados:
+                clave_norm = (nombre_norm, equipo_fb_norm)
+            else:
+                pos_clave = normalizar_pos_clave(pos_val)
+                clave_norm = (nombre_norm, equipo_fb_norm, pos_clave)
 
-        clave_norm = (nombre_norm, equipo_fb_norm, pos_clave)
+        if equipo_fb_norm == "barcelona":
+            logger.debug(
+                "[DEBUG BARCELONA PROP_CLAVE] fb_name_norm=%s, eq=%s, pos=%s, "
+                "apellido=%s, lista_fantasy_mismo_ap=%s, hay_duplicados=%s, clave_norm=%s",
+                nombre_norm,
+                equipo_fb_norm,
+                pos_val,
+                apellido,
+                [
+                    (cf, inf["nombre_norm"], inf["posicion"], inf["puntos"])
+                    for cf, inf in lista_fantasy_mismo_ap
+                ],
+                hay_duplicados,
+                clave_norm,
+            )
 
         if clave_norm not in propuestas_por_norm:
             propuestas_por_norm[clave_norm] = []
-
         propuestas_por_norm[clave_norm].append(propuesta)
 
     for clave_norm, lista_props in propuestas_por_norm.items():
@@ -753,6 +808,10 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
             if "herrera" in clave_norm[0]:
                 logger.debug(
                     f"[DEBUG HERRERA] SIN CANDIDOS FANTASY PARA CLAVE {clave_norm}"
+                )
+            if "garcia" in clave_norm[0]:
+                logger.debug(
+                    "[DEBUG GARCIA] SIN CANDIDATOS FANTASY PARA CLAVE %s", clave_norm
                 )
             continue
 
@@ -773,9 +832,7 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
                 f"fantasy={[(c['clave_ff'], c['puntos']) for c in candidatos_ff_ordenados]}"
             )
 
-        for propuesta, candidato in zip(
-            lista_props_ordenada, candidatos_ff_ordenados
-        ):
+        for propuesta, candidato in zip(lista_props_ordenada, candidatos_ff_ordenados):
             clave_fbref = propuesta["clave_fbref"]
             clave_ff = candidato["clave_ff"]
             asignacion_fbref_a_fantasy[clave_fbref] = clave_ff
@@ -787,7 +844,42 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
                     f"clave_ff={clave_ff}, puntos={candidato['puntos']}"
                 )
 
-    # ================== FIN MATCHING ==================
+    debug_matching_por_fbref = {}
+    for propuesta in propuestas:
+        clave_fbref = propuesta["clave_fbref"]
+        mejor_norm = propuesta["mejor_norm"]
+        equipo_fb_norm = propuesta["equipo_fb_norm"]
+        pos_val = propuesta["posicion"]
+        score = propuesta["score"]
+        clave_ff_asignada = asignacion_fbref_a_fantasy.get(clave_fbref)
+
+        if mejor_norm:
+            apellido = mejor_norm.split()[-1]
+            clave_ap = (apellido, equipo_fb_norm)
+            lista_fantasy_mismo_ap = jugadores_por_apellido_equipo.get(clave_ap, [])
+            hay_duplicados = (
+                apellido in APELLIDOS_CRITICOS and len(lista_fantasy_mismo_ap) > 1
+            )
+
+            if not lista_fantasy_mismo_ap:
+                clave_norm = (mejor_norm, equipo_fb_norm)
+            else:
+                if not hay_duplicados:
+                    clave_norm = (mejor_norm, equipo_fb_norm)
+                else:
+                    pos_clave = normalizar_pos_clave(pos_val)
+                    clave_norm = (mejor_norm, equipo_fb_norm, pos_clave)
+        else:
+            clave_norm = None
+
+        debug_matching_por_fbref[clave_fbref] = {
+            "mejor_norm": mejor_norm,
+            "equipo_fb_norm": equipo_fb_norm,
+            "pos_val": pos_val,
+            "score": score,
+            "clave_norm": clave_norm,
+            "clave_ff_asignada": clave_ff_asignada,
+        }
 
     bd_partido = {}
 
@@ -799,10 +891,7 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         minutos = propuesta["minutos"]
         pos_val = propuesta["posicion"]
 
-        if equipo_fb_norm == local_norm:
-            equipo_rival_norm = visit_norm
-        else:
-            equipo_rival_norm = local_norm
+        equipo_rival_norm = visit_norm if equipo_fb_norm == local_norm else local_norm
 
         clave_ff = asignacion_fbref_a_fantasy.get(clave_fbref)
 
@@ -812,19 +901,12 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
             clave_registro = f"{nombre_fb_norm}|{equipo_fb_norm}|{minutos}|{pos_val}"
 
         if clave_registro not in bd_partido:
-            fila_nueva = {}
-            for columna in COLUMNAS_MODELO:
-                fila_nueva[columna] = np.nan
+            fila_nueva = {col: np.nan for col in COLUMNAS_MODELO}
 
             fila_nueva["player"] = nombre_fb
             fila_nueva["Equipo_propio"] = equipo_fb_norm
             fila_nueva["Equipo_rival"] = equipo_rival_norm
-
-            if nombre_fb in titulares:
-                fila_nueva["Titular"] = 1
-            else:
-                fila_nueva["Titular"] = 0
-
+            fila_nueva["Titular"] = 1 if nombre_fb in titulares else 0
             fila_nueva["Goles_en_contra"] = np.nan
             fila_nueva["Porcentaje_paradas"] = np.nan
             fila_nueva["PSxG"] = np.nan
@@ -842,9 +924,37 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         fila_salida["puntosFantasy"] = puntos
 
         if puntos == 6767:
+            info_dbg = debug_matching_por_fbref.get(clave_fbref, {})
+            mejor_norm = info_dbg.get("mejor_norm")
+            score = info_dbg.get("score")
+            clave_norm = info_dbg.get("clave_norm")
+            clave_ff_asignada = info_dbg.get("clave_ff_asignada")
+
             logger.debug(
-                f"[DEBUG 6767] {nombre_fb} ({equipo_fb_norm}, pos={pos_val}, "
-                f"min={minutos}) sin puntosFantasy asignados (clave_ff={clave_ff})"
+                "[DEBUG 6767] player=%s, equipo_fb=%s, pos_fb=%s, min=%s, "
+                "clave_fbref=%s, clave_ff_asignada=%s, puntosFantasy=%s, "
+                "mejor_norm=%s, score=%.2f, clave_norm=%s, candidatos_fantasy=%s",
+                nombre_fb,
+                equipo_fb_norm,
+                pos_val,
+                minutos,
+                clave_fbref,
+                clave_ff_asignada,
+                puntos,
+                mejor_norm,
+                score if score is not None else -1.0,
+                clave_norm,
+                [
+                    (
+                        c["info"]["nombre_original"],
+                        c["info"]["nombre_norm"],
+                        c["info"]["posicion"],
+                        c["info"]["puntos"],
+                    )
+                    for c in fantasy_por_norm.get(clave_norm, [])
+                ]
+                if clave_norm
+                else [],
             )
 
         if "herrera" in normalizar_texto(nombre_fb):
@@ -910,7 +1020,6 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
                 ):
                     fila["puntosFantasy"] = info.get("puntos", 6767)
                     break
-
             continue
 
         if clave_ff in usadas_ff:
@@ -923,10 +1032,7 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         if amarillas_banquillo == 0 and rojas_banquillo == 0:
             continue
 
-        if equipo_norm == local_norm:
-            equipo_rival_norm = visit_norm
-        else:
-            equipo_rival_norm = local_norm
+        equipo_rival_norm = visit_norm if equipo_norm == local_norm else local_norm
 
         nombre_norm = info["nombre_norm"]
         clave_registro = f"{nombre_norm}|{equipo_norm}|0|{pos_val}|fantasy_only}}"
@@ -934,9 +1040,7 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         if clave_registro in bd_partido:
             continue
 
-        fila = {}
-        for columna in COLUMNAS_MODELO:
-            fila[columna] = 0
+        fila = {col: 0 for col in COLUMNAS_MODELO}
 
         fila["player"] = nombre_a_mayus(nombre_canonico_ff)
         fila["posicion"] = pos_val
@@ -952,17 +1056,6 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
 
     df_partido = pd.DataFrame.from_dict(bd_partido, orient="index")
     df_partido = postprocesar_df_partido(df_partido)
-
-    mask_cero = df_partido["puntosFantasy"].fillna(0) == 0
-    df_cero = df_partido[mask_cero].copy()
-    if not df_cero.empty:
-        print(f"[LOG 0 PUNTOS] {equipo_local} vs {equipo_visitante}")
-        for _, fila in df_cero.iterrows():
-            print(
-                f"  - {fila.get('player','')} | equipo={fila.get('Equipo_propio','')} | "
-                f"min={fila.get('Min_partido',0)} | amarillas={fila.get('Amarillas',0)} "
-                f"| rojas={fila.get('Rojas',0)} | pos={fila.get('posicion','')}"
-            )
 
     return df_partido, equipo_local, equipo_visitante
 
@@ -1085,7 +1178,10 @@ def procesar_un_partido(jornada: int, idx_partido: int):
 
 
 if __name__ == "__main__":
-    TEMPORADA_ACTUAL = "24_25"
+    analizar_temporada("25_26", 1, 17)
+'''
+    TEMPORADA_ACTUAL = "25_26"
     CARPETA_HTML, CARPETA_CSV = _build_rutas_temporada(TEMPORADA_ACTUAL)
 
-    procesar_un_partido(jornada=3, idx_partido=8)
+    procesar_un_partido(jornada=13, idx_partido=3)
+'''
