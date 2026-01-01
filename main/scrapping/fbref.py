@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 # ========== LOG ESPECÍFICO JUGADORES SIN ENTRADA ==========
 def log_jugadores_sin_entrada():
     logger.info('24/25 J10->Villareal:Pau Navarro no tiene entrada en futbolfantasy.com')
-    logger.info('24/24 J15->Villareal:Pau Cabanes no tiene entrada en futbolfantasy.com')
+    logger.info('24/25 J15->Villareal:Pau Cabanes no tiene entrada en futbolfantasy.com')
 
 
 def contar_tarjetas_banquillo(df):
