@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Alexander Sørloth,DT,atletico madrid,valencia,1,60,0,0,0.6,0.0,4,3,1,13,76.9,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,2,1,0,1,14,83.0,23.0,1,4,1,80.0
+Julián Álvarez,DT,atletico madrid,valencia,0,30,1,0,0.5,0.0,1,0,1,4,75.0,0,0,0.0,0.0,0.0,7,0,0,0,0,1,0,1,0,0,0,0,3,19.0,4.0,0,0,1,0.0
+Antoine Griezmann,DT,atletico madrid,valencia,1,75,1,0,0.7,0.0,2,1,1,48,68.8,0,0,0.0,0.0,0.0,12,1,1,0,0,2,0,2,1,1,1,0,31,113.0,63.0,3,0,0,0.0
+Giuliano Simeone,MC,atletico madrid,valencia,0,15,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,1,1,0,1,1,1,0,1,0.0,0.0,0,0,0,0.0
+Conor Gallagher,MC,atletico madrid,valencia,1,90,1,0,0.7,0.0,1,0,1,37,78.4,0,0,0.0,0.0,0.0,12,4,2,0,0,2,0,2,2,1,0,1,20,69.0,24.0,1,2,2,50.0
+Koke,MC,atletico madrid,valencia,1,90,0,0,0.0,0.2,0,0,0,66,84.8,1,0,0.0,0.0,0.0,4,0,2,0,2,2,0,2,1,0,0,0,29,120.0,52.0,1,0,1,0.0
+Rodrigo De Paul,MC,atletico madrid,valencia,1,60,0,1,0.0,0.7,0,0,0,48,79.2,0,0,0.0,0.0,0.0,11,0,2,0,2,0,0,0,0,1,0,0,31,149.0,83.0,2,0,0,0.0
+Ángel Correa,DT,atletico madrid,valencia,0,30,0,0,0.0,0.0,0,0,0,8,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,1,0,5,84.0,67.0,1,0,1,0.0
+Samuel Lino,DF,atletico madrid,valencia,1,66,0,1,0.4,0.7,3,3,0,35,88.6,0,0,0.0,0.0,0.0,15,3,4,0,1,2,0,2,0,4,1,3,31,163.0,69.0,1,0,0,0.0
+Rodrigo Riquelme,DF,atletico madrid,valencia,0,24,0,0,0.0,0.0,0,0,0,7,71.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,7,71.0,58.0,2,0,0,0.0
+César Azpilicueta,DF,atletico madrid,valencia,1,76,0,0,0.0,0.0,0,0,0,49,85.7,0,0,0.0,0.0,0.0,6,3,4,0,1,0,0,0,1,0,0,0,26,69.0,23.0,0,2,0,100.0
+Reinildo Mandava,DF,atletico madrid,valencia,0,14,0,0,0.0,0.0,0,0,0,11,81.8,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,6,16.0,2.0,0,0,0,0.0
+José María Giménez,DF,atletico madrid,valencia,1,90,0,0,0.1,0.0,1,1,0,70,94.3,0,0,0.0,0.0,0.0,9,1,1,0,0,1,0,1,4,0,0,0,48,171.0,83.0,0,1,0,100.0
+Robin Le Normand,DF,atletico madrid,valencia,1,90,0,0,0.2,0.0,1,1,0,74,83.8,0,0,0.0,0.0,0.0,8,0,1,0,1,1,0,1,3,1,1,0,57,215.0,126.0,1,3,0,100.0
+Marcos Llorente,DF,atletico madrid,valencia,1,90,0,0,0.0,0.6,1,1,0,76,88.2,0,0,0.0,0.0,0.0,10,0,0,0,0,2,0,2,1,0,0,0,45,167.0,84.0,2,0,2,0.0
+Jan Oblak,PT,atletico madrid,valencia,1,90,0,0,0.0,0.0,0,0,0,23,87.0,0,0,0.0,100.0,0.1,9,0,0,0,0,0,0,0,0,0,0,0,12,52.0,26.0,0,0,0,0.0
+Dani Gómez,DT,valencia,atletico madrid,1,78,0,0,0.0,0.0,0,0,0,11,81.8,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,1,1,0,1,5,16.0,1.0,0,1,3,25.0
+Martín Tejón,DT,valencia,atletico madrid,0,12,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,1,0,4,6.0,1.0,0,0,2,0.0
+Javier Guerra,DT,valencia,atletico madrid,1,78,0,0,0.0,0.0,2,2,0,33,75.8,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,4,3,1,24,120.0,62.0,1,0,1,0.0
+Germán Valera,MC,valencia,atletico madrid,0,12,0,0,0.0,0.0,1,1,0,7,85.7,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,1,1,1,0,6,32.0,11.0,0,0,0,0.0
+Luis Rioja,MC,valencia,atletico madrid,1,69,0,0,0.0,0.0,0,0,0,28,60.7,0,0,0.0,0.0,0.0,2,0,0,0,0,4,0,4,3,2,1,1,14,85.0,25.0,0,0,0,0.0
+Sergi Canós,MC,valencia,atletico madrid,0,21,0,0,0.1,0.0,1,1,0,16,68.8,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,0,0,0,13,41.0,17.0,0,1,0,100.0
+José Luis García Vayá,MC,valencia,atletico madrid,1,90,0,0,0.0,0.1,0,0,0,62,82.3,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,2,0,0,0,32,147.0,82.0,0,0,2,0.0
+Hugo Guillamón,MC,valencia,atletico madrid,1,45,0,0,0.0,0.0,0,0,0,20,85.0,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,1,0,0,0,7,25.0,17.0,0,0,0,0.0
+Enzo Barrenechea,MC,valencia,atletico madrid,0,45,0,0,0.0,0.0,0,0,0,40,97.5,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,1,0,0,0,14,48.0,15.0,0,1,0,100.0
+Diego López,MC,valencia,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,31,77.4,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,0,6,0,6,18,85.0,26.0,2,0,1,0.0
+Thierry Correia,DF,valencia,atletico madrid,1,90,0,0,0.0,0.0,1,0,1,66,84.8,0,0,0.0,0.0,0.0,1,1,1,0,1,2,0,2,2,2,1,1,28,133.0,78.0,1,0,0,0.0
+Cristhian Mosquera,DF,valencia,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,55,87.3,0,0,0.0,0.0,0.0,1,2,1,0,0,0,0,0,2,0,0,0,33,183.0,100.0,1,1,2,33.3
+César Tárrega,DF,valencia,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,57,80.7,1,0,0.0,0.0,0.0,1,3,1,0,0,1,1,0,3,0,0,0,24,75.0,26.0,0,3,0,100.0
+Dimitri Foulquier,DF,valencia,atletico madrid,1,70,0,0,0.0,0.0,0,0,0,38,76.3,0,0,0.0,0.0,0.0,-1,3,4,0,2,0,0,0,3,1,0,0,23,157.0,96.0,3,1,0,100.0
+Jesus Vazquez,DF,valencia,atletico madrid,0,20,0,0,0.0,0.0,0,0,0,10,80.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,4,32.0,12.0,0,0,1,0.0
+Giorgi Mamardashvili,PT,valencia,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,29,69.0,0,0,3.0,25.0,3.1,0,0,0,0,0,0,0,0,0,0,0,0,5,18.0,15.0,0,0,0,0.0

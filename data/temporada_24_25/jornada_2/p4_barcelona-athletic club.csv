@@ -1,0 +1,32 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Robert Lewandowski,DT,barcelona,athletic,1,90,1,0,1.2,0.0,6,4,2,26,57.7,1,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,0,0,0,0,16,49.0,5.0,0,2,0,100.0
+Ferrán Torres,DT,barcelona,athletic,1,62,0,0,0.0,0.0,1,0,1,21,76.2,0,0,0.0,0.0,0.0,6,0,0,0,0,0,0,0,0,4,3,0,13,97.0,35.0,0,0,0,0.0
+Fermin López,MC,barcelona,athletic,0,28,0,0,0.0,0.0,0,0,0,10,90.0,1,0,0.0,0.0,0.0,0,1,2,0,1,0,0,0,0,1,0,1,9,38.0,8.0,0,0,0,0.0
+Lamine Yamal,DT,barcelona,athletic,1,89,1,0,0.1,0.0,2,1,1,39,69.2,0,0,0.0,0.0,0.0,10,2,2,0,1,0,0,0,0,8,3,4,34,297.0,179.0,5,0,0,0.0
+Pau Victor,DT,barcelona,athletic,0,1,0,0,0.0,0.0,0,0,0,2,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0
+Raphinha,MC,barcelona,athletic,1,90,0,0,0.5,0.9,4,3,1,49,77.6,0,0,0.0,0.0,0.0,12,3,1,0,1,1,0,1,0,5,3,2,35,210.0,95.0,2,0,1,0.0
+Pedri,MC,barcelona,athletic,1,90,0,0,0.0,0.5,0,0,0,54,85.2,0,0,0.0,0.0,0.0,7,2,2,0,1,1,0,1,0,3,2,1,35,200.0,89.0,3,0,0,0.0
+Marc Bernal,MC,barcelona,athletic,1,82,0,0,0.0,0.0,0,0,0,53,96.2,1,0,0.0,0.0,0.0,0,1,0,0,0,0,0,0,1,2,2,0,29,127.0,32.0,0,0,4,0.0
+Eric García,MC,barcelona,athletic,0,8,0,0,0.0,0.0,0,0,0,2,100.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,1,0,0,0,1,6.0,6.0,0,1,0,100.0
+Alejandro Balde,DF,barcelona,athletic,1,89,0,0,0.0,0.1,0,0,0,58,87.9,0,0,0.0,0.0,0.0,2,1,0,0,0,1,1,0,0,4,0,3,40,314.0,172.0,6,0,0,0.0
+Gerard Martín,DF,barcelona,athletic,0,1,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0
+Iñigo Martínez,DF,barcelona,athletic,1,90,0,0,0.0,0.0,0,0,0,98,92.9,0,0,0.0,0.0,0.0,5,2,1,0,0,1,1,0,3,0,0,0,68,339.0,259.0,2,4,1,80.0
+Pau Cubarsí,DF,barcelona,athletic,1,90,0,0,0.0,0.0,0,0,0,88,93.2,1,0,0.0,0.0,0.0,0,1,3,0,2,0,0,0,2,0,0,0,51,229.0,118.0,0,2,2,50.0
+Jules Koundé,DF,barcelona,athletic,1,90,0,0,0.0,0.1,0,0,0,69,88.4,0,0,0.0,0.0,0.0,4,3,2,0,0,3,1,2,1,2,0,2,31,116.0,59.0,1,2,0,100.0
+MarcAndré ter Stegen,PT,barcelona,athletic,1,90,0,0,0.0,0.0,0,0,0,38,97.4,0,0,1.0,100.0,0.8,8,0,0,0,0,0,0,0,2,0,0,0,27,170.0,127.0,0,0,0,0.0
+Iñaki Williams,DT,athletic,barcelona,1,77,0,0,0.0,0.0,0,0,0,14,64.3,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,1,2,0,2,14,75.0,27.0,0,4,5,44.4
+Gorka Guruzeta,DT,athletic,barcelona,0,13,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,2,25.0,0.0,0,0,0,0.0
+Nico Williams,DT,athletic,barcelona,1,90,0,0,0.1,0.0,3,3,0,24,58.3,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,0,6,3,2,25,197.0,116.0,4,0,0,0.0
+Álex Berenguer,DT,athletic,barcelona,1,71,0,0,0.0,0.0,1,1,0,21,57.1,1,0,0.0,0.0,0.0,3,2,4,0,2,1,1,0,0,1,0,0,17,88.0,55.0,0,0,1,0.0
+Adu Ares,DT,athletic,barcelona,0,19,0,0,0.0,0.0,0,0,0,9,55.6,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,1,0,1,8,44.0,29.0,1,0,0,0.0
+Oihan Sancet,MC,athletic,barcelona,1,61,1,0,0.8,0.0,0,0,0,20,80.0,0,0,0.0,0.0,0.0,10,1,2,0,1,0,0,0,1,1,0,0,18,139.0,73.0,3,1,0,100.0
+Unai Gómez,MC,athletic,barcelona,0,29,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,2,2.0,0.0,0,0,1,0.0
+Mikel Vesga,MC,athletic,barcelona,1,62,0,0,0.0,0.0,0,0,0,15,66.7,0,0,0.0,0.0,0.0,2,1,3,0,3,1,0,1,0,0,0,0,9,19.0,4.0,0,0,0,0.0
+Mikel Jauregizar,MC,athletic,barcelona,0,28,0,0,0.0,0.0,0,0,0,9,77.8,1,0,0.0,0.0,0.0,0,2,1,0,0,0,0,0,0,0,0,0,2,17.0,6.0,0,0,1,0.0
+Beñat Prados,MC,athletic,barcelona,1,77,0,0,0.0,0.0,2,1,1,24,83.3,0,0,0.0,0.0,0.0,1,1,4,0,3,4,0,4,0,0,0,0,19,73.0,17.0,0,0,0,0.0
+Ander Herrera,MC,athletic,barcelona,0,13,0,0,0.0,0.0,0,0,0,11,90.9,1,0,0.0,0.0,0.0,0,1,1,0,0,0,0,0,0,1,1,0,6,21.0,0.0,0,0,0,0.0
+Yuri Berchiche,DF,athletic,barcelona,1,90,0,0,0.0,0.1,0,0,0,28,92.9,0,0,0.0,0.0,0.0,0,2,3,0,1,4,1,3,2,1,0,1,13,72.0,54.0,1,0,0,0.0
+Yeray Álvarez,DF,athletic,barcelona,1,90,0,0,0.1,0.0,1,1,0,37,81.1,1,0,0.0,0.0,0.0,3,1,1,0,0,2,1,1,2,3,2,1,28,139.0,59.0,0,2,3,40.0
+Daniel Vivian,DF,athletic,barcelona,1,90,0,0,0.0,0.0,0,0,0,45,86.7,0,0,0.0,0.0,0.0,4,1,1,0,0,2,0,2,5,0,0,0,36,155.0,62.0,0,1,0,100.0
+Iñigo Lekue,DF,athletic,barcelona,1,90,0,0,0.0,0.0,0,0,0,40,85.0,1,0,0.0,0.0,0.0,-1,1,3,0,2,1,0,1,2,0,0,0,24,140.0,76.0,2,0,0,0.0
+Alex Padilla,PT,athletic,barcelona,1,90,0,0,0.0,0.0,0,0,0,33,54.5,0,0,2.0,60.0,1.7,3,0,0,0,0,0,0,0,1,0,0,0,21,113.0,71.0,0,0,0,0.0

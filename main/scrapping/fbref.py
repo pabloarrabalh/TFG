@@ -50,7 +50,6 @@ def contar_tarjetas_banquillo(df):
 # CONFIG GLOBAL DEPENDIENTE DE TEMPORADA
 # =====================================================
 
-
 TEMPORADA_ACTUAL = "25_26"  # valor por defecto
 
 
@@ -64,7 +63,6 @@ def _build_rutas_temporada(temporada: str):
 
 CARPETA_HTML, CARPETA_CSV = _build_rutas_temporada(TEMPORADA_ACTUAL)
 
-
 scraper = cloudscraper.create_scraper(
     browser={
         "browser": "chrome",
@@ -77,7 +75,6 @@ scraper = cloudscraper.create_scraper(
 # =====================================================
 # HELPERS ALIAS / NORMALIZACIÓN
 # =====================================================
-
 
 def normalizar_equipo_temporada(nombre: str) -> str:
     nombre_norm = normalizar_texto(nombre)
@@ -101,7 +98,6 @@ def aplicar_alias_jugador_temporada(nombre: str, equipo_norm: str) -> str:
 # =====================================================
 # LÓGICA FBREF + FANTASY
 # =====================================================
-
 
 def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo=None):
     caption = tabla_html.find("caption")
@@ -734,7 +730,14 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         else:
             equipo_rival_norm = local_norm
 
-        clave_registro = f"{nombre_fb_norm}|{equipo_fb_norm}|{minutos}|{pos_val}"
+        # clave de Fantasy asociada (si existe)
+        clave_ff = asignacion_fbref_a_fantasy.get(clave_fbref)
+
+        # CLAVE REGISTRO: usar clave_ff para evitar cruces entre jugadores con mismo nombre corto
+        if clave_ff is not None:
+            clave_registro = f"{clave_ff}|{equipo_fb_norm}|{pos_val}"
+        else:
+            clave_registro = f"{nombre_fb_norm}|{equipo_fb_norm}|{minutos}|{pos_val}"
 
         if clave_registro not in bd_partido:
             fila_nueva = {}
@@ -760,9 +763,7 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         fila_salida = bd_partido[clave_registro]
         rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val)
 
-        clave_ff = asignacion_fbref_a_fantasy.get(clave_fbref)
         puntos = 0
-
         if clave_ff is not None:
             puntos = fantasy_partido[clave_ff]["puntos"]
 
@@ -953,4 +954,4 @@ def analizar_temporada(codigo_temporada: str, j_ini: int = 1, j_fin: int = 38):
 
 
 if __name__ == "__main__":
-    analizar_temporada("24_25", 2, 2)
+    analizar_temporada("24_25", 1, 5)

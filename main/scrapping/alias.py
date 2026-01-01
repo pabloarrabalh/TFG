@@ -50,23 +50,14 @@ ALIAS_JUGADORES_POR_TEMPORADA = {
         "sevilla": {"joaquin martinez gauna": "oso"},
     },
     "24_25": {
-        "athletic": {
-            "nico williams": "n williams",
-            "inaki williams": "i williams",
-        },
+        "athletic": {  "nico williams": "n williams", "inaki williams": "i williams", },
         "rayo": {"isaac palazon camacho": "isi palazon"},
         "valencia": {"jose luis garcia vaya": "pepelu"},
-        "betis": {
-            "ezequiel avila": "chimy",
-            "dani perez": "dani perez",
-        },
-        "espanyol": {"antoniu roca": "roca"},
+        "betis": {"ezequiel avila": "chimy", },
+        "espanyol": {"antoniu": "roca"},
         "mallorca": {"antonio sanchez": "antonio"},
-        "girona": {"arnau martinez": "arnau"},
-        "getafe": {
-            "bertug yildirim": "yildirim",
-            "john joe finn": "patrick finn",
-        },
+        "girona": {"arnau martinez": "arnau","yangel herrera": "herrera",},
+        "getafe": { "bertug yildirim": "yildirim", "john joe finn": "patrick finn",},
     },
 }
 
@@ -90,7 +81,7 @@ def get_alias_jugadores_reverse(temporada: str) -> dict:
     return invertido
 
 
-APELLIDOS_CRITICOS = {"garcia", "rodriguez", "gonzalez"}
+APELLIDOS_CRITICOS = {"garcia", "rodriguez", "gonzalez","herrera"}
 
 POSICION_MAP = {
     "GK": "PT",
