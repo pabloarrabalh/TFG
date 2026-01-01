@@ -73,7 +73,8 @@ ALIAS_JUGADORES_POR_TEMPORADA = {
             # NUEVO: FBRef Álvaro Pascual -> Fantasy García Pascual
             "alvaro pascual": "garcia pascual",
         },
-        "valladolid":{"adrian baquerin": "arnu",}
+        "valladolid":{"adrian baquerin": "arnu",},
+        "leganes":{"adria altimira": "altimira",}
     },
 }
 

@@ -2,37 +2,128 @@ import os
 import re
 import pandas as pd
 from rapidfuzz import process, fuzz
+from io import StringIO
 
 from commons import (
     normalizar_texto,
     normalizar_equipo,
-    aplicar_alias_contextual,
+    añadir_equipo_y_player_norm,
     limpiar_numero_generico,
     fmt_generico,
-    añadir_equipo_y_player_norm,
-    extraer_tablas_fbref,
-    construir_diccionario_jugadores,
+    limpiar_minuto,
+    extraer_nombre_jugador,
     _posicion_csv_es_medio,
     _posicion_csv_es_defensa,
     _posicion_html,
-    normalizar_clave_html,
 )
+from fbref import (
+    normalizar_equipo_temporada,
+)
+from bs4 import BeautifulSoup
+
 
 # =====================================================
 # HELPERS DE RUTAS POR TEMPORADA
 # =====================================================
 
+
 def _carpeta_html_partidos(codigo_temporada: str, num_jornada: int) -> str:
-    # main/html/temporada_<temp>/jX/pY.html
     return os.path.join("main", "html", f"temporada_{codigo_temporada}", f"j{num_jornada}")
 
+
 def _carpeta_csv_jornada(codigo_temporada: str, num_jornada: int) -> str:
-    # data/temporada_<temp>/jornada_X/*.csv
     return os.path.join("data", f"temporada_{codigo_temporada}", f"jornada_{num_jornada}")
+
+
+# =====================================================
+# EXTRAER TABLAS FBREF Y DICCIONARIO JUGADORES
+# =====================================================
+
+
+def extraer_tablas_fbref(html_content: str):
+    soup = BeautifulSoup(html_content, "lxml")
+    tablas = []
+
+    # summary, passing, defense, possession, misc, keepers
+    tipos = ["summary", "passing", "defense", "possession", "misc", "keepers"]
+    for tipo in tipos:
+        if tipo == "keepers":
+            tablas_tipo = list(soup.find_all("table", id=re.compile(r"stats_.*_keepers")))
+            for tabla in soup.find_all("table"):
+                tid = tabla.get("id") or ""
+                if "keeper_stats_" in tid and tabla not in tablas_tipo:
+                    tablas_tipo.append(tabla)
+        else:
+            tablas_tipo = soup.find_all("table", id=re.compile(f"stats_.*_{tipo}"))
+
+        for tabla in tablas_tipo:
+            tablas.append((tipo, tabla))
+
+    return tablas
+
+
+def construir_diccionario_jugadores(tablas):
+    """
+    Construye un diccionario:
+    {
+      nombre_norm: {
+         "summary:Min": ...,
+         "summary:Gls": ...,
+         ...
+      },
+      ...
+    }
+    usando las tablas de FBRef.
+    """
+    jugadores_html = {}
+
+    for tipo, tabla_html in tablas:
+        caption = tabla_html.find("caption")
+        if caption:
+            texto_caption = caption.get_text(strip=True)
+        else:
+            texto_caption = ""
+
+        equipo_local = ""
+        equipo_visitante = ""
+
+        try:
+            df_tabla = pd.read_html(StringIO(str(tabla_html)))[0]
+        except Exception:
+            continue
+
+        columnas = []
+        for columna in df_tabla.columns.get_level_values(-1):
+            texto_columna = str(columna)
+            columnas.append(texto_columna)
+        df_tabla.columns = columnas
+
+        for _, fila in df_tabla.iterrows():
+            nombre = str(fila.get("Player", "")).strip()
+            nombre = re.sub(r"\s\(.*\)\s*", "", nombre).strip()
+            if nombre in ["nan", "Player", "Total", "Players"]:
+                continue
+            if re.match(r"^\d+\s+Players$", nombre):
+                continue
+
+            nombre = limpiar_minuto(nombre)
+            nombre_norm = normalizar_texto(nombre)
+
+            if nombre_norm not in jugadores_html:
+                jugadores_html[nombre_norm] = {}
+
+            for col in df_tabla.columns:
+                val = fila.get(col, "")
+                clave = f"{tipo}:{col}"
+                jugadores_html[nombre_norm][clave] = val
+
+    return jugadores_html
+
 
 # =====================================================
 # LÓGICA PRINCIPAL
 # =====================================================
+
 
 def mostrar_analisis_jugador(resultado):
     if not resultado["ok"]:
@@ -53,19 +144,18 @@ def mostrar_analisis_jugador(resultado):
         html_val = d["html"]
         print(f"  - {campo}: CSV={csv_val} | HTML={html_val}")
 
+
 def comparar_partido_stats_precalculado(jugadores_html, df_csv, jugador_objetivo):
     """
-    Igual que comparar_partido_stats, pero usando jugadores_html y df_csv ya
-    precalculados para no leer HTML/CSV por jugador.
+    Igualar jugador en CSV y en HTML, y preparar getters de columnas FBRef.
+    Se evita fuzzy-match HTML para jugadores sin minutos (suplentes puros).
     """
     fila_jugador = None
     equipo_jugador = None
 
-    # 1) exacto por equipo propio
+    # 1) match exacto en CSV por equipo propio
     for eq in df_csv["equipo_norm"].unique().tolist():
-        obj_norm_eq = normalizar_texto(
-            aplicar_alias_contextual(jugador_objetivo, eq)
-        )
+        obj_norm_eq = normalizar_texto(jugador_objetivo)
         cand = df_csv[
             (df_csv["equipo_norm"] == eq) & (df_csv["player_norm"] == obj_norm_eq)
         ]
@@ -74,7 +164,7 @@ def comparar_partido_stats_precalculado(jugadores_html, df_csv, jugador_objetivo
             equipo_jugador = eq
             break
 
-    # 2) fuzzy CSV si no hubo match exacto (sobre player_norm)
+    # 2) fuzzy en CSV si no hubo match exacto
     if fila_jugador is None:
         nombres_csv_norm = df_csv["player_norm"].tolist()
         match_norm, score, idx = process.extractOne(
@@ -91,11 +181,26 @@ def comparar_partido_stats_precalculado(jugadores_html, df_csv, jugador_objetivo
     if fila_jugador is None:
         return None
 
-    # 3) localizar jugador en diccionario HTML (exacto o fuzzy+posición)
-    jugador_norm = normalizar_clave_html(jugador_objetivo, equipo_jugador, jugadores_html)
+    # minutos en CSV, para decidir si tiene sentido buscarlo en HTML
+    try:
+        min_csv = float(fila_jugador.get("Min_partido", 0) or 0)
+    except Exception:
+        min_csv = 0.0
+
+    # 3) localizar jugador en diccionario HTML
+    jugador_norm = normalizar_texto(jugador_objetivo)
     nombres_html = list(jugadores_html.keys())
 
-    if jugador_norm not in jugadores_html:
+    # --- CASO 3A: si no está en HTML y no jugó minutos, no comparar ---
+    if jugador_norm not in jugadores_html and min_csv == 0:
+        # suplente sin minutos, stats FBRef no existen -> no se analiza
+        return None
+
+    # --- CASO 3B: exacto en HTML ---
+    if jugador_norm in jugadores_html:
+        row_html = jugadores_html[jugador_norm]
+    else:
+        # --- CASO 3C: fuzzy en HTML sólo si tiene minutos ---
         if not nombres_html:
             return None
 
@@ -130,8 +235,7 @@ def comparar_partido_stats_precalculado(jugadores_html, df_csv, jugador_objetivo
         candidatos_filtrados.sort(key=lambda x: x[1], reverse=True)
         match_norm_html, score_html = candidatos_filtrados[0]
         jugador_norm = match_norm_html
-
-    row_html = jugadores_html[jugador_norm]
+        row_html = jugadores_html[jugador_norm]
 
     def get_summary(col):
         return row_html.get(f"summary:{col}", "")
@@ -166,6 +270,7 @@ def comparar_partido_stats_precalculado(jugadores_html, df_csv, jugador_objetivo
         "es_portero": es_portero,
     }
 
+
 def _comparar_campos_stats(
     fila_csv,
     es_portero,
@@ -176,9 +281,6 @@ def _comparar_campos_stats(
     get_defense,
     get_possession,
 ):
-    """
-    Devuelve (campos_mal, discrepancias) usando siempre limpiar_numero_generico/fmt_generico.
-    """
     campos_a_comprobar = [
         ("Min_partido", lambda: (fila_csv.get("Min_partido", ""), get_summary("Min"))),
         ("Gol_partido", lambda: (fila_csv.get("Gol_partido", ""), get_summary("Gls"))),
@@ -190,7 +292,8 @@ def _comparar_campos_stats(
             lambda: (
                 fila_csv.get("TiroFallado_partido", ""),
                 (float(get_summary("Sh")) - float(get_summary("SoT")))
-                if get_summary("Sh") != "" and get_summary("SoT") != ""
+                if get_summary("Sh") not in ("", None)
+                and get_summary("SoT") not in ("", None)
                 else 0.0,
             ),
         ),
@@ -203,7 +306,11 @@ def _comparar_campos_stats(
             "Pases_Completados_Pct",
             lambda: (
                 fila_csv.get("Pases_Completados_Pct", ""),
-                get_passing("Cmp%") if get_passing("Cmp%") != "" else get_summary("Cmp%"),
+                (
+                    limpiar_numero_generico(get_passing("Cmp%"))
+                    if str(get_passing("Cmp%")).strip() not in ("", "-", "nan", "NaN")
+                    else limpiar_numero_generico(get_summary("Cmp%"))
+                ),
             ),
         ),
         ("Amarillas", lambda: (fila_csv.get("Amarillas", ""), get_misc("CrdY"))),
@@ -287,10 +394,8 @@ def _comparar_campos_stats(
 
     return campos_mal, discrepancias
 
+
 def analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador):
-    """
-    Versión rápida: usa jugadores_html y df_csv ya preparados para el partido.
-    """
     info = comparar_partido_stats_precalculado(jugadores_html, df_csv, nombre_jugador)
     if info is None:
         return {
@@ -320,19 +425,13 @@ def analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador
         "discrepancias": discrepancias,
     }
 
+
 # =====================================================
 # CLASIFICAR NO_ANALIZADOS SEGÚN TARJETA DESDE BANQUILLO
 # =====================================================
 
+
 def clasificar_no_analizados_tarjetas(codigo_temporada: str, no_analizados_globales):
-    """
-    Para cada jugador NO_ANALIZADO mira su CSV (jornada/partido) y comprueba:
-    - Min_partido == 0
-    - Amarillas + Rojas > 0
-    Devuelve dos listas:
-      - con_tarjeta_banquillo: los que cumplen esas condiciones
-      - otros: el resto de NO_ANALIZADO
-    """
     con_tarjeta_banquillo = []
     otros = []
 
@@ -392,14 +491,13 @@ def clasificar_no_analizados_tarjetas(codigo_temporada: str, no_analizados_globa
 
     return con_tarjeta_banquillo, otros
 
+
 # =====================================================
 # FUNCIONES PÚBLICAS CON MULTI‑TEMPORADA
 # =====================================================
 
+
 def analizar_jugador(codigo_temporada: str, num_jornada: int, num_partido: int, nombre_jugador: str):
-    """
-    Analizar un jugador concreto cargando HTML/CSV de ese partido para la temporada dada.
-    """
     carpeta_html = _carpeta_html_partidos(codigo_temporada, num_jornada)
     carpeta_csv = _carpeta_csv_jornada(codigo_temporada, num_jornada)
 
@@ -430,6 +528,7 @@ def analizar_jugador(codigo_temporada: str, num_jornada: int, num_partido: int, 
 
     resultado = analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador)
     mostrar_analisis_jugador(resultado)
+
 
 def analizar_partido_completo(codigo_temporada: str, num_jornada: int, num_partido: int,
                               errores_jornada, no_analizados_jornada):
@@ -490,6 +589,7 @@ def analizar_partido_completo(codigo_temporada: str, num_jornada: int, num_parti
                 }
             )
 
+
 def analizar_jornada_completa(codigo_temporada: str, num_jornada: int):
     carpeta_csv = _carpeta_csv_jornada(codigo_temporada, num_jornada)
     if not os.path.exists(carpeta_csv):
@@ -533,17 +633,11 @@ def analizar_jornada_completa(codigo_temporada: str, num_jornada: int):
                     f"{err['tipo']} | {err['detalle']}"
                 )
 
+
 def imprimir_resumen_global(errores_globales, no_analizados_globales, codigo_temporada: str):
-    """
-    Imprime el resumen global:
-      - Lista de NO_ANALIZADO indicando si es tarjeta desde banquillo.
-      - Mensaje de 'no hay discrepancias' si no hay CAMPOS_ERRONEOS.
-      - Tabla de errores si los hay.
-    """
     print("\n" + "=" * 80)
     print("RESUMEN GLOBAL")
 
-    # Clasificar NO_ANALIZADO según tarjetas desde banquillo
     con_tarjeta_banquillo, otros_no_analizados = clasificar_no_analizados_tarjetas(
         codigo_temporada, no_analizados_globales
     )
@@ -576,9 +670,10 @@ def imprimir_resumen_global(errores_globales, no_analizados_globales, codigo_tem
         detalle = err['detalle']
         print(f"{jornada:7s} | {partido:7s} | {equipo:15s} | {jugador:25s} | {tipo:15s} | {detalle}")
 
+
 def analizar_rango_jornadas(codigo_temporada: str, jornada_inicio: int, jornada_fin: int):
-    errores_globales = []        # solo CAMPOS_ERRONEOS
-    no_analizados_globales = []  # solo NO_ANALIZADO
+    errores_globales = []
+    no_analizados_globales = []
 
     for j in range(jornada_inicio, jornada_fin + 1):
         carpeta_csv = _carpeta_csv_jornada(codigo_temporada, j)
@@ -630,12 +725,9 @@ def analizar_rango_jornadas(codigo_temporada: str, jornada_inicio: int, jornada_
 
     imprimir_resumen_global(errores_globales, no_analizados_globales, codigo_temporada)
 
+
 def comparar_jugador_completo(codigo_temporada: str, num_jornada: int,
                               num_partido: int, nombre_jugador: str):
-    """
-    Muestra por consola una comparativa CSV vs HTML de todas las stats
-    para un jugador concreto en un partido concreto.
-    """
     carpeta_html = _carpeta_html_partidos(codigo_temporada, num_jornada)
     carpeta_csv = _carpeta_csv_jornada(codigo_temporada, num_jornada)
 
@@ -716,6 +808,6 @@ def comparar_jugador_completo(codigo_temporada: str, num_jornada: int,
             ok = "✓"
         print(f"{campo:35s} | {csv_v:>10s} | {html_v:>10s} | {ok:>3s}")
 
+
 if __name__ == "__main__":
-    # ejemplo: temporada "25_26", jornadas 1-17
-    analizar_rango_jornadas("24_25", 1, 5)
+    analizar_rango_jornadas("24_25", 10, 20)
