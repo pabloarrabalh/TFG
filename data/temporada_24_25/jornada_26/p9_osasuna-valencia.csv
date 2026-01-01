@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Ante Budimir,DT,osasuna,valencia,1,90,1,1,0.9,0.2,2,2,0,16,37.5,0,0,0.0,0.0,0.0,10,2,1,0,1,0,0,0,0,1,0,1,16,73.0,31.0,1,5,3,62.5
+Bryan Zaragoza,DT,osasuna,valencia,1,72,0,0,0.1,0.0,3,1,2,31,71.0,0,0,0.0,0.0,0.0,3,1,2,0,1,0,0,0,0,4,0,4,33,272.0,116.0,5,1,0,100.0
+Moi Gómez,MC,osasuna,valencia,0,18,0,0,0.0,0.0,0,0,0,9,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,3,35.0,0.0,0,0,0,0.0
+Rubén García,DT,osasuna,valencia,1,90,0,0,0.0,0.0,0,0,0,47,72.3,0,0,0.0,0.0,0.0,6,0,3,0,3,1,0,1,1,0,0,0,33,174.0,77.0,3,0,1,0.0
+Aimar Oroz,MC,osasuna,valencia,1,54,2,0,0.2,0.1,2,0,2,30,90.0,0,0,0.0,0.0,0.0,15,0,1,0,1,0,0,0,0,2,1,1,21,148.0,76.0,3,0,0,0.0
+Kike Barja,DT,osasuna,valencia,0,36,0,0,0.0,0.0,1,1,0,7,42.9,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,2,0,0,0,8,90.0,62.0,3,0,0,0.0
+Lucas Torró,MC,osasuna,valencia,1,90,0,0,0.0,0.2,0,0,0,57,80.7,1,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,1,0,0,0,35,172.0,56.0,1,4,3,57.1
+Jon Moncayola,MC,osasuna,valencia,1,71,0,0,0.0,0.0,0,0,0,40,82.5,0,0,0.0,0.0,0.0,2,6,4,0,2,2,0,2,0,0,0,0,24,64.0,19.0,0,0,0,0.0
+Iker Muñoz,MC,osasuna,valencia,0,19,0,0,0.0,0.0,0,0,0,6,83.3,1,0,0.0,0.0,0.0,0,1,1,0,0,1,0,1,0,0,0,0,3,15.0,0.0,0,0,1,0.0
+Abel Bretones,DF,osasuna,valencia,1,71,0,0,0.0,0.0,0,0,0,49,81.6,0,0,0.0,0.0,0.0,4,3,1,0,0,1,0,1,4,1,1,0,36,249.0,155.0,3,0,1,0.0
+Juan Cruz Armada,DF,osasuna,valencia,0,19,0,0,0.0,0.0,0,0,0,10,90.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,7,29.0,23.0,0,0,0,0.0
+Catena,DF,osasuna,valencia,1,90,0,0,0.2,0.1,1,1,0,57,94.7,0,0,0.0,0.0,0.0,5,2,2,0,0,0,0,0,6,0,0,0,39,157.0,79.0,0,3,2,60.0
+Enzo Boyomo,DF,osasuna,valencia,1,90,0,0,0.0,0.0,1,1,0,41,90.2,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,36,163.0,63.0,1,0,1,0.0
+Jesús Areso,DF,osasuna,valencia,1,82,0,1,0.0,0.1,0,0,0,45,88.9,0,0,0.0,0.0,0.0,4,2,2,0,0,0,0,0,1,6,1,4,35,289.0,94.0,2,0,0,0.0
+Rubén Peña,DF,osasuna,valencia,0,8,0,0,0.0,0.0,0,0,0,12,66.7,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,1,0,4,36.0,12.0,1,0,0,0.0
+Sergio Herrera,PT,osasuna,valencia,1,90,0,0,0.0,0.0,0,0,0,41,78.0,0,0,3.0,40.0,2.4,4,0,1,0,1,0,0,0,1,0,0,0,25,158.0,95.0,0,0,0,0.0
+Umar Sadiq,DT,valencia,osasuna,1,90,2,0,0.7,0.0,2,0,2,23,65.2,0,0,0.0,0.0,0.0,12,0,0,0,0,0,0,0,0,1,0,1,16,59.0,17.0,0,1,1,50.0
+Diego López,MC,valencia,osasuna,1,79,1,0,0.8,0.0,2,1,1,26,80.8,0,0,0.0,0.0,0.0,7,0,2,0,2,0,0,0,0,2,1,1,19,75.0,30.0,0,0,0,0.0
+Sergi Canós,MC,valencia,osasuna,0,11,0,1,0.0,0.1,0,0,0,4,100.0,0,0,0.0,0.0,0.0,6,0,0,0,0,0,0,0,0,0,0,0,3,13.0,4.0,0,0,1,0.0
+Luis Rioja,DF,valencia,osasuna,1,90,0,1,0.1,0.6,2,1,1,44,63.6,1,0,0.0,0.0,0.0,8,3,2,0,0,2,0,2,1,6,4,2,29,208.0,60.0,2,1,0,100.0
+Ivan Jaime Pajuelo,MC,valencia,osasuna,1,55,0,0,0.0,0.0,1,0,1,11,81.8,0,0,0.0,0.0,0.0,1,1,1,0,0,0,0,0,0,1,0,1,8,39.0,23.0,1,0,0,0.0
+Rafa Mir,MC,valencia,osasuna,0,35,0,0,0.1,0.0,2,2,0,12,91.7,0,0,0.0,0.0,0.0,2,1,1,0,1,0,0,0,0,0,0,0,7,30.0,8.0,0,1,0,100.0
+Enzo Barrenechea,MC,valencia,osasuna,1,79,0,0,0.0,0.0,1,1,0,54,85.2,0,0,0.0,0.0,0.0,5,3,2,0,0,0,0,0,2,4,3,1,35,241.0,145.0,5,4,3,57.1
+José Luis García Vayá,MC,valencia,osasuna,0,11,0,0,0.0,0.0,0,0,0,11,63.6,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,1,0,0,0,5,19.0,10.0,0,0,1,0.0
+Javier Guerra,MC,valencia,osasuna,1,66,0,1,0.0,0.7,1,1,0,31,90.3,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,1,2,0,2,23,108.0,73.0,1,0,0,0.0
+Domingos André Ribeiro Almeida,MC,valencia,osasuna,0,24,0,0,0.0,0.0,0,0,0,14,85.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,0,1,11,56.0,36.0,1,0,0,0.0
+José Luis Gayà,DF,valencia,osasuna,1,66,0,0,0.0,0.2,1,1,0,38,86.8,0,0,0.0,0.0,0.0,1,2,2,0,0,2,0,2,3,0,0,0,14,57.0,35.0,1,1,0,100.0
+Francisco Perez,MC,valencia,osasuna,0,24,0,0,0.0,0.0,0,0,0,13,69.2,0,0,0.0,0.0,0.0,2,0,1,0,1,2,0,2,0,1,1,0,9,131.0,81.0,3,1,0,100.0
+Cristhian Mosquera,DF,valencia,osasuna,1,90,0,0,0.0,0.0,0,0,0,74,95.9,0,0,0.0,0.0,0.0,1,2,1,0,0,1,0,1,4,0,0,0,55,287.0,207.0,4,0,1,0.0
+César Tárrega,DF,valencia,osasuna,1,90,0,0,0.0,0.0,1,1,0,54,85.2,0,0,0.0,0.0,0.0,2,2,2,0,0,0,0,0,6,0,0,0,34,173.0,110.0,0,3,2,60.0
+Dimitri Foulquier,DF,valencia,osasuna,1,90,0,0,0.0,0.0,0,0,0,43,83.7,0,0,0.0,0.0,0.0,-1,1,0,0,0,0,0,0,1,0,0,0,26,134.0,87.0,0,0,4,0.0
+Giorgi Mamardashvili,PT,valencia,osasuna,1,90,0,0,0.0,0.0,0,0,0,28,71.4,0,0,3.0,60.0,1.9,2,0,0,0,0,0,0,0,0,0,0,0,13,49.0,23.0,0,0,0,0.0

@@ -1,0 +1,32 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Juanmi Latasa,DT,valladolid,osasuna,1,85,0,0,0.3,0.2,4,4,0,18,72.2,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,1,4,1,3,8,12.0,0.0,0,5,3,62.5
+Marcos André,DT,valladolid,osasuna,0,5,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,1,0,100.0
+Raúl Moro,MC,valladolid,osasuna,1,90,1,0,0.6,0.0,3,1,2,43,67.4,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,1,6,3,2,30,266.0,136.0,2,0,1,0.0
+Florian Grillitsch,MC,valladolid,osasuna,1,45,0,0,0.0,0.0,0,0,0,21,81.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,1,0,11,50.0,40.0,1,0,0,0.0
+Mamadou Sylla,DT,valladolid,osasuna,0,45,1,0,0.8,0.1,0,0,0,9,66.7,0,0,0.0,0.0,0.0,9,0,1,0,1,0,0,0,0,0,0,0,6,19.0,7.0,0,0,1,0.0
+Chuky san jose,MC,valladolid,osasuna,1,62,0,0,0.2,0.0,1,0,1,13,76.9,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,0,1,0,1,7,51.0,34.0,0,0,1,0.0
+Mario Martín,MC,valladolid,osasuna,0,28,0,0,0.0,0.0,0,0,0,23,82.6,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,12,73.0,13.0,0,0,1,0.0
+Darwin Machís,MC,valladolid,osasuna,1,45,0,0,0.0,0.0,1,1,0,23,69.6,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,1,4,1,3,14,71.0,23.0,0,1,0,100.0
+Iván Sánchez,MC,valladolid,osasuna,0,45,0,0,0.0,0.1,0,0,0,24,83.3,0,0,0.0,0.0,0.0,3,1,1,0,1,0,0,0,0,0,0,0,18,96.0,53.0,1,1,0,100.0
+Stanko Jurić,MC,valladolid,osasuna,1,90,0,0,0.0,0.0,1,0,1,53,83.0,0,0,0.0,0.0,0.0,2,3,2,0,1,1,0,1,0,2,1,1,28,120.0,59.0,1,4,4,50.0
+Henrique,DF,valladolid,osasuna,1,62,0,0,0.0,0.0,0,0,0,57,84.2,0,0,0.0,0.0,0.0,0,1,0,0,0,0,0,0,1,4,1,2,40,200.0,138.0,2,0,1,0.0
+Adam Aznou,DF,valladolid,osasuna,0,28,0,0,0.0,0.0,0,0,0,21,85.7,0,0,0.0,0.0,0.0,4,3,3,0,1,1,0,1,1,6,4,2,17,161.0,121.0,5,0,0,0.0
+Javi Sánchez,DF,valladolid,osasuna,1,90,0,0,0.0,0.0,0,0,0,77,96.1,1,0,0.0,0.0,0.0,0,2,0,0,0,0,0,0,2,0,0,0,41,156.0,33.0,0,1,1,50.0
+Joseph Aidoo,DF,valladolid,osasuna,1,90,0,0,0.0,0.0,1,1,0,73,91.8,0,0,0.0,0.0,0.0,3,1,0,0,0,3,2,1,3,0,0,0,52,324.0,192.0,1,2,0,100.0
+Antonio Candela,DF,valladolid,osasuna,1,90,0,0,0.0,0.1,0,0,0,57,86.0,0,0,0.0,0.0,0.0,1,0,3,0,3,1,0,1,1,2,1,1,43,259.0,105.0,2,0,1,0.0
+André Ferreira,PT,valladolid,osasuna,1,90,0,0,0.0,0.0,0,0,0,28,89.3,0,0,3.0,66.7,2.7,4,0,0,0,0,0,0,0,1,0,0,0,18,81.0,57.0,0,0,0,0.0
+Rubén García,DT,osasuna,valladolid,1,72,1,1,0.9,0.3,1,0,1,35,77.1,0,0,0.0,0.0,0.0,13,0,0,0,0,0,0,0,0,0,0,0,29,116.0,51.0,1,0,1,0.0
+Moi Gómez,MC,osasuna,valladolid,0,18,0,0,0.0,0.0,1,0,1,22,90.9,0,0,0.0,0.0,0.0,3,1,1,0,0,0,0,0,0,1,1,0,18,99.0,37.0,1,0,0,0.0
+Ante Budimir,DT,osasuna,valladolid,1,90,2,0,1.4,0.0,4,3,1,13,76.9,0,0,0.0,0.0,0.0,14,2,1,0,0,0,0,0,0,1,0,1,12,22.0,3.0,0,1,2,33.3
+Aimar Oroz,MC,osasuna,valladolid,1,90,0,0,0.0,0.0,0,0,0,47,89.4,1,0,0.0,0.0,0.0,3,2,4,0,4,0,0,0,0,0,0,0,44,246.0,92.0,2,0,0,0.0
+Lucas Torró,MC,osasuna,valladolid,1,90,0,0,0.0,0.0,2,1,1,49,77.6,0,0,0.0,0.0,0.0,2,1,3,0,2,0,0,0,0,0,0,0,34,168.0,53.0,0,5,4,55.6
+Jon Moncayola,MC,osasuna,valladolid,1,5,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,6.0,5.0,1,0,1,0.0
+Pablo Ibáñez,MC,osasuna,valladolid,0,81,0,0,0.0,0.0,1,0,1,32,87.5,0,0,0.0,0.0,0.0,2,2,8,0,7,2,1,1,1,2,1,1,28,160.0,60.0,1,0,0,0.0
+Iker Muñoz,MC,osasuna,valladolid,0,4,0,0,0.0,0.0,0,0,0,7,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,4,4.0,3.0,0,0,0,0.0
+Abel Bretones,DF,osasuna,valladolid,1,90,0,0,0.0,0.1,1,1,0,61,78.7,0,0,0.0,0.0,0.0,6,6,3,0,0,1,1,0,2,4,4,0,42,178.0,111.0,3,1,2,33.3
+Jorge Herrando,DF,osasuna,valladolid,1,90,0,0,0.0,0.0,0,0,0,55,98.2,0,0,0.0,0.0,0.0,0,1,1,0,0,1,1,0,5,0,0,0,46,180.0,77.0,0,1,0,100.0
+Catena,DF,osasuna,valladolid,1,90,0,0,0.0,0.0,0,0,0,62,91.9,0,0,0.0,0.0,0.0,6,1,1,0,0,1,1,0,7,0,0,0,50,240.0,161.0,0,3,2,60.0
+Enzo Boyomo,DF,osasuna,valladolid,1,90,0,0,0.0,0.0,0,0,0,59,89.8,0,0,0.0,0.0,0.0,4,3,2,0,0,1,1,0,7,0,0,0,46,212.0,130.0,1,0,3,0.0
+Jesús Areso,DF,osasuna,valladolid,1,85,0,1,0.0,0.9,0,0,0,41,80.5,0,0,0.0,0.0,0.0,6,4,4,0,0,0,0,0,0,1,1,0,25,79.0,42.0,0,2,0,100.0
+Rubén Peña,DF,osasuna,valladolid,0,5,0,0,0.0,0.0,0,0,0,13,69.2,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,9,13.0,4.0,0,0,0,0.0
+Sergio Herrera,PT,osasuna,valladolid,1,90,0,0,0.0,0.0,0,0,0,38,71.1,0,0,2.0,80.0,1.4,6,0,0,0,0,0,0,0,2,1,1,0,26,176.0,95.0,0,1,0,100.0

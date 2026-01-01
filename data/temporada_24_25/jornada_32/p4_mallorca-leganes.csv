@@ -1,0 +1,30 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Cyle Larin,DT,mallorca,leganes,1,90,0,0,0.3,0.1,2,2,0,13,69.2,0,0,0.0,0.0,0.0,5,1,1,0,1,0,0,0,1,3,2,1,19,88.0,27.0,2,2,3,40.0
+Abdón Prats,DT,mallorca,leganes,1,63,0,0,0.2,0.1,1,1,0,10,60.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,1,0,0,0,8,26.0,3.0,0,1,2,33.3
+Marc Domenech,MC,mallorca,leganes,0,27,0,0,0.1,0.1,2,2,0,5,80.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,0,0,0,5,11.0,0.0,0,2,0,100.0
+Sergi Darder,MC,mallorca,leganes,1,90,0,0,0.1,0.1,2,2,0,54,74.1,0,0,0.0,0.0,0.0,9,0,1,0,1,0,0,0,1,1,0,1,46,186.0,88.0,0,0,0,0.0
+Samu Costa,MC,mallorca,leganes,1,90,0,0,0.0,0.0,0,0,0,45,71.1,0,0,0.0,0.0,0.0,6,3,1,0,1,0,0,0,2,3,1,1,35,135.0,29.0,1,0,0,0.0
+Dani Rodríguez,MC,mallorca,leganes,1,63,0,0,0.0,0.0,0,0,0,25,76.0,1,0,0.0,0.0,0.0,5,2,1,0,1,1,0,1,0,1,1,0,22,65.0,26.0,1,1,0,100.0
+Antonio Sánchez,MC,mallorca,leganes,0,27,0,0,0.1,0.0,2,1,1,8,62.5,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,2,1,1,8,22.0,13.0,0,0,1,0.0
+Johan Mojica,DF,mallorca,leganes,1,84,0,0,0.0,0.0,0,0,0,58,70.7,0,0,0.0,0.0,0.0,8,0,1,0,1,0,0,0,3,2,1,0,37,141.0,68.0,3,0,1,0.0
+Mateu Morey,MC,mallorca,leganes,0,6,0,0,0.0,0.1,0,0,0,9,55.6,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,4,20.0,13.0,0,1,0,100.0
+Copete,DF,mallorca,leganes,1,90,0,0,0.1,0.0,1,1,0,48,87.5,0,0,0.0,0.0,0.0,10,2,0,0,0,1,1,0,11,0,0,0,36,182.0,108.0,0,6,0,100.0
+Antonio Raillo,DF,mallorca,leganes,1,90,0,0,0.0,0.0,0,0,0,62,91.9,0,0,0.0,0.0,0.0,10,0,0,0,0,3,2,1,7,0,0,0,46,238.0,171.0,0,6,3,66.7
+Martin Valjent,DF,mallorca,leganes,1,90,0,0,0.1,0.0,1,1,0,50,76.0,0,0,0.0,0.0,0.0,9,0,0,0,0,1,1,0,7,0,0,0,33,164.0,72.0,2,1,1,50.0
+Pablo Maffeo,DF,mallorca,leganes,1,83,0,0,0.0,0.0,0,0,0,30,73.3,1,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,2,3,2,1,19,84.0,43.0,2,1,0,100.0
+Toni Lato,MC,mallorca,leganes,0,7,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,1,0,2,0,0,0,3,22.0,21.0,1,1,0,100.0
+Dominik Greif,PT,mallorca,leganes,1,90,0,0,0.0,0.0,0,0,0,28,78.6,0,0,0.0,100.0,0.3,10,0,0,0,0,0,0,0,0,0,0,0,12,63.0,34.0,0,0,0,0.0
+Diego,DT,leganes,mallorca,1,75,0,0,0.0,0.0,0,0,0,7,85.7,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,0,0,0,7,21.0,3.0,0,1,7,12.5
+Miguel,DT,leganes,mallorca,0,15,0,0,0.1,0.0,2,2,0,2,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,3,4.0,1.0,0,1,0,100.0
+Adrià Altimira,DT,leganes,mallorca,1,90,0,0,0.0,0.2,0,0,0,27,74.1,0,0,0.0,0.0,0.0,8,1,3,0,2,0,0,0,2,1,0,0,17,84.0,58.0,3,0,2,0.0
+Yan Diomandé,DT,leganes,mallorca,1,90,0,0,0.1,0.1,1,1,0,22,63.6,0,0,0.0,0.0,0.0,0,1,2,0,2,5,0,5,1,2,2,0,20,180.0,127.0,3,0,3,0.0
+Seydouba Cissé,MC,leganes,mallorca,1,75,0,0,0.1,0.0,2,1,1,34,88.2,0,0,0.0,0.0,0.0,6,1,0,0,0,0,0,0,1,0,0,0,24,90.0,39.0,2,0,0,0.0
+Óscar Rodríguez Arnaiz,MC,leganes,mallorca,0,15,0,0,0.2,0.0,2,2,0,7,71.4,0,0,0.0,0.0,0.0,3,1,2,0,2,0,0,0,0,0,0,0,6,9.0,6.0,0,0,0,0.0
+Yvan Neyou,MC,leganes,mallorca,1,79,0,0,0.0,0.0,0,0,0,40,85.0,1,0,0.0,0.0,0.0,5,1,1,0,1,1,0,1,1,0,0,0,29,90.0,39.0,1,1,0,100.0
+Darko Brašanac,MC,leganes,mallorca,0,11,0,0,0.1,0.0,1,1,0,4,50.0,0,0,0.0,0.0,0.0,2,1,1,0,0,1,0,1,0,1,1,0,1,5.0,2.0,0,1,1,50.0
+Renato Tapia,MC,leganes,mallorca,1,90,0,0,0.0,0.1,0,0,0,24,62.5,0,0,0.0,0.0,0.0,7,1,1,0,0,0,0,0,1,0,0,0,9,45.0,29.0,0,0,2,0.0
+Javi Hernández,DF,leganes,mallorca,1,90,0,0,0.1,0.0,3,3,0,59,71.2,0,0,0.0,0.0,0.0,6,0,1,0,1,0,0,0,2,2,2,0,31,190.0,125.0,2,1,0,100.0
+Sergi,DF,leganes,mallorca,1,90,0,0,0.0,0.0,0,0,0,37,83.8,0,0,0.0,0.0,0.0,9,2,1,0,1,2,2,0,7,0,0,0,21,81.0,29.0,0,4,4,50.0
+Jorge Sáenz,DF,leganes,mallorca,1,90,0,0,0.1,0.0,1,1,0,29,69.0,0,0,0.0,0.0,0.0,8,1,0,0,0,0,0,0,7,0,0,0,18,58.0,15.0,0,2,3,40.0
+Valentin Rosier,DF,leganes,mallorca,1,90,0,0,0.2,0.1,3,3,0,39,84.6,0,0,0.0,0.0,0.0,10,2,2,0,0,2,0,2,2,2,1,0,30,269.0,182.0,3,0,0,0.0
+Marko Dmitrović,PT,leganes,mallorca,1,90,0,0,0.0,0.0,0,0,0,32,28.1,0,0,0.0,100.0,0.0,8,0,0,0,0,0,0,0,0,0,0,0,14,81.0,59.0,0,0,0,0.0

@@ -1,0 +1,31 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Mikel Oyarzabal,DT,real sociedad,mallorca,1,90,0,0,0.0,0.0,1,0,1,21,71.4,1,0,0.0,0.0,0.0,0,0,0,0,0,2,0,2,0,3,1,2,17,124.0,60.0,4,1,4,20.0
+Ander Barrenetxea,DT,real sociedad,mallorca,1,45,0,0,0.0,0.0,0,0,0,22,77.3,0,0,0.0,0.0,0.0,1,2,1,0,1,1,0,1,0,2,0,1,13,109.0,64.0,2,0,0,0.0
+Sergio Gómez,MC,real sociedad,mallorca,0,45,0,0,0.0,0.2,0,0,0,26,65.4,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,0,0,0,0,7,28.0,9.0,0,1,1,50.0
+Takefusa Kubo,DT,real sociedad,mallorca,1,71,0,0,0.1,0.1,3,3,0,44,81.8,0,0,0.0,0.0,0.0,3,1,2,0,2,0,0,0,0,4,1,2,30,208.0,122.0,4,0,0,0.0
+Arkaitz Mariezkurrena,MC,real sociedad,mallorca,0,19,0,0,0.2,0.0,2,2,0,14,57.1,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,13,64.0,37.0,1,1,0,100.0
+Pablo Marín,MC,real sociedad,mallorca,1,71,0,0,0.1,0.0,2,1,1,24,75.0,0,0,0.0,0.0,0.0,1,3,1,0,0,2,0,2,0,2,0,2,16,61.0,30.0,1,1,3,25.0
+Olasagasti,MC,real sociedad,mallorca,0,19,0,0,0.0,0.0,0,0,0,8,87.5,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,3,34.0,1.0,0,0,0,0.0
+Martín Zubimendi,MC,real sociedad,mallorca,1,90,0,0,0.1,0.0,1,0,1,51,76.5,1,0,0.0,0.0,0.0,1,2,2,0,1,1,0,1,6,0,0,0,35,253.0,142.0,2,5,5,50.0
+Luka Sučić,MC,real sociedad,mallorca,1,55,0,0,0.0,0.1,1,1,0,32,78.1,0,0,0.0,0.0,0.0,2,1,2,0,2,0,0,0,0,2,1,1,18,135.0,52.0,1,0,2,0.0
+Orri Steinn Óskarsson,DT,real sociedad,mallorca,0,35,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,4,23.0,14.0,1,0,0,0.0
+Aihen Muñoz,DF,real sociedad,mallorca,1,90,0,0,0.0,0.0,1,1,0,70,74.3,0,0,0.0,0.0,0.0,-2,5,2,0,1,1,0,1,2,0,0,0,39,176.0,94.0,5,0,1,0.0
+Aritz Elustondo,DF,real sociedad,mallorca,1,90,0,0,0.0,0.0,1,1,0,76,88.2,1,0,0.0,0.0,0.0,1,1,0,0,0,1,0,1,6,1,0,1,54,374.0,183.0,3,2,4,33.3
+Jon Martin,DF,real sociedad,mallorca,1,90,0,0,0.1,0.1,3,2,1,91,90.1,0,0,0.0,0.0,0.0,6,2,2,0,1,0,0,0,9,0,0,0,62,354.0,216.0,1,11,0,100.0
+Jon Aramburu,DF,real sociedad,mallorca,1,90,0,0,0.0,0.0,0,0,0,80,90.0,0,0,0.0,0.0,0.0,0,7,6,0,2,2,0,2,1,1,0,0,47,173.0,102.0,0,1,2,33.3
+Álex Remiro,PT,real sociedad,mallorca,1,90,0,0,0.0,0.0,0,0,0,16,75.0,0,0,2.0,33.3,0.2,1,0,0,0,0,0,0,0,0,0,0,0,8,58.0,41.0,0,0,0,0.0
+Dani Rodríguez,DT,mallorca,real sociedad,1,71,0,1,0.0,0.1,0,0,0,18,55.6,0,0,0.0,0.0,0.0,9,0,1,0,1,0,0,0,0,0,0,0,13,49.0,6.0,0,0,7,0.0
+Omar Mascarell,DT,mallorca,real sociedad,0,19,0,0,0.0,0.0,0,0,0,9,77.8,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,4,16.0,9.0,0,1,0,100.0
+Cyle Larin,DT,mallorca,real sociedad,1,78,1,0,0.3,0.0,1,0,1,13,69.2,0,0,0.0,0.0,0.0,9,1,0,0,0,1,0,1,0,1,0,1,11,26.0,4.0,0,5,6,45.5
+Abdón Prats,DT,mallorca,real sociedad,0,12,0,0,0.2,0.0,1,1,0,4,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,7,13.0,3.0,0,2,1,66.7
+Sergi Darder,MC,mallorca,real sociedad,1,90,1,1,0.0,0.3,1,0,1,31,61.3,0,0,0.0,0.0,0.0,19,1,0,0,0,0,0,0,1,6,4,1,25,144.0,77.0,2,0,1,0.0
+Samu Costa,MC,mallorca,real sociedad,1,90,0,0,0.0,0.0,0,0,0,35,85.7,0,0,0.0,0.0,0.0,8,3,4,0,1,2,1,1,5,3,2,1,14,66.0,41.0,1,4,1,80.0
+Antonio Sánchez,MC,mallorca,real sociedad,1,84,0,0,0.1,0.0,2,2,0,17,64.7,0,0,0.0,0.0,0.0,5,2,1,0,0,0,0,0,1,1,1,0,9,31.0,20.0,0,2,1,66.7
+Mateu Morey,MC,mallorca,real sociedad,0,6,0,0,0.0,0.0,0,0,0,6,83.3,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,7,34.0,4.0,0,0,0,0.0
+Johan Mojica,DF,mallorca,real sociedad,1,83,0,0,0.0,0.2,0,0,0,34,85.3,0,0,0.0,0.0,0.0,10,3,2,0,1,2,1,1,4,3,1,2,18,90.0,60.0,1,0,2,0.0
+Toni Lato,DF,mallorca,real sociedad,0,7,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,2,0,0,0,1,2.0,2.0,0,0,0,0.0
+Copete,DF,mallorca,real sociedad,1,90,0,0,0.0,0.0,0,0,0,26,76.9,0,0,0.0,0.0,0.0,10,3,0,0,0,3,2,1,13,0,0,0,17,55.0,21.0,0,3,0,100.0
+Antonio Raillo,DF,mallorca,real sociedad,1,90,0,0,0.0,0.0,1,0,1,26,96.2,0,0,0.0,0.0,0.0,10,1,1,0,1,0,0,0,11,0,0,0,16,94.0,29.0,0,3,1,75.0
+Martin Valjent,DF,mallorca,real sociedad,1,90,0,0,0.0,0.0,1,1,0,31,77.4,0,0,0.0,0.0,0.0,8,2,1,0,0,2,2,0,9,0,0,0,14,65.0,3.0,0,2,3,40.0
+Pablo Maffeo,DF,mallorca,real sociedad,1,90,0,0,0.0,0.1,0,0,0,28,60.7,1,0,0.0,0.0,0.0,6,2,2,0,0,1,0,1,9,4,2,2,20,98.0,52.0,2,0,0,0.0
+Dominik Greif,PT,mallorca,real sociedad,1,90,0,0,0.0,0.0,0,0,0,37,43.2,0,0,0.0,100.0,0.8,11,0,0,0,0,0,0,0,0,0,0,0,16,65.0,16.0,0,0,0,0.0

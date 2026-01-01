@@ -1,0 +1,31 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Isaac Romero,DT,sevilla,mallorca,1,90,0,0,0.2,0.2,2,2,0,17,82.4,0,0,0.0,0.0,0.0,3,2,2,0,2,0,0,0,0,1,0,1,14,52.0,35.0,1,2,2,50.0
+Ruben Vargas,DT,sevilla,mallorca,1,81,0,0,0.1,0.1,2,1,1,39,74.4,0,0,0.0,0.0,0.0,8,0,0,0,0,2,0,2,2,4,1,1,32,172.0,106.0,6,0,1,0.0
+Chidera Ejuke,DT,sevilla,mallorca,0,9,0,0,0.1,0.0,1,1,0,2,100.0,0,0,0.0,0.0,0.0,1,1,2,0,1,0,0,0,0,0,0,0,4,49.0,43.0,1,0,0,0.0
+Dodi Lukebakio,DT,sevilla,mallorca,1,90,0,0,0.1,0.0,3,3,0,32,68.8,0,0,0.0,0.0,0.0,5,2,3,0,1,0,0,0,0,5,3,2,28,207.0,127.0,4,1,0,100.0
+Juanlu Sánchez,MC,sevilla,mallorca,1,85,0,0,0.0,0.1,0,0,0,18,77.8,0,0,0.0,0.0,0.0,5,0,3,0,3,1,0,1,0,0,0,0,14,100.0,74.0,3,0,2,0.0
+Manu Bueno,MC,sevilla,mallorca,0,5,0,0,0.0,0.0,0,0,0,1,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,0,1,2,11.0,0.0,0,0,0,0.0
+Saúl Ñíguez,MC,sevilla,mallorca,1,90,0,0,0.1,0.2,2,2,0,62,77.4,0,0,0.0,0.0,0.0,8,3,1,0,0,0,0,0,2,3,2,1,32,162.0,45.0,0,0,2,0.0
+Djibril Sow,MC,sevilla,mallorca,1,81,0,0,0.0,0.0,1,0,1,57,87.7,0,0,0.0,0.0,0.0,6,3,2,0,1,1,0,1,0,1,1,0,35,191.0,66.0,0,1,2,33.3
+Lucien Agoume,MC,sevilla,mallorca,0,9,0,0,0.1,0.0,1,1,0,4,75.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,2,7.0,0.0,0,0,0,0.0
+Adrià Pedrosa,DF,sevilla,mallorca,1,90,0,0,0.0,0.1,2,2,0,60,81.7,0,0,0.0,0.0,0.0,7,1,0,0,0,1,1,0,3,2,2,0,36,262.0,175.0,2,2,1,66.7
+Kike Salas,DF,sevilla,mallorca,1,90,1,0,0.5,0.0,4,3,1,60,86.7,0,0,0.0,0.0,0.0,16,5,2,0,0,2,1,1,7,0,0,0,33,103.0,43.0,0,3,2,60.0
+Loïc Bade,DF,sevilla,mallorca,1,90,0,0,0.0,0.1,0,0,0,59,81.4,0,0,0.0,0.0,0.0,4,2,3,0,1,1,0,1,5,0,0,0,35,134.0,82.0,0,4,1,80.0
+Carmona,DF,sevilla,mallorca,1,90,0,0,0.0,0.0,1,1,0,59,72.9,1,0,0.0,0.0,0.0,4,3,4,0,2,1,0,1,8,1,1,0,23,225.0,157.0,3,3,1,75.0
+Ørjan Nyland,PT,sevilla,mallorca,1,90,0,0,0.0,0.0,0,0,0,25,52.0,0,0,1.0,50.0,1.0,2,0,0,0,0,0,0,0,0,0,0,0,12,85.0,52.0,0,1,0,100.0
+Vedat Muriqi,DT,mallorca,sevilla,1,76,0,0,0.3,0.5,2,1,1,16,68.8,0,0,0.0,0.0,0.0,9,1,0,0,0,0,0,0,4,3,2,1,15,74.0,22.0,1,6,5,54.5
+Cyle Larin,DT,mallorca,sevilla,0,14,0,0,0.6,0.0,2,2,0,2,50.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,0,1,6,36.0,6.0,1,0,1,0.0
+Dani Rodríguez,MC,mallorca,sevilla,1,76,0,0,0.0,0.2,0,0,0,30,86.7,0,0,0.0,0.0,0.0,6,2,2,0,1,2,0,2,0,5,3,2,20,154.0,68.0,1,0,1,0.0
+Abdón Prats,DT,mallorca,sevilla,0,14,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,0,0,0,1,1.0,0.0,0,1,0,100.0
+Sergi Darder,MC,mallorca,sevilla,1,76,0,0,0.0,0.0,0,0,0,29,82.8,1,0,0.0,0.0,0.0,2,2,1,0,1,1,0,1,1,0,0,0,18,80.0,42.0,0,0,1,0.0
+Antonio Sánchez,MC,mallorca,sevilla,0,14,0,0,0.0,0.0,0,0,0,9,77.8,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,4,21.0,3.0,0,0,1,0.0
+Omar Mascarell,MC,mallorca,sevilla,1,90,0,0,0.0,0.0,1,1,0,49,81.6,0,0,0.0,0.0,0.0,5,0,2,0,2,3,2,1,1,2,2,0,31,119.0,27.0,0,4,2,66.7
+Takuma Asano,MC,mallorca,sevilla,1,66,0,0,0.2,0.0,1,1,0,12,58.3,0,0,0.0,0.0,0.0,4,0,1,0,1,1,0,1,1,1,0,1,9,86.0,52.0,3,0,2,0.0
+Roberto Navarro,MC,mallorca,sevilla,0,24,0,0,0.7,0.0,2,2,0,12,66.7,0,0,0.0,0.0,0.0,2,0,1,0,1,1,0,1,0,4,1,2,14,86.0,60.0,2,0,0,0.0
+Johan Mojica,DF,mallorca,sevilla,1,90,0,0,0.1,0.6,2,2,0,46,60.9,1,0,0.0,0.0,0.0,2,3,4,0,2,0,0,0,0,2,0,2,30,181.0,92.0,3,0,1,0.0
+Copete,DF,mallorca,sevilla,1,90,0,0,0.0,0.0,0,0,0,53,69.8,0,0,0.0,0.0,0.0,3,0,0,0,0,1,0,1,4,0,0,0,39,173.0,97.0,1,0,1,0.0
+Antonio Raillo,DF,mallorca,sevilla,1,90,0,0,0.1,0.0,2,2,0,56,91.1,1,0,0.0,0.0,0.0,6,3,2,0,0,0,0,0,7,0,0,0,35,223.0,137.0,3,2,1,66.7
+Martin Valjent,DF,mallorca,sevilla,1,90,1,0,0.2,0.0,1,0,1,39,82.1,0,0,0.0,0.0,0.0,11,2,1,0,0,2,2,0,3,1,0,1,25,127.0,58.0,0,0,1,0.0
+Pablo Maffeo,DF,mallorca,sevilla,1,84,0,0,0.0,0.3,0,0,0,42,69.0,0,0,0.0,0.0,0.0,1,1,1,0,1,0,0,0,1,2,1,1,30,133.0,68.0,1,1,0,100.0
+Valery Fernández,DF,mallorca,sevilla,0,6,0,0,0.0,0.0,0,0,0,4,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,7.0,2.0,0,0,0,0.0
+Dominik Greif,PT,mallorca,sevilla,1,90,0,0,0.0,0.0,0,0,0,36,66.7,0,0,1.0,66.7,1.0,7,0,0,0,0,0,0,0,0,2,2,0,19,79.0,39.0,0,0,0,0.0

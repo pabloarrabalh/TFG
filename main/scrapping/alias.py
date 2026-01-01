@@ -51,7 +51,7 @@ ALIAS_JUGADORES_POR_TEMPORADA = {
     },
     "24_25": {
         "atletico madrid": {"alexander sorloth": "sorloth"},
-        "las palmas":{"fabio": "fabio gonzalez",},
+        "las palmas":{"fabio": "fabio gonzalez","jose carlos gonzalez": "josito", },
         "athletic": {  "nico williams": "n williams", "inaki williams": "i williams", },
         "rayo": {"isaac palazon camacho": "isi"},
         "valencia": {"jose luis garcia vaya": "pepelu"},
@@ -76,6 +76,7 @@ ALIAS_JUGADORES_POR_TEMPORADA = {
         "sevilla": {
             # NUEVO: FBRef Álvaro Pascual -> Fantasy García Pascual
             "alvaro pascual": "garcia pascual",
+            "diego iturralde": "hormigo",
         },
         "valladolid":{"adrian baquerin": "arnu",},
         "leganes":{"adria altimira": "altimira",}

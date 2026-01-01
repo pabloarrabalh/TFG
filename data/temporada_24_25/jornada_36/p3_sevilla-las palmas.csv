@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Álvaro Pascual,DT,sevilla,las palmas,1,73,1,0,0.1,0.0,1,0,1,12,58.3,0,0,0.0,0.0,0.0,10,1,1,0,1,1,0,1,1,0,0,0,8,37.0,14.0,1,4,2,66.7
+Leandro Antonetti,DT,sevilla,las palmas,0,17,0,0,0.1,0.0,1,0,1,3,33.3,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,0,1,4,40.0,39.0,1,0,0,0.0
+Dodi Lukebakio,DT,sevilla,las palmas,1,90,0,0,0.6,0.0,2,2,0,28,75.0,0,0,0.0,0.0,0.0,4,1,1,0,0,0,0,0,1,2,1,1,22,209.0,91.0,3,0,1,0.0
+Suso,DT,sevilla,las palmas,1,90,0,0,0.1,0.0,1,1,0,47,59.6,1,0,0.0,0.0,0.0,4,4,2,0,1,0,0,0,2,5,2,3,24,158.0,51.0,2,0,0,0.0
+Albert Sambi Lokonga,MC,sevilla,las palmas,1,58,0,0,0.3,0.1,3,2,1,21,90.5,0,0,0.0,0.0,0.0,3,1,0,0,0,1,0,1,0,0,0,0,17,120.0,78.0,2,0,2,0.0
+Nemanja Gudelj,MC,sevilla,las palmas,0,32,0,0,0.0,0.0,0,0,0,8,87.5,1,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,4,0,0,0,3,9.0,0.0,0,2,1,66.7
+Djibril Sow,MC,sevilla,las palmas,1,75,0,0,0.0,0.0,1,1,0,32,84.4,0,0,0.0,0.0,0.0,7,1,1,0,0,2,1,1,0,0,0,0,14,84.0,44.0,2,1,0,100.0
+Saúl Ñíguez,MC,sevilla,las palmas,0,15,0,0,0.0,0.0,0,0,0,5,20.0,1,0,0.0,0.0,0.0,0,0,1,0,1,0,0,0,1,0,0,0,0,0.0,0.0,0,2,0,100.0
+Lucien Agoume,MC,sevilla,las palmas,1,90,0,1,0.0,0.2,0,0,0,45,77.8,1,0,0.0,0.0,0.0,13,4,3,0,1,3,1,2,3,2,2,0,23,94.0,62.0,1,0,2,0.0
+Carmona,DF,sevilla,las palmas,1,90,0,0,0.1,0.1,1,1,0,37,73.0,0,0,0.0,0.0,0.0,9,1,0,0,0,3,0,3,2,1,0,0,18,160.0,98.0,4,0,0,0.0
+Kike Salas,DF,sevilla,las palmas,1,43,0,0,0.0,0.0,0,0,0,22,77.3,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,3,0,0,0,12,77.0,61.0,1,1,2,33.3
+Ramón Martínez,DF,sevilla,las palmas,0,47,0,0,0.0,0.0,0,0,0,9,100.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,5,0,0,0,4,9.0,1.0,0,1,0,100.0
+Loïc Bade,DF,sevilla,las palmas,1,90,0,0,0.0,0.0,0,0,0,37,81.1,1,0,0.0,0.0,0.0,8,4,2,0,0,3,2,1,8,0,0,0,28,182.0,102.0,0,2,2,50.0
+Juanlu Sánchez,DF,sevilla,las palmas,1,90,0,0,0.0,0.3,0,0,0,50,78.0,1,0,0.0,0.0,0.0,6,8,4,0,0,4,2,2,2,2,2,0,21,126.0,65.0,2,0,0,0.0
+Ørjan Nyland,PT,sevilla,las palmas,1,90,0,0,0.0,0.0,0,0,0,35,51.4,0,0,0.0,100.0,0.5,10,0,0,0,0,0,0,0,0,0,0,0,17,139.0,100.0,0,0,0,0.0
+Oliver McBurnie,DT,las palmas,sevilla,1,90,0,0,0.0,0.1,0,0,0,5,40.0,1,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,2,0,0,0,4,7.0,1.0,0,4,5,44.4
+Adnan Januzaj,DT,las palmas,sevilla,1,69,0,0,0.2,0.0,4,2,2,28,78.6,0,0,0.0,0.0,0.0,5,0,1,0,1,1,0,1,1,2,0,1,27,184.0,98.0,2,2,0,100.0
+Marc Cardona,DT,las palmas,sevilla,0,21,0,0,0.0,0.0,0,0,0,5,60.0,1,0,0.0,0.0,0.0,0,2,0,0,0,0,0,0,0,1,0,1,7,20.0,5.0,0,0,1,0.0
+Alberto Moleiro,MC,las palmas,sevilla,1,81,0,0,0.0,0.1,0,0,0,34,79.4,0,0,0.0,0.0,0.0,4,1,0,0,0,0,0,0,0,4,1,3,32,181.0,92.0,5,0,0,0.0
+Jaime Mata,MC,las palmas,sevilla,0,9,0,0,0.0,0.0,0,0,0,2,50.0,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,2,4.0,3.0,0,0,1,0.0
+José Campaña,MC,las palmas,sevilla,1,69,0,0,0.0,0.0,1,0,1,50,86.0,1,0,0.0,0.0,0.0,3,1,2,0,1,1,1,0,0,0,0,0,33,127.0,62.0,1,0,0,0.0
+Manuel Fuster,MC,las palmas,sevilla,0,21,0,0,0.0,0.0,0,0,0,27,77.8,0,0,0.0,0.0,0.0,5,2,1,0,0,0,0,0,0,1,1,0,18,142.0,102.0,3,0,0,0.0
+Stefan Bajcetic,MC,las palmas,sevilla,1,50,0,0,0.0,0.0,1,1,0,20,75.0,0,0,0.0,0.0,0.0,1,1,1,0,0,1,0,1,2,4,1,3,9,55.0,27.0,1,2,1,66.7
+Dario Essugo,DF,las palmas,sevilla,0,40,0,0,0.0,0.0,1,1,0,28,92.9,0,0,0.0,0.0,0.0,3,1,0,0,0,1,1,0,0,0,0,0,16,141.0,108.0,3,0,0,0.0
+Sandro Ramírez,MC,las palmas,sevilla,1,90,0,0,0.1,0.0,5,5,0,26,65.4,0,0,0.0,0.0,0.0,2,1,0,0,0,2,0,2,1,3,1,2,27,150.0,44.0,2,0,1,0.0
+Mika Mármol,DF,las palmas,sevilla,1,90,0,0,0.0,0.0,0,0,0,59,57.6,1,0,0.0,0.0,0.0,1,2,3,0,2,3,0,3,6,1,0,1,29,119.0,73.0,2,1,0,100.0
+Juan Herzog,DF,las palmas,sevilla,1,90,0,0,0.0,0.0,0,0,0,48,87.5,0,0,0.0,0.0,0.0,6,0,2,0,2,1,1,0,9,1,0,1,32,116.0,55.0,0,3,3,50.0
+Álex Suárez,DF,las palmas,sevilla,1,69,0,0,0.0,0.0,1,1,0,43,79.1,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,4,0,0,0,25,124.0,67.0,0,0,0,0.0
+Javier Muñoz,MC,las palmas,sevilla,0,21,0,0,0.0,0.0,1,1,0,19,94.7,1,0,0.0,0.0,0.0,1,2,1,0,0,0,0,0,0,0,0,0,10,53.0,24.0,1,0,0,0.0
+Viti,DF,las palmas,sevilla,1,81,0,0,0.0,0.0,0,0,0,33,84.8,0,0,0.0,0.0,0.0,5,1,0,0,0,1,1,0,3,0,0,0,18,121.0,72.0,3,0,0,0.0
+Marvin,DF,las palmas,sevilla,0,9,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,2,3.0,2.0,0,0,1,0.0
+Dinko Horkaš,PT,las palmas,sevilla,1,90,0,0,0.0,0.0,0,0,0,44,77.3,0,0,1.0,66.7,1.2,6,0,0,0,0,0,0,0,1,0,0,0,34,141.0,92.0,0,0,0,0.0

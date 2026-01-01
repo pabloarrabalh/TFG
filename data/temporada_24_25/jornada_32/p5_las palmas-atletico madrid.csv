@@ -1,0 +1,32 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Fábio Silva,DT,las palmas,atletico madrid,1,82,0,0,0.0,0.0,0,0,0,22,72.7,0,0,0.0,0.0,0.0,3,1,0,0,0,1,0,1,1,3,1,1,10,58.0,10.0,0,3,4,42.9
+Jaime Mata,DT,las palmas,atletico madrid,0,8,0,0,0.0,0.0,0,0,0,3,33.3,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,2,0,100.0
+Oliver McBurnie,DT,las palmas,atletico madrid,1,66,0,0,0.0,0.0,0,0,0,10,50.0,0,0,0.0,0.0,0.0,3,0,0,0,0,1,0,1,1,1,0,1,8,16.0,0.0,0,3,3,50.0
+Marvin,MC,las palmas,atletico madrid,0,24,0,0,0.0,0.0,1,1,0,7,57.1,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,1,1,0,6,13.0,7.0,0,0,0,0.0
+Alberto Moleiro,MC,las palmas,atletico madrid,1,82,0,0,0.0,0.0,1,1,0,38,76.3,0,0,0.0,0.0,0.0,7,0,1,0,1,2,0,2,0,5,2,3,33,252.0,127.0,4,0,0,0.0
+José Campaña,MC,las palmas,atletico madrid,0,8,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,18.0,11.0,0,0,0,0.0
+Stefan Bajcetic,MC,las palmas,atletico madrid,1,90,0,0,0.0,0.0,1,1,0,38,60.5,0,0,0.0,0.0,0.0,5,3,2,0,0,2,0,2,0,0,0,0,17,113.0,65.0,0,1,2,33.3
+Dario Essugo,MC,las palmas,atletico madrid,1,78,0,0,0.1,0.0,2,2,0,31,74.2,1,0,0.0,0.0,0.0,6,3,0,0,0,2,0,2,3,2,1,1,19,74.0,31.0,0,3,1,75.0
+Sandro Ramírez,MC,las palmas,atletico madrid,0,12,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,2,7.0,3.0,0,0,1,0.0
+Javier Muñoz,MC,las palmas,atletico madrid,1,90,1,0,0.2,0.0,2,1,1,27,74.1,1,0,0.0,0.0,0.0,12,1,1,0,1,0,0,0,1,0,0,0,15,103.0,43.0,1,1,0,100.0
+Mika Mármol,DF,las palmas,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,50,78.0,0,0,0.0,0.0,0.0,9,3,1,0,0,2,0,2,6,0,0,0,18,81.0,48.0,0,1,1,50.0
+Scott McKenna,DF,las palmas,atletico madrid,1,90,0,0,0.0,0.3,0,0,0,47,91.5,0,0,0.0,0.0,0.0,11,0,0,0,0,0,0,0,9,0,0,0,34,208.0,94.0,0,4,3,57.1
+Álex Suárez,DF,las palmas,atletico madrid,1,90,0,0,0.3,0.0,1,0,1,51,90.2,0,0,0.0,0.0,0.0,9,1,1,0,0,1,0,1,4,0,0,0,34,178.0,97.0,1,0,4,0.0
+Viti,DF,las palmas,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,45,71.1,0,0,0.0,0.0,0.0,5,2,0,0,0,2,1,1,2,0,0,0,18,116.0,65.0,3,0,0,0.0
+Dinko Horkaš,PT,las palmas,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,48,79.2,0,0,0.0,100.0,0.8,11,0,0,0,0,0,0,0,0,0,0,0,29,133.0,81.0,0,0,0,0.0
+Alexander Sørloth,DT,atletico madrid,las palmas,1,74,0,0,0.2,0.0,3,2,1,10,80.0,0,0,0.0,0.0,0.0,5,1,0,0,0,0,0,0,1,0,0,0,4,1.0,1.0,0,7,2,77.8
+Ángel Correa,DT,atletico madrid,las palmas,0,16,0,0,0.0,0.0,0,0,0,5,40.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,4,44.0,37.0,1,0,1,0.0
+Julián Álvarez,DT,atletico madrid,las palmas,1,64,0,0,0.4,0.0,1,0,1,26,65.4,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,0,0,0,17,64.0,19.0,1,0,1,0.0
+Antoine Griezmann,DT,atletico madrid,las palmas,0,26,0,0,0.1,0.0,1,1,0,15,93.3,0,0,0.0,0.0,0.0,2,0,0,0,0,2,1,1,0,0,0,0,12,28.0,15.0,0,1,0,100.0
+Conor Gallagher,MC,atletico madrid,las palmas,1,58,0,0,0.1,0.0,1,1,0,25,76.0,0,0,0.0,0.0,0.0,4,2,1,0,0,0,0,0,2,1,0,1,22,92.0,21.0,1,0,1,0.0
+Rodrigo Riquelme,MC,atletico madrid,las palmas,0,32,0,0,0.0,0.0,0,0,0,13,84.6,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,0,1,13,22.0,6.0,0,0,0,0.0
+Koke,MC,atletico madrid,las palmas,1,58,0,0,0.0,0.0,0,0,0,57,78.9,0,0,0.0,0.0,0.0,3,3,0,0,0,2,1,1,2,0,0,0,40,199.0,102.0,2,0,0,0.0
+Rodrigo De Paul,MC,atletico madrid,las palmas,0,32,0,0,0.0,0.1,0,0,0,37,81.1,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,0,0,0,29,164.0,80.0,2,0,0,0.0
+Pablo Barrios,MC,atletico madrid,las palmas,1,90,0,0,0.0,0.1,0,0,0,59,79.7,0,0,0.0,0.0,0.0,3,2,3,0,1,2,1,1,1,2,1,1,51,271.0,131.0,3,2,1,66.7
+Giuliano Simeone,MC,atletico madrid,las palmas,1,90,0,0,0.0,0.5,1,1,0,41,82.9,0,0,0.0,0.0,0.0,5,2,3,0,2,1,0,1,0,3,1,1,36,191.0,100.0,5,0,1,0.0
+Javi Galán,DF,atletico madrid,las palmas,1,64,0,0,0.0,0.0,0,0,0,39,82.1,1,0,0.0,0.0,0.0,5,0,0,0,0,1,0,1,5,2,0,1,30,100.0,57.0,1,0,3,0.0
+César Azpilicueta,DF,atletico madrid,las palmas,0,26,0,0,0.0,0.0,0,0,0,25,84.0,0,0,0.0,0.0,0.0,1,0,0,0,0,2,1,1,2,0,0,0,17,70.0,55.0,1,0,2,0.0
+Robin Le Normand,DF,atletico madrid,las palmas,1,90,0,0,0.0,0.0,0,0,0,69,87.0,0,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,4,0,0,0,55,234.0,130.0,1,5,2,71.4
+José María Giménez,DF,atletico madrid,las palmas,1,90,0,0,0.0,0.0,0,0,0,85,88.2,0,0,0.0,0.0,0.0,5,1,2,0,1,3,0,3,5,0,0,0,70,267.0,159.0,0,3,3,50.0
+Marcos Llorente,DF,atletico madrid,las palmas,1,90,0,0,0.0,0.2,0,0,0,62,82.3,0,0,0.0,0.0,0.0,4,2,1,0,1,1,0,1,0,0,0,0,52,235.0,115.0,2,0,1,0.0
+Jan Oblak,PT,atletico madrid,las palmas,1,90,0,0,0.0,0.0,0,0,0,30,90.0,0,0,1.0,50.0,0.4,5,0,0,0,0,0,0,0,2,0,0,0,18,103.0,43.0,0,1,0,100.0

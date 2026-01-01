@@ -1,0 +1,32 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Gorka Guruzeta,DT,athletic,mallorca,1,53,0,0,0.1,0.0,1,1,0,6,100.0,0,0,0.0,0.0,0.0,1,0,1,0,1,1,1,0,0,0,0,0,4,1.0,0.0,0,1,3,25.0
+Iñaki Williams,DT,athletic,mallorca,0,37,0,0,0.0,0.0,1,1,0,8,25.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,1,1,0,1,11,95.0,34.0,2,0,0,0.0
+Nico Williams,DT,athletic,mallorca,1,90,1,0,0.5,0.0,4,2,2,34,52.9,0,0,0.0,0.0,0.0,11,0,1,0,1,2,1,1,1,9,4,4,36,324.0,151.0,5,2,2,50.0
+Álex Berenguer,DT,athletic,mallorca,1,77,0,0,0.0,0.0,0,0,0,25,56.0,0,0,0.0,0.0,0.0,4,1,0,0,0,3,0,3,3,1,0,1,14,125.0,12.0,0,1,0,100.0
+Unai Gómez,MC,athletic,mallorca,0,13,0,0,0.1,0.0,2,2,0,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,2.0,0.0,0,1,0,100.0
+Peio Canales,MC,athletic,mallorca,1,53,0,0,0.0,0.0,0,0,0,19,73.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,1,1,12,98.0,39.0,2,0,1,0.0
+Maroan Sannadi,DT,athletic,mallorca,0,37,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,0,1,5,5.0,1.0,0,1,3,25.0
+Beñat Prados,MC,athletic,mallorca,1,90,0,0,0.0,0.2,0,0,0,47,87.2,0,0,0.0,0.0,0.0,7,3,1,0,1,0,0,0,3,3,2,1,31,174.0,97.0,2,3,3,50.0
+Mikel Jauregizar,MC,athletic,mallorca,1,90,0,0,0.0,0.0,0,0,0,46,71.7,0,0,0.0,0.0,0.0,4,1,1,0,1,0,0,0,1,2,1,1,30,136.0,76.0,1,0,0,0.0
+Adama Boiro,DF,athletic,mallorca,1,77,0,0,0.0,0.0,0,0,0,39,82.1,0,0,0.0,0.0,0.0,4,2,1,0,0,1,0,1,0,1,1,0,19,155.0,107.0,2,1,1,50.0
+Iñigo Lekue,DF,athletic,mallorca,0,13,0,0,0.0,0.1,0,0,0,19,89.5,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,1,1,0,13,78.0,42.0,1,0,0,0.0
+Aitor Paredes,DF,athletic,mallorca,1,56,0,0,0.0,0.0,0,0,0,37,86.5,0,0,0.0,0.0,0.0,4,1,0,0,0,0,0,0,4,0,0,0,19,122.0,78.0,0,1,1,50.0
+Unai Núñez,DF,athletic,mallorca,0,34,0,0,0.0,0.0,0,0,0,32,93.8,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,4,0,0,0,26,128.0,69.0,0,4,3,57.1
+Yeray Álvarez,DF,athletic,mallorca,1,90,0,0,0.0,0.0,0,0,0,69,85.5,0,0,0.0,0.0,0.0,8,1,1,0,0,0,0,0,12,0,0,0,38,268.0,216.0,3,4,3,57.1
+Andoni Gorosabel,DF,athletic,mallorca,1,90,0,1,0.0,0.4,0,0,0,72,84.7,1,0,0.0,0.0,0.0,7,2,1,0,1,3,0,3,2,0,0,0,25,121.0,83.0,2,1,0,100.0
+Unai Simón,PT,athletic,mallorca,1,90,0,0,0.0,0.0,0,0,0,31,64.5,0,0,1.0,50.0,0.6,3,0,0,0,0,0,0,0,0,0,0,0,18,76.0,55.0,0,0,0,0.0
+Vedat Muriqi,DT,mallorca,athletic,1,84,0,0,0.1,0.0,1,1,0,29,44.8,0,0,0.0,0.0,0.0,1,1,1,0,0,1,0,1,0,1,0,1,17,35.0,20.0,1,5,8,38.5
+Cyle Larin,DT,mallorca,athletic,0,6,0,0,0.0,0.0,0,0,0,6,83.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,0,0,0,4,15.0,2.0,0,2,0,100.0
+Sergi Darder,MC,mallorca,athletic,1,71,0,1,0.0,0.1,1,1,0,31,83.9,0,0,0.0,0.0,0.0,11,1,0,0,0,0,0,0,1,1,1,0,19,73.0,25.0,0,0,1,0.0
+Manu Morlanes,MC,mallorca,athletic,0,19,0,0,0.0,0.0,0,0,0,6,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,2,10.0,1.0,0,0,0,0.0
+Omar Mascarell,MC,mallorca,athletic,1,71,0,0,0.0,0.0,1,1,0,20,90.0,0,0,0.0,0.0,0.0,3,1,3,0,2,0,0,0,2,0,0,0,7,34.0,4.0,0,0,0,0.0
+Dani Rodríguez,MC,mallorca,athletic,0,19,0,0,0.0,0.0,0,0,0,6,66.7,0,0,0.0,0.0,0.0,3,1,1,0,0,0,0,0,0,0,0,0,3,18.0,0.0,0,0,2,0.0
+Samu Costa,MC,mallorca,athletic,1,90,0,0,0.3,0.0,2,2,0,34,70.6,0,0,0.0,0.0,0.0,1,5,7,0,5,1,1,0,2,0,0,0,16,34.0,8.0,0,3,2,60.0
+Takuma Asano,MC,mallorca,athletic,1,58,0,0,0.0,0.1,0,0,0,9,55.6,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,0,0,0,0,9,38.0,20.0,1,1,3,25.0
+Antonio Sánchez,MC,mallorca,athletic,0,32,0,0,0.0,0.0,1,1,0,13,84.6,1,0,0.0,0.0,0.0,0,0,1,0,1,0,0,0,1,1,1,0,12,39.0,29.0,2,0,0,0.0
+Johan Mojica,DF,mallorca,athletic,1,90,0,0,0.0,0.3,0,0,0,52,73.1,0,0,0.0,0.0,0.0,8,1,0,0,0,2,0,2,7,2,2,0,35,167.0,93.0,2,1,2,33.3
+Copete,DF,mallorca,athletic,1,90,0,0,0.0,0.0,0,0,0,45,84.4,1,0,0.0,0.0,0.0,7,5,2,0,0,0,0,0,11,0,0,0,27,123.0,39.0,0,3,0,100.0
+Antonio Raillo,DF,mallorca,athletic,1,90,1,0,0.1,0.0,3,1,2,30,83.3,1,0,0.0,0.0,0.0,13,0,0,0,0,0,0,0,9,0,0,0,23,99.0,52.0,0,3,1,75.0
+Martin Valjent,DF,mallorca,athletic,1,90,0,0,0.0,0.0,0,0,0,32,84.4,0,0,0.0,0.0,0.0,7,2,0,0,0,0,0,0,9,1,1,0,16,47.0,31.0,0,2,1,66.7
+Pablo Maffeo,DF,mallorca,athletic,1,90,0,0,0.0,0.0,0,0,0,37,56.8,0,0,0.0,0.0,0.0,4,4,4,0,1,1,0,1,4,1,0,1,21,116.0,63.0,1,0,0,0.0
+Dominik Greif,PT,mallorca,athletic,1,90,0,0,0.0,0.0,0,0,0,44,68.2,0,0,1.0,50.0,0.2,4,0,0,0,0,0,0,0,0,0,0,0,25,126.0,101.0,0,0,0,0.0

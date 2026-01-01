@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Maroan Sannadi,DT,athletic,valladolid,1,63,1,0,1.3,0.1,2,0,2,8,75.0,0,0,0.0,0.0,0.0,10,0,0,0,0,1,0,1,0,1,0,1,10,33.0,1.0,0,0,0,0.0
+Gorka Guruzeta,DT,athletic,valladolid,0,27,1,0,0.5,0.1,4,2,2,6,100.0,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,1,0,0,0,3,4.0,0.0,0,1,0,100.0
+Nico Williams,DT,athletic,valladolid,1,67,2,1,0.2,0.1,3,1,2,26,76.9,0,0,0.0,0.0,0.0,19,1,1,0,0,1,0,1,0,2,2,0,18,134.0,105.0,3,0,1,0.0
+Peio Canales,DT,athletic,valladolid,0,23,0,0,0.0,0.1,0,0,0,9,100.0,0,0,0.0,0.0,0.0,3,1,1,0,0,0,0,0,0,1,1,0,5,49.0,31.0,1,0,0,0.0
+Iñaki Williams,DT,athletic,valladolid,1,90,1,1,1.0,0.5,4,1,3,42,66.7,0,0,0.0,0.0,0.0,16,0,0,0,0,1,0,1,1,4,2,2,35,153.0,100.0,4,2,0,100.0
+Oihan Sancet,MC,athletic,valladolid,1,67,1,0,0.4,0.0,5,4,1,31,83.9,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,2,1,0,23,128.0,73.0,3,0,0,0.0
+Álex Berenguer,MC,athletic,valladolid,0,23,0,0,0.0,0.1,1,0,1,11,90.9,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,7,47.0,13.0,1,0,0,0.0
+Mikel Vesga,MC,athletic,valladolid,1,90,0,0,0.1,0.1,2,0,2,47,91.5,0,0,0.0,0.0,0.0,6,3,3,0,1,0,0,0,0,0,0,0,26,143.0,90.0,4,1,2,33.3
+Mikel Jauregizar,MC,athletic,valladolid,1,63,1,1,0.2,0.1,3,0,3,34,82.4,0,0,0.0,0.0,0.0,17,2,4,0,4,2,0,2,1,1,0,0,24,113.0,27.0,1,2,1,66.7
+Iñigo Ruiz de Galarreta,MC,athletic,valladolid,0,27,0,0,0.1,0.0,1,1,0,18,77.8,1,0,0.0,0.0,0.0,1,2,2,0,1,0,0,0,0,0,0,0,8,69.0,45.0,2,0,1,0.0
+Yuri Berchiche,DF,athletic,valladolid,1,90,0,2,0.0,0.8,1,1,0,63,90.5,0,0,0.0,0.0,0.0,15,0,0,0,0,2,0,2,0,1,1,0,33,185.0,149.0,3,0,0,0.0
+Aitor Paredes,DF,athletic,valladolid,1,90,0,0,0.0,0.0,0,0,0,50,94.0,0,0,0.0,0.0,0.0,5,0,0,0,0,1,1,0,3,0,0,0,27,137.0,80.0,0,1,0,100.0
+Daniel Vivian,DF,athletic,valladolid,1,90,0,0,0.0,0.1,0,0,0,56,87.5,1,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,2,0,0,0,31,251.0,197.0,2,0,2,0.0
+Óscar de Marcos,DF,athletic,valladolid,1,74,0,0,0.0,0.1,1,1,0,45,86.7,0,0,0.0,0.0,0.0,6,1,3,0,2,1,0,1,0,1,0,1,18,69.0,35.0,1,0,4,0.0
+Iñigo Lekue,DF,athletic,valladolid,0,16,0,0,0.2,0.0,2,2,0,5,80.0,0,0,0.0,0.0,0.0,2,1,2,0,1,0,0,0,0,0,0,0,3,29.0,26.0,2,0,1,0.0
+Unai Simón,PT,athletic,valladolid,1,90,0,0,0.0,0.0,0,0,0,13,84.6,0,0,1.0,66.7,0.5,6,0,0,0,0,0,0,0,0,0,0,0,6,27.0,16.0,0,0,0,0.0
+Marcos André,DT,valladolid,athletic,1,67,0,0,0.0,0.0,0,0,0,10,60.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,1,3,2,1,10,57.0,10.0,0,2,0,100.0
+Tamás Nikitscher,MC,valladolid,athletic,0,23,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,3,17.0,13.0,0,0,0,0.0
+Chuky san jose,MC,valladolid,athletic,1,45,0,0,0.0,0.0,0,0,0,11,63.6,0,0,0.0,0.0,0.0,-1,1,1,0,1,1,0,1,0,1,0,1,8,29.0,5.0,0,0,2,0.0
+Raúl Moro,MC,valladolid,athletic,0,45,0,1,0.2,0.3,2,1,1,11,54.5,0,0,0.0,0.0,0.0,8,0,1,0,1,0,0,0,0,4,2,2,11,143.0,74.0,3,1,0,100.0
+Stanko Jurić,MC,valladolid,athletic,1,55,0,0,0.0,0.0,0,0,0,18,88.9,2,1,0.0,0.0,0.0,-3,2,0,0,0,0,0,0,0,0,0,0,4,22.0,13.0,0,0,0,0.0
+Mario Martín,MC,valladolid,athletic,1,60,0,0,0.0,0.0,1,1,0,30,83.3,1,0,0.0,0.0,0.0,0,2,1,0,1,1,0,1,1,4,2,2,12,117.0,39.0,0,1,0,100.0
+Florian Grillitsch,MC,valladolid,athletic,0,30,0,0,0.0,0.2,0,0,0,11,81.8,0,0,0.0,0.0,0.0,1,0,0,0,0,1,1,0,0,2,1,1,3,36.0,8.0,0,0,0,0.0
+Mamadou Sylla,DT,valladolid,athletic,1,90,1,0,0.3,0.0,1,0,1,19,57.9,0,0,0.0,0.0,0.0,5,1,0,0,0,2,0,2,0,0,0,0,8,17.0,0.0,0,7,2,77.8
+Antonio Candela,DF,valladolid,athletic,1,45,0,0,0.0,0.0,0,0,0,22,59.1,0,0,0.0,0.0,0.0,-3,2,1,0,0,1,0,1,2,1,1,0,8,104.0,65.0,1,0,1,0.0
+Darwin Machís,MC,valladolid,athletic,0,45,0,0,0.0,0.0,1,0,1,18,61.1,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,14,86.0,41.0,1,0,0,0.0
+David Torres,DF,valladolid,athletic,1,90,0,0,0.0,0.0,0,0,0,39,69.2,0,0,0.0,0.0,0.0,-2,5,4,0,1,1,1,0,3,1,1,0,21,163.0,101.0,1,0,1,0.0
+Joseph Aidoo,DF,valladolid,athletic,1,64,0,0,0.0,0.0,0,0,0,35,97.1,0,0,0.0,0.0,0.0,-1,1,0,0,0,0,0,0,1,0,0,0,21,82.0,50.0,0,0,0,0.0
+Eray Cömert,DF,valladolid,athletic,0,26,0,0,0.0,0.0,0,0,0,10,100.0,0,0,0.0,0.0,0.0,-1,0,0,0,0,1,1,0,1,0,0,0,3,9.0,3.0,0,0,1,0.0
+Javi Sánchez,DF,valladolid,athletic,1,90,0,0,0.0,0.0,0,0,0,40,82.5,0,0,0.0,0.0,0.0,-2,2,1,0,1,1,1,0,3,0,0,0,25,140.0,56.0,1,0,0,0.0
+Luis Pérez,DF,valladolid,athletic,1,90,0,0,0.0,0.0,0,0,0,29,82.8,0,0,0.0,0.0,0.0,-4,1,1,0,1,0,0,0,3,0,0,0,6,16.0,11.0,0,1,0,100.0
+Karl Jakob Hein,PT,valladolid,athletic,1,90,0,0,0.0,0.0,0,0,0,46,80.4,0,0,7.0,56.3,5.8,1,0,1,0,1,0,0,0,0,0,0,0,17,81.0,66.0,0,0,0,0.0
