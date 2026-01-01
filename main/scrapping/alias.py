@@ -56,8 +56,19 @@ ALIAS_JUGADORES_POR_TEMPORADA = {
         "betis": {"ezequiel avila": "chimy", },
         "espanyol": {"antoniu": "roca"},
         "mallorca": {"antonio sanchez": "antonio"},
-        "girona": {"arnau martinez": "arnau","yangel herrera": "herrera",},
-        "getafe": { "bertug yildirim": "yildirim", "john joe finn": "patrick finn",},
+        "girona": {
+        # FBRef: Arnau Martinez  -> Fantasy: Arnau
+        "arnau martinez": "arnau",
+        "arnaut danjuma": "danjuma",
+        # FBRef: Yangel Herrera   -> Fantasy: Herrera (esto ya lo tenías)
+        "yangel herrera": "herrera",
+        },
+        "getafe": {
+        # FBRef: Bertuğ Yıldırım  -> Fantasy: Yildirim
+        "bertug yıldırım": "yildirim",
+        # FBRef: John Joe         -> Fantasy: Patrick Finn
+        "john joe": "patrick finn",
+        }, 
     },
 }
 
