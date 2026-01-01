@@ -2,6 +2,8 @@
 import os
 import re
 import pandas as pd
+from rapidfuzz import fuzz
+
 
 from commons import (
     normalizar_equipo,
@@ -14,9 +16,11 @@ from commons import (
 from alias import get_alias_jugadores_reverse  # usamos alias invertidos
 
 
+
 # =====================================================
 # RUTAS POR TEMPORADA
 # =====================================================
+
 
 def _build_rutas_temporada(codigo_temporada: str):
     """
@@ -30,19 +34,16 @@ def _build_rutas_temporada(codigo_temporada: str):
     return carpeta_html, carpeta_csv
 
 
+
 # =====================================================
 # WRAPPER PARA LEER puntos.html USANDO fbref.py
 # =====================================================
 
+
 def scrapear_puntos_fantasy(path_html: str, codigo_temporada: str):
     """
-    Lee puntos.html de una jornada y devuelve:
-    {
-      'betis-leganes': [(equipo_raw, nombre_html, puntos), ...],
-      ...
-    }
-    reutilizando obtener_fantasy_jornada de fbref.py y
-    forzando la temporada correcta.
+    Devuelve:
+    { 'betis-leganes': [(equipo_raw, nombre_html, puntos, pos_fantasy), ...], ... }
     """
     m = re.search(r"[\\/](j(\d+))[\\/]puntos\.html$", path_html)
     if not m:
@@ -50,32 +51,32 @@ def scrapear_puntos_fantasy(path_html: str, codigo_temporada: str):
 
     num_jornada = int(m.group(2))
 
-    # importamos aquí para evitar dependencias circulares
     import fbref
 
-    # Forzar temporada y rutas en fbref
     fbref.TEMPORADA_ACTUAL = codigo_temporada
     fbref.CARPETA_HTML, fbref.CARPETA_CSV = fbref._build_rutas_temporada(codigo_temporada)
 
     mapa_fantasy = fbref.obtener_fantasy_jornada(num_jornada)
-    # mapa_fantasy: { 'betis-leganes': { clave_ff: info, ... }, ... }
     resultado = {}
 
     for clave_partido, mapa_puntos in (mapa_fantasy or {}).items():
         lista = []
         for _, info in mapa_puntos.items():
-            equipo_raw = info.get("equipo")            # nombre original del equipo en Fantasy
-            nombre_html = info.get("nombre_original")  # texto mostrado en puntos.html
+            equipo_raw = info.get("equipo")
+            nombre_html = info.get("nombre_original")
             puntos = info.get("puntos", 0)
-            lista.append((equipo_raw, nombre_html, puntos))
+            pos_fantasy = info.get("posicion")
+            lista.append((equipo_raw, nombre_html, puntos, pos_fantasy))
         resultado[clave_partido] = lista
 
     return resultado
 
 
+
 # =====================================================
 # REGISTRO DE ERRORES
 # =====================================================
+
 
 def registrar_error(errores,
                     partido,
@@ -98,6 +99,7 @@ def registrar_error(errores,
     )
 
 
+
 def mostrar_errores(errores):
     if not errores:
         print("Sin errores de puntos.")
@@ -114,9 +116,11 @@ def mostrar_errores(errores):
         )
 
 
+
 # =====================================================
-# LOG LIGERO DE CLAVES POR PARTIDO (DESACTIVADO)
+# LOG LIGERO (DESACTIVADO)
 # =====================================================
+
 
 def _log_claves_partido(clave_partido, puntos_html_por_partido, df_partido):
     # claves_html = list(puntos_html_por_partido.keys())
@@ -127,17 +131,21 @@ def _log_claves_partido(clave_partido, puntos_html_por_partido, df_partido):
     pass
 
 
+
 # =====================================================
 # LOG ESPECIAL PARA HERRERA / ARNAU / YILDIRIM
 # =====================================================
 
+
 OBJ_ESPECIALES = {"herrera", "arnau", "yildirim"}
+
 
 
 def _es_especial(nombre_html: str, nombre_match: str) -> bool:
     n1 = normalizar_texto(limpiar_minuto(nombre_html or ""))
     n2 = normalizar_texto(nombre_match or "")
     return n1 in OBJ_ESPECIALES or n2 in OBJ_ESPECIALES
+
 
 
 def log_debug_match_especial(clave_partido,
@@ -172,22 +180,164 @@ def log_debug_match_especial(clave_partido,
             print(f"    {k}: {v}")
 
 
+
 # =====================================================
-# LÓGICA DE COMPROBACIÓN
+# LOG PARA AMBIGÜEDAD
 # =====================================================
 
+
+def log_match_ambiguo(clave_partido,
+                      equipo_html_norm,
+                      nombre_html,
+                      nombre_match_norm,
+                      score_match,
+                      coincidentes_df):
+    print("\n[MATCH_AMBIGUO]")
+    print(f"  PARTIDO          : {clave_partido}")
+    print(f"  EQUIPO_HTML_NORM : {equipo_html_norm}")
+    print(f"  NOMBRE_HTML      : {nombre_html}")
+    print(f"  MATCH_NORM       : {nombre_match_norm}")
+    print(f"  SCORE            : {score_match}")
+    print("  CANDIDATOS CSV:")
+    for _, fila in coincidentes_df.iterrows():
+        print(
+            f"    - player={fila['player']} | player_norm={fila['player_norm']} | "
+            f"pos={fila.get('posicion', '')} | puntosFantasy={fila.get('puntosFantasy', '')}"
+        )
+
+
+
+# =====================================================
+# FUNCIONES AUXILIARES DE MATCH
+# =====================================================
+
+
+def _resolver_coincidente(
+    df_candidatos_equipo: pd.DataFrame,
+    nombre_html_norm: str,
+    apellido_html: str,
+    pos_fantasy: str,
+    puntos_html_normalizado: int,
+    nombre_match_norm: str,
+    clave_partido: str,
+    equipo_html_norm: str,
+    nombre_html: str,
+    score_match: float,
+):
+    """
+    Devuelve (fila_match, coincidentes_orden) filtrando por:
+    equipo -> (posición opcional) -> (match_norm / base_html) -> apellido -> diferencia de puntos.
+    Además loguea candidatos y diffs de puntos en los casos ambiguos.
+    """
+    coincidentes = df_candidatos_equipo.copy()
+
+    # LOG INICIAL DEL CONTEXTO
+    print(
+        f"[RESOLVER] partido={clave_partido} eq={equipo_html_norm} "
+        f"HTML='{nombre_html}' norm='{nombre_html_norm}' "
+        f"match_norm='{nombre_match_norm}' score={score_match:.1f} "
+        f"pos_fantasy={pos_fantasy}"
+    )
+
+    # 1) Filtrar por posición SOLO si el score del nombre no es muy alto
+    if "posicion" in coincidentes.columns and pos_fantasy and score_match < 90:
+        antes = len(coincidentes)
+        coinc_pos = coincidentes[
+            coincidentes["posicion"] == pos_fantasy
+        ].copy()
+        if not coinc_pos.empty:
+            coincidentes = coinc_pos
+        print(
+            f"[RESOLVER] filtro pos => {antes} -> {len(coincidentes)} "
+            f"(pos_fantasy={pos_fantasy})"
+        )
+
+    # 2) intentar usar match_norm exacto
+    if nombre_match_norm and not coincidentes.empty:
+        antes = len(coincidentes)
+        coinc_nm = coincidentes[
+            coincidentes["player_norm"] == nombre_match_norm
+        ].copy()
+        if not coinc_nm.empty:
+            coincidentes = coinc_nm
+            print(
+                f"[RESOLVER] filtro match_norm exacto '{nombre_match_norm}' "
+                f"=> {antes} -> {len(coincidentes)}"
+            )
+        else:
+            # 2b) si no hay exacto, buscar algún player_norm que contenga
+            # la primera palabra del nombre HTML
+            base_html = nombre_html_norm.split()[0] if nombre_html_norm else ""
+            if base_html:
+                antes2 = len(coincidentes)
+                mask = coincidentes["player_norm"].str.contains(base_html)
+                coinc_base = coincidentes[mask].copy()
+                if not coinc_base.empty:
+                    coincidentes = coinc_base
+                print(
+                    f"[RESOLVER] filtro base_html '{base_html}' "
+                    f"=> {antes2} -> {len(coincidentes)}"
+                )
+
+    # 3) si aún hay varios y el HTML tiene apellido, filtrar por apellido
+    if apellido_html and " " in nombre_html_norm and len(coincidentes) > 1:
+        antes = len(coincidentes)
+        coinc_ap = coincidentes[
+            coincidentes["player_norm"].str.split().str[-1] == apellido_html
+        ].copy()
+        if not coinc_ap.empty:
+            coincidentes = coinc_ap
+        print(
+            f"[RESOLVER] filtro apellido '{apellido_html}' "
+            f"=> {antes} -> {len(coincidentes)}"
+        )
+
+    # 4) desempate final por diferencia de puntos
+    coincidentes = coincidentes.copy()
+    coincidentes["__diff_puntos__"] = (
+        coincidentes["puntosFantasy"].apply(normalizar_puntos)
+        - puntos_html_normalizado
+    ).abs()
+    coincidentes_orden = coincidentes.sort_values("__diff_puntos__")
+
+    # LOG DETALLADO DE CANDIDATOS ORDENADOS POR DIFERENCIA DE PUNTOS
+    print(f"[RESOLVER] candidatos ordenados por diff_puntos (HTML={puntos_html_normalizado}):")
+    for _, fila in coincidentes_orden.iterrows():
+        print(
+            f"   - player={fila['player']} | norm={fila['player_norm']} | "
+            f"pos={fila.get('posicion', '')} | ptsCSV={fila.get('puntosFantasy', '')} | "
+            f"diff={fila['__diff_puntos__']}"
+        )
+
+    if len(coincidentes_orden) > 1:
+        log_match_ambiguo(
+            clave_partido,
+            equipo_html_norm,
+            nombre_html,
+            nombre_match_norm,
+            score_match,
+            coincidentes_orden,
+        )
+
+    fila_match = coincidentes_orden.iloc[0]
+    print(
+        f"[RESOLVER] elegido => player={fila_match['player']} | "
+        f"norm={fila_match['player_norm']} | ptsCSV={fila_match['puntosFantasy']}\n"
+    )
+    return fila_match, coincidentes_orden
+
+
+
+# =====================================================
+# LÓGICA DE COMPROBACIÓN (RANGO / JORNADA)
+# =====================================================
+
+
 def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cutoff=70):
-    """
-    path_html: ruta a puntos.html de la jornada
-    csv_dir  : carpeta con los CSV de esa jornada
-    codigo_temporada: '24_25', '25_26', etc. (para cargar alias de jugadores)
-    """
     puntos_html_por_partido = scrapear_puntos_fantasy(path_html, codigo_temporada)
     archivos_csv = [n for n in os.listdir(csv_dir) if n.endswith(".csv")]
 
-    # mapa equipo_norm -> {alias_corto_norm (HTML) -> nombre_largo_norm (CSV)}
     alias_temp = get_alias_jugadores_reverse(codigo_temporada)
-
     errores = []
 
     for nombre_archivo_csv in archivos_csv:
@@ -201,8 +351,6 @@ def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cut
 
         ruta_csv = os.path.join(csv_dir, nombre_archivo_csv)
         df_partido = pd.read_csv(ruta_csv)
-
-        # añade equipo_norm y player_norm a partir del CSV
         df_partido = añadir_equipo_y_player_norm(df_partido)
 
         _log_claves_partido(clave_partido, puntos_html_por_partido, df_partido)
@@ -216,26 +364,21 @@ def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cut
 
         partido_ok = True
 
-        for equipo_html_raw, nombre_html, puntos_html in jugadores_html_partido:
-            # Normalizar puntos del HTML y filtrar suplentes/no jugados
+        for equipo_html_raw, nombre_html, puntos_html, pos_fantasy in jugadores_html_partido:
             puntos_html_normalizado = normalizar_puntos(puntos_html)
             if puntos_html_normalizado == 0:
-                # Jugadores con 0 puntos Fantasy: normalmente suplentes/no jugados → los ignoramos
                 continue
 
             equipo_html_norm = normalizar_equipo(equipo_html_raw)
-            df_candidatos_equipo = df_partido[df_partido["equipo_norm"] == equipo_html_norm].copy()
-
+            df_candidatos_equipo = df_partido[
+                df_partido["equipo_norm"] == equipo_html_norm
+            ].copy()
             if df_candidatos_equipo.empty:
-                # Plantilla del CSV vacía para ese equipo en este partido → nada que comparar
                 continue
 
-            # 1) limpiar minuto en nombre HTML
             nombre_html_limpio = limpiar_minuto(nombre_html)
-            # 2) normalizar HTML
             nombre_html_norm_original = normalizar_texto(nombre_html_limpio)
 
-            # 3) aplicar alias invertido (Pepelu -> jose luis garcia vaya, etc.)
             alias_equipo = alias_temp.get(equipo_html_norm, {})
             nombre_html_norm = alias_equipo.get(
                 nombre_html_norm_original,
@@ -252,8 +395,13 @@ def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cut
                 score_cutoff=score_cutoff,
             )
 
+            if nombre_match_norm and score_match >= score_cutoff:
+                print(
+                    f"[MATCH_OK] {debug_prefix} -> match_norm='{nombre_match_norm}' "
+                    f"score={score_match:.1f} pos_fantasy={pos_fantasy}"
+                )
+
             if not nombre_match_norm or score_match < score_cutoff:
-                # Si a pesar de tener puntos no encontramos match decente, esto sí interesa verlo
                 print(f"[MATCH_FAIL] {debug_prefix} score={score_match}")
                 registrar_error(
                     errores,
@@ -268,14 +416,24 @@ def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cut
                 partido_ok = False
                 continue
 
-            fila_match = df_candidatos_equipo[
-                df_candidatos_equipo["player_norm"] == nombre_match_norm
-            ].iloc[0]
+            apellido_html = nombre_html_norm.split()[-1] if nombre_html_norm else ""
+
+            fila_match, coincidentes_orden = _resolver_coincidente(
+                df_candidatos_equipo=df_candidatos_equipo,
+                nombre_html_norm=nombre_html_norm,
+                apellido_html=apellido_html,
+                pos_fantasy=pos_fantasy,
+                puntos_html_normalizado=puntos_html_normalizado,
+                nombre_match_norm=nombre_match_norm,
+                clave_partido=clave_partido,
+                equipo_html_norm=equipo_html_norm,
+                nombre_html=nombre_html,
+                score_match=score_match,
+            )
 
             nombre_csv = fila_match["player"]
             puntos_csv = normalizar_puntos(fila_match["puntosFantasy"])
 
-            # LOG ESPECIAL para Herrera / Arnau / Yildirim
             if puntos_csv != puntos_html_normalizado:
                 log_debug_match_especial(
                     clave_partido=clave_partido,
@@ -310,9 +468,11 @@ def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cut
     return errores
 
 
+
 # =====================================================
-# API PÚBLICA: TEMPORADA + JORNADA(S)
+# API PÚBLICA
 # =====================================================
+
 
 def comprobar_jornada(codigo_temporada: str, num_jornada: int, score_cutoff=70):
     carpeta_html, carpeta_csv = _build_rutas_temporada(codigo_temporada)
@@ -321,7 +481,13 @@ def comprobar_jornada(codigo_temporada: str, num_jornada: int, score_cutoff=70):
     path_html = os.path.join(carpeta_html, etiqueta_jornada, "puntos.html")
     path_csv_dir = os.path.join(carpeta_csv, f"jornada_{num_jornada}")
 
-    return comprobar_jornada_paths(path_html, path_csv_dir, codigo_temporada, score_cutoff=score_cutoff)
+    return comprobar_jornada_paths(
+        path_html,
+        path_csv_dir,
+        codigo_temporada,
+        score_cutoff=score_cutoff,
+    )
+
 
 
 def comprobar_rango_jornadas(codigo_temporada: str,
@@ -366,14 +532,20 @@ def comprobar_rango_jornadas(codigo_temporada: str,
         for err in errores_globales:
             print(
                 f"{err['partido']} | {err['equipo']} | {err['nombre_html']} | "
-                f"{err.get('nombre_csv', '')} | {err['puntos_html']} | {err.get('puntos_csv', '')} | "
-                f"{err.get('score', 0)}"
+                f"{err.get('nombre_csv', '')} | {err['puntos_html']} | "
+                f"{err.get('puntos_csv', '')} | {err.get('score', 0)}"
             )
         print(
             "\nNota: es posible que alguno de los jugadores listados con 0 minutos "
             "haya recibido tarjeta desde el banquillo; en esos casos este "
             "comportamiento es esperado y no indica un fallo de scraping."
         )
+
+
+
+# =====================================================
+# COMPARAR UN PARTIDO
+# =====================================================
 
 
 def comparar_partido(codigo_temporada: str,
@@ -419,15 +591,18 @@ def comparar_partido(codigo_temporada: str,
 
     print(
         f"\n--- COMPARATIVA {codigo_temporada} | JORNADA {num_jornada} "
-        f"| PARTIDO {id_partido} ({eq1}-{eq2}) ---"
+        f"| PARTIDO p{num_partido} ({eq1}-{eq2}) ---"
     )
     print(f"{'JUGADOR':<25} | {'EQUIPO':<15} | {'HTML':<5} | {'CSV':<5} | {'ESTADO'}")
     print("-" * 80)
 
-    for equipo_html_raw, nombre_html, puntos_html in jugadores_html:
+    for equipo_html_raw, nombre_html, puntos_html, pos_fantasy in jugadores_html:
+        puntos_html_normalizado = normalizar_puntos(puntos_html)
+
         equipo_html_norm = normalizar_equipo(equipo_html_raw)
         df_candidatos_equipo = df_partido[df_partido["equipo_norm"] == equipo_html_norm].copy()
-        nombres_norm_equipo = df_candidatos_equipo["player_norm"].tolist()
+        if df_candidatos_equipo.empty:
+            continue
 
         nombre_html_limpio = limpiar_minuto(nombre_html)
         nombre_html_norm_original = normalizar_texto(nombre_html_limpio)
@@ -436,6 +611,8 @@ def comparar_partido(codigo_temporada: str,
             nombre_html_norm_original,
             nombre_html_norm_original,
         )
+
+        nombres_norm_equipo = df_candidatos_equipo["player_norm"].tolist()
 
         debug_prefix = f"{eq1}-{eq2} | eq={equipo_html_norm} | HTML='{nombre_html}'"
         match_norm, score = obtener_match_nombre(
@@ -449,12 +626,26 @@ def comparar_partido(codigo_temporada: str,
         estado = "❓ No existe"
         nombre_csv = ""
 
-        puntos_html_normalizado = normalizar_puntos(puntos_html)
-
         if match_norm and score >= score_cutoff:
-            fila = df_candidatos_equipo[
-                df_candidatos_equipo["player_norm"] == match_norm
-            ].iloc[0]
+            print(
+                f"[MATCH_OK] {debug_prefix} -> match_norm='{match_norm}' "
+                f"score={score:.1f} pos_fantasy={pos_fantasy}"
+            )
+            apellido_html = nombre_html_norm.split()[-1] if nombre_html_norm else ""
+
+            fila, coincidentes_orden = _resolver_coincidente(
+                df_candidatos_equipo=df_candidatos_equipo,
+                nombre_html_norm=nombre_html_norm,
+                apellido_html=apellido_html,
+                pos_fantasy=pos_fantasy,
+                puntos_html_normalizado=puntos_html_normalizado,
+                nombre_match_norm=match_norm,
+                clave_partido=f"{eq1}-{eq2}",
+                equipo_html_norm=equipo_html_norm,
+                nombre_html=nombre_html,
+                score_match=score,
+            )
+
             puntos_csv = normalizar_puntos(fila["puntosFantasy"])
             estado = "✅ OK" if puntos_csv == puntos_html_normalizado else "❌ ERROR"
             nombre_csv = fila["player"]
@@ -486,4 +677,7 @@ def comparar_partido(codigo_temporada: str,
 
 
 if __name__ == "__main__":
-    comprobar_rango_jornadas("24_25", 1, 20)
+    # ejemplo: rango completo
+    # comprobar_rango_jornadas("24_25", 1, 20)
+    # o solo un partido:
+    comparar_partido("24_25", 15, 2)

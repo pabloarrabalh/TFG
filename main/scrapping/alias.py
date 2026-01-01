@@ -23,6 +23,7 @@ ALIAS_EQUIPOS = {
 # Dirección: nombre_largo_norm (CSV/FBRef) -> alias_corto_norm (Fantasy/HTML)
 ALIAS_JUGADORES_POR_TEMPORADA = {
     "25_26": {
+        "las palmas":{"fabio": "fabio gonzalez",},
         "espanyol": {"antoniu": "roca"},
         "rayo": {"isaac palazon camacho": "isi palazon"},
         "valencia": {"jose luis garcia vaya": "pepelu"},
