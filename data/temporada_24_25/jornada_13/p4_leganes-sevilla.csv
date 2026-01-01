@@ -1,0 +1,30 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Miguel,DT,leganes,sevilla,1,90,1,0,0.9,0.0,2,0,2,11,18.2,0,0,0.0,0.0,0.0,12,0,0,0,0,1,1,0,0,2,2,0,5,23.0,18.0,1,3,5,37.5
+Munir El Haddadi,DT,leganes,sevilla,1,90,0,0,0.1,0.0,2,1,1,18,44.4,0,0,0.0,0.0,0.0,3,4,4,0,1,3,1,2,1,2,0,2,12,42.0,7.0,0,0,6,0.0
+Juan Cruz,DT,leganes,sevilla,1,75,0,0,0.0,0.1,1,1,0,20,45.0,0,0,0.0,0.0,0.0,5,0,0,0,0,1,0,1,1,0,0,0,12,61.0,27.0,0,0,0,0.0
+Óscar Rodríguez Arnaiz,MC,leganes,sevilla,0,15,0,0,0.0,0.0,1,1,0,9,88.9,0,0,0.0,0.0,0.0,1,1,2,0,1,0,0,0,0,1,0,1,7,25.0,7.0,0,0,1,0.0
+Darko Brašanac,MC,leganes,sevilla,1,90,0,0,0.0,0.0,1,1,0,38,81.6,0,0,0.0,0.0,0.0,8,3,2,0,1,0,0,0,1,0,0,0,15,48.0,25.0,1,3,2,60.0
+Seydouba Cissé,MC,leganes,sevilla,1,88,0,0,0.0,0.0,0,0,0,38,76.3,1,0,0.0,0.0,0.0,7,4,0,0,0,1,0,1,0,1,1,0,20,121.0,70.0,1,2,4,33.3
+Roberto López,MC,leganes,sevilla,0,2,0,0,0.0,0.0,0,0,0,1,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,6.0,5.0,0,0,0,0.0
+Renato Tapia,MC,leganes,sevilla,1,75,0,0,0.0,0.0,0,0,0,38,73.7,0,0,0.0,0.0,0.0,5,0,1,0,1,0,0,0,2,0,0,0,20,87.0,44.0,1,2,1,66.7
+Julián Chicco,MC,leganes,sevilla,0,15,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,4,19.0,0.0,0,0,0,0.0
+Enric Franquesa,DF,leganes,sevilla,1,66,0,0,0.0,0.0,0,0,0,39,76.9,0,0,0.0,0.0,0.0,5,1,3,0,2,0,0,0,0,2,2,0,22,180.0,95.0,5,0,2,0.0
+Javi Hernández,DF,leganes,sevilla,0,24,0,0,0.0,0.0,0,0,0,9,44.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,3,2,1,1,4,14.0,8.0,0,0,1,0.0
+Matija Nastasić,DF,leganes,sevilla,1,90,0,0,0.0,0.0,0,0,0,55,74.5,0,0,0.0,0.0,0.0,7,4,4,0,1,1,1,0,4,0,0,0,30,187.0,124.0,0,1,1,50.0
+Sergi,DF,leganes,sevilla,1,90,0,0,0.0,0.0,0,0,0,53,73.6,1,0,0.0,0.0,0.0,8,3,2,0,0,0,0,0,9,0,0,0,30,143.0,115.0,0,2,2,50.0
+Adrià Altimira,DF,leganes,sevilla,1,90,0,0,0.0,0.0,0,0,0,32,81.3,0,0,0.0,0.0,0.0,10,3,0,0,0,1,1,0,6,2,1,1,18,158.0,85.0,3,3,2,60.0
+Marko Dmitrović,PT,leganes,sevilla,1,90,0,0,0.0,0.0,0,0,0,44,40.9,0,0,0.0,100.0,0.1,9,0,0,0,0,0,0,0,1,0,0,0,20,116.0,45.0,0,0,0,0.0
+Isaac Romero,DT,sevilla,leganes,1,90,0,0,0.1,0.0,2,1,1,27,44.4,0,0,0.0,0.0,0.0,1,0,1,0,1,1,0,1,0,4,0,4,18,67.0,23.0,2,5,3,62.5
+Kelechi Iheanacho,DT,sevilla,leganes,1,72,0,0,0.1,0.1,1,1,0,25,72.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,1,0,1,16,98.0,70.0,4,1,1,50.0
+Jesús Navas,DT,sevilla,leganes,0,18,0,0,0.0,0.0,0,0,0,15,93.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,7,43.0,32.0,2,0,0,0.0
+Dodi Lukebakio,DT,sevilla,leganes,1,90,0,0,0.2,0.2,6,5,1,34,85.3,0,0,0.0,0.0,0.0,8,0,2,0,2,0,0,0,0,6,3,2,28,148.0,76.0,3,1,1,50.0
+Albert Sambi Lokonga,MC,sevilla,leganes,1,90,0,0,0.1,0.1,2,2,0,61,88.5,0,0,0.0,0.0,0.0,4,1,0,0,0,1,0,1,2,0,0,0,31,143.0,59.0,1,2,2,50.0
+Lucien Agoume,MC,sevilla,leganes,1,79,0,0,0.0,0.0,0,0,0,46,67.4,0,1,0.0,0.0,0.0,1,4,4,0,2,0,0,0,0,2,2,0,19,127.0,67.0,2,4,2,66.7
+Djibril Sow,MC,sevilla,leganes,1,87,0,0,0.0,0.1,1,1,0,47,85.1,0,0,0.0,0.0,0.0,4,0,0,0,0,1,0,1,0,0,0,0,27,120.0,44.0,2,4,3,57.1
+Peque,MC,sevilla,leganes,0,3,0,0,0.0,0.0,0,0,0,1,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,2,3.0,0.0,0,0,0,0.0
+Adrià Pedrosa,DF,sevilla,leganes,1,90,0,0,0.0,0.0,0,0,0,39,71.8,0,0,0.0,0.0,0.0,2,1,2,0,2,1,0,1,2,1,1,0,19,147.0,56.0,2,1,0,100.0
+Kike Salas,DF,sevilla,leganes,1,90,0,0,0.0,0.0,1,1,0,61,70.5,0,0,0.0,0.0,0.0,4,0,0,0,0,2,1,1,5,1,0,1,31,121.0,49.0,0,5,1,83.3
+Nemanja Gudelj,DF,sevilla,leganes,1,90,0,0,0.0,0.0,0,0,0,71,71.8,1,0,0.0,0.0,0.0,0,1,1,0,0,0,0,0,2,0,0,0,40,169.0,87.0,0,2,1,66.7
+Carmona,DF,sevilla,leganes,1,87,0,0,0.0,0.0,0,0,0,64,75.0,0,0,0.0,0.0,0.0,6,2,1,0,0,2,0,2,1,2,0,2,31,186.0,99.0,2,1,2,33.3
+Juanlu Sánchez,MC,sevilla,leganes,0,3,0,0,0.0,0.0,0,0,0,4,50.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,1,0,1,1,4.0,0.0,0,1,0,100.0
+Álvaro Fernández,PT,sevilla,leganes,1,90,0,0,0.0,0.0,0,0,0,45,73.3,0,0,1.0,100.0,1.3,7,0,0,0,0,0,0,0,0,0,0,0,28,109.0,42.0,0,0,0,0.0

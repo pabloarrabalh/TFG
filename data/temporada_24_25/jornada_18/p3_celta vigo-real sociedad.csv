@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Borja Iglesias,DT,celta,real sociedad,1,89,0,0,0.1,0.0,1,0,1,18,61.1,0,0,0.0,0.0,0.0,4,1,1,0,0,0,0,0,2,1,0,0,21,81.0,14.0,0,1,1,50.0
+Anastasios Douvikas,DT,celta,real sociedad,0,1,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,2,29.0,4.0,0,0,1,0.0
+Pablo Durán,DT,celta,real sociedad,1,72,2,0,0.9,0.0,2,0,2,18,72.2,1,0,0.0,0.0,0.0,15,0,1,0,1,0,0,0,1,3,0,3,20,60.0,15.0,1,0,2,0.0
+Williot Swedberg,DT,celta,real sociedad,0,18,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,3,38.0,32.0,1,0,0,0.0
+Alfon,DT,celta,real sociedad,1,83,0,1,0.2,0.9,3,2,1,23,73.9,0,0,0.0,0.0,0.0,13,1,2,0,1,1,0,1,0,2,1,1,24,325.0,258.0,9,0,1,0.0
+Franco Cervi,DT,celta,real sociedad,0,7,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,3,18.0,11.0,0,0,0,0.0
+Óscar Mingueza,MC,celta,real sociedad,1,89,0,0,0.0,0.0,1,1,0,45,55.6,0,0,0.0,0.0,0.0,5,1,3,0,2,0,0,0,1,6,2,4,33,186.0,108.0,5,0,0,0.0
+Carlos Dominguez,DF,celta,real sociedad,0,1,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,0,0.0,0.0,0,0,0,0.0
+Ilaix Moriba,MC,celta,real sociedad,1,90,0,0,0.0,0.1,1,0,1,34,82.4,0,0,0.0,0.0,0.0,7,3,3,0,1,4,1,3,4,2,0,2,21,149.0,72.0,1,0,0,0.0
+Fran Beltrán,MC,celta,real sociedad,1,90,0,0,0.0,0.1,1,1,0,41,80.5,0,0,0.0,0.0,0.0,5,1,1,0,1,3,0,3,2,2,0,1,25,82.0,32.0,0,0,0,0.0
+Sergio Carreira,MC,celta,real sociedad,1,71,0,0,0.0,0.0,0,0,0,36,66.7,0,0,0.0,0.0,0.0,5,1,1,0,0,4,1,3,3,0,0,0,19,102.0,48.0,3,0,1,0.0
+Hugo Álvarez,MC,celta,real sociedad,0,19,0,0,0.0,0.0,0,0,0,10,70.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,4,33.0,1.0,0,0,0,0.0
+Marcos Alonso,DF,celta,real sociedad,1,90,0,0,0.0,0.0,2,0,2,62,79.0,0,0,0.0,0.0,0.0,11,1,1,0,0,1,0,1,7,0,0,0,40,154.0,49.0,0,5,0,100.0
+Carl Starfelt,DF,celta,real sociedad,1,90,0,0,0.0,0.0,0,0,0,31,90.3,1,0,0.0,0.0,0.0,9,1,0,0,0,3,1,2,7,0,0,0,21,86.0,26.0,0,2,3,40.0
+Javi Rodríguez,DF,celta,real sociedad,1,90,0,1,0.0,0.0,0,0,0,37,67.6,1,0,0.0,0.0,0.0,9,3,2,0,0,3,0,3,4,0,0,0,23,99.0,30.0,1,2,3,40.0
+Vicente Guaita,PT,celta,real sociedad,1,90,0,0,0.0,0.0,0,0,0,25,68.0,0,0,0.0,100.0,0.1,12,0,0,0,0,0,0,0,3,0,0,0,23,129.0,74.0,0,0,0,0.0
+Mikel Oyarzabal,DT,real sociedad,celta,1,63,0,0,0.1,0.0,1,1,0,22,54.5,1,0,0.0,0.0,0.0,0,0,0,0,0,1,0,1,2,0,0,0,12,39.0,15.0,0,1,1,50.0
+Takefusa Kubo,DT,real sociedad,celta,0,27,0,0,0.0,0.0,0,0,0,16,50.0,1,0,0.0,0.0,0.0,-1,0,0,0,0,0,0,0,0,3,0,3,14,62.0,28.0,1,0,0,0.0
+Ander Barrenetxea,MC,real sociedad,celta,1,45,0,0,0.0,0.0,1,1,0,7,71.4,0,0,0.0,0.0,0.0,0,0,0,0,0,1,0,1,0,1,0,1,12,57.0,15.0,1,0,1,0.0
+Orri Steinn Óskarsson,DT,real sociedad,celta,0,45,0,0,0.0,0.1,0,0,0,12,41.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,7,18.0,2.0,0,1,3,25.0
+Luka Sučić,MC,real sociedad,celta,1,90,0,0,0.0,0.0,0,0,0,53,84.9,0,0,0.0,0.0,0.0,4,2,1,0,0,0,0,0,0,4,2,2,35,224.0,108.0,0,0,2,0.0
+Brais Méndez,MC,real sociedad,celta,1,82,0,0,0.1,0.0,1,1,0,54,85.2,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,0,2,1,1,23,111.0,57.0,1,1,1,50.0
+Pablo Marín,MC,real sociedad,celta,0,8,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,1,1,1,0,3,9.0,0.0,0,0,0,0.0
+Sergio Gómez,MC,real sociedad,celta,1,90,0,0,0.0,0.0,0,0,0,52,75.0,0,0,0.0,0.0,0.0,2,4,0,0,0,3,0,3,1,2,1,1,30,126.0,46.0,1,1,0,100.0
+Beñat Turrientes,MC,real sociedad,celta,1,45,0,0,0.0,0.0,0,0,0,17,88.2,1,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,1,2,1,1,12,93.0,66.0,3,1,1,50.0
+Sheraldo Becker,DT,real sociedad,celta,0,45,0,0,0.0,0.0,1,1,0,11,45.5,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,6,53.0,20.0,1,0,1,0.0
+Aihen Muñoz,DF,real sociedad,celta,1,45,0,0,0.0,0.0,0,0,0,33,60.6,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,2,0,0,0,15,101.0,33.0,2,1,0,100.0
+Jon Martin,DF,real sociedad,celta,0,45,0,0,0.1,0.0,1,1,0,28,92.9,0,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,0,0,0,0,13,72.0,18.0,0,1,0,100.0
+Jon Pacheco,DF,real sociedad,celta,1,90,0,0,0.0,0.0,0,0,0,65,83.1,0,0,0.0,0.0,0.0,1,1,2,0,1,1,1,0,1,0,0,0,30,153.0,76.0,2,1,0,100.0
+Igor Zubeldia,DF,real sociedad,celta,1,90,0,0,0.1,0.0,2,1,1,53,84.9,1,0,0.0,0.0,0.0,0,5,5,0,1,2,1,1,2,0,0,0,32,174.0,50.0,0,3,0,100.0
+Jon Aramburu,MC,real sociedad,celta,1,90,0,0,0.0,0.0,0,0,0,58,81.0,0,0,0.0,0.0,0.0,1,4,5,0,1,2,0,2,1,0,0,0,24,86.0,64.0,0,1,0,100.0
+Álex Remiro,PT,real sociedad,celta,1,90,0,0,0.0,0.0,0,0,0,47,74.5,0,0,2.0,71.4,2.1,5,0,0,0,0,0,0,0,0,0,0,0,30,169.0,31.0,0,0,0,0.0

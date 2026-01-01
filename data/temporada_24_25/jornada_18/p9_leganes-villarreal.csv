@@ -1,0 +1,32 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Miguel,DT,leganes,villarreal,1,62,0,1,0.1,0.2,1,0,1,6,83.3,0,0,0.0,0.0,0.0,5,0,1,0,1,0,0,0,0,1,0,0,5,13.0,9.0,0,1,6,14.3
+Juan Cruz,MC,leganes,villarreal,0,28,0,0,0.0,0.0,0,0,0,9,77.8,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,3,0,2,8,67.0,15.0,1,0,0,0.0
+Óscar Rodríguez Arnaiz,MC,leganes,villarreal,1,57,0,0,0.0,0.0,0,0,0,18,66.7,0,1,0.0,0.0,0.0,-2,1,1,0,1,1,0,1,0,2,2,0,8,32.0,18.0,1,1,1,50.0
+Seydouba Cissé,MC,leganes,villarreal,1,90,1,0,0.2,0.0,1,0,1,31,74.2,0,0,0.0,0.0,0.0,5,5,3,0,1,1,0,1,0,1,1,0,25,142.0,57.0,1,0,1,0.0
+Yvan Neyou,MC,leganes,villarreal,1,90,0,0,0.0,0.0,1,1,0,30,93.3,0,0,0.0,0.0,0.0,1,2,1,0,0,1,0,1,0,1,0,1,13,50.0,14.0,1,0,2,0.0
+Dani Raba,MC,leganes,villarreal,1,62,1,0,0.8,0.0,0,0,0,14,57.1,0,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,0,4,0,2,17,105.0,66.0,2,0,0,0.0
+Darko Brašanac,MC,leganes,villarreal,0,28,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,0,1,1,8.0,0.0,0,0,1,0.0
+Javi Hernández,DF,leganes,villarreal,1,73,0,0,0.0,0.0,0,0,0,30,76.7,0,0,0.0,0.0,0.0,4,1,0,0,0,0,0,0,4,0,0,0,11,62.0,17.0,0,1,0,100.0
+Diego,MC,leganes,villarreal,0,17,0,0,0.2,0.0,1,1,0,2,50.0,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,2,1.0,0.0,0,1,2,33.3
+Matija Nastasić,DF,leganes,villarreal,1,51,0,0,0.0,0.0,0,0,0,20,70.0,0,0,0.0,0.0,0.0,-3,0,0,0,0,1,1,0,2,0,0,0,9,21.0,8.0,0,1,0,100.0
+Valentin Rosier,DF,leganes,villarreal,0,39,0,0,0.0,0.0,0,0,0,8,75.0,0,0,0.0,0.0,0.0,-1,0,0,0,0,0,0,0,1,1,1,0,5,43.0,17.0,0,0,0,0.0
+Jorge Sáenz,DF,leganes,villarreal,1,76,0,0,0.0,0.1,0,0,0,27,92.6,0,1,0.0,0.0,0.0,-1,2,1,0,0,2,0,2,7,0,0,0,13,62.0,26.0,0,0,1,0.0
+Sergi,DF,leganes,villarreal,1,90,0,0,0.0,0.2,0,0,0,52,75.0,0,0,0.0,0.0,0.0,-2,1,0,0,0,2,1,1,1,0,0,0,23,107.0,67.0,0,2,2,50.0
+Adrià Altimira,DF,leganes,villarreal,1,90,0,0,0.0,0.0,0,0,0,29,86.2,1,0,0.0,0.0,0.0,-4,3,3,0,2,0,0,0,2,0,0,0,10,50.0,34.0,1,0,0,0.0
+Marko Dmitrović,PT,leganes,villarreal,1,90,0,0,0.0,0.0,0,0,0,33,45.5,0,0,5.0,66.7,4.4,2,0,0,0,0,0,0,0,2,0,0,0,14,116.0,56.0,0,1,0,100.0
+Thierno Barry,DT,villarreal,leganes,1,90,3,0,1.3,0.0,4,1,3,12,75.0,1,0,0.0,0.0,0.0,18,1,1,0,0,2,0,2,0,3,1,1,13,47.0,15.0,1,4,1,80.0
+Alex Baena,MC,villarreal,leganes,1,90,0,0,0.3,0.1,2,2,0,37,73.0,0,0,0.0,0.0,0.0,3,1,1,0,0,0,0,0,0,0,0,0,25,149.0,97.0,4,0,1,0.0
+Denis Suárez,MC,villarreal,leganes,1,45,0,0,0.0,0.0,0,0,0,11,72.7,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,0,2,0,1,13,56.0,28.0,2,0,0,0.0
+Gerard Moreno,DT,villarreal,leganes,0,45,1,0,1.2,0.1,4,3,1,29,93.1,0,0,0.0,0.0,0.0,9,0,1,0,1,0,0,0,0,1,0,1,32,151.0,51.0,1,1,1,50.0
+Pape Gueye,MC,villarreal,leganes,1,90,0,0,0.1,0.0,3,2,1,66,84.8,0,0,0.0,0.0,0.0,5,2,0,0,0,0,0,0,4,0,0,0,50,231.0,90.0,0,4,0,100.0
+Santi Comesaña,MC,villarreal,leganes,1,75,0,0,0.0,0.1,0,0,0,58,84.5,0,0,0.0,0.0,0.0,2,1,1,0,1,1,0,1,0,0,0,0,42,213.0,135.0,1,3,1,75.0
+Daniel Parejo,MC,villarreal,leganes,0,15,0,0,0.0,0.0,0,0,0,16,100.0,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,0,0,0,13,42.0,16.0,0,0,0,0.0
+Yeremi Pino,MC,villarreal,leganes,1,66,0,0,0.0,0.1,0,0,0,19,63.2,1,0,0.0,0.0,0.0,4,2,0,0,0,1,0,1,0,6,2,0,24,162.0,81.0,2,0,1,0.0
+Pau Cabanes,MC,villarreal,leganes,0,24,1,0,0.4,0.3,3,1,2,8,100.0,0,0,0.0,0.0,0.0,13,0,0,0,0,0,0,0,0,2,1,0,9,67.0,61.0,2,0,0,0.0
+Sergi Cardona,DF,villarreal,leganes,1,90,0,0,0.0,0.3,0,0,0,57,87.7,0,0,0.0,0.0,0.0,4,2,1,0,0,2,0,2,3,0,0,0,39,168.0,99.0,2,0,0,0.0
+Logan Costa,DF,villarreal,leganes,1,45,0,0,0.0,0.0,0,0,0,34,88.2,0,0,0.0,0.0,0.0,-3,2,0,0,0,1,0,1,1,0,0,0,27,170.0,97.0,0,0,0,0.0
+Pau Navarro,DF,villarreal,leganes,0,45,0,0,0.0,0.0,0,0,0,33,90.9,0,0,0.0,0.0,0.0,3,1,1,0,0,0,0,0,1,0,0,0,30,125.0,57.0,0,0,1,0.0
+Raúl Albiol,DF,villarreal,leganes,1,90,0,0,0.0,0.0,0,0,0,77,89.6,0,0,0.0,0.0,0.0,2,2,2,0,0,0,0,0,4,0,0,0,54,298.0,165.0,0,4,1,80.0
+Kiko Femenía,DF,villarreal,leganes,1,82,0,0,0.0,0.0,0,0,0,54,98.1,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,3,1,2,39,229.0,124.0,2,0,0,0.0
+Juan Foyth,DF,villarreal,leganes,0,8,0,0,0.0,0.0,0,0,0,15,93.3,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,11,63.0,46.0,0,0,1,0.0
+Luiz Lúcio Reis Júnior,PT,villarreal,leganes,1,90,0,0,0.0,0.0,0,0,0,28,85.7,0,0,2.0,66.7,1.3,1,0,0,0,0,0,0,0,0,0,0,0,19,91.0,49.0,0,0,0,0.0

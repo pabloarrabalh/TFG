@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Mamadou Sylla,DT,valladolid,villarreal,1,70,1,0,0.8,0.0,1,1,0,9,66.7,1,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,2,1,1,11,42.0,26.0,1,0,1,0.0
+Juanmi Latasa,DT,valladolid,villarreal,0,20,0,0,0.0,0.0,0,0,0,7,57.1,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,1,0,0,0,3,3.0,3.0,0,3,1,75.0
+Raúl Moro,DT,valladolid,villarreal,1,90,0,0,0.0,0.0,0,0,0,39,76.9,0,0,0.0,0.0,0.0,2,2,2,0,1,1,0,1,2,3,1,2,32,274.0,137.0,6,0,0,0.0
+Anuar,DT,valladolid,villarreal,1,87,0,0,0.0,0.0,1,0,1,14,78.6,0,0,0.0,0.0,0.0,2,1,1,0,1,1,1,0,1,0,0,0,15,73.0,18.0,0,2,1,66.7
+Kenedy,DT,valladolid,villarreal,0,3,0,0,0.0,0.0,1,1,0,0,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,2.0,0.0,0,0,0,0.0
+Selim Amallah,MC,valladolid,villarreal,1,78,0,0,0.0,0.0,1,1,0,24,66.7,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,1,0,1,20,112.0,42.0,1,0,1,0.0
+Kike Pérez,MC,valladolid,villarreal,0,12,0,0,0.0,0.0,0,0,0,9,77.8,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,3,6.0,4.0,0,0,0,0.0
+Eray Cömert,MC,valladolid,villarreal,1,87,0,0,0.0,0.0,1,1,0,35,80.0,1,0,0.0,0.0,0.0,-1,1,0,0,0,1,1,0,0,0,0,0,23,76.0,37.0,0,2,0,100.0
+Iván Sánchez,MC,valladolid,villarreal,0,3,0,0,0.0,0.0,0,0,0,5,60.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,4,49.0,30.0,1,0,0,0.0
+Mario Martín,MC,valladolid,villarreal,1,70,0,0,0.0,0.0,1,0,1,36,80.6,0,0,0.0,0.0,0.0,3,0,0,0,0,3,0,3,2,1,1,0,28,206.0,97.0,0,1,2,33.3
+Víctor Meseguer,MC,valladolid,villarreal,0,20,0,0,0.0,0.0,0,0,0,11,90.9,0,0,0.0,0.0,0.0,2,2,1,0,1,0,0,0,0,0,0,0,8,50.0,36.0,1,0,0,0.0
+Lucas Oliveira Rosa,DF,valladolid,villarreal,1,90,0,0,0.0,0.0,0,0,0,39,71.8,0,0,0.0,0.0,0.0,2,6,7,0,2,3,1,2,3,0,0,0,26,144.0,87.0,3,0,0,0.0
+David Torres,DF,valladolid,villarreal,1,90,0,0,0.0,0.0,0,0,0,68,95.6,1,0,0.0,0.0,0.0,0,0,1,0,1,0,0,0,4,0,0,0,53,252.0,119.0,0,1,1,50.0
+Javi Sánchez,DF,valladolid,villarreal,1,90,0,0,0.0,0.0,0,0,0,68,89.7,1,0,0.0,0.0,0.0,0,2,2,0,0,1,0,1,5,0,0,0,60,299.0,152.0,0,1,2,33.3
+Luis Pérez,DF,valladolid,villarreal,1,90,0,0,0.0,0.1,0,0,0,51,80.4,0,0,0.0,0.0,0.0,1,0,0,0,0,1,1,0,4,0,0,0,40,137.0,76.0,1,0,1,0.0
+Karl Jakob Hein,PT,valladolid,villarreal,1,90,0,0,0.0,0.0,0,0,0,44,97.7,0,0,2.0,77.8,4.2,10,0,0,0,0,0,0,0,3,0,0,0,34,143.0,91.0,0,0,0,0.0
+Thierno Barry,DT,villarreal,valladolid,1,69,1,0,0.5,0.0,4,2,2,12,58.3,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,0,0,0,15,88.0,48.0,3,3,0,100.0
+Ayoze Pérez,DT,villarreal,valladolid,0,21,1,0,0.6,0.1,2,1,1,4,100.0,0,0,0.0,0.0,0.0,8,0,0,0,0,1,0,1,0,1,0,1,5,35.0,23.0,2,0,0,0.0
+Nicolas Pépé,DT,villarreal,valladolid,1,89,0,0,0.2,0.0,2,0,2,44,75.0,0,0,0.0,0.0,0.0,5,0,0,0,0,1,0,1,1,2,2,0,42,318.0,186.0,5,0,3,0.0
+Ramón Terrats,DT,villarreal,valladolid,0,1,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,2,0,2,2,5.0,3.0,0,0,1,0.0
+Alex Baena,MC,villarreal,valladolid,1,89,0,0,0.1,0.4,3,3,0,55,70.9,0,0,0.0,0.0,0.0,5,2,2,0,2,0,0,0,3,1,1,0,44,253.0,148.0,3,0,0,0.0
+Juan Bernat,MC,villarreal,valladolid,0,1,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,0,0,0,0,1,10.0,0.0,0,0,0,0.0
+Daniel Parejo,MC,villarreal,valladolid,1,90,0,0,0.0,0.0,0,0,0,76,96.1,1,0,0.0,0.0,0.0,3,2,2,0,0,0,0,0,1,1,1,0,63,226.0,95.0,0,0,2,0.0
+Santi Comesaña,MC,villarreal,valladolid,1,70,0,0,0.1,0.0,2,2,0,34,91.2,1,0,0.0,0.0,0.0,3,1,1,0,0,0,0,0,1,0,0,0,34,126.0,46.0,0,2,0,100.0
+Pape Gueye,MC,villarreal,valladolid,0,20,0,0,0.3,0.0,2,1,1,11,81.8,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,2,0,2,16,84.0,43.0,2,0,1,0.0
+Ilias Akhomach,MC,villarreal,valladolid,1,81,0,0,0.1,0.2,3,2,1,32,87.5,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,0,7,3,3,37,248.0,151.0,5,1,1,50.0
+Yeremi Pino,MC,villarreal,valladolid,0,9,0,0,0.2,0.0,1,1,0,7,71.4,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,1,0,0,7,58.0,45.0,1,0,0,0.0
+Sergi Cardona,DF,villarreal,valladolid,1,90,0,0,0.2,0.2,1,0,1,39,82.1,0,0,0.0,0.0,0.0,3,1,0,0,0,1,0,1,2,0,0,0,24,91.0,44.0,1,1,1,50.0
+Logan Costa,DF,villarreal,valladolid,1,90,0,0,0.0,0.0,1,0,1,70,90.0,1,0,0.0,0.0,0.0,0,2,2,0,1,0,0,0,4,0,0,0,58,363.0,252.0,6,3,1,75.0
+Raúl Albiol,DF,villarreal,valladolid,1,90,0,0,0.0,0.0,0,0,0,67,92.5,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,3,0,0,0,57,260.0,169.0,0,0,0,0.0
+Kiko Femenía,DF,villarreal,valladolid,1,90,0,1,0.0,0.3,0,0,0,83,90.4,0,0,0.0,0.0,0.0,9,0,1,0,1,0,0,0,3,0,0,0,58,205.0,104.0,0,0,0,0.0
+Diego Conde,PT,villarreal,valladolid,1,90,0,0,0.0,0.0,0,0,0,23,87.0,0,0,1.0,100.0,0.9,7,0,0,0,0,0,0,0,1,0,0,0,20,122.0,83.0,0,0,0,0.0

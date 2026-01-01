@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Juanmi Latasa,DT,valladolid,mallorca,1,90,0,0,0.2,0.1,2,2,0,19,68.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,0,1,8,38.0,4.0,0,4,7,36.4
+Darwin Machís,DT,valladolid,mallorca,1,50,0,0,0.6,0.0,3,3,0,18,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,1,0,14,104.0,18.0,0,0,0,0.0
+Iván Sánchez,MC,valladolid,mallorca,0,40,1,0,0.1,0.0,2,1,1,24,62.5,0,0,0.0,0.0,0.0,7,2,1,0,0,0,0,0,0,0,0,0,18,121.0,77.0,2,1,0,100.0
+Raúl Moro,DT,valladolid,mallorca,1,90,0,0,0.2,0.1,2,2,0,31,64.5,0,0,0.0,0.0,0.0,1,1,5,0,4,1,0,1,0,1,0,1,22,191.0,53.0,1,0,0,0.0
+Kike Pérez,MC,valladolid,mallorca,1,64,0,0,0.1,0.0,2,2,0,16,81.3,1,0,0.0,0.0,0.0,1,2,1,0,0,0,0,0,0,1,0,1,14,106.0,52.0,3,0,0,0.0
+Stanko Jurić,MC,valladolid,mallorca,0,26,0,0,0.0,0.0,0,0,0,12,50.0,0,0,0.0,0.0,0.0,1,1,2,0,1,0,0,0,0,1,1,0,7,28.0,19.0,1,1,2,33.3
+Eray Cömert,MC,valladolid,mallorca,1,90,0,0,0.1,0.0,1,1,0,42,83.3,1,0,0.0,0.0,0.0,1,1,2,0,2,1,0,1,3,1,1,0,27,158.0,68.0,1,3,4,42.9
+Mario Martín,MC,valladolid,mallorca,1,64,0,0,0.1,0.0,1,1,0,29,89.7,0,0,0.0,0.0,0.0,4,2,2,0,1,0,0,0,1,3,1,2,20,80.0,12.0,0,0,1,0.0
+Mamadou Sylla,DT,valladolid,mallorca,0,26,0,0,0.0,0.1,0,0,0,4,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,0.0,0.0,0,1,1,50.0
+Lucas Oliveira Rosa,DF,valladolid,mallorca,1,90,0,0,0.0,0.1,0,0,0,48,79.2,0,0,0.0,0.0,0.0,1,0,0,0,0,2,1,1,1,1,0,1,26,142.0,80.0,3,2,0,100.0
+David Torres,DF,valladolid,mallorca,1,71,0,0,0.0,0.0,0,0,0,56,82.1,0,0,0.0,0.0,0.0,2,0,0,0,0,2,2,0,2,0,0,0,28,193.0,124.0,0,3,3,50.0
+Mario Maroto,MC,valladolid,mallorca,0,19,0,1,0.0,0.1,0,0,0,15,73.3,0,0,0.0,0.0,0.0,0,0,1,0,1,0,0,0,1,1,1,0,5,16.0,3.0,0,1,1,50.0
+Abdulai Juma Bah,DF,valladolid,mallorca,1,90,0,0,0.0,0.0,0,0,0,57,82.5,1,0,0.0,0.0,0.0,0,2,0,0,0,0,0,0,6,0,0,0,38,157.0,72.0,0,2,0,100.0
+Luis Pérez,DF,valladolid,mallorca,1,50,0,0,0.0,0.0,0,0,0,31,74.2,0,0,0.0,0.0,0.0,3,1,1,0,0,2,0,2,0,1,0,1,16,115.0,59.0,2,0,1,0.0
+Raúl Chasco,DF,valladolid,mallorca,0,40,0,0,0.0,0.0,0,0,0,29,65.5,0,0,0.0,0.0,0.0,-2,1,1,0,1,1,0,1,2,1,0,1,17,53.0,28.0,0,0,0,0.0
+Karl Jakob Hein,PT,valladolid,mallorca,1,90,0,0,0.0,0.0,0,0,0,33,90.9,0,0,2.0,66.7,2.8,5,0,0,0,0,0,0,0,0,0,0,0,19,85.0,57.0,0,0,0,0.0
+Cyle Larin,DT,mallorca,valladolid,1,74,1,0,1.0,0.0,4,3,1,9,77.8,0,0,0.0,0.0,0.0,9,0,0,0,0,1,0,1,0,1,0,1,11,41.0,20.0,1,2,7,22.2
+Abdón Prats,DT,mallorca,valladolid,0,16,0,0,0.0,0.0,1,1,0,6,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,6,15.0,8.0,0,2,1,66.7
+Dani Rodríguez,DT,mallorca,valladolid,1,75,0,1,0.0,0.8,0,0,0,20,80.0,0,0,0.0,0.0,0.0,12,1,1,0,0,0,0,0,1,0,0,0,19,65.0,17.0,0,2,1,66.7
+Chiquinho,DT,mallorca,valladolid,0,15,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,1,1,1,0,1,0,0,0,0,0,0,0,7,37.0,11.0,1,0,0,0.0
+Sergi Darder,MC,mallorca,valladolid,1,75,0,0,0.0,0.1,0,0,0,45,71.1,0,0,0.0,0.0,0.0,6,0,3,0,3,0,0,0,0,3,1,2,29,176.0,67.0,1,1,0,100.0
+Valery Fernández,MC,mallorca,valladolid,0,15,1,0,0.8,0.0,2,0,2,4,100.0,0,0,0.0,0.0,0.0,11,1,1,0,0,0,0,0,1,0,0,0,3,21.0,2.0,0,0,1,0.0
+Samu Costa,MC,mallorca,valladolid,1,90,0,0,0.1,0.0,3,2,1,60,81.7,1,0,0.0,0.0,0.0,5,6,2,0,1,2,1,1,6,0,0,0,39,212.0,93.0,1,1,1,50.0
+Manu Morlanes,MC,mallorca,valladolid,1,64,0,0,0.0,0.0,1,1,0,26,80.8,1,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,2,1,0,1,17,76.0,43.0,0,0,0,0.0
+Omar Mascarell,MC,mallorca,valladolid,0,26,0,0,0.0,0.0,0,0,0,12,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,1,0,0,0,5,57.0,26.0,0,0,0,0.0
+Roberto Navarro,MC,mallorca,valladolid,1,85,0,0,0.0,0.0,1,0,1,29,82.8,0,0,0.0,0.0,0.0,0,2,1,0,0,2,0,2,0,5,3,1,24,197.0,126.0,4,0,0,0.0
+Antonio Sánchez,MC,mallorca,valladolid,0,5,0,0,0.0,0.0,0,0,0,7,85.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,5,26.0,7.0,0,0,0,0.0
+Johan Mojica,DF,mallorca,valladolid,1,90,0,0,0.0,0.1,0,0,0,49,77.6,0,0,0.0,0.0,0.0,7,1,1,0,0,0,0,0,2,2,2,0,31,121.0,59.0,2,0,0,0.0
+Copete,DF,mallorca,valladolid,1,90,0,0,0.2,0.0,1,0,1,52,78.8,0,0,0.0,0.0,0.0,5,3,2,0,0,0,0,0,6,0,0,0,34,152.0,99.0,1,6,1,85.7
+Antonio Raillo,DF,mallorca,valladolid,1,90,0,0,0.0,0.2,2,2,0,40,85.0,0,0,0.0,0.0,0.0,7,1,0,0,0,2,2,0,5,0,0,0,26,156.0,91.0,2,6,4,60.0
+Pablo Maffeo,DF,mallorca,valladolid,1,90,0,0,0.1,0.5,2,2,0,51,76.5,0,0,0.0,0.0,0.0,6,3,1,0,0,2,1,1,1,4,3,1,30,155.0,93.0,1,0,2,0.0
+Leo Román,PT,mallorca,valladolid,1,90,0,0,0.0,0.0,0,0,0,37,45.9,0,0,1.0,0.0,0.9,1,0,0,0,0,0,0,0,0,0,0,0,17,97.0,46.0,0,0,0,0.0

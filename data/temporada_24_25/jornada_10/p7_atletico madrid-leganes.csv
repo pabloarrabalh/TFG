@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Alexander Sørloth,DT,atletico madrid,leganes,1,90,2,0,2.0,0.0,7,4,3,20,75.0,0,0,0.0,0.0,0.0,18,1,1,0,1,0,0,0,2,2,2,0,19,113.0,87.0,3,1,2,33.3
+Ángel Correa,DT,atletico madrid,leganes,1,56,0,0,0.8,0.0,5,3,2,21,66.7,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,1,0,1,25,106.0,50.0,3,0,0,0.0
+Julián Álvarez,DT,atletico madrid,leganes,0,34,0,1,0.2,0.4,3,2,1,25,80.0,0,0,0.0,0.0,0.0,11,1,1,0,1,0,0,0,0,6,4,2,27,161.0,90.0,4,0,0,0.0
+Antoine Griezmann,MC,atletico madrid,leganes,1,90,1,0,0.3,1.2,2,1,1,74,77.0,1,0,0.0,0.0,0.0,12,4,3,0,1,1,0,1,1,2,2,0,59,235.0,133.0,6,0,0,0.0
+Rodrigo Riquelme,MC,atletico madrid,leganes,1,56,0,0,0.1,0.0,2,1,1,31,74.2,0,0,0.0,0.0,0.0,0,1,4,0,3,1,0,1,0,4,1,3,28,246.0,135.0,7,0,0,0.0
+Giuliano Simeone,DF,atletico madrid,leganes,0,34,0,1,0.0,0.2,0,0,0,23,60.9,1,0,0.0,0.0,0.0,7,1,1,0,0,1,0,1,1,0,0,0,15,93.0,58.0,2,1,1,50.0
+Pablo Barrios,MC,atletico madrid,leganes,1,90,0,0,0.1,0.2,2,2,0,67,91.0,0,0,0.0,0.0,0.0,7,3,1,0,0,1,0,1,1,1,1,0,54,234.0,143.0,2,1,0,100.0
+Koke,MC,atletico madrid,leganes,1,56,0,0,0.0,0.1,0,0,0,62,88.7,0,0,0.0,0.0,0.0,4,0,1,0,1,0,0,0,0,0,0,0,48,258.0,151.0,1,0,0,0.0
+Rodrigo De Paul,MC,atletico madrid,leganes,0,34,0,0,0.1,0.0,1,1,0,25,72.0,1,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,20,115.0,50.0,0,1,0,100.0
+Javi Galán,DF,atletico madrid,leganes,1,90,0,0,0.0,0.0,1,1,0,60,86.7,1,0,0.0,0.0,0.0,3,4,4,0,1,1,0,1,0,2,2,0,45,203.0,133.0,3,1,0,100.0
+Clément Lenglet,DF,atletico madrid,leganes,1,63,0,0,0.0,0.1,0,0,0,49,85.7,1,0,0.0,0.0,0.0,3,0,0,0,0,1,1,0,1,1,1,0,44,375.0,259.0,3,1,3,25.0
+José María Giménez,DF,atletico madrid,leganes,0,27,0,0,0.0,0.0,0,0,0,16,87.5,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,1,0,0,0,11,64.0,48.0,0,3,0,100.0
+Axel Witsel,DF,atletico madrid,leganes,1,90,0,1,0.0,0.5,0,0,0,58,89.7,0,0,0.0,0.0,0.0,10,2,2,0,1,0,0,0,0,1,1,0,43,257.0,170.0,0,3,2,60.0
+Nahuel Molina,DF,atletico madrid,leganes,1,45,0,0,0.0,0.0,0,0,0,54,85.2,0,0,0.0,0.0,0.0,1,1,1,0,0,0,0,0,0,1,1,0,43,182.0,118.0,2,1,0,100.0
+Samuel Lino,MC,atletico madrid,leganes,0,45,0,0,0.7,0.5,1,1,0,25,72.0,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,2,1,1,25,171.0,117.0,3,0,0,0.0
+Jan Oblak,PT,atletico madrid,leganes,1,90,0,0,0.0,0.0,0,0,0,22,77.3,0,0,1.0,50.0,0.3,4,0,0,0,0,0,0,0,0,0,0,0,16,53.0,33.0,0,0,0,0.0
+Miguel,DT,leganes,atletico madrid,1,76,0,0,0.0,0.0,0,0,0,9,55.6,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,2,1,0,1,13,53.0,7.0,1,2,4,33.3
+Sébastien Haller,DT,leganes,atletico madrid,0,14,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,0,1,0,0,0,0,0,0,0,0,0,0,3,13.0,0.0,0,0,2,0.0
+Dani Raba,DT,leganes,atletico madrid,1,67,0,1,0.0,0.1,1,0,1,21,66.7,0,0,0.0,0.0,0.0,10,0,0,0,0,1,0,1,0,5,3,1,15,96.0,69.0,2,0,1,0.0
+Roberto López,MC,leganes,atletico madrid,0,23,0,0,0.0,0.0,0,0,0,16,62.5,0,0,0.0,0.0,0.0,0,1,1,0,1,0,0,0,1,0,0,0,9,29.0,15.0,0,0,1,0.0
+Seydouba Cissé,MC,leganes,atletico madrid,1,82,0,0,0.1,0.0,1,1,0,30,83.3,1,0,0.0,0.0,0.0,2,1,4,0,3,1,0,1,3,5,3,2,17,82.0,25.0,0,0,2,0.0
+Diego,DT,leganes,atletico madrid,0,8,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,3,11.0,8.0,0,0,0,0.0
+Renato Tapia,MC,leganes,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,34,70.6,0,0,0.0,0.0,0.0,1,3,4,0,2,5,5,0,3,2,0,2,17,33.0,13.0,0,2,0,100.0
+Yvan Neyou,MC,leganes,atletico madrid,1,90,1,0,0.1,0.1,1,0,1,33,87.9,0,0,0.0,0.0,0.0,10,1,2,0,2,2,0,2,3,3,0,2,25,95.0,42.0,2,0,1,0.0
+Juan Cruz,MC,leganes,atletico madrid,1,67,0,0,0.1,0.0,2,2,0,16,93.8,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,1,3,2,1,15,95.0,57.0,2,0,0,0.0
+Munir El Haddadi,MC,leganes,atletico madrid,0,23,0,0,0.0,0.0,0,0,0,10,60.0,0,0,0.0,0.0,0.0,0,0,1,0,1,0,0,0,0,0,0,0,9,39.0,5.0,0,1,1,50.0
+Javi Hernández,DF,leganes,atletico madrid,1,82,0,0,0.0,0.0,0,0,0,30,73.3,0,0,0.0,0.0,0.0,3,0,1,0,1,1,0,1,3,1,1,0,10,54.0,37.0,1,0,1,0.0
+Enric Franquesa,DF,leganes,atletico madrid,0,8,0,0,0.0,0.0,0,0,0,8,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,9,61.0,14.0,1,0,0,0.0
+Matija Nastasić,DF,leganes,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,46,78.3,0,0,0.0,0.0,0.0,4,0,0,0,0,1,1,0,15,0,0,0,21,69.0,19.0,0,3,0,100.0
+Sergi,DF,leganes,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,40,75.0,0,0,0.0,0.0,0.0,3,0,2,0,2,2,2,0,7,2,2,0,19,75.0,45.0,0,0,0,0.0
+Valentin Rosier,DF,leganes,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,36,83.3,0,0,0.0,0.0,0.0,4,5,8,0,4,0,0,0,11,0,0,0,16,46.0,8.0,0,0,0,0.0
+Marko Dmitrović,PT,leganes,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,34,61.8,0,0,3.0,62.5,3.6,5,0,0,0,0,0,0,0,2,0,0,0,18,75.0,46.0,0,0,0,0.0
