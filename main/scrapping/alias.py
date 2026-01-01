@@ -23,7 +23,6 @@ ALIAS_EQUIPOS = {
 # Dirección: nombre_largo_norm (CSV/FBRef) -> alias_corto_norm (Fantasy/HTML)
 ALIAS_JUGADORES_POR_TEMPORADA = {
     "25_26": {
-        "las palmas":{"fabio": "fabio gonzalez",},
         "espanyol": {"antoniu": "roca"},
         "rayo": {"isaac palazon camacho": "isi palazon"},
         "valencia": {"jose luis garcia vaya": "pepelu"},
@@ -51,8 +50,10 @@ ALIAS_JUGADORES_POR_TEMPORADA = {
         "sevilla": {"joaquin martinez gauna": "oso"},
     },
     "24_25": {
+        "atletico madrid": {"alexander sorloth": "sorloth"},
+        "las palmas":{"fabio": "fabio gonzalez",},
         "athletic": {  "nico williams": "n williams", "inaki williams": "i williams", },
-        "rayo": {"isaac palazon camacho": "isi palazon"},
+        "rayo": {"isaac palazon camacho": "isi"},
         "valencia": {"jose luis garcia vaya": "pepelu"},
         "betis": {"ezequiel avila": "chimy", },
         "espanyol": {"antoniu": "roca"},
@@ -61,6 +62,8 @@ ALIAS_JUGADORES_POR_TEMPORADA = {
         # FBRef: Arnau Martinez  -> Fantasy: Arnau
         "arnau martinez": "arnau",
         "arnaut danjuma": "danjuma",
+        "viktor tsyhankov": "tsygankov",
+
         # FBRef: Yangel Herrera   -> Fantasy: Herrera (esto ya lo tenías)
         "yangel herrera": "herrera",
         },
