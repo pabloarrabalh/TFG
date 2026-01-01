@@ -38,6 +38,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# ========== LOG ESPECÍFICO JUGADORES SIN ENTRADA ==========
+def log_jugadores_sin_entrada():
+    logger.info('24/25 J10->Villareal:Pau Navarro no tiene entrada en futbolfantasy.com')
+    logger.info('24/24 J15->Villareal:Pau Cabanes no tiene entrada en futbolfantasy.com')
+
 
 def contar_tarjetas_banquillo(df):
     if df is None or df.empty:
@@ -1028,8 +1033,6 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         nombre_norm = info["nombre_norm"]
         clave_registro = f"{nombre_norm}|{equipo_norm}|0|{pos_val}|fantasy_only}}"
 
-        # IMPORTANTE: ya NO se hace if clave_registro in bd_partido: continue
-        # siempre creamos una fila fantasy_only para tarjetas desde banquillo
         fila = {col: 0 for col in COLUMNAS_MODELO}
 
         fila["player"] = nombre_a_mayus(nombre_canonico_ff)
@@ -1046,6 +1049,17 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
 
     df_partido = pd.DataFrame.from_dict(bd_partido, orient="index")
     df_partido = postprocesar_df_partido(df_partido)
+
+    # ===== NUEVO: imprimir jugadores con puntosFantasy = 6767 =====
+    jugadores_6767 = df_partido[df_partido["puntosFantasy"] == 6767]
+    if not jugadores_6767.empty:
+        print("\nJugadores con puntosFantasy = 6767 en este partido:")
+        for _, fila in jugadores_6767.iterrows():
+            print(
+                f"- {fila['player']} ({fila['Equipo_propio']}) | "
+                f"pos: {fila['posicion']} | min: {fila['Min_partido']}"
+            )
+    # ===============================================================
 
     return df_partido, equipo_local, equipo_visitante
 
@@ -1168,10 +1182,13 @@ def procesar_un_partido(jornada: int, idx_partido: int):
 
 
 if __name__ == "__main__":
-    analizar_temporada("25_26", 1, 17)
+    analizar_temporada("24_25", 10, 20)
     '''
     TEMPORADA_ACTUAL = "24_25"
     CARPETA_HTML, CARPETA_CSV = _build_rutas_temporada(TEMPORADA_ACTUAL)
 
-    procesar_un_partido(jornada=4, idx_partido=8)
+    procesar_un_partido(jornada=10, idx_partido=7)
+
 '''
+
+log_jugadores_sin_entrada()

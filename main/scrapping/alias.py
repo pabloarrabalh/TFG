@@ -69,6 +69,11 @@ ALIAS_JUGADORES_POR_TEMPORADA = {
         # FBRef: John Joe         -> Fantasy: Patrick Finn
         "john joe": "patrick finn",
         }, 
+        "sevilla": {
+            # NUEVO: FBRef Álvaro Pascual -> Fantasy García Pascual
+            "alvaro pascual": "garcia pascual",
+        },
+        "valladolid":{"adrian baquerin": "arnu",}
     },
 }
 
