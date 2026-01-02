@@ -24,33 +24,21 @@ ALIAS_EQUIPOS = {
 ALIAS_JUGADORES_POR_TEMPORADA = {
     "25_26": {
         "espanyol": {"antoniu": "roca"},
-        "rayo": {"isaac palazon camacho": "isi palazon"},
+        "rayo": {"isaac palazon camacho": "isi"},
         "valencia": {"jose luis garcia vaya": "pepelu"},
-        "betis": {
-            "ezequiel avila": "chimy",
-            "daniel guerrero": "dani perez",
-        },
+        "betis": {"ezequiel avila": "chimy","daniel guerrero": "dani perez",},
         "levante": {"pablo cunat": "cunat campos"},
         "oviedo": {"rahim bonkano": "alhassane"},
-        "girona": {
-            "lancinet kourouma": "lass",
-            "viktor tsyhankov": "tsygankov",
-        },
+        "girona": {"lancinet kourouma": "lass","viktor tsyhankov": "tsygankov",},
         "celta": {"el abdellaoui": "elabdellaoui"},
-        "real sociedad": {
-            "caleta car": "caletacar",
-            "duje caleta car": "duje caletacar",
-        },
+        "real sociedad": { "caleta car": "caletacar"},
         "real madrid": {"trent alexander arnold": "alexanderarnold"},
         "atletico madrid": {"alexander sorloth": "sorloth"},
-        "athletic": {
-            "nico williams": "n williams",
-            "inaki williams": "i williams",
-        },
+        "athletic": {"nico williams": "n williams","inaki williams": "i williams",},
         "sevilla": {"joaquin martinez gauna": "oso"},
     },
     "24_25": {
-        "atletico madrid": {"alexander sorloth": "sorloth"}, #TOCADO
+        "atletico madrid": {"alexander sorloth": "sorloth"}, 
         "las palmas":{"fabio": "fabio gonzalez","jose carlos gonzalez": "josito", },
         "athletic": {  "nico williams": "n williams", "inaki williams": "i williams", },
         "rayo": {"isaac palazon camacho": "isi"},

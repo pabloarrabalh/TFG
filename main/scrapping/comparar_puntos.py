@@ -690,6 +690,6 @@ def comparar_partido(
 
 if __name__ == "__main__":
     # ejemplo: rango completo
-    comprobar_rango_jornadas("24_25", 1, 38)
+    comprobar_rango_jornadas("25_26", 1, 17)
     # o solo un partido:
     # comparar_partido("24_25", 15, 2)
