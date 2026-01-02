@@ -2,6 +2,7 @@ import os
 import re
 from io import StringIO
 import logging
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
@@ -31,7 +32,7 @@ from alias import (
     COLUMNAS_MODELO,
     UMBRAL_MATCH,
 )
-
+from roles import ROLES_DESTACADOS  # <--- NUEVO
 
 # ========== LOGGING ==========
 logging.basicConfig(
@@ -407,12 +408,6 @@ def obtener_fantasy_jornada(jornada):
 
 
 def obtener_nombres_partido(html_partido):
-    """
-    A partir del HTML de un partido de FBRef, intenta extraer:
-        - equipo_local
-        - equipo_visitante
-    Usando la etiqueta <title> y el patrón "Local vs. Visitante Match".
-    """
     soup = BeautifulSoup(html_partido, "lxml")
     tag_title = soup.find("title")
 
@@ -431,12 +426,36 @@ def obtener_nombres_partido(html_partido):
     return equipo_local, equipo_visitante
 
 
-def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido, jornada):
+def obtener_fecha_partido(html_partido):
     """
-    Core de integración FBRef + Fantasy para un partido.
+    Extrae la fecha del partido desde el div.scorebox_meta (atributo data-venue-date)
+    y la devuelve como cadena en formato dd/mm/yyyy.
     """
     soup = BeautifulSoup(html_partido, "lxml")
+    scorebox = soup.find("div", class_="scorebox_meta")
+    if not scorebox:
+        return None
+
+    span_venuetime = scorebox.find("span", class_="venuetime")
+    if not span_venuetime:
+        return None
+
+    fecha_raw = span_venuetime.get("data-venue-date")
+    if not fecha_raw:
+        return None
+
+    try:
+        dt = datetime.strptime(fecha_raw, "%Y-%m-%d")
+        return dt.strftime("%d/%m/%Y")
+    except ValueError:
+        return None
+
+
+def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido, jornada):
+    soup = BeautifulSoup(html_partido, "lxml")
     tag_title = soup.find("title")
+
+    fecha_partido = obtener_fecha_partido(html_partido)
 
     if tag_title:
         title = tag_title.get_text()
@@ -734,6 +753,7 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido, jornada):
             # Contexto
             fila_nueva["temporada"] = TEMPORADA_ACTUAL
             fila_nueva["jornada"] = jornada
+            fila_nueva["fecha_partido"] = fecha_partido
 
             # Entidad
             fila_nueva["player"] = nombre_fb
@@ -750,6 +770,9 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido, jornada):
             fila_nueva["Goles_en_contra"] = np.nan
             fila_nueva["Porcentaje_paradas"] = np.nan
             fila_nueva["PSxG"] = np.nan
+
+            # Columna roles: lista vacía
+            fila_nueva["roles"] = []
 
             bd_partido[clave_registro] = fila_nueva
 
@@ -884,6 +907,7 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido, jornada):
 
         fila["temporada"] = TEMPORADA_ACTUAL
         fila["jornada"] = jornada
+        fila["fecha_partido"] = fecha_partido
         fila["player"] = nombre_a_mayus(nombre_canonico_ff)
         fila["posicion"] = pos_val
         fila["Equipo_propio"] = equipo_norm
@@ -895,10 +919,30 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido, jornada):
         fila["Amarillas"] = amarillas_banquillo
         fila["Rojas"] = rojas_banquillo
 
+        # Columna roles también para estos casos
+        fila["roles"] = []
+
         bd_partido[clave_registro] = fila
 
     df_partido = pd.DataFrame.from_dict(bd_partido, orient="index")
     df_partido = postprocesar_df_partido(df_partido)
+
+    # Asegurar columna roles en el DataFrame, por si postprocesar la borra o reordena
+    if "roles" not in df_partido.columns:
+        df_partido["roles"] = df_partido.index.to_series().apply(lambda _: [])
+
+    # Rellenar roles desde el dict por temporada (sincronizado por nombre canónico)
+    mapa_roles_temp = ROLES_DESTACADOS.get(TEMPORADA_ACTUAL, {})
+
+    def _asignar_roles_fila(fila):
+        nombre_canonico = normalizar_texto(
+            aplicar_alias_jugador_temporada(
+                fila["player"], fila["Equipo_propio"], TEMPORADA_ACTUAL
+            )
+        )
+        return [r for r in mapa_roles_temp.get(nombre_canonico, [])]
+
+    df_partido["roles"] = df_partido.apply(_asignar_roles_fila, axis=1)
 
     jugadores_6767 = df_partido[df_partido["puntosFantasy"] == 6767]
     if not jugadores_6767.empty:
@@ -913,9 +957,6 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido, jornada):
 
 
 def procesar_jornada(jornada: int):
-    """
-    Procesa los 10 partidos de una jornada.
-    """
     sj = str(jornada)
     print(f"\n=== JORNADA {sj} (temp {TEMPORADA_ACTUAL}) ===")
 
@@ -970,18 +1011,11 @@ def procesar_jornada(jornada: int):
 
 
 def procesar_rango_jornadas(jornada_inicio: int, jornada_fin: int):
-    """
-    Procesa un rango de jornadas consecutivas.
-    """
     for j in range(jornada_inicio, jornada_fin + 1):
         procesar_jornada(j)
 
 
 def analizar_temporada(codigo_temporada: str, j_ini: int = 1, j_fin: int = 38):
-    """
-    Reconfigura TEMPORADA_ACTUAL y las carpetas asociadas, y procesa
-    un rango de jornadas para esa temporada.
-    """
     global TEMPORADA_ACTUAL, CARPETA_HTML, CARPETA_CSV
 
     TEMPORADA_ACTUAL = codigo_temporada
@@ -992,9 +1026,6 @@ def analizar_temporada(codigo_temporada: str, j_ini: int = 1, j_fin: int = 38):
 
 
 def procesar_un_partido(jornada: int, idx_partido: int):
-    """
-    Procesa un único partido (útil para debug).
-    """
     sj = str(jornada)
 
     fantasy_por_partido = obtener_fantasy_jornada(sj)
@@ -1044,7 +1075,15 @@ def procesar_un_partido(jornada: int, idx_partido: int):
     print(f"✅ CSV generado: J{sj} P{idx_partido} {eq_loc_norm}-{eq_vis_norm}")
 
 
+import time
+
+
 if __name__ == "__main__":
+    inicio = time.perf_counter()
+
     analizar_temporada("23_24", 1, 38)
     analizar_temporada("24_25", 1, 38)
     analizar_temporada("25_26", 1, 38)
+    fin = time.perf_counter()
+    duracion = fin - inicio
+    print(f"\nTiempo total de ejecución: {duracion:.2f} segundos")
