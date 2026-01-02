@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Juanmi,DT,cadiz,atletico madrid,1,67,2,0,0.9,0.0,2,0,2,19,78.9,1,0,0.0,0.0,0.0,16,4,3,0,2,1,0,1,0,4,1,3,18,95.0,24.0,1,1,1,50.0
-Álex Fernández,MC,cadiz,atletico madrid,0,23,0,0,0.0,0.0,1,1,0,12,50.0,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,1,0,0,0,9,40.0,9.0,0,1,0,100.0
-Maxi Gómez,DT,cadiz,atletico madrid,1,67,0,0,0.0,0.0,0,0,0,12,41.7,0,0,0.0,0.0,0.0,3,1,1,0,1,0,0,0,0,1,0,1,11,40.0,9.0,0,4,3,57.1
-Chris Ramos,DT,cadiz,atletico madrid,0,23,0,0,0.0,0.0,1,1,0,7,100.0,0,0,0.0,0.0,0.0,2,2,0,0,0,0,0,0,1,0,0,0,9,42.0,21.0,1,4,5,44.4
-Rubén Sobrino,MC,cadiz,atletico madrid,1,86,0,1,0.1,0.7,1,1,0,35,68.6,1,0,0.0,0.0,0.0,9,4,2,0,0,4,0,4,0,1,0,1,28,137.0,44.0,2,0,0,0.0
-Iván Alejo,MC,cadiz,atletico madrid,0,4,0,0,0.0,0.0,0,0,0,3,66.7,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,1,0,4,25.0,0.0,0,0,0,0.0
-Rominigue Kouamé,MC,cadiz,atletico madrid,1,67,0,0,0.0,0.0,0,0,0,36,88.9,0,0,0.0,0.0,0.0,8,1,3,0,2,2,0,2,3,0,0,0,25,151.0,59.0,0,1,1,50.0
-Diadie Samassékou,MC,cadiz,atletico madrid,0,23,0,0,0.0,0.0,0,0,0,8,100.0,0,0,0.0,0.0,0.0,2,2,3,0,1,0,0,0,0,0,0,0,4,28.0,3.0,0,1,1,50.0
-Rubén Alcaraz,MC,cadiz,atletico madrid,1,90,0,0,0.0,0.0,2,1,1,47,87.2,1,0,0.0,0.0,0.0,7,3,3,0,2,1,0,1,2,1,1,0,32,95.0,38.0,0,2,0,100.0
-Roberto Navarro,MC,cadiz,atletico madrid,1,77,0,0,0.0,0.1,0,0,0,23,60.9,0,0,0.0,0.0,0.0,5,0,2,0,2,1,0,1,2,6,3,3,27,228.0,135.0,5,0,0,0.0
-Lucas,DF,cadiz,atletico madrid,0,13,0,0,0.0,0.0,0,0,0,7,71.4,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,7,39.0,11.0,0,0,0,0.0
-Javi Hernández,DF,cadiz,atletico madrid,1,90,0,1,0.0,0.3,0,0,0,46,71.7,0,0,0.0,0.0,0.0,10,0,0,0,0,2,0,2,1,3,0,3,38,238.0,78.0,0,1,0,100.0
-Víctor Chust,DF,cadiz,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,35,80.0,0,0,0.0,0.0,0.0,10,3,3,0,0,1,1,0,7,1,1,0,29,121.0,14.0,0,1,1,50.0
-Aiham Ousou,DF,cadiz,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,38,84.2,0,0,0.0,0.0,0.0,8,2,1,0,0,0,0,0,5,0,0,0,24,163.0,93.0,0,1,1,50.0
-Isaac Carcelen,DF,cadiz,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,38,73.7,0,0,0.0,0.0,0.0,7,2,2,0,1,0,0,0,1,0,0,0,23,106.0,51.0,1,0,0,0.0
-Jeremías Ledesma,PT,cadiz,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,40,37.5,0,0,0.0,100.0,0.6,12,0,0,0,0,0,0,0,0,0,0,0,27,234.0,172.0,0,0,0,0.0
-Álvaro Morata,DT,atletico madrid,cadiz,1,90,0,0,0.5,0.1,1,1,0,22,63.6,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,2,0,2,13,39.0,10.0,0,3,2,60.0
-Memphis,DT,atletico madrid,cadiz,1,45,0,0,0.1,0.0,1,0,1,12,83.3,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,3,0,3,12,35.0,14.0,0,0,1,0.0
-Ángel Correa,DT,atletico madrid,cadiz,0,45,0,0,0.1,0.0,3,2,1,13,69.2,0,0,0.0,0.0,0.0,5,1,1,0,0,1,0,1,0,6,4,2,16,75.0,37.0,1,0,1,0.0
-Saúl Ñíguez,MC,atletico madrid,cadiz,1,45,0,0,0.0,0.0,0,0,0,22,72.7,0,0,0.0,0.0,0.0,1,2,2,0,0,1,0,1,0,0,0,0,17,50.0,15.0,0,0,1,0.0
-Nahuel Molina,DF,atletico madrid,cadiz,0,45,0,0,0.0,0.0,0,0,0,38,60.5,1,0,0.0,0.0,0.0,-2,0,1,0,1,0,0,0,2,2,1,1,23,122.0,56.0,3,0,0,0.0
-Koke,MC,atletico madrid,cadiz,1,77,0,0,0.0,0.0,0,0,0,84,88.1,0,0,0.0,0.0,0.0,2,3,4,0,1,1,0,1,1,0,0,0,59,265.0,113.0,1,0,1,0.0
-Salim El Jebari,MC,atletico madrid,cadiz,0,13,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,0,1,0,0,0,0,0,0,1,0,0,0,5,47.0,24.0,1,0,2,0.0
-Rodrigo De Paul,MC,atletico madrid,cadiz,1,45,0,0,0.0,0.0,0,0,0,31,77.4,0,0,0.0,0.0,0.0,2,0,1,0,1,1,0,1,0,2,1,1,29,187.0,95.0,2,0,0,0.0
-Rodrigo Riquelme,MC,atletico madrid,cadiz,0,45,0,0,0.0,0.3,0,0,0,24,58.3,0,0,0.0,0.0,0.0,2,1,3,0,2,0,0,0,0,2,0,2,18,58.0,31.0,1,0,0,0.0
-Samuel Lino,DF,atletico madrid,cadiz,1,70,0,0,0.1,0.1,2,1,1,39,82.1,0,0,0.0,0.0,0.0,4,2,1,0,1,1,0,1,1,3,2,1,36,271.0,138.0,8,0,0,0.0
-Arthur Vermeeren,MC,atletico madrid,cadiz,0,20,0,0,0.0,0.0,0,0,0,22,95.5,1,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,1,1,0,1,15,74.0,44.0,1,1,1,50.0
-Mario Hermoso,DF,atletico madrid,cadiz,1,90,0,0,0.0,0.0,0,0,0,89,87.6,0,0,0.0,0.0,0.0,2,1,1,0,0,1,0,1,0,2,2,0,67,394.0,252.0,5,1,1,50.0
-Gabriel Paulista,DF,atletico madrid,cadiz,1,90,0,0,0.0,0.0,0,0,0,66,84.8,0,0,0.0,0.0,0.0,2,3,1,0,0,3,2,1,4,0,0,0,43,233.0,93.0,0,4,1,80.0
-Axel Witsel,DF,atletico madrid,cadiz,1,90,0,0,0.0,0.0,0,0,0,78,83.3,0,0,0.0,0.0,0.0,3,1,0,0,0,1,0,1,2,2,2,0,57,317.0,243.0,3,4,5,44.4
-Marcos Llorente,DF,atletico madrid,cadiz,1,90,0,0,0.2,0.0,1,0,1,52,78.8,1,0,0.0,0.0,0.0,1,2,2,0,0,1,1,0,1,0,0,0,41,141.0,55.0,0,0,1,0.0
-Jan Oblak,PT,atletico madrid,cadiz,1,90,0,0,0.0,0.0,0,0,0,16,81.3,0,0,2.0,33.3,1.8,2,0,0,0,0,0,0,0,1,0,0,0,10,63.0,29.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Juanmi,DT,cadiz,atletico madrid,1,67,2,0,0.9,0.0,2,0,2,19,78.9,1,0,0.0,0.0,0.0,16,4,3,0,2,1,0,1,0,4,1,3,18,95.0,24.0,1,1,1,50.0,23_24,28,1
+Álex Fernández,MC,cadiz,atletico madrid,0,23,0,0,0.0,0.0,1,1,0,12,50.0,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,1,0,0,0,9,40.0,9.0,0,1,0,100.0,23_24,28,1
+Maxi Gómez,DT,cadiz,atletico madrid,1,67,0,0,0.0,0.0,0,0,0,12,41.7,0,0,0.0,0.0,0.0,3,1,1,0,1,0,0,0,0,1,0,1,11,40.0,9.0,0,4,3,57.1,23_24,28,1
+Chris Ramos,DT,cadiz,atletico madrid,0,23,0,0,0.0,0.0,1,1,0,7,100.0,0,0,0.0,0.0,0.0,2,2,0,0,0,0,0,0,1,0,0,0,9,42.0,21.0,1,4,5,44.4,23_24,28,1
+Rubén Sobrino,MC,cadiz,atletico madrid,1,86,0,1,0.1,0.7,1,1,0,35,68.6,1,0,0.0,0.0,0.0,9,4,2,0,0,4,0,4,0,1,0,1,28,137.0,44.0,2,0,0,0.0,23_24,28,1
+Iván Alejo,MC,cadiz,atletico madrid,0,4,0,0,0.0,0.0,0,0,0,3,66.7,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,1,0,4,25.0,0.0,0,0,0,0.0,23_24,28,1
+Rominigue Kouamé,MC,cadiz,atletico madrid,1,67,0,0,0.0,0.0,0,0,0,36,88.9,0,0,0.0,0.0,0.0,8,1,3,0,2,2,0,2,3,0,0,0,25,151.0,59.0,0,1,1,50.0,23_24,28,1
+Diadie Samassékou,MC,cadiz,atletico madrid,0,23,0,0,0.0,0.0,0,0,0,8,100.0,0,0,0.0,0.0,0.0,2,2,3,0,1,0,0,0,0,0,0,0,4,28.0,3.0,0,1,1,50.0,23_24,28,1
+Rubén Alcaraz,MC,cadiz,atletico madrid,1,90,0,0,0.0,0.0,2,1,1,47,87.2,1,0,0.0,0.0,0.0,7,3,3,0,2,1,0,1,2,1,1,0,32,95.0,38.0,0,2,0,100.0,23_24,28,1
+Roberto Navarro,MC,cadiz,atletico madrid,1,77,0,0,0.0,0.1,0,0,0,23,60.9,0,0,0.0,0.0,0.0,5,0,2,0,2,1,0,1,2,6,3,3,27,228.0,135.0,5,0,0,0.0,23_24,28,1
+Lucas,DF,cadiz,atletico madrid,0,13,0,0,0.0,0.0,0,0,0,7,71.4,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,7,39.0,11.0,0,0,0,0.0,23_24,28,1
+Javi Hernández,DF,cadiz,atletico madrid,1,90,0,1,0.0,0.3,0,0,0,46,71.7,0,0,0.0,0.0,0.0,10,0,0,0,0,2,0,2,1,3,0,3,38,238.0,78.0,0,1,0,100.0,23_24,28,1
+Víctor Chust,DF,cadiz,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,35,80.0,0,0,0.0,0.0,0.0,10,3,3,0,0,1,1,0,7,1,1,0,29,121.0,14.0,0,1,1,50.0,23_24,28,1
+Aiham Ousou,DF,cadiz,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,38,84.2,0,0,0.0,0.0,0.0,8,2,1,0,0,0,0,0,5,0,0,0,24,163.0,93.0,0,1,1,50.0,23_24,28,1
+Isaac Carcelen,DF,cadiz,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,38,73.7,0,0,0.0,0.0,0.0,7,2,2,0,1,0,0,0,1,0,0,0,23,106.0,51.0,1,0,0,0.0,23_24,28,1
+Jeremías Ledesma,PT,cadiz,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,40,37.5,0,0,0.0,100.0,0.6,12,0,0,0,0,0,0,0,0,0,0,0,27,234.0,172.0,0,0,0,0.0,23_24,28,1
+Álvaro Morata,DT,atletico madrid,cadiz,1,90,0,0,0.5,0.1,1,1,0,22,63.6,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,2,0,2,13,39.0,10.0,0,3,2,60.0,23_24,28,0
+Memphis,DT,atletico madrid,cadiz,1,45,0,0,0.1,0.0,1,0,1,12,83.3,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,3,0,3,12,35.0,14.0,0,0,1,0.0,23_24,28,0
+Ángel Correa,DT,atletico madrid,cadiz,0,45,0,0,0.1,0.0,3,2,1,13,69.2,0,0,0.0,0.0,0.0,5,1,1,0,0,1,0,1,0,6,4,2,16,75.0,37.0,1,0,1,0.0,23_24,28,0
+Saúl Ñíguez,MC,atletico madrid,cadiz,1,45,0,0,0.0,0.0,0,0,0,22,72.7,0,0,0.0,0.0,0.0,1,2,2,0,0,1,0,1,0,0,0,0,17,50.0,15.0,0,0,1,0.0,23_24,28,0
+Nahuel Molina,DF,atletico madrid,cadiz,0,45,0,0,0.0,0.0,0,0,0,38,60.5,1,0,0.0,0.0,0.0,-2,0,1,0,1,0,0,0,2,2,1,1,23,122.0,56.0,3,0,0,0.0,23_24,28,0
+Koke,MC,atletico madrid,cadiz,1,77,0,0,0.0,0.0,0,0,0,84,88.1,0,0,0.0,0.0,0.0,2,3,4,0,1,1,0,1,1,0,0,0,59,265.0,113.0,1,0,1,0.0,23_24,28,0
+Salim El Jebari,MC,atletico madrid,cadiz,0,13,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,0,1,0,0,0,0,0,0,1,0,0,0,5,47.0,24.0,1,0,2,0.0,23_24,28,0
+Rodrigo De Paul,MC,atletico madrid,cadiz,1,45,0,0,0.0,0.0,0,0,0,31,77.4,0,0,0.0,0.0,0.0,2,0,1,0,1,1,0,1,0,2,1,1,29,187.0,95.0,2,0,0,0.0,23_24,28,0
+Rodrigo Riquelme,MC,atletico madrid,cadiz,0,45,0,0,0.0,0.3,0,0,0,24,58.3,0,0,0.0,0.0,0.0,2,1,3,0,2,0,0,0,0,2,0,2,18,58.0,31.0,1,0,0,0.0,23_24,28,0
+Samuel Lino,DF,atletico madrid,cadiz,1,70,0,0,0.1,0.1,2,1,1,39,82.1,0,0,0.0,0.0,0.0,4,2,1,0,1,1,0,1,1,3,2,1,36,271.0,138.0,8,0,0,0.0,23_24,28,0
+Arthur Vermeeren,MC,atletico madrid,cadiz,0,20,0,0,0.0,0.0,0,0,0,22,95.5,1,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,1,1,0,1,15,74.0,44.0,1,1,1,50.0,23_24,28,0
+Mario Hermoso,DF,atletico madrid,cadiz,1,90,0,0,0.0,0.0,0,0,0,89,87.6,0,0,0.0,0.0,0.0,2,1,1,0,0,1,0,1,0,2,2,0,67,394.0,252.0,5,1,1,50.0,23_24,28,0
+Gabriel Paulista,DF,atletico madrid,cadiz,1,90,0,0,0.0,0.0,0,0,0,66,84.8,0,0,0.0,0.0,0.0,2,3,1,0,0,3,2,1,4,0,0,0,43,233.0,93.0,0,4,1,80.0,23_24,28,0
+Axel Witsel,DF,atletico madrid,cadiz,1,90,0,0,0.0,0.0,0,0,0,78,83.3,0,0,0.0,0.0,0.0,3,1,0,0,0,1,0,1,2,2,2,0,57,317.0,243.0,3,4,5,44.4,23_24,28,0
+Marcos Llorente,DF,atletico madrid,cadiz,1,90,0,0,0.2,0.0,1,0,1,52,78.8,1,0,0.0,0.0,0.0,1,2,2,0,0,1,1,0,1,0,0,0,41,141.0,55.0,0,0,1,0.0,23_24,28,0
+Jan Oblak,PT,atletico madrid,cadiz,1,90,0,0,0.0,0.0,0,0,0,16,81.3,0,0,2.0,33.3,1.8,2,0,0,0,0,0,0,0,1,0,0,0,10,63.0,29.0,0,0,0,0.0,23_24,28,0

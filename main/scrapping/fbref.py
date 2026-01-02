@@ -1045,4 +1045,6 @@ def procesar_un_partido(jornada: int, idx_partido: int):
 
 
 if __name__ == "__main__":
-    analizar_temporada("24_25", 1, 5)
+    analizar_temporada("23_24", 1, 38)
+    analizar_temporada("24_25", 1, 38)
+    analizar_temporada("25_26", 1, 38)

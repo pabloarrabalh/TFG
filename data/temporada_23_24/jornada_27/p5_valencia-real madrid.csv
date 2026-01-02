@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Roman Yaremchuk,DT,valencia,real madrid,1,56,1,0,0.6,0.0,1,0,1,14,64.3,1,0,0.0,0.0,0.0,8,1,1,0,0,0,0,0,1,1,1,0,13,93.0,74.0,2,0,2,0.0
-Diego López,MC,valencia,real madrid,0,34,0,0,0.1,0.0,1,0,1,4,50.0,0,0,0.0,0.0,0.0,1,0,2,0,2,1,0,1,0,1,0,0,4,35.0,8.0,0,1,1,50.0
-Hugo Duro,DT,valencia,real madrid,1,90,1,0,0.2,0.0,2,0,2,19,78.9,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,2,0,0,0,18,33.0,15.0,0,1,2,33.3
-Sergi Canós,MC,valencia,real madrid,1,56,0,0,0.0,0.0,0,0,0,14,42.9,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,1,2,0,2,14,56.0,14.0,0,1,0,100.0
-Hugo Guillamón,MC,valencia,real madrid,0,34,0,0,0.0,0.0,0,0,0,16,75.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,2,2,0,14,35.0,15.0,0,0,0,0.0
-Javier Guerra,MC,valencia,real madrid,1,72,0,0,0.1,0.0,3,3,0,31,77.4,0,0,0.0,0.0,0.0,2,3,2,0,0,1,0,1,1,1,1,0,33,192.0,69.0,1,0,1,0.0
-Selim Amallah,DT,valencia,real madrid,0,18,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,2,30.0,6.0,0,0,1,0.0
-José Luis García Vayá,MC,valencia,real madrid,1,90,0,0,0.1,0.0,2,2,0,49,73.5,0,0,0.0,0.0,0.0,4,4,3,0,0,0,0,0,2,0,0,0,28,116.0,54.0,1,0,1,0.0
-Francisco Perez,MC,valencia,real madrid,1,72,0,1,0.1,0.3,1,1,0,25,92.0,0,0,0.0,0.0,0.0,12,2,3,0,1,0,0,0,0,2,0,1,24,108.0,61.0,3,0,0,0.0
-Peter González,MC,valencia,real madrid,0,18,0,0,0.1,0.0,2,1,1,5,80.0,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,2,2,0,8,49.0,15.0,1,0,0,0.0
-José Luis Gayà,DF,valencia,real madrid,1,90,0,0,0.0,0.1,0,0,0,33,69.7,0,0,0.0,0.0,0.0,1,2,1,0,0,1,0,1,2,0,0,0,19,67.0,23.0,0,1,0,100.0
-Mouctar Diakhaby,DF,valencia,real madrid,1,88,0,0,0.0,0.0,0,0,0,24,83.3,1,0,0.0,0.0,0.0,-1,1,0,0,0,0,0,0,1,0,0,0,21,79.0,58.0,0,0,0,0.0
-Cenk Özkacar,DF,valencia,real madrid,0,2,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,10.0,0.0,0,0,0,0.0
-Cristhian Mosquera,DF,valencia,real madrid,1,90,0,0,0.0,0.0,0,0,0,26,84.6,0,0,0.0,0.0,0.0,3,2,2,0,1,0,0,0,5,0,0,0,21,70.0,38.0,0,0,0,0.0
-Dimitri Foulquier,DF,valencia,real madrid,1,90,0,0,0.0,0.1,0,0,0,44,81.8,0,0,0.0,0.0,0.0,2,3,3,0,0,0,0,0,3,0,0,0,26,139.0,95.0,3,0,0,0.0
-Giorgi Mamardashvili,PT,valencia,real madrid,1,90,0,0,0.0,0.0,0,0,0,27,51.9,0,0,2.0,60.0,2.4,2,0,0,0,0,0,0,0,0,0,0,0,14,76.0,41.0,0,1,0,100.0
-Vinicius Júnior,DT,real madrid,valencia,1,90,2,0,1.7,0.0,3,1,2,27,66.7,1,0,0.0,0.0,0.0,12,1,1,0,1,1,0,1,0,4,0,3,24,179.0,71.0,2,0,1,0.0
-Rodrygo,DT,real madrid,valencia,1,62,0,1,0.0,0.9,0,0,0,26,92.3,0,0,0.0,0.0,0.0,6,0,0,0,0,1,0,1,0,2,0,0,22,117.0,54.0,1,0,1,0.0
-Brahim Díaz,DT,real madrid,valencia,0,28,0,1,0.1,0.8,1,1,0,13,76.9,0,0,0.0,0.0,0.0,8,0,1,0,1,0,0,0,0,3,1,2,10,36.0,18.0,1,0,0,0.0
-Jude Bellingham,MC,real madrid,valencia,1,89,0,0,0.2,0.0,1,0,1,57,80.7,0,1,0.0,0.0,0.0,-1,1,0,0,0,0,0,0,0,4,1,2,35,151.0,90.0,2,1,1,50.0
-Eduardo Camavinga,MC,real madrid,valencia,1,71,0,0,0.1,0.0,2,1,1,69,92.8,0,0,0.0,0.0,0.0,3,2,1,0,0,1,0,1,0,3,0,2,42,180.0,61.0,1,2,0,100.0
-Joselu,DT,real madrid,valencia,0,19,0,0,0.0,0.0,0,0,0,2,100.0,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,1,0,0,0,1,7.0,0.0,0,0,0,0.0
-Toni Kroos,MC,real madrid,valencia,1,62,0,0,0.1,0.0,2,2,0,91,94.5,0,0,0.0,0.0,0.0,4,0,1,0,1,1,1,0,0,0,0,0,50,340.0,195.0,2,0,0,0.0
-Luka Modrić,MC,real madrid,valencia,0,28,0,0,0.0,0.1,0,0,0,41,82.9,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,0,0,0,25,178.0,113.0,3,0,0,0.0
-Federico Valverde,MC,real madrid,valencia,1,85,0,0,0.0,0.0,1,0,1,74,91.9,1,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,1,3,1,2,42,223.0,135.0,2,0,1,0.0
-Nacho,DF,real madrid,valencia,0,5,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,0,0.0,0.0,0,0,0,0.0
-Ferland Mendy,DF,real madrid,valencia,1,71,0,0,0.0,0.3,0,0,0,79,93.7,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,1,2,1,1,43,209.0,89.0,0,0,0,0.0
-Fran Garcia,DF,real madrid,valencia,0,19,0,0,0.0,0.0,0,0,0,12,66.7,0,0,0.0,0.0,0.0,2,1,1,0,1,0,0,0,0,1,1,0,6,32.0,23.0,1,0,0,0.0
-Antonio Rüdiger,DF,real madrid,valencia,1,90,0,0,0.0,0.0,0,0,0,87,94.3,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,4,0,0,0,41,243.0,167.0,0,3,0,100.0
-Aurélien Tchouaméni,DF,real madrid,valencia,1,90,0,0,0.0,0.0,0,0,0,92,90.2,0,0,0.0,0.0,0.0,4,2,0,0,0,0,0,0,4,1,0,1,60,430.0,291.0,3,0,1,0.0
-Dani Carvajal,DF,real madrid,valencia,1,90,0,0,0.0,0.0,0,0,0,74,82.4,0,0,0.0,0.0,0.0,0,2,2,0,1,5,1,4,1,0,0,0,30,154.0,70.0,1,1,0,100.0
-Andriy Lunin,PT,real madrid,valencia,1,90,0,0,0.0,0.0,0,0,0,32,93.8,0,0,2.0,60.0,1.7,4,0,1,0,1,0,0,0,1,0,0,0,15,71.0,55.0,0,1,0,100.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Roman Yaremchuk,DT,valencia,real madrid,1,56,1,0,0.6,0.0,1,0,1,14,64.3,1,0,0.0,0.0,0.0,8,1,1,0,0,0,0,0,1,1,1,0,13,93.0,74.0,2,0,2,0.0,23_24,27,1
+Diego López,MC,valencia,real madrid,0,34,0,0,0.1,0.0,1,0,1,4,50.0,0,0,0.0,0.0,0.0,1,0,2,0,2,1,0,1,0,1,0,0,4,35.0,8.0,0,1,1,50.0,23_24,27,1
+Hugo Duro,DT,valencia,real madrid,1,90,1,0,0.2,0.0,2,0,2,19,78.9,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,2,0,0,0,18,33.0,15.0,0,1,2,33.3,23_24,27,1
+Sergi Canós,MC,valencia,real madrid,1,56,0,0,0.0,0.0,0,0,0,14,42.9,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,1,2,0,2,14,56.0,14.0,0,1,0,100.0,23_24,27,1
+Hugo Guillamón,MC,valencia,real madrid,0,34,0,0,0.0,0.0,0,0,0,16,75.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,2,2,0,14,35.0,15.0,0,0,0,0.0,23_24,27,1
+Javier Guerra,MC,valencia,real madrid,1,72,0,0,0.1,0.0,3,3,0,31,77.4,0,0,0.0,0.0,0.0,2,3,2,0,0,1,0,1,1,1,1,0,33,192.0,69.0,1,0,1,0.0,23_24,27,1
+Selim Amallah,DT,valencia,real madrid,0,18,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,2,30.0,6.0,0,0,1,0.0,23_24,27,1
+José Luis García Vayá,MC,valencia,real madrid,1,90,0,0,0.1,0.0,2,2,0,49,73.5,0,0,0.0,0.0,0.0,4,4,3,0,0,0,0,0,2,0,0,0,28,116.0,54.0,1,0,1,0.0,23_24,27,1
+Francisco Perez,MC,valencia,real madrid,1,72,0,1,0.1,0.3,1,1,0,25,92.0,0,0,0.0,0.0,0.0,12,2,3,0,1,0,0,0,0,2,0,1,24,108.0,61.0,3,0,0,0.0,23_24,27,1
+Peter González,MC,valencia,real madrid,0,18,0,0,0.1,0.0,2,1,1,5,80.0,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,2,2,0,8,49.0,15.0,1,0,0,0.0,23_24,27,1
+José Luis Gayà,DF,valencia,real madrid,1,90,0,0,0.0,0.1,0,0,0,33,69.7,0,0,0.0,0.0,0.0,1,2,1,0,0,1,0,1,2,0,0,0,19,67.0,23.0,0,1,0,100.0,23_24,27,1
+Mouctar Diakhaby,DF,valencia,real madrid,1,88,0,0,0.0,0.0,0,0,0,24,83.3,1,0,0.0,0.0,0.0,-1,1,0,0,0,0,0,0,1,0,0,0,21,79.0,58.0,0,0,0,0.0,23_24,27,1
+Cenk Özkacar,DF,valencia,real madrid,0,2,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,10.0,0.0,0,0,0,0.0,23_24,27,1
+Cristhian Mosquera,DF,valencia,real madrid,1,90,0,0,0.0,0.0,0,0,0,26,84.6,0,0,0.0,0.0,0.0,3,2,2,0,1,0,0,0,5,0,0,0,21,70.0,38.0,0,0,0,0.0,23_24,27,1
+Dimitri Foulquier,DF,valencia,real madrid,1,90,0,0,0.0,0.1,0,0,0,44,81.8,0,0,0.0,0.0,0.0,2,3,3,0,0,0,0,0,3,0,0,0,26,139.0,95.0,3,0,0,0.0,23_24,27,1
+Giorgi Mamardashvili,PT,valencia,real madrid,1,90,0,0,0.0,0.0,0,0,0,27,51.9,0,0,2.0,60.0,2.4,2,0,0,0,0,0,0,0,0,0,0,0,14,76.0,41.0,0,1,0,100.0,23_24,27,1
+Vinicius Júnior,DT,real madrid,valencia,1,90,2,0,1.7,0.0,3,1,2,27,66.7,1,0,0.0,0.0,0.0,12,1,1,0,1,1,0,1,0,4,0,3,24,179.0,71.0,2,0,1,0.0,23_24,27,0
+Rodrygo,DT,real madrid,valencia,1,62,0,1,0.0,0.9,0,0,0,26,92.3,0,0,0.0,0.0,0.0,6,0,0,0,0,1,0,1,0,2,0,0,22,117.0,54.0,1,0,1,0.0,23_24,27,0
+Brahim Díaz,DT,real madrid,valencia,0,28,0,1,0.1,0.8,1,1,0,13,76.9,0,0,0.0,0.0,0.0,8,0,1,0,1,0,0,0,0,3,1,2,10,36.0,18.0,1,0,0,0.0,23_24,27,0
+Jude Bellingham,MC,real madrid,valencia,1,89,0,0,0.2,0.0,1,0,1,57,80.7,0,1,0.0,0.0,0.0,-1,1,0,0,0,0,0,0,0,4,1,2,35,151.0,90.0,2,1,1,50.0,23_24,27,0
+Eduardo Camavinga,MC,real madrid,valencia,1,71,0,0,0.1,0.0,2,1,1,69,92.8,0,0,0.0,0.0,0.0,3,2,1,0,0,1,0,1,0,3,0,2,42,180.0,61.0,1,2,0,100.0,23_24,27,0
+Joselu,DT,real madrid,valencia,0,19,0,0,0.0,0.0,0,0,0,2,100.0,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,1,0,0,0,1,7.0,0.0,0,0,0,0.0,23_24,27,0
+Toni Kroos,MC,real madrid,valencia,1,62,0,0,0.1,0.0,2,2,0,91,94.5,0,0,0.0,0.0,0.0,4,0,1,0,1,1,1,0,0,0,0,0,50,340.0,195.0,2,0,0,0.0,23_24,27,0
+Luka Modrić,MC,real madrid,valencia,0,28,0,0,0.0,0.1,0,0,0,41,82.9,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,0,0,0,25,178.0,113.0,3,0,0,0.0,23_24,27,0
+Federico Valverde,MC,real madrid,valencia,1,85,0,0,0.0,0.0,1,0,1,74,91.9,1,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,1,3,1,2,42,223.0,135.0,2,0,1,0.0,23_24,27,0
+Nacho,DF,real madrid,valencia,0,5,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,0,0.0,0.0,0,0,0,0.0,23_24,27,0
+Ferland Mendy,DF,real madrid,valencia,1,71,0,0,0.0,0.3,0,0,0,79,93.7,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,1,2,1,1,43,209.0,89.0,0,0,0,0.0,23_24,27,0
+Fran Garcia,DF,real madrid,valencia,0,19,0,0,0.0,0.0,0,0,0,12,66.7,0,0,0.0,0.0,0.0,2,1,1,0,1,0,0,0,0,1,1,0,6,32.0,23.0,1,0,0,0.0,23_24,27,0
+Antonio Rüdiger,DF,real madrid,valencia,1,90,0,0,0.0,0.0,0,0,0,87,94.3,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,4,0,0,0,41,243.0,167.0,0,3,0,100.0,23_24,27,0
+Aurélien Tchouaméni,DF,real madrid,valencia,1,90,0,0,0.0,0.0,0,0,0,92,90.2,0,0,0.0,0.0,0.0,4,2,0,0,0,0,0,0,4,1,0,1,60,430.0,291.0,3,0,1,0.0,23_24,27,0
+Dani Carvajal,DF,real madrid,valencia,1,90,0,0,0.0,0.0,0,0,0,74,82.4,0,0,0.0,0.0,0.0,0,2,2,0,1,5,1,4,1,0,0,0,30,154.0,70.0,1,1,0,100.0,23_24,27,0
+Andriy Lunin,PT,real madrid,valencia,1,90,0,0,0.0,0.0,0,0,0,32,93.8,0,0,2.0,60.0,1.7,4,0,1,0,1,0,0,0,1,0,0,0,15,71.0,55.0,0,1,0,100.0,23_24,27,0

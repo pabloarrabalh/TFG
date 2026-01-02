@@ -1,32 +1,32 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Antoine Griezmann,DT,atletico madrid,athletic,1,90,0,0,0.0,0.1,2,2,0,39,61.5,1,0,0.0,0.0,0.0,2,1,2,0,1,0,0,0,2,0,0,0,11,52.0,32.0,1,2,0,100.0
-Ángel Correa,DT,atletico madrid,athletic,1,76,1,0,0.6,0.0,2,0,2,23,78.3,0,0,0.0,0.0,0.0,11,2,0,0,0,1,0,1,1,3,1,2,11,78.0,49.0,1,1,0,100.0
-Pablo Barrios,MC,atletico madrid,athletic,0,14,0,0,0.0,0.0,0,0,0,6,83.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,1,0,2,11.0,10.0,0,0,0,0.0
-Marcos Llorente,MC,atletico madrid,athletic,1,81,0,0,0.0,0.0,0,0,0,38,76.3,0,0,0.0,0.0,0.0,4,1,1,0,0,0,0,0,2,2,1,1,15,70.0,29.0,0,1,2,33.3
-Saúl Ñíguez,MC,atletico madrid,athletic,0,9,0,0,0.0,0.0,0,0,0,1,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,2,0,0,0,0,0.0,0.0,0,1,1,50.0
-Koke,MC,atletico madrid,athletic,1,90,0,1,0.0,0.6,0,0,0,60,80.0,0,0,0.0,0.0,0.0,10,3,5,0,3,0,0,0,1,0,0,0,15,63.0,39.0,0,0,1,0.0
-Rodrigo De Paul,MC,atletico madrid,athletic,1,81,1,0,0.0,0.0,1,0,1,42,81.0,1,0,0.0,0.0,0.0,9,0,0,0,0,1,0,1,1,4,1,3,27,144.0,51.0,1,0,0,0.0
-César Azpilicueta,MC,atletico madrid,athletic,0,9,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,1,26.0,14.0,0,1,0,100.0
-Samuel Lino,MC,atletico madrid,athletic,1,90,0,0,0.2,0.0,3,3,0,34,82.4,0,0,0.0,0.0,0.0,1,1,5,0,4,2,0,2,2,2,1,1,27,149.0,91.0,4,2,1,66.7
-Nahuel Molina,MC,atletico madrid,athletic,1,66,0,0,0.0,0.0,0,0,0,47,63.8,0,0,0.0,0.0,0.0,2,3,6,0,3,1,0,1,1,0,0,0,20,124.0,91.0,3,1,2,33.3
-Rodrigo Riquelme,DT,atletico madrid,athletic,0,24,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,1,1,0,2,26.0,21.0,0,0,2,0.0
-Mario Hermoso,DF,atletico madrid,athletic,1,90,0,0,0.0,0.0,0,0,0,52,86.5,1,0,0.0,0.0,0.0,3,2,2,0,0,0,0,0,4,2,0,2,26,130.0,57.0,2,2,0,100.0
-José María Giménez,DF,atletico madrid,athletic,1,90,0,0,0.0,0.0,0,0,0,47,91.5,0,0,0.0,0.0,0.0,5,1,1,0,1,2,1,1,6,0,0,0,27,97.0,33.0,0,1,0,100.0
-Axel Witsel,DF,atletico madrid,athletic,1,90,0,0,0.0,0.0,0,0,0,55,83.6,0,0,0.0,0.0,0.0,5,1,2,0,1,0,0,0,4,0,0,0,32,170.0,88.0,0,1,0,100.0
-Jan Oblak,PT,atletico madrid,athletic,1,90,0,0,0.0,0.0,0,0,0,26,73.1,0,0,1.0,0.0,0.7,4,0,0,0,0,0,0,0,0,0,0,0,15,62.0,48.0,0,0,0,0.0
-Gorka Guruzeta,DT,athletic,atletico madrid,1,65,0,1,0.0,0.6,0,0,0,14,78.6,0,0,0.0,0.0,0.0,8,1,2,0,1,3,0,3,0,1,1,0,11,40.0,29.0,1,0,0,0.0
-Iker Muniain,MC,athletic,atletico madrid,0,25,0,0,0.0,0.0,0,0,0,21,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,3,1,2,17,55.0,3.0,0,0,1,0.0
-Nico Williams,DT,athletic,atletico madrid,1,90,1,0,0.6,0.0,2,1,1,49,67.3,0,0,0.0,0.0,0.0,12,1,0,0,0,0,0,0,0,12,6,5,45,254.0,116.0,5,1,0,100.0
-Iñaki Williams,DT,athletic,atletico madrid,1,80,0,0,0.1,0.0,2,2,0,36,72.2,0,0,0.0,0.0,0.0,2,2,3,0,1,0,0,0,0,7,2,4,22,82.0,26.0,1,0,1,0.0
-Raúl García,DT,athletic,atletico madrid,0,10,0,0,0.0,0.0,0,0,0,4,50.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,1,0,0,0,2,3.0,1.0,0,0,0,0.0
-Oihan Sancet,MC,athletic,atletico madrid,1,65,0,0,0.1,0.0,1,1,0,29,82.8,1,0,0.0,0.0,0.0,1,1,2,0,1,0,0,0,0,0,0,0,18,67.0,24.0,1,1,1,50.0
-Ander Herrera,MC,athletic,atletico madrid,0,25,0,0,0.2,0.0,1,1,0,27,88.9,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,0,0,0,0,20,49.0,20.0,0,1,0,100.0
-Beñat Prados,MC,athletic,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,58,84.5,0,0,0.0,0.0,0.0,2,1,1,0,0,1,1,0,1,0,0,0,41,134.0,67.0,0,1,4,20.0
-Iñigo Ruiz de Galarreta,MC,athletic,atletico madrid,1,68,0,0,0.0,0.1,0,0,0,51,82.4,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,0,1,1,0,27,138.0,43.0,0,0,0,0.0
-Mikel Vesga,MC,athletic,atletico madrid,0,22,0,0,0.0,0.0,0,0,0,17,82.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,11,49.0,29.0,0,0,0,0.0
-Iñigo Lekue,DF,athletic,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,87,83.9,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,4,1,1,0,40,174.0,83.0,1,2,1,66.7
-Aitor Paredes,DF,athletic,atletico madrid,1,90,0,0,0.0,0.1,0,0,0,73,98.6,1,0,0.0,0.0,0.0,1,1,1,0,0,0,0,0,2,0,0,0,47,227.0,141.0,0,1,1,50.0
-Yeray Álvarez,DF,athletic,atletico madrid,1,64,0,0,0.0,0.0,1,1,0,68,89.7,0,0,0.0,0.0,0.0,0,1,1,0,0,0,0,0,1,1,1,0,43,295.0,252.0,3,0,1,0.0
-Álex Berenguer,DT,athletic,atletico madrid,0,26,0,0,0.0,0.2,0,0,0,10,90.0,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,0,0,0,0,9,46.0,21.0,0,0,1,0.0
-Daniel Vivian,DF,athletic,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,77,93.5,0,0,0.0,0.0,0.0,1,0,1,0,1,2,1,1,2,0,0,0,40,167.0,122.0,2,2,2,50.0
-Unai Simón,PT,athletic,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,26,84.6,0,0,3.0,0.0,0.7,-1,0,0,0,0,0,0,0,0,0,0,0,17,89.0,51.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Antoine Griezmann,DT,atletico madrid,athletic,1,90,0,0,0.0,0.1,2,2,0,39,61.5,1,0,0.0,0.0,0.0,2,1,2,0,1,0,0,0,2,0,0,0,11,52.0,32.0,1,2,0,100.0,23_24,33,1
+Ángel Correa,DT,atletico madrid,athletic,1,76,1,0,0.6,0.0,2,0,2,23,78.3,0,0,0.0,0.0,0.0,11,2,0,0,0,1,0,1,1,3,1,2,11,78.0,49.0,1,1,0,100.0,23_24,33,1
+Pablo Barrios,MC,atletico madrid,athletic,0,14,0,0,0.0,0.0,0,0,0,6,83.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,1,0,2,11.0,10.0,0,0,0,0.0,23_24,33,1
+Marcos Llorente,MC,atletico madrid,athletic,1,81,0,0,0.0,0.0,0,0,0,38,76.3,0,0,0.0,0.0,0.0,4,1,1,0,0,0,0,0,2,2,1,1,15,70.0,29.0,0,1,2,33.3,23_24,33,1
+Saúl Ñíguez,MC,atletico madrid,athletic,0,9,0,0,0.0,0.0,0,0,0,1,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,2,0,0,0,0,0.0,0.0,0,1,1,50.0,23_24,33,1
+Koke,MC,atletico madrid,athletic,1,90,0,1,0.0,0.6,0,0,0,60,80.0,0,0,0.0,0.0,0.0,10,3,5,0,3,0,0,0,1,0,0,0,15,63.0,39.0,0,0,1,0.0,23_24,33,1
+Rodrigo De Paul,MC,atletico madrid,athletic,1,81,1,0,0.0,0.0,1,0,1,42,81.0,1,0,0.0,0.0,0.0,9,0,0,0,0,1,0,1,1,4,1,3,27,144.0,51.0,1,0,0,0.0,23_24,33,1
+César Azpilicueta,MC,atletico madrid,athletic,0,9,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,1,26.0,14.0,0,1,0,100.0,23_24,33,1
+Samuel Lino,MC,atletico madrid,athletic,1,90,0,0,0.2,0.0,3,3,0,34,82.4,0,0,0.0,0.0,0.0,1,1,5,0,4,2,0,2,2,2,1,1,27,149.0,91.0,4,2,1,66.7,23_24,33,1
+Nahuel Molina,MC,atletico madrid,athletic,1,66,0,0,0.0,0.0,0,0,0,47,63.8,0,0,0.0,0.0,0.0,2,3,6,0,3,1,0,1,1,0,0,0,20,124.0,91.0,3,1,2,33.3,23_24,33,1
+Rodrigo Riquelme,DT,atletico madrid,athletic,0,24,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,1,1,0,2,26.0,21.0,0,0,2,0.0,23_24,33,1
+Mario Hermoso,DF,atletico madrid,athletic,1,90,0,0,0.0,0.0,0,0,0,52,86.5,1,0,0.0,0.0,0.0,3,2,2,0,0,0,0,0,4,2,0,2,26,130.0,57.0,2,2,0,100.0,23_24,33,1
+José María Giménez,DF,atletico madrid,athletic,1,90,0,0,0.0,0.0,0,0,0,47,91.5,0,0,0.0,0.0,0.0,5,1,1,0,1,2,1,1,6,0,0,0,27,97.0,33.0,0,1,0,100.0,23_24,33,1
+Axel Witsel,DF,atletico madrid,athletic,1,90,0,0,0.0,0.0,0,0,0,55,83.6,0,0,0.0,0.0,0.0,5,1,2,0,1,0,0,0,4,0,0,0,32,170.0,88.0,0,1,0,100.0,23_24,33,1
+Jan Oblak,PT,atletico madrid,athletic,1,90,0,0,0.0,0.0,0,0,0,26,73.1,0,0,1.0,0.0,0.7,4,0,0,0,0,0,0,0,0,0,0,0,15,62.0,48.0,0,0,0,0.0,23_24,33,1
+Gorka Guruzeta,DT,athletic,atletico madrid,1,65,0,1,0.0,0.6,0,0,0,14,78.6,0,0,0.0,0.0,0.0,8,1,2,0,1,3,0,3,0,1,1,0,11,40.0,29.0,1,0,0,0.0,23_24,33,0
+Iker Muniain,MC,athletic,atletico madrid,0,25,0,0,0.0,0.0,0,0,0,21,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,3,1,2,17,55.0,3.0,0,0,1,0.0,23_24,33,0
+Nico Williams,DT,athletic,atletico madrid,1,90,1,0,0.6,0.0,2,1,1,49,67.3,0,0,0.0,0.0,0.0,12,1,0,0,0,0,0,0,0,12,6,5,45,254.0,116.0,5,1,0,100.0,23_24,33,0
+Iñaki Williams,DT,athletic,atletico madrid,1,80,0,0,0.1,0.0,2,2,0,36,72.2,0,0,0.0,0.0,0.0,2,2,3,0,1,0,0,0,0,7,2,4,22,82.0,26.0,1,0,1,0.0,23_24,33,0
+Raúl García,DT,athletic,atletico madrid,0,10,0,0,0.0,0.0,0,0,0,4,50.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,1,0,0,0,2,3.0,1.0,0,0,0,0.0,23_24,33,0
+Oihan Sancet,MC,athletic,atletico madrid,1,65,0,0,0.1,0.0,1,1,0,29,82.8,1,0,0.0,0.0,0.0,1,1,2,0,1,0,0,0,0,0,0,0,18,67.0,24.0,1,1,1,50.0,23_24,33,0
+Ander Herrera,MC,athletic,atletico madrid,0,25,0,0,0.2,0.0,1,1,0,27,88.9,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,0,0,0,0,20,49.0,20.0,0,1,0,100.0,23_24,33,0
+Beñat Prados,MC,athletic,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,58,84.5,0,0,0.0,0.0,0.0,2,1,1,0,0,1,1,0,1,0,0,0,41,134.0,67.0,0,1,4,20.0,23_24,33,0
+Iñigo Ruiz de Galarreta,MC,athletic,atletico madrid,1,68,0,0,0.0,0.1,0,0,0,51,82.4,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,0,1,1,0,27,138.0,43.0,0,0,0,0.0,23_24,33,0
+Mikel Vesga,MC,athletic,atletico madrid,0,22,0,0,0.0,0.0,0,0,0,17,82.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,11,49.0,29.0,0,0,0,0.0,23_24,33,0
+Iñigo Lekue,DF,athletic,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,87,83.9,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,4,1,1,0,40,174.0,83.0,1,2,1,66.7,23_24,33,0
+Aitor Paredes,DF,athletic,atletico madrid,1,90,0,0,0.0,0.1,0,0,0,73,98.6,1,0,0.0,0.0,0.0,1,1,1,0,0,0,0,0,2,0,0,0,47,227.0,141.0,0,1,1,50.0,23_24,33,0
+Yeray Álvarez,DF,athletic,atletico madrid,1,64,0,0,0.0,0.0,1,1,0,68,89.7,0,0,0.0,0.0,0.0,0,1,1,0,0,0,0,0,1,1,1,0,43,295.0,252.0,3,0,1,0.0,23_24,33,0
+Álex Berenguer,DT,athletic,atletico madrid,0,26,0,0,0.0,0.2,0,0,0,10,90.0,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,0,0,0,0,9,46.0,21.0,0,0,1,0.0,23_24,33,0
+Daniel Vivian,DF,athletic,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,77,93.5,0,0,0.0,0.0,0.0,1,0,1,0,1,2,1,1,2,0,0,0,40,167.0,122.0,2,2,2,50.0,23_24,33,0
+Unai Simón,PT,athletic,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,26,84.6,0,0,3.0,0.0,0.7,-1,0,0,0,0,0,0,0,0,0,0,0,17,89.0,51.0,0,0,0,0.0,23_24,33,0

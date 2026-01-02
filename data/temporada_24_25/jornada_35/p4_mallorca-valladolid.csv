@@ -1,32 +1,32 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Vedat Muriqi,DT,mallorca,valladolid,1,65,0,0,0.1,0.1,1,1,0,19,52.6,0,0,0.0,0.0,0.0,4,0,0,0,0,1,0,1,1,0,0,0,11,20.0,2.0,0,3,2,60.0
-Antonio Sánchez,MC,mallorca,valladolid,0,25,0,0,0.0,0.0,1,1,0,7,42.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,1,0,6,108.0,79.0,2,1,2,33.3
-Sergi Darder,DT,mallorca,valladolid,1,84,1,0,0.2,0.0,2,1,1,48,68.8,0,0,0.0,0.0,0.0,11,1,2,0,1,0,0,0,0,1,1,0,30,159.0,90.0,2,0,0,0.0
-Toni Lato,MC,mallorca,valladolid,0,6,0,0,0.0,0.0,0,0,0,2,100.0,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,1,5.0,5.0,0,0,0,0.0
-Takuma Asano,DT,mallorca,valladolid,1,65,0,1,0.4,0.1,3,2,1,16,75.0,0,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,1,2,1,0,14,71.0,20.0,1,0,0,0.0
-Cyle Larin,DT,mallorca,valladolid,0,25,0,0,0.0,0.0,0,0,0,6,83.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,0,0,0,8,39.0,8.0,1,1,0,100.0
-Dani Rodríguez,MC,mallorca,valladolid,1,75,0,0,0.0,0.0,0,0,0,23,82.6,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,1,1,0,1,13,26.0,10.0,0,1,1,50.0
-Mateu Morey,MC,mallorca,valladolid,0,15,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,6,31.0,23.0,1,0,0,0.0
-Samu Costa,MC,mallorca,valladolid,1,90,0,0,0.0,0.0,1,1,0,60,88.3,0,0,0.0,0.0,0.0,4,2,4,0,2,1,1,0,2,2,1,1,42,180.0,103.0,1,2,3,40.0
-Omar Mascarell,MC,mallorca,valladolid,1,90,1,0,0.2,0.2,2,1,1,55,85.5,0,0,0.0,0.0,0.0,13,0,2,0,2,1,1,0,5,0,0,0,28,122.0,61.0,1,4,4,50.0
-Johan Mojica,DF,mallorca,valladolid,1,90,0,0,0.0,0.1,0,0,0,64,84.4,0,0,0.0,0.0,0.0,5,1,3,0,2,0,0,0,3,1,0,1,44,168.0,67.0,3,0,0,0.0
-Antonio Raillo,DF,mallorca,valladolid,1,90,0,0,0.0,0.0,1,1,0,56,91.1,1,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,4,0,0,0,44,288.0,225.0,1,3,0,100.0
-Martin Valjent,DF,mallorca,valladolid,1,90,0,0,0.2,0.0,1,0,1,65,92.3,0,0,0.0,0.0,0.0,5,1,3,0,2,0,0,0,7,0,0,0,52,446.0,316.0,4,1,1,50.0
-Pablo Maffeo,DF,mallorca,valladolid,1,90,0,1,0.0,0.1,0,0,0,48,79.2,0,0,0.0,0.0,0.0,11,2,3,0,1,0,0,0,5,3,1,2,34,104.0,60.0,1,1,0,100.0
-Dominik Greif,PT,mallorca,valladolid,1,90,0,0,0.0,0.0,0,0,0,29,79.3,0,0,1.0,85.7,3.1,10,0,0,0,0,0,0,0,1,0,0,0,20,102.0,58.0,0,1,0,100.0
-Juanmi Latasa,DT,valladolid,mallorca,1,90,0,0,0.3,0.2,3,1,2,15,40.0,0,0,0.0,0.0,0.0,3,1,0,0,0,1,0,1,0,1,1,0,11,23.0,7.0,0,4,3,57.1
-Raúl Moro,MC,valladolid,mallorca,1,73,0,1,0.0,0.7,0,0,0,26,69.2,0,0,0.0,0.0,0.0,10,3,3,0,1,0,0,0,3,4,1,2,20,114.0,68.0,3,0,2,0.0
-Darwin Machís,MC,valladolid,mallorca,0,17,0,0,0.0,0.0,1,1,0,12,16.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,0,9,97.0,60.0,3,0,0,0.0
-Selim Amallah,MC,valladolid,mallorca,1,73,0,0,0.1,0.1,2,1,1,18,77.8,0,0,0.0,0.0,0.0,4,2,1,0,0,2,0,2,1,5,2,2,12,100.0,66.0,1,0,2,0.0
-Anuar,MC,valladolid,mallorca,0,17,0,0,0.0,0.0,0,0,0,13,92.3,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,7,42.0,29.0,0,0,3,0.0
-Tamás Nikitscher,MC,valladolid,mallorca,1,90,0,0,0.1,0.0,1,1,0,24,87.5,0,0,0.0,0.0,0.0,2,2,1,0,1,1,0,1,1,0,0,0,11,48.0,17.0,0,1,0,100.0
-Chuky san jose,MC,valladolid,mallorca,1,57,1,0,0.8,0.4,4,2,2,7,57.1,0,0,0.0,0.0,0.0,11,0,0,0,0,0,0,0,2,0,0,0,7,33.0,26.0,1,1,0,100.0
-Iván Sánchez,DT,valladolid,mallorca,0,33,0,0,0.0,0.0,0,0,0,28,78.6,0,0,0.0,0.0,0.0,5,1,1,0,0,0,0,0,0,2,2,0,24,159.0,92.0,2,0,0,0.0
-Eray Cömert,MC,valladolid,mallorca,1,81,0,0,0.4,0.0,1,0,1,22,86.4,0,0,0.0,0.0,0.0,1,0,0,0,0,2,0,2,4,0,0,0,11,15.0,7.0,0,1,1,50.0
-Marcos André,DT,valladolid,mallorca,0,9,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0
-Adam Aznou,DF,valladolid,mallorca,1,90,0,0,0.2,0.0,3,2,1,27,77.8,0,0,0.0,0.0,0.0,5,1,1,0,1,0,0,0,8,5,3,2,20,93.0,58.0,1,1,1,50.0
-Cenk Özkacar,DF,valladolid,mallorca,1,90,0,0,0.0,0.0,0,0,0,30,80.0,1,0,0.0,0.0,0.0,4,2,1,0,1,0,0,0,15,0,0,0,19,93.0,58.0,0,1,2,33.3
-Antonio Candela,DF,valladolid,mallorca,1,57,0,0,0.0,0.0,0,0,0,13,84.6,0,0,0.0,0.0,0.0,1,1,2,0,1,1,1,0,6,0,0,0,9,40.0,32.0,1,1,1,50.0
-Florian Grillitsch,MC,valladolid,mallorca,0,33,0,0,0.0,0.0,0,0,0,25,88.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,16,125.0,72.0,0,3,1,75.0
-Luis Pérez,DF,valladolid,mallorca,1,90,0,0,0.0,0.2,1,1,0,34,85.3,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,9,1,1,0,12,25.0,3.0,1,0,2,0.0
-André Ferreira,PT,valladolid,mallorca,1,90,0,0,0.0,0.0,0,0,0,31,77.4,0,0,2.0,50.0,1.7,3,0,0,0,0,0,0,0,0,0,0,0,11,48.0,21.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Vedat Muriqi,DT,mallorca,valladolid,1,65,0,0,0.1,0.1,1,1,0,19,52.6,0,0,0.0,0.0,0.0,4,0,0,0,0,1,0,1,1,0,0,0,11,20.0,2.0,0,3,2,60.0,24_25,35,1
+Antonio Sánchez,MC,mallorca,valladolid,0,25,0,0,0.0,0.0,1,1,0,7,42.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,1,0,6,108.0,79.0,2,1,2,33.3,24_25,35,1
+Sergi Darder,DT,mallorca,valladolid,1,84,1,0,0.2,0.0,2,1,1,48,68.8,0,0,0.0,0.0,0.0,11,1,2,0,1,0,0,0,0,1,1,0,30,159.0,90.0,2,0,0,0.0,24_25,35,1
+Toni Lato,MC,mallorca,valladolid,0,6,0,0,0.0,0.0,0,0,0,2,100.0,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,1,5.0,5.0,0,0,0,0.0,24_25,35,1
+Takuma Asano,DT,mallorca,valladolid,1,65,0,1,0.4,0.1,3,2,1,16,75.0,0,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,1,2,1,0,14,71.0,20.0,1,0,0,0.0,24_25,35,1
+Cyle Larin,DT,mallorca,valladolid,0,25,0,0,0.0,0.0,0,0,0,6,83.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,0,0,0,8,39.0,8.0,1,1,0,100.0,24_25,35,1
+Dani Rodríguez,MC,mallorca,valladolid,1,75,0,0,0.0,0.0,0,0,0,23,82.6,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,1,1,0,1,13,26.0,10.0,0,1,1,50.0,24_25,35,1
+Mateu Morey,MC,mallorca,valladolid,0,15,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,6,31.0,23.0,1,0,0,0.0,24_25,35,1
+Samu Costa,MC,mallorca,valladolid,1,90,0,0,0.0,0.0,1,1,0,60,88.3,0,0,0.0,0.0,0.0,4,2,4,0,2,1,1,0,2,2,1,1,42,180.0,103.0,1,2,3,40.0,24_25,35,1
+Omar Mascarell,MC,mallorca,valladolid,1,90,1,0,0.2,0.2,2,1,1,55,85.5,0,0,0.0,0.0,0.0,13,0,2,0,2,1,1,0,5,0,0,0,28,122.0,61.0,1,4,4,50.0,24_25,35,1
+Johan Mojica,DF,mallorca,valladolid,1,90,0,0,0.0,0.1,0,0,0,64,84.4,0,0,0.0,0.0,0.0,5,1,3,0,2,0,0,0,3,1,0,1,44,168.0,67.0,3,0,0,0.0,24_25,35,1
+Antonio Raillo,DF,mallorca,valladolid,1,90,0,0,0.0,0.0,1,1,0,56,91.1,1,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,4,0,0,0,44,288.0,225.0,1,3,0,100.0,24_25,35,1
+Martin Valjent,DF,mallorca,valladolid,1,90,0,0,0.2,0.0,1,0,1,65,92.3,0,0,0.0,0.0,0.0,5,1,3,0,2,0,0,0,7,0,0,0,52,446.0,316.0,4,1,1,50.0,24_25,35,1
+Pablo Maffeo,DF,mallorca,valladolid,1,90,0,1,0.0,0.1,0,0,0,48,79.2,0,0,0.0,0.0,0.0,11,2,3,0,1,0,0,0,5,3,1,2,34,104.0,60.0,1,1,0,100.0,24_25,35,1
+Dominik Greif,PT,mallorca,valladolid,1,90,0,0,0.0,0.0,0,0,0,29,79.3,0,0,1.0,85.7,3.1,10,0,0,0,0,0,0,0,1,0,0,0,20,102.0,58.0,0,1,0,100.0,24_25,35,1
+Juanmi Latasa,DT,valladolid,mallorca,1,90,0,0,0.3,0.2,3,1,2,15,40.0,0,0,0.0,0.0,0.0,3,1,0,0,0,1,0,1,0,1,1,0,11,23.0,7.0,0,4,3,57.1,24_25,35,0
+Raúl Moro,MC,valladolid,mallorca,1,73,0,1,0.0,0.7,0,0,0,26,69.2,0,0,0.0,0.0,0.0,10,3,3,0,1,0,0,0,3,4,1,2,20,114.0,68.0,3,0,2,0.0,24_25,35,0
+Darwin Machís,MC,valladolid,mallorca,0,17,0,0,0.0,0.0,1,1,0,12,16.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,0,9,97.0,60.0,3,0,0,0.0,24_25,35,0
+Selim Amallah,MC,valladolid,mallorca,1,73,0,0,0.1,0.1,2,1,1,18,77.8,0,0,0.0,0.0,0.0,4,2,1,0,0,2,0,2,1,5,2,2,12,100.0,66.0,1,0,2,0.0,24_25,35,0
+Anuar,MC,valladolid,mallorca,0,17,0,0,0.0,0.0,0,0,0,13,92.3,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,7,42.0,29.0,0,0,3,0.0,24_25,35,0
+Tamás Nikitscher,MC,valladolid,mallorca,1,90,0,0,0.1,0.0,1,1,0,24,87.5,0,0,0.0,0.0,0.0,2,2,1,0,1,1,0,1,1,0,0,0,11,48.0,17.0,0,1,0,100.0,24_25,35,0
+Chuky san jose,MC,valladolid,mallorca,1,57,1,0,0.8,0.4,4,2,2,7,57.1,0,0,0.0,0.0,0.0,11,0,0,0,0,0,0,0,2,0,0,0,7,33.0,26.0,1,1,0,100.0,24_25,35,0
+Iván Sánchez,DT,valladolid,mallorca,0,33,0,0,0.0,0.0,0,0,0,28,78.6,0,0,0.0,0.0,0.0,5,1,1,0,0,0,0,0,0,2,2,0,24,159.0,92.0,2,0,0,0.0,24_25,35,0
+Eray Cömert,MC,valladolid,mallorca,1,81,0,0,0.4,0.0,1,0,1,22,86.4,0,0,0.0,0.0,0.0,1,0,0,0,0,2,0,2,4,0,0,0,11,15.0,7.0,0,1,1,50.0,24_25,35,0
+Marcos André,DT,valladolid,mallorca,0,9,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0,24_25,35,0
+Adam Aznou,DF,valladolid,mallorca,1,90,0,0,0.2,0.0,3,2,1,27,77.8,0,0,0.0,0.0,0.0,5,1,1,0,1,0,0,0,8,5,3,2,20,93.0,58.0,1,1,1,50.0,24_25,35,0
+Cenk Özkacar,DF,valladolid,mallorca,1,90,0,0,0.0,0.0,0,0,0,30,80.0,1,0,0.0,0.0,0.0,4,2,1,0,1,0,0,0,15,0,0,0,19,93.0,58.0,0,1,2,33.3,24_25,35,0
+Antonio Candela,DF,valladolid,mallorca,1,57,0,0,0.0,0.0,0,0,0,13,84.6,0,0,0.0,0.0,0.0,1,1,2,0,1,1,1,0,6,0,0,0,9,40.0,32.0,1,1,1,50.0,24_25,35,0
+Florian Grillitsch,MC,valladolid,mallorca,0,33,0,0,0.0,0.0,0,0,0,25,88.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,16,125.0,72.0,0,3,1,75.0,24_25,35,0
+Luis Pérez,DF,valladolid,mallorca,1,90,0,0,0.0,0.2,1,1,0,34,85.3,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,9,1,1,0,12,25.0,3.0,1,0,2,0.0,24_25,35,0
+André Ferreira,PT,valladolid,mallorca,1,90,0,0,0.0,0.0,0,0,0,31,77.4,0,0,2.0,50.0,1.7,3,0,0,0,0,0,0,0,0,0,0,0,11,48.0,21.0,0,0,0,0.0,24_25,35,0

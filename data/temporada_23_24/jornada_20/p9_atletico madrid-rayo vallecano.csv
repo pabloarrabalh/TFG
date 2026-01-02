@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Ángel Correa,DT,atletico madrid,rayo,1,57,0,0,0.2,0.0,1,0,1,11,63.6,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,11,71.0,24.0,0,0,0,0.0
-Antoine Griezmann,DT,atletico madrid,rayo,0,33,0,1,0.0,0.3,1,1,0,20,90.0,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,0,0,0,17,80.0,48.0,1,1,0,100.0
-Memphis,DT,atletico madrid,rayo,1,90,1,0,0.5,0.2,3,2,1,24,62.5,0,0,0.0,0.0,0.0,9,1,1,0,0,0,0,0,0,5,1,3,23,145.0,52.0,1,0,1,0.0
-Saúl Ñíguez,MC,atletico madrid,rayo,1,68,0,0,0.0,0.0,0,0,0,30,66.7,0,0,0.0,0.0,0.0,4,3,2,0,1,1,0,1,4,1,0,1,14,127.0,99.0,5,2,1,66.7
-Koke,MC,atletico madrid,rayo,0,22,0,0,0.0,0.0,0,0,0,23,91.3,0,0,0.0,0.0,0.0,3,3,2,0,1,1,1,0,1,0,0,0,12,43.0,31.0,0,0,0,0.0
-Pablo Barrios,MC,atletico madrid,rayo,1,90,0,0,0.0,0.0,1,1,0,44,86.4,0,0,0.0,0.0,0.0,7,1,2,0,1,1,1,0,3,5,5,0,31,222.0,133.0,3,0,0,0.0
-Arthur Vermeeren,MC,atletico madrid,rayo,1,45,0,0,0.0,0.0,0,0,0,27,70.4,0,0,0.0,0.0,0.0,0,1,0,0,0,3,0,3,0,0,0,0,21,101.0,44.0,1,0,1,0.0
-Nahuel Molina,MC,atletico madrid,rayo,0,45,0,0,0.0,0.0,0,0,0,37,73.0,0,0,0.0,0.0,0.0,2,3,4,0,1,0,0,0,2,0,0,0,21,63.0,15.0,0,1,0,100.0
-Rodrigo Riquelme,MC,atletico madrid,rayo,1,57,0,1,0.0,0.1,0,0,0,28,82.1,0,0,0.0,0.0,0.0,10,1,5,0,4,1,0,1,0,2,1,1,17,116.0,62.0,2,1,1,50.0
-Samuel Lino,MC,atletico madrid,rayo,0,33,0,0,0.2,0.0,1,1,0,20,85.0,0,0,0.0,0.0,0.0,3,2,0,0,0,0,0,0,0,1,0,1,14,110.0,80.0,1,0,0,0.0
-Marcos Llorente,MC,atletico madrid,rayo,1,57,0,0,0.0,0.3,0,0,0,22,77.3,0,0,0.0,0.0,0.0,4,1,1,0,0,2,0,2,0,0,0,0,11,101.0,39.0,1,0,0,0.0
-Rodrigo De Paul,MC,atletico madrid,rayo,0,33,0,0,0.0,0.0,0,0,0,28,64.3,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,0,2,2,0,18,148.0,74.0,4,0,0,0.0
-Reinildo Mandava,DF,atletico madrid,rayo,1,90,1,0,0.1,0.0,1,0,1,43,83.7,0,0,0.0,0.0,0.0,14,4,3,0,0,3,1,2,3,0,0,0,26,203.0,148.0,4,3,1,75.0
-Mario Hermoso,DF,atletico madrid,rayo,1,90,0,0,0.0,0.0,0,0,0,76,80.3,0,0,0.0,0.0,0.0,4,0,1,0,1,1,0,1,0,0,0,0,39,327.0,242.0,0,7,0,100.0
-Axel Witsel,DF,atletico madrid,rayo,1,90,0,0,0.0,0.0,0,0,0,71,88.7,0,0,0.0,0.0,0.0,5,1,1,0,0,1,1,0,4,0,0,0,51,286.0,138.0,2,2,2,50.0
-Jan Oblak,PT,atletico madrid,rayo,1,90,0,0,0.0,0.0,0,0,0,29,86.2,0,0,1.0,50.0,0.4,4,0,0,0,0,0,0,0,0,0,0,0,14,70.0,46.0,0,0,0,0.0
-Sergio Camello,DT,rayo,atletico madrid,1,82,0,0,0.0,0.0,0,0,0,11,72.7,0,0,0.0,0.0,0.0,3,1,3,0,2,0,0,0,2,4,1,3,14,90.0,61.0,3,1,8,11.1
-Radamel Falcao,DT,rayo,atletico madrid,0,8,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,0.0,0.0,0,0,0,0.0
-Álvaro García,MC,rayo,atletico madrid,1,75,1,0,0.2,0.0,3,1,2,16,75.0,0,0,0.0,0.0,0.0,11,2,0,0,0,0,0,0,3,0,0,0,8,69.0,50.0,3,0,2,0.0
-Óscar Trejo,MC,rayo,atletico madrid,0,15,0,0,0.0,0.0,0,0,0,15,80.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,0,2,10,29.0,13.0,0,0,0,0.0
-Isaac Palazón Camacho,MC,rayo,atletico madrid,1,75,0,0,0.0,0.0,1,1,0,37,70.3,1,0,0.0,0.0,0.0,2,2,0,0,0,0,0,0,1,1,0,1,17,75.0,36.0,2,0,2,0.0
-Jorge de Frutos,MC,rayo,atletico madrid,0,15,0,0,0.0,0.0,1,1,0,4,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,0,1,5,53.0,14.0,1,1,1,50.0
-Óscar Valentín,MC,rayo,atletico madrid,1,90,0,0,0.0,0.0,1,1,0,39,76.9,0,0,0.0,0.0,0.0,1,3,4,0,1,3,1,2,0,0,0,0,16,95.0,32.0,0,1,0,100.0
-Kike Pérez,MC,rayo,atletico madrid,1,63,0,0,0.0,0.0,0,0,0,27,88.9,1,0,0.0,0.0,0.0,2,1,3,0,3,2,0,2,0,1,0,1,19,148.0,49.0,2,0,2,0.0
-Crespo,MC,rayo,atletico madrid,0,27,0,0,0.0,0.0,0,0,0,12,75.0,0,0,0.0,0.0,0.0,0,1,1,0,0,1,1,0,0,2,2,0,7,26.0,23.0,1,0,0,0.0
-Pep Chavarría,MC,rayo,atletico madrid,1,90,0,1,0.1,0.2,3,3,0,39,69.2,1,0,0.0,0.0,0.0,8,0,0,0,0,1,0,1,5,3,1,2,20,108.0,34.0,1,1,1,50.0
-Andrei Ratiu,MC,rayo,atletico madrid,1,63,0,0,0.1,0.0,1,1,0,27,81.5,0,0,0.0,0.0,0.0,3,1,2,0,1,1,0,1,1,7,4,3,12,89.0,45.0,3,1,1,50.0
-Iván Balliu,MC,rayo,atletico madrid,0,27,0,0,0.0,0.0,0,0,0,13,69.2,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,11.0,0.0,0,0,0,0.0
-Alfonso Espino,DF,rayo,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,61,82.0,0,0,0.0,0.0,0.0,1,1,0,0,0,1,0,1,1,1,1,0,24,114.0,68.0,0,1,0,100.0
-Florian Lejeune,DF,rayo,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,66,83.3,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,4,0,0,0,37,169.0,58.0,1,0,0,0.0
-Aridane Hernández,DF,rayo,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,48,91.7,0,0,0.0,0.0,0.0,2,1,1,0,1,2,1,1,2,0,0,0,23,57.0,9.0,0,1,0,100.0
-Stole Dimitrievski,PT,rayo,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,30,30.0,0,0,2.0,33.3,1.5,0,0,0,0,0,0,0,0,1,0,0,0,7,39.0,16.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Ángel Correa,DT,atletico madrid,rayo,1,57,0,0,0.2,0.0,1,0,1,11,63.6,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,11,71.0,24.0,0,0,0,0.0,23_24,20,1
+Antoine Griezmann,DT,atletico madrid,rayo,0,33,0,1,0.0,0.3,1,1,0,20,90.0,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,0,0,0,17,80.0,48.0,1,1,0,100.0,23_24,20,1
+Memphis,DT,atletico madrid,rayo,1,90,1,0,0.5,0.2,3,2,1,24,62.5,0,0,0.0,0.0,0.0,9,1,1,0,0,0,0,0,0,5,1,3,23,145.0,52.0,1,0,1,0.0,23_24,20,1
+Saúl Ñíguez,MC,atletico madrid,rayo,1,68,0,0,0.0,0.0,0,0,0,30,66.7,0,0,0.0,0.0,0.0,4,3,2,0,1,1,0,1,4,1,0,1,14,127.0,99.0,5,2,1,66.7,23_24,20,1
+Koke,MC,atletico madrid,rayo,0,22,0,0,0.0,0.0,0,0,0,23,91.3,0,0,0.0,0.0,0.0,3,3,2,0,1,1,1,0,1,0,0,0,12,43.0,31.0,0,0,0,0.0,23_24,20,1
+Pablo Barrios,MC,atletico madrid,rayo,1,90,0,0,0.0,0.0,1,1,0,44,86.4,0,0,0.0,0.0,0.0,7,1,2,0,1,1,1,0,3,5,5,0,31,222.0,133.0,3,0,0,0.0,23_24,20,1
+Arthur Vermeeren,MC,atletico madrid,rayo,1,45,0,0,0.0,0.0,0,0,0,27,70.4,0,0,0.0,0.0,0.0,0,1,0,0,0,3,0,3,0,0,0,0,21,101.0,44.0,1,0,1,0.0,23_24,20,1
+Nahuel Molina,MC,atletico madrid,rayo,0,45,0,0,0.0,0.0,0,0,0,37,73.0,0,0,0.0,0.0,0.0,2,3,4,0,1,0,0,0,2,0,0,0,21,63.0,15.0,0,1,0,100.0,23_24,20,1
+Rodrigo Riquelme,MC,atletico madrid,rayo,1,57,0,1,0.0,0.1,0,0,0,28,82.1,0,0,0.0,0.0,0.0,10,1,5,0,4,1,0,1,0,2,1,1,17,116.0,62.0,2,1,1,50.0,23_24,20,1
+Samuel Lino,MC,atletico madrid,rayo,0,33,0,0,0.2,0.0,1,1,0,20,85.0,0,0,0.0,0.0,0.0,3,2,0,0,0,0,0,0,0,1,0,1,14,110.0,80.0,1,0,0,0.0,23_24,20,1
+Marcos Llorente,MC,atletico madrid,rayo,1,57,0,0,0.0,0.3,0,0,0,22,77.3,0,0,0.0,0.0,0.0,4,1,1,0,0,2,0,2,0,0,0,0,11,101.0,39.0,1,0,0,0.0,23_24,20,1
+Rodrigo De Paul,MC,atletico madrid,rayo,0,33,0,0,0.0,0.0,0,0,0,28,64.3,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,0,2,2,0,18,148.0,74.0,4,0,0,0.0,23_24,20,1
+Reinildo Mandava,DF,atletico madrid,rayo,1,90,1,0,0.1,0.0,1,0,1,43,83.7,0,0,0.0,0.0,0.0,14,4,3,0,0,3,1,2,3,0,0,0,26,203.0,148.0,4,3,1,75.0,23_24,20,1
+Mario Hermoso,DF,atletico madrid,rayo,1,90,0,0,0.0,0.0,0,0,0,76,80.3,0,0,0.0,0.0,0.0,4,0,1,0,1,1,0,1,0,0,0,0,39,327.0,242.0,0,7,0,100.0,23_24,20,1
+Axel Witsel,DF,atletico madrid,rayo,1,90,0,0,0.0,0.0,0,0,0,71,88.7,0,0,0.0,0.0,0.0,5,1,1,0,0,1,1,0,4,0,0,0,51,286.0,138.0,2,2,2,50.0,23_24,20,1
+Jan Oblak,PT,atletico madrid,rayo,1,90,0,0,0.0,0.0,0,0,0,29,86.2,0,0,1.0,50.0,0.4,4,0,0,0,0,0,0,0,0,0,0,0,14,70.0,46.0,0,0,0,0.0,23_24,20,1
+Sergio Camello,DT,rayo,atletico madrid,1,82,0,0,0.0,0.0,0,0,0,11,72.7,0,0,0.0,0.0,0.0,3,1,3,0,2,0,0,0,2,4,1,3,14,90.0,61.0,3,1,8,11.1,23_24,20,0
+Radamel Falcao,DT,rayo,atletico madrid,0,8,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,0.0,0.0,0,0,0,0.0,23_24,20,0
+Álvaro García,MC,rayo,atletico madrid,1,75,1,0,0.2,0.0,3,1,2,16,75.0,0,0,0.0,0.0,0.0,11,2,0,0,0,0,0,0,3,0,0,0,8,69.0,50.0,3,0,2,0.0,23_24,20,0
+Óscar Trejo,MC,rayo,atletico madrid,0,15,0,0,0.0,0.0,0,0,0,15,80.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,0,2,10,29.0,13.0,0,0,0,0.0,23_24,20,0
+Isaac Palazón Camacho,MC,rayo,atletico madrid,1,75,0,0,0.0,0.0,1,1,0,37,70.3,1,0,0.0,0.0,0.0,2,2,0,0,0,0,0,0,1,1,0,1,17,75.0,36.0,2,0,2,0.0,23_24,20,0
+Jorge de Frutos,MC,rayo,atletico madrid,0,15,0,0,0.0,0.0,1,1,0,4,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,0,1,5,53.0,14.0,1,1,1,50.0,23_24,20,0
+Óscar Valentín,MC,rayo,atletico madrid,1,90,0,0,0.0,0.0,1,1,0,39,76.9,0,0,0.0,0.0,0.0,1,3,4,0,1,3,1,2,0,0,0,0,16,95.0,32.0,0,1,0,100.0,23_24,20,0
+Kike Pérez,MC,rayo,atletico madrid,1,63,0,0,0.0,0.0,0,0,0,27,88.9,1,0,0.0,0.0,0.0,2,1,3,0,3,2,0,2,0,1,0,1,19,148.0,49.0,2,0,2,0.0,23_24,20,0
+Crespo,MC,rayo,atletico madrid,0,27,0,0,0.0,0.0,0,0,0,12,75.0,0,0,0.0,0.0,0.0,0,1,1,0,0,1,1,0,0,2,2,0,7,26.0,23.0,1,0,0,0.0,23_24,20,0
+Pep Chavarría,MC,rayo,atletico madrid,1,90,0,1,0.1,0.2,3,3,0,39,69.2,1,0,0.0,0.0,0.0,8,0,0,0,0,1,0,1,5,3,1,2,20,108.0,34.0,1,1,1,50.0,23_24,20,0
+Andrei Ratiu,MC,rayo,atletico madrid,1,63,0,0,0.1,0.0,1,1,0,27,81.5,0,0,0.0,0.0,0.0,3,1,2,0,1,1,0,1,1,7,4,3,12,89.0,45.0,3,1,1,50.0,23_24,20,0
+Iván Balliu,MC,rayo,atletico madrid,0,27,0,0,0.0,0.0,0,0,0,13,69.2,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,11.0,0.0,0,0,0,0.0,23_24,20,0
+Alfonso Espino,DF,rayo,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,61,82.0,0,0,0.0,0.0,0.0,1,1,0,0,0,1,0,1,1,1,1,0,24,114.0,68.0,0,1,0,100.0,23_24,20,0
+Florian Lejeune,DF,rayo,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,66,83.3,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,4,0,0,0,37,169.0,58.0,1,0,0,0.0,23_24,20,0
+Aridane Hernández,DF,rayo,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,48,91.7,0,0,0.0,0.0,0.0,2,1,1,0,1,2,1,1,2,0,0,0,23,57.0,9.0,0,1,0,100.0,23_24,20,0
+Stole Dimitrievski,PT,rayo,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,30,30.0,0,0,2.0,33.3,1.5,0,0,0,0,0,0,0,0,1,0,0,0,7,39.0,16.0,0,0,0,0.0,23_24,20,0

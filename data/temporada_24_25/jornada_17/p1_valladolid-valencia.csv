@@ -1,32 +1,32 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Marcos André,DT,valladolid,valencia,1,70,0,1,0.0,0.3,0,0,0,7,57.1,1,0,0.0,0.0,0.0,8,2,0,0,0,2,0,2,0,0,0,0,4,6.0,2.0,0,0,4,0.0
-Juanmi Latasa,DT,valladolid,valencia,0,7,0,0,0.0,0.0,0,0,0,1,0.0,0,1,0.0,0.0,0.0,-2,0,0,0,0,0,0,0,1,0,0,0,0,0.0,0.0,0,0,0,0.0
-Raúl Moro,DT,valladolid,valencia,1,70,0,0,0.0,0.0,0,0,0,14,64.3,0,0,0.0,0.0,0.0,5,1,1,0,0,0,0,0,0,3,2,1,15,152.0,52.0,0,0,0,0.0
-Darwin Machís,DT,valladolid,valencia,0,20,0,0,0.0,0.0,0,0,0,3,0.0,0,0,0.0,0.0,0.0,4,2,1,0,0,0,0,0,4,0,0,0,1,1.0,0.0,0,2,0,100.0
-Anuar,DT,valladolid,valencia,1,90,1,0,0.3,0.0,1,0,1,22,77.3,1,0,0.0,0.0,0.0,13,2,1,0,0,1,0,1,2,2,2,0,14,144.0,50.0,2,1,4,20.0
-Iván Sánchez,MC,valladolid,valencia,1,57,0,0,0.0,0.0,0,0,0,22,77.3,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,0,1,0,0,14,119.0,51.0,1,1,1,50.0
-Mario Martín,MC,valladolid,valencia,0,33,0,0,0.0,0.0,0,0,0,9,88.9,0,0,0.0,0.0,0.0,4,1,1,0,1,1,1,0,6,0,0,0,2,6.0,0.0,0,5,1,83.3
-Kike Pérez,MC,valladolid,valencia,1,76,0,0,0.0,0.0,0,0,0,39,82.1,1,0,0.0,0.0,0.0,6,4,2,0,1,1,0,1,4,4,1,3,21,79.0,20.0,0,1,0,100.0
-Víctor Meseguer,MC,valladolid,valencia,0,14,0,0,0.2,0.0,1,1,0,4,75.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,1,0,0,0,2,3.0,0.0,0,1,0,100.0
-Stanko Jurić,MC,valladolid,valencia,1,90,0,0,0.0,0.0,0,0,0,32,75.0,0,0,0.0,0.0,0.0,9,5,2,0,1,1,1,0,10,0,0,0,11,34.0,8.0,0,2,0,100.0
-Lucas Oliveira Rosa,DF,valladolid,valencia,1,90,0,0,0.0,0.0,0,0,0,25,72.0,0,0,0.0,0.0,0.0,8,1,2,0,1,2,1,1,7,0,0,0,9,41.0,24.0,0,0,0,0.0
-Javi Sánchez,DF,valladolid,valencia,1,90,0,0,0.0,0.0,0,0,0,26,80.8,1,0,0.0,0.0,0.0,9,3,3,0,0,2,2,0,12,0,0,0,8,33.0,2.0,0,3,2,60.0
-Abdulai Juma Bah,DF,valladolid,valencia,1,90,0,0,0.0,0.0,0,0,0,31,74.2,0,0,0.0,0.0,0.0,0,2,1,0,0,4,3,1,14,1,0,1,19,101.0,64.0,0,6,2,75.0
-Luis Pérez,DF,valladolid,valencia,1,90,0,0,0.0,0.0,0,0,0,41,65.9,0,0,0.0,0.0,0.0,6,0,0,0,0,1,1,0,8,0,0,0,12,23.0,15.0,0,0,1,0.0
-Karl Jakob Hein,PT,valladolid,valencia,1,90,0,0,0.0,0.0,0,0,0,33,57.6,0,0,0.0,100.0,0.0,9,0,0,0,0,0,0,0,1,0,0,0,18,101.0,71.0,0,0,0,0.0
-Hugo Duro,DT,valencia,valladolid,1,90,0,0,0.2,0.2,3,3,0,16,68.8,0,0,0.0,0.0,0.0,4,0,1,0,1,1,0,1,0,1,1,0,14,72.0,39.0,1,4,4,50.0
-Diego López,DT,valencia,valladolid,1,90,0,0,0.0,0.0,1,1,0,59,72.9,0,0,0.0,0.0,0.0,3,2,2,0,0,0,0,0,0,5,0,4,51,273.0,154.0,5,0,3,0.0
-Luis Rioja,MC,valencia,valladolid,1,90,0,0,0.0,0.2,1,1,0,60,65.0,0,0,0.0,0.0,0.0,3,2,1,0,0,1,0,1,0,0,0,0,46,342.0,218.0,6,0,1,0.0
-Javier Guerra,MC,valencia,valladolid,1,60,0,0,0.1,0.0,2,2,0,46,89.1,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,0,0,0,0,39,223.0,93.0,0,0,0,0.0
-Rafa Mir,DT,valencia,valladolid,0,30,0,0,0.2,0.0,2,2,0,7,71.4,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,4,10.0,3.0,0,1,3,25.0
-José Luis García Vayá,MC,valencia,valladolid,1,90,0,0,0.1,0.1,2,2,0,96,82.3,0,0,0.0,0.0,0.0,7,0,0,0,0,1,0,1,0,1,1,0,68,259.0,162.0,0,1,0,100.0
-Francisco Perez,MC,valencia,valladolid,1,45,0,0,0.0,0.0,0,0,0,22,77.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,23,167.0,88.0,3,0,0,0.0
-Domingos André Ribeiro Almeida,MC,valencia,valladolid,0,45,0,0,0.0,0.0,1,1,0,38,89.5,0,0,0.0,0.0,0.0,3,1,2,0,1,1,0,1,0,1,1,0,31,188.0,140.0,3,0,1,0.0
-Jesus Vazquez,DF,valencia,valladolid,1,45,0,0,0.0,0.0,0,0,0,35,82.9,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,1,1,0,1,19,68.0,25.0,0,3,1,75.0
-Yarek Gasiorowski,DF,valencia,valladolid,0,45,0,0,0.0,0.0,0,0,0,26,84.6,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,1,0,0,0,15,41.0,25.0,0,1,2,33.3
-Cristhian Mosquera,DF,valencia,valladolid,1,79,0,0,0.0,0.0,0,0,0,62,87.1,0,0,0.0,0.0,0.0,3,1,3,0,2,0,0,0,2,0,0,0,48,261.0,159.0,2,1,1,50.0
-Germán Valera,MC,valencia,valladolid,0,11,0,0,0.0,0.0,0,0,0,10,80.0,0,0,0.0,0.0,0.0,0,0,0,0,0,1,0,1,0,0,0,0,8,29.0,0.0,0,0,1,0.0
-César Tárrega,DF,valencia,valladolid,1,90,0,0,0.2,0.0,2,1,1,61,93.4,0,0,0.0,0.0,0.0,7,3,1,0,1,0,0,0,5,1,0,1,47,261.0,201.0,2,4,4,50.0
-Dimitri Foulquier,DF,valencia,valladolid,1,66,0,0,0.0,0.0,0,0,0,45,77.8,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,3,3,0,3,29,196.0,77.0,2,0,0,0.0
-Sergi Canós,MC,valencia,valladolid,0,24,0,0,0.0,0.0,0,0,0,14,64.3,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,0,1,14,40.0,14.0,0,0,1,0.0
-Stole Dimitrievski,PT,valencia,valladolid,1,90,0,0,0.0,0.0,0,0,0,27,70.4,0,0,1.0,0.0,0.4,3,0,0,0,0,0,0,0,0,0,0,0,14,101.0,92.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Marcos André,DT,valladolid,valencia,1,70,0,1,0.0,0.3,0,0,0,7,57.1,1,0,0.0,0.0,0.0,8,2,0,0,0,2,0,2,0,0,0,0,4,6.0,2.0,0,0,4,0.0,24_25,17,1
+Juanmi Latasa,DT,valladolid,valencia,0,7,0,0,0.0,0.0,0,0,0,1,0.0,0,1,0.0,0.0,0.0,-2,0,0,0,0,0,0,0,1,0,0,0,0,0.0,0.0,0,0,0,0.0,24_25,17,1
+Raúl Moro,DT,valladolid,valencia,1,70,0,0,0.0,0.0,0,0,0,14,64.3,0,0,0.0,0.0,0.0,5,1,1,0,0,0,0,0,0,3,2,1,15,152.0,52.0,0,0,0,0.0,24_25,17,1
+Darwin Machís,DT,valladolid,valencia,0,20,0,0,0.0,0.0,0,0,0,3,0.0,0,0,0.0,0.0,0.0,4,2,1,0,0,0,0,0,4,0,0,0,1,1.0,0.0,0,2,0,100.0,24_25,17,1
+Anuar,DT,valladolid,valencia,1,90,1,0,0.3,0.0,1,0,1,22,77.3,1,0,0.0,0.0,0.0,13,2,1,0,0,1,0,1,2,2,2,0,14,144.0,50.0,2,1,4,20.0,24_25,17,1
+Iván Sánchez,MC,valladolid,valencia,1,57,0,0,0.0,0.0,0,0,0,22,77.3,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,0,1,0,0,14,119.0,51.0,1,1,1,50.0,24_25,17,1
+Mario Martín,MC,valladolid,valencia,0,33,0,0,0.0,0.0,0,0,0,9,88.9,0,0,0.0,0.0,0.0,4,1,1,0,1,1,1,0,6,0,0,0,2,6.0,0.0,0,5,1,83.3,24_25,17,1
+Kike Pérez,MC,valladolid,valencia,1,76,0,0,0.0,0.0,0,0,0,39,82.1,1,0,0.0,0.0,0.0,6,4,2,0,1,1,0,1,4,4,1,3,21,79.0,20.0,0,1,0,100.0,24_25,17,1
+Víctor Meseguer,MC,valladolid,valencia,0,14,0,0,0.2,0.0,1,1,0,4,75.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,1,0,0,0,2,3.0,0.0,0,1,0,100.0,24_25,17,1
+Stanko Jurić,MC,valladolid,valencia,1,90,0,0,0.0,0.0,0,0,0,32,75.0,0,0,0.0,0.0,0.0,9,5,2,0,1,1,1,0,10,0,0,0,11,34.0,8.0,0,2,0,100.0,24_25,17,1
+Lucas Oliveira Rosa,DF,valladolid,valencia,1,90,0,0,0.0,0.0,0,0,0,25,72.0,0,0,0.0,0.0,0.0,8,1,2,0,1,2,1,1,7,0,0,0,9,41.0,24.0,0,0,0,0.0,24_25,17,1
+Javi Sánchez,DF,valladolid,valencia,1,90,0,0,0.0,0.0,0,0,0,26,80.8,1,0,0.0,0.0,0.0,9,3,3,0,0,2,2,0,12,0,0,0,8,33.0,2.0,0,3,2,60.0,24_25,17,1
+Abdulai Juma Bah,DF,valladolid,valencia,1,90,0,0,0.0,0.0,0,0,0,31,74.2,0,0,0.0,0.0,0.0,0,2,1,0,0,4,3,1,14,1,0,1,19,101.0,64.0,0,6,2,75.0,24_25,17,1
+Luis Pérez,DF,valladolid,valencia,1,90,0,0,0.0,0.0,0,0,0,41,65.9,0,0,0.0,0.0,0.0,6,0,0,0,0,1,1,0,8,0,0,0,12,23.0,15.0,0,0,1,0.0,24_25,17,1
+Karl Jakob Hein,PT,valladolid,valencia,1,90,0,0,0.0,0.0,0,0,0,33,57.6,0,0,0.0,100.0,0.0,9,0,0,0,0,0,0,0,1,0,0,0,18,101.0,71.0,0,0,0,0.0,24_25,17,1
+Hugo Duro,DT,valencia,valladolid,1,90,0,0,0.2,0.2,3,3,0,16,68.8,0,0,0.0,0.0,0.0,4,0,1,0,1,1,0,1,0,1,1,0,14,72.0,39.0,1,4,4,50.0,24_25,17,0
+Diego López,DT,valencia,valladolid,1,90,0,0,0.0,0.0,1,1,0,59,72.9,0,0,0.0,0.0,0.0,3,2,2,0,0,0,0,0,0,5,0,4,51,273.0,154.0,5,0,3,0.0,24_25,17,0
+Luis Rioja,MC,valencia,valladolid,1,90,0,0,0.0,0.2,1,1,0,60,65.0,0,0,0.0,0.0,0.0,3,2,1,0,0,1,0,1,0,0,0,0,46,342.0,218.0,6,0,1,0.0,24_25,17,0
+Javier Guerra,MC,valencia,valladolid,1,60,0,0,0.1,0.0,2,2,0,46,89.1,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,0,0,0,0,39,223.0,93.0,0,0,0,0.0,24_25,17,0
+Rafa Mir,DT,valencia,valladolid,0,30,0,0,0.2,0.0,2,2,0,7,71.4,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,4,10.0,3.0,0,1,3,25.0,24_25,17,0
+José Luis García Vayá,MC,valencia,valladolid,1,90,0,0,0.1,0.1,2,2,0,96,82.3,0,0,0.0,0.0,0.0,7,0,0,0,0,1,0,1,0,1,1,0,68,259.0,162.0,0,1,0,100.0,24_25,17,0
+Francisco Perez,MC,valencia,valladolid,1,45,0,0,0.0,0.0,0,0,0,22,77.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,23,167.0,88.0,3,0,0,0.0,24_25,17,0
+Domingos André Ribeiro Almeida,MC,valencia,valladolid,0,45,0,0,0.0,0.0,1,1,0,38,89.5,0,0,0.0,0.0,0.0,3,1,2,0,1,1,0,1,0,1,1,0,31,188.0,140.0,3,0,1,0.0,24_25,17,0
+Jesus Vazquez,DF,valencia,valladolid,1,45,0,0,0.0,0.0,0,0,0,35,82.9,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,1,1,0,1,19,68.0,25.0,0,3,1,75.0,24_25,17,0
+Yarek Gasiorowski,DF,valencia,valladolid,0,45,0,0,0.0,0.0,0,0,0,26,84.6,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,1,0,0,0,15,41.0,25.0,0,1,2,33.3,24_25,17,0
+Cristhian Mosquera,DF,valencia,valladolid,1,79,0,0,0.0,0.0,0,0,0,62,87.1,0,0,0.0,0.0,0.0,3,1,3,0,2,0,0,0,2,0,0,0,48,261.0,159.0,2,1,1,50.0,24_25,17,0
+Germán Valera,MC,valencia,valladolid,0,11,0,0,0.0,0.0,0,0,0,10,80.0,0,0,0.0,0.0,0.0,0,0,0,0,0,1,0,1,0,0,0,0,8,29.0,0.0,0,0,1,0.0,24_25,17,0
+César Tárrega,DF,valencia,valladolid,1,90,0,0,0.2,0.0,2,1,1,61,93.4,0,0,0.0,0.0,0.0,7,3,1,0,1,0,0,0,5,1,0,1,47,261.0,201.0,2,4,4,50.0,24_25,17,0
+Dimitri Foulquier,DF,valencia,valladolid,1,66,0,0,0.0,0.0,0,0,0,45,77.8,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,3,3,0,3,29,196.0,77.0,2,0,0,0.0,24_25,17,0
+Sergi Canós,MC,valencia,valladolid,0,24,0,0,0.0,0.0,0,0,0,14,64.3,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,0,1,14,40.0,14.0,0,0,1,0.0,24_25,17,0
+Stole Dimitrievski,PT,valencia,valladolid,1,90,0,0,0.0,0.0,0,0,0,27,70.4,0,0,1.0,0.0,0.4,3,0,0,0,0,0,0,0,0,0,0,0,14,101.0,92.0,0,0,0,0.0,24_25,17,0

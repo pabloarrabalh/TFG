@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Georges Mikautadze,DT,villarreal,athletic,1,71,0,0,0.2,0.0,1,0,1,12,50.0,0,0,0.0,0.0,0.0,4,1,0,0,0,0,0,0,0,0,0,0,10,15.0,3.0,0,0,1,0.0
-Tani Oluwaseyi,DT,villarreal,athletic,0,19,0,0,0.1,0.0,1,1,0,6,50.0,0,0,0.0,0.0,0.0,2,1,1,0,0,1,0,1,1,0,0,0,5,38.0,10.0,0,0,0,0.0
-Nicolas Pépé,DT,villarreal,athletic,1,89,0,0,0.7,0.3,5,4,1,23,82.6,0,0,0.0,0.0,0.0,9,3,1,0,0,1,0,1,2,1,1,0,21,150.0,93.0,3,0,4,0.0
-Alfonso Pedraza,MC,villarreal,athletic,0,1,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,1,30.0,0.0,0,0,0,0.0
-Manor Solomon,MC,villarreal,athletic,1,71,0,0,0.0,0.0,0,0,0,21,71.4,0,0,0.0,0.0,0.0,5,0,1,0,1,0,0,0,0,5,3,2,21,109.0,37.0,1,0,1,0.0
-Alberto Moleiro,MC,villarreal,athletic,0,19,1,0,0.1,0.1,1,0,1,4,50.0,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,0,0,0,4,46.0,38.0,2,0,0,0.0
-Pape Gueye,MC,villarreal,athletic,1,90,0,0,0.0,0.0,2,1,1,51,66.7,0,0,0.0,0.0,0.0,7,1,0,0,0,1,0,1,3,0,0,0,40,106.0,73.0,1,2,0,100.0
-Thomas Partey,MC,villarreal,athletic,1,71,0,0,0.0,0.0,2,1,1,35,74.3,0,0,0.0,0.0,0.0,6,0,0,0,0,2,0,2,2,0,0,0,23,82.0,46.0,1,2,1,66.7
-Daniel Parejo,MC,villarreal,athletic,0,19,0,0,0.0,0.0,0,0,0,13,84.6,1,0,0.0,0.0,0.0,1,1,1,0,0,0,0,0,1,1,0,1,11,39.0,13.0,0,0,0,0.0
-Ilias Akhomach,MC,villarreal,athletic,1,45,0,0,0.0,0.4,0,0,0,12,50.0,0,0,0.0,0.0,0.0,4,2,0,0,0,5,2,3,1,1,0,1,13,81.0,70.0,2,0,0,0.0
-Tajon Buchanan,MC,villarreal,athletic,0,45,0,0,0.0,0.1,0,0,0,12,83.3,1,0,0.0,0.0,0.0,5,0,0,0,0,1,0,1,1,4,3,0,15,93.0,68.0,2,0,0,0.0
-Sergi Cardona,DF,villarreal,athletic,1,90,0,0,0.0,0.1,0,0,0,60,71.7,0,0,0.0,0.0,0.0,6,1,0,0,0,1,0,1,3,1,0,0,37,189.0,110.0,5,2,0,100.0
-Renato Veiga,DF,villarreal,athletic,1,90,0,0,0.0,0.0,0,0,0,51,90.2,0,0,0.0,0.0,0.0,9,0,0,0,0,2,2,0,4,0,0,0,41,182.0,126.0,0,1,0,100.0
-Rafa Marín,DF,villarreal,athletic,1,90,0,0,0.0,0.0,1,1,0,53,90.6,0,0,0.0,0.0,0.0,11,4,3,0,0,1,1,0,10,0,0,0,42,129.0,95.0,0,2,1,66.7
-Santiago Mouriño,DF,villarreal,athletic,1,90,0,0,0.0,0.0,1,1,0,45,88.9,0,0,0.0,0.0,0.0,8,8,6,0,3,3,2,1,5,0,0,0,30,118.0,38.0,0,1,0,100.0
-Luiz Lúcio Reis Júnior,PT,villarreal,athletic,1,90,0,0,0.0,0.0,0,0,0,24,79.2,0,0,0.0,100.0,0.6,13,0,0,0,0,0,0,0,0,0,0,0,17,86.0,61.0,0,1,0,100.0
-Gorka Guruzeta,DT,athletic,villarreal,1,67,0,0,0.3,0.0,3,1,2,13,84.6,0,0,0.0,0.0,0.0,6,0,1,0,1,0,0,0,1,2,0,2,9,22.0,9.0,0,3,4,42.9
-Jesús Areso,DF,athletic,villarreal,0,23,0,0,0.0,0.0,0,0,0,23,82.6,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,0,1,16,61.0,14.0,0,0,1,0.0
-Unai Gómez,DT,athletic,villarreal,1,56,0,0,0.0,0.1,2,2,0,35,68.6,0,0,0.0,0.0,0.0,3,2,2,0,1,0,0,0,0,2,1,1,24,82.0,32.0,0,0,2,0.0
-Roberto Navarro,DT,athletic,villarreal,0,34,0,0,0.0,0.0,0,0,0,19,63.2,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,4,1,1,23,118.0,46.0,2,0,0,0.0
-Iñaki Williams,DT,athletic,villarreal,1,74,0,0,0.0,0.2,0,0,0,17,76.5,0,0,0.0,0.0,0.0,6,0,0,0,0,0,0,0,1,1,0,1,20,80.0,45.0,2,0,0,0.0
-Maroan Sannadi,DT,athletic,villarreal,0,16,0,0,0.0,0.0,0,0,0,11,63.6,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,6,12.0,5.0,0,0,0,0.0
-Oihan Sancet,MC,athletic,villarreal,1,90,0,0,0.7,0.2,3,2,1,34,97.1,0,0,0.0,0.0,0.0,3,1,0,0,0,1,0,1,0,2,0,2,27,136.0,77.0,2,0,1,0.0
-Mikel Jauregizar,MC,athletic,villarreal,1,90,0,0,0.1,0.0,1,1,0,56,75.0,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,0,0,0,0,36,108.0,55.0,0,1,0,100.0
-Iñigo Ruiz de Galarreta,MC,athletic,villarreal,1,66,0,0,0.1,0.4,2,2,0,38,78.9,0,0,0.0,0.0,0.0,7,3,2,0,1,0,0,0,0,1,0,0,25,70.0,31.0,0,0,0,0.0
-Mikel Vesga,MC,athletic,villarreal,0,7,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,14.0,3.0,0,0,0,0.0
-Alejandro Rego,MC,athletic,villarreal,0,17,0,0,0.0,0.0,1,1,0,16,81.3,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,8,24.0,4.0,0,0,0,0.0
-Yuri Berchiche,DF,athletic,villarreal,1,90,0,0,0.0,0.0,1,1,0,86,88.4,0,0,0.0,0.0,0.0,5,0,2,0,2,0,0,0,4,1,1,0,48,158.0,115.0,2,1,0,100.0
-Aymeric Laporte,DF,athletic,villarreal,1,90,0,0,0.0,0.0,0,0,0,69,97.1,0,0,0.0,0.0,0.0,5,0,0,0,0,3,3,0,5,0,0,0,52,221.0,136.0,1,3,2,60.0
-Daniel Vivian,DF,athletic,villarreal,1,90,0,0,0.1,0.1,1,1,0,66,87.9,0,0,0.0,0.0,0.0,8,4,1,0,0,0,0,0,8,1,0,1,51,217.0,149.0,1,0,0,0.0
-Iñigo Lekue,DF,athletic,villarreal,1,90,0,0,0.1,0.0,2,1,1,52,78.8,0,0,0.0,0.0,0.0,3,1,2,0,1,0,0,0,5,2,1,1,32,171.0,98.0,3,0,1,0.0
-Unai Simón,PT,athletic,villarreal,1,90,0,0,0.0,0.0,0,0,0,30,66.7,0,0,1.0,80.0,1.6,7,0,0,0,0,0,0,0,0,0,0,0,16,94.0,65.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Georges Mikautadze,DT,villarreal,athletic,1,71,0,0,0.2,0.0,1,0,1,12,50.0,0,0,0.0,0.0,0.0,4,1,0,0,0,0,0,0,0,0,0,0,10,15.0,3.0,0,0,1,0.0,25_26,7,1
+Tani Oluwaseyi,DT,villarreal,athletic,0,19,0,0,0.1,0.0,1,1,0,6,50.0,0,0,0.0,0.0,0.0,2,1,1,0,0,1,0,1,1,0,0,0,5,38.0,10.0,0,0,0,0.0,25_26,7,1
+Nicolas Pépé,DT,villarreal,athletic,1,89,0,0,0.7,0.3,5,4,1,23,82.6,0,0,0.0,0.0,0.0,9,3,1,0,0,1,0,1,2,1,1,0,21,150.0,93.0,3,0,4,0.0,25_26,7,1
+Alfonso Pedraza,MC,villarreal,athletic,0,1,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,1,30.0,0.0,0,0,0,0.0,25_26,7,1
+Manor Solomon,MC,villarreal,athletic,1,71,0,0,0.0,0.0,0,0,0,21,71.4,0,0,0.0,0.0,0.0,5,0,1,0,1,0,0,0,0,5,3,2,21,109.0,37.0,1,0,1,0.0,25_26,7,1
+Alberto Moleiro,MC,villarreal,athletic,0,19,1,0,0.1,0.1,1,0,1,4,50.0,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,0,0,0,4,46.0,38.0,2,0,0,0.0,25_26,7,1
+Pape Gueye,MC,villarreal,athletic,1,90,0,0,0.0,0.0,2,1,1,51,66.7,0,0,0.0,0.0,0.0,7,1,0,0,0,1,0,1,3,0,0,0,40,106.0,73.0,1,2,0,100.0,25_26,7,1
+Thomas Partey,MC,villarreal,athletic,1,71,0,0,0.0,0.0,2,1,1,35,74.3,0,0,0.0,0.0,0.0,6,0,0,0,0,2,0,2,2,0,0,0,23,82.0,46.0,1,2,1,66.7,25_26,7,1
+Daniel Parejo,MC,villarreal,athletic,0,19,0,0,0.0,0.0,0,0,0,13,84.6,1,0,0.0,0.0,0.0,1,1,1,0,0,0,0,0,1,1,0,1,11,39.0,13.0,0,0,0,0.0,25_26,7,1
+Ilias Akhomach,MC,villarreal,athletic,1,45,0,0,0.0,0.4,0,0,0,12,50.0,0,0,0.0,0.0,0.0,4,2,0,0,0,5,2,3,1,1,0,1,13,81.0,70.0,2,0,0,0.0,25_26,7,1
+Tajon Buchanan,MC,villarreal,athletic,0,45,0,0,0.0,0.1,0,0,0,12,83.3,1,0,0.0,0.0,0.0,5,0,0,0,0,1,0,1,1,4,3,0,15,93.0,68.0,2,0,0,0.0,25_26,7,1
+Sergi Cardona,DF,villarreal,athletic,1,90,0,0,0.0,0.1,0,0,0,60,71.7,0,0,0.0,0.0,0.0,6,1,0,0,0,1,0,1,3,1,0,0,37,189.0,110.0,5,2,0,100.0,25_26,7,1
+Renato Veiga,DF,villarreal,athletic,1,90,0,0,0.0,0.0,0,0,0,51,90.2,0,0,0.0,0.0,0.0,9,0,0,0,0,2,2,0,4,0,0,0,41,182.0,126.0,0,1,0,100.0,25_26,7,1
+Rafa Marín,DF,villarreal,athletic,1,90,0,0,0.0,0.0,1,1,0,53,90.6,0,0,0.0,0.0,0.0,11,4,3,0,0,1,1,0,10,0,0,0,42,129.0,95.0,0,2,1,66.7,25_26,7,1
+Santiago Mouriño,DF,villarreal,athletic,1,90,0,0,0.0,0.0,1,1,0,45,88.9,0,0,0.0,0.0,0.0,8,8,6,0,3,3,2,1,5,0,0,0,30,118.0,38.0,0,1,0,100.0,25_26,7,1
+Luiz Lúcio Reis Júnior,PT,villarreal,athletic,1,90,0,0,0.0,0.0,0,0,0,24,79.2,0,0,0.0,100.0,0.6,13,0,0,0,0,0,0,0,0,0,0,0,17,86.0,61.0,0,1,0,100.0,25_26,7,1
+Gorka Guruzeta,DT,athletic,villarreal,1,67,0,0,0.3,0.0,3,1,2,13,84.6,0,0,0.0,0.0,0.0,6,0,1,0,1,0,0,0,1,2,0,2,9,22.0,9.0,0,3,4,42.9,25_26,7,0
+Jesús Areso,DF,athletic,villarreal,0,23,0,0,0.0,0.0,0,0,0,23,82.6,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,0,1,16,61.0,14.0,0,0,1,0.0,25_26,7,0
+Unai Gómez,DT,athletic,villarreal,1,56,0,0,0.0,0.1,2,2,0,35,68.6,0,0,0.0,0.0,0.0,3,2,2,0,1,0,0,0,0,2,1,1,24,82.0,32.0,0,0,2,0.0,25_26,7,0
+Roberto Navarro,DT,athletic,villarreal,0,34,0,0,0.0,0.0,0,0,0,19,63.2,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,4,1,1,23,118.0,46.0,2,0,0,0.0,25_26,7,0
+Iñaki Williams,DT,athletic,villarreal,1,74,0,0,0.0,0.2,0,0,0,17,76.5,0,0,0.0,0.0,0.0,6,0,0,0,0,0,0,0,1,1,0,1,20,80.0,45.0,2,0,0,0.0,25_26,7,0
+Maroan Sannadi,DT,athletic,villarreal,0,16,0,0,0.0,0.0,0,0,0,11,63.6,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,6,12.0,5.0,0,0,0,0.0,25_26,7,0
+Oihan Sancet,MC,athletic,villarreal,1,90,0,0,0.7,0.2,3,2,1,34,97.1,0,0,0.0,0.0,0.0,3,1,0,0,0,1,0,1,0,2,0,2,27,136.0,77.0,2,0,1,0.0,25_26,7,0
+Mikel Jauregizar,MC,athletic,villarreal,1,90,0,0,0.1,0.0,1,1,0,56,75.0,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,0,0,0,0,36,108.0,55.0,0,1,0,100.0,25_26,7,0
+Iñigo Ruiz de Galarreta,MC,athletic,villarreal,1,66,0,0,0.1,0.4,2,2,0,38,78.9,0,0,0.0,0.0,0.0,7,3,2,0,1,0,0,0,0,1,0,0,25,70.0,31.0,0,0,0,0.0,25_26,7,0
+Mikel Vesga,MC,athletic,villarreal,0,7,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,14.0,3.0,0,0,0,0.0,25_26,7,0
+Alejandro Rego,MC,athletic,villarreal,0,17,0,0,0.0,0.0,1,1,0,16,81.3,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,8,24.0,4.0,0,0,0,0.0,25_26,7,0
+Yuri Berchiche,DF,athletic,villarreal,1,90,0,0,0.0,0.0,1,1,0,86,88.4,0,0,0.0,0.0,0.0,5,0,2,0,2,0,0,0,4,1,1,0,48,158.0,115.0,2,1,0,100.0,25_26,7,0
+Aymeric Laporte,DF,athletic,villarreal,1,90,0,0,0.0,0.0,0,0,0,69,97.1,0,0,0.0,0.0,0.0,5,0,0,0,0,3,3,0,5,0,0,0,52,221.0,136.0,1,3,2,60.0,25_26,7,0
+Daniel Vivian,DF,athletic,villarreal,1,90,0,0,0.1,0.1,1,1,0,66,87.9,0,0,0.0,0.0,0.0,8,4,1,0,0,0,0,0,8,1,0,1,51,217.0,149.0,1,0,0,0.0,25_26,7,0
+Iñigo Lekue,DF,athletic,villarreal,1,90,0,0,0.1,0.0,2,1,1,52,78.8,0,0,0.0,0.0,0.0,3,1,2,0,1,0,0,0,5,2,1,1,32,171.0,98.0,3,0,1,0.0,25_26,7,0
+Unai Simón,PT,athletic,villarreal,1,90,0,0,0.0,0.0,0,0,0,30,66.7,0,0,1.0,80.0,1.6,7,0,0,0,0,0,0,0,0,0,0,0,16,94.0,65.0,0,0,0,0.0,25_26,7,0

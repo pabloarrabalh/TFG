@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Fábio Silva,DT,las palmas,valladolid,1,78,0,1,0.1,0.2,2,1,1,11,45.5,1,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,0,0,0,8,44.0,29.0,2,3,1,75.0
-Jaime Mata,DT,las palmas,valladolid,0,12,0,0,0.5,0.1,1,0,1,8,62.5,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,3,1,0,1,5,6.0,1.0,0,0,2,0.0
-Alberto Moleiro,DT,las palmas,valladolid,1,90,0,0,0.0,0.1,1,1,0,29,72.4,0,0,0.0,0.0,0.0,4,0,3,0,3,2,0,2,0,6,2,4,32,191.0,92.0,3,1,0,100.0
-Sandro Ramírez,DT,las palmas,valladolid,1,86,2,0,0.3,0.1,3,0,3,34,61.8,0,0,0.0,0.0,0.0,14,1,0,0,0,0,0,0,0,2,1,1,14,67.0,21.0,0,0,2,0.0
-Benito Ramírez,DT,las palmas,valladolid,0,4,0,0,0.1,0.0,1,1,0,2,50.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,2,13.0,13.0,1,0,2,0.0
-Javier Muñoz,MC,las palmas,valladolid,1,86,0,0,0.0,0.0,0,0,0,24,70.8,0,0,0.0,0.0,0.0,2,1,1,0,1,0,0,0,0,0,0,0,13,116.0,29.0,3,0,2,0.0
-Enzo Loiodice,MC,las palmas,valladolid,0,4,0,0,0.1,0.0,1,1,0,5,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,4,7.0,6.0,0,0,0,0.0
-Kirian Rodríguez,MC,las palmas,valladolid,1,90,0,0,0.0,0.0,0,0,0,78,89.7,0,0,0.0,0.0,0.0,6,6,4,0,0,2,1,1,2,1,1,0,49,282.0,188.0,2,3,3,50.0
-Dario Essugo,MC,las palmas,valladolid,1,57,0,0,0.1,0.0,1,1,0,32,87.5,0,0,0.0,0.0,0.0,3,0,2,0,2,0,0,0,2,1,1,0,14,85.0,21.0,1,1,1,50.0
-José Campaña,MC,las palmas,valladolid,0,33,0,1,0.0,0.1,1,1,0,31,83.9,0,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,1,0,0,0,11,35.0,5.0,0,2,1,66.7
-Mika Mármol,DF,las palmas,valladolid,1,90,0,0,0.0,0.0,0,0,0,55,69.1,0,0,0.0,0.0,0.0,5,2,1,0,0,2,1,1,5,0,0,0,18,87.0,26.0,1,2,2,50.0
-Scott McKenna,DF,las palmas,valladolid,1,90,0,0,0.0,0.0,0,0,0,65,93.8,1,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,4,0,0,0,35,85.0,53.0,0,5,1,83.3
-Álex Suárez,DF,las palmas,valladolid,1,90,0,0,0.0,0.0,0,0,0,76,94.7,1,0,0.0,0.0,0.0,3,1,1,0,0,1,1,0,3,0,0,0,47,251.0,132.0,0,0,4,0.0
-Viti,DF,las palmas,valladolid,1,57,0,0,0.0,0.0,0,0,0,31,93.5,0,0,0.0,0.0,0.0,4,2,0,0,0,0,0,0,3,2,0,2,19,84.0,41.0,1,1,3,25.0
-Marvin,DF,las palmas,valladolid,0,33,0,0,0.0,0.0,0,0,0,27,81.5,1,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,0,0,0,0,8,68.0,7.0,0,1,0,100.0
-Jasper Cillessen,PT,las palmas,valladolid,1,90,0,0,0.0,0.0,0,0,0,37,81.1,0,0,1.0,50.0,0.9,4,0,0,0,0,0,0,0,0,0,0,0,20,65.0,40.0,0,0,0,0.0
-Marcos André,DT,valladolid,las palmas,1,67,1,0,0.7,0.0,2,1,1,9,55.6,0,0,0.0,0.0,0.0,8,1,0,0,0,0,0,0,1,0,0,0,5,14.0,2.0,0,5,1,83.3
-Juanmi Latasa,DT,valladolid,las palmas,0,23,0,0,0.1,0.0,1,0,1,1,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,1,3.0,0.0,0,1,4,20.0
-Mamadou Sylla,MC,valladolid,las palmas,1,90,0,0,0.1,0.6,2,2,0,14,92.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,2,1,1,10,63.0,26.0,1,2,2,50.0
-Kike Pérez,MC,valladolid,las palmas,1,74,0,0,0.4,0.0,2,2,0,25,72.0,0,0,0.0,0.0,0.0,1,0,1,0,1,2,0,2,1,1,1,0,17,108.0,37.0,1,0,2,0.0
-Darwin Machís,MC,valladolid,las palmas,0,16,0,0,0.0,0.0,1,1,0,12,58.3,0,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,0,1,0,1,7,139.0,95.0,2,0,1,0.0
-Mario Martín,MC,valladolid,las palmas,1,67,0,0,0.0,0.0,0,0,0,21,76.2,0,0,0.0,0.0,0.0,2,2,1,0,0,2,1,1,1,0,0,0,13,48.0,10.0,0,1,2,33.3
-Víctor Meseguer,MC,valladolid,las palmas,0,23,0,0,0.0,0.0,0,0,0,11,72.7,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,0,1,5,22.0,2.0,0,1,1,50.0
-Iván Sánchez,MC,valladolid,las palmas,1,85,0,0,0.0,0.0,0,0,0,32,68.8,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,0,3,1,1,23,198.0,103.0,5,2,1,66.7
-Amath,MC,valladolid,las palmas,0,5,0,0,0.0,0.0,0,0,0,1,100.0,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,0,1,0,0.0,0.0,0,0,1,0.0
-Stanko Jurić,MC,valladolid,las palmas,1,90,0,0,0.0,0.0,0,0,0,43,81.4,0,0,0.0,0.0,0.0,4,0,3,0,3,1,0,1,3,0,0,0,16,90.0,53.0,1,6,0,100.0
-Lucas Oliveira Rosa,DF,valladolid,las palmas,1,90,0,0,0.0,0.3,0,0,0,37,78.4,0,0,0.0,0.0,0.0,6,5,3,0,0,1,0,1,5,4,2,1,23,164.0,98.0,3,1,0,100.0
-Javi Sánchez,DF,valladolid,las palmas,1,90,0,0,0.0,0.0,0,0,0,55,80.0,0,0,0.0,0.0,0.0,0,1,1,0,0,1,0,1,1,0,0,0,33,190.0,122.0,1,2,1,66.7
-Eray Cömert,DF,valladolid,las palmas,1,85,0,0,0.0,0.0,1,1,0,43,79.1,1,0,0.0,0.0,0.0,-1,2,0,0,0,1,1,0,0,1,1,0,22,115.0,78.0,0,2,1,66.7
-Abdulai Juma Bah,DF,valladolid,las palmas,0,5,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,3,16.0,1.0,0,0,0,0.0
-Luis Pérez,DF,valladolid,las palmas,1,90,0,0,0.0,0.2,0,0,0,47,61.7,0,0,0.0,0.0,0.0,2,3,2,0,1,0,0,0,2,0,0,0,23,105.0,52.0,2,1,2,33.3
-Karl Jakob Hein,PT,valladolid,las palmas,1,90,0,0,0.0,0.0,0,0,0,43,86.0,0,0,2.0,60.0,2.2,3,0,0,0,0,0,0,0,1,0,0,0,26,151.0,117.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Fábio Silva,DT,las palmas,valladolid,1,78,0,1,0.1,0.2,2,1,1,11,45.5,1,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,0,0,0,8,44.0,29.0,2,3,1,75.0,24_25,16,1
+Jaime Mata,DT,las palmas,valladolid,0,12,0,0,0.5,0.1,1,0,1,8,62.5,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,3,1,0,1,5,6.0,1.0,0,0,2,0.0,24_25,16,1
+Alberto Moleiro,DT,las palmas,valladolid,1,90,0,0,0.0,0.1,1,1,0,29,72.4,0,0,0.0,0.0,0.0,4,0,3,0,3,2,0,2,0,6,2,4,32,191.0,92.0,3,1,0,100.0,24_25,16,1
+Sandro Ramírez,DT,las palmas,valladolid,1,86,2,0,0.3,0.1,3,0,3,34,61.8,0,0,0.0,0.0,0.0,14,1,0,0,0,0,0,0,0,2,1,1,14,67.0,21.0,0,0,2,0.0,24_25,16,1
+Benito Ramírez,DT,las palmas,valladolid,0,4,0,0,0.1,0.0,1,1,0,2,50.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,2,13.0,13.0,1,0,2,0.0,24_25,16,1
+Javier Muñoz,MC,las palmas,valladolid,1,86,0,0,0.0,0.0,0,0,0,24,70.8,0,0,0.0,0.0,0.0,2,1,1,0,1,0,0,0,0,0,0,0,13,116.0,29.0,3,0,2,0.0,24_25,16,1
+Enzo Loiodice,MC,las palmas,valladolid,0,4,0,0,0.1,0.0,1,1,0,5,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,4,7.0,6.0,0,0,0,0.0,24_25,16,1
+Kirian Rodríguez,MC,las palmas,valladolid,1,90,0,0,0.0,0.0,0,0,0,78,89.7,0,0,0.0,0.0,0.0,6,6,4,0,0,2,1,1,2,1,1,0,49,282.0,188.0,2,3,3,50.0,24_25,16,1
+Dario Essugo,MC,las palmas,valladolid,1,57,0,0,0.1,0.0,1,1,0,32,87.5,0,0,0.0,0.0,0.0,3,0,2,0,2,0,0,0,2,1,1,0,14,85.0,21.0,1,1,1,50.0,24_25,16,1
+José Campaña,MC,las palmas,valladolid,0,33,0,1,0.0,0.1,1,1,0,31,83.9,0,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,1,0,0,0,11,35.0,5.0,0,2,1,66.7,24_25,16,1
+Mika Mármol,DF,las palmas,valladolid,1,90,0,0,0.0,0.0,0,0,0,55,69.1,0,0,0.0,0.0,0.0,5,2,1,0,0,2,1,1,5,0,0,0,18,87.0,26.0,1,2,2,50.0,24_25,16,1
+Scott McKenna,DF,las palmas,valladolid,1,90,0,0,0.0,0.0,0,0,0,65,93.8,1,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,4,0,0,0,35,85.0,53.0,0,5,1,83.3,24_25,16,1
+Álex Suárez,DF,las palmas,valladolid,1,90,0,0,0.0,0.0,0,0,0,76,94.7,1,0,0.0,0.0,0.0,3,1,1,0,0,1,1,0,3,0,0,0,47,251.0,132.0,0,0,4,0.0,24_25,16,1
+Viti,DF,las palmas,valladolid,1,57,0,0,0.0,0.0,0,0,0,31,93.5,0,0,0.0,0.0,0.0,4,2,0,0,0,0,0,0,3,2,0,2,19,84.0,41.0,1,1,3,25.0,24_25,16,1
+Marvin,DF,las palmas,valladolid,0,33,0,0,0.0,0.0,0,0,0,27,81.5,1,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,0,0,0,0,8,68.0,7.0,0,1,0,100.0,24_25,16,1
+Jasper Cillessen,PT,las palmas,valladolid,1,90,0,0,0.0,0.0,0,0,0,37,81.1,0,0,1.0,50.0,0.9,4,0,0,0,0,0,0,0,0,0,0,0,20,65.0,40.0,0,0,0,0.0,24_25,16,1
+Marcos André,DT,valladolid,las palmas,1,67,1,0,0.7,0.0,2,1,1,9,55.6,0,0,0.0,0.0,0.0,8,1,0,0,0,0,0,0,1,0,0,0,5,14.0,2.0,0,5,1,83.3,24_25,16,0
+Juanmi Latasa,DT,valladolid,las palmas,0,23,0,0,0.1,0.0,1,0,1,1,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,1,3.0,0.0,0,1,4,20.0,24_25,16,0
+Mamadou Sylla,MC,valladolid,las palmas,1,90,0,0,0.1,0.6,2,2,0,14,92.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,2,1,1,10,63.0,26.0,1,2,2,50.0,24_25,16,0
+Kike Pérez,MC,valladolid,las palmas,1,74,0,0,0.4,0.0,2,2,0,25,72.0,0,0,0.0,0.0,0.0,1,0,1,0,1,2,0,2,1,1,1,0,17,108.0,37.0,1,0,2,0.0,24_25,16,0
+Darwin Machís,MC,valladolid,las palmas,0,16,0,0,0.0,0.0,1,1,0,12,58.3,0,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,0,1,0,1,7,139.0,95.0,2,0,1,0.0,24_25,16,0
+Mario Martín,MC,valladolid,las palmas,1,67,0,0,0.0,0.0,0,0,0,21,76.2,0,0,0.0,0.0,0.0,2,2,1,0,0,2,1,1,1,0,0,0,13,48.0,10.0,0,1,2,33.3,24_25,16,0
+Víctor Meseguer,MC,valladolid,las palmas,0,23,0,0,0.0,0.0,0,0,0,11,72.7,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,0,1,5,22.0,2.0,0,1,1,50.0,24_25,16,0
+Iván Sánchez,MC,valladolid,las palmas,1,85,0,0,0.0,0.0,0,0,0,32,68.8,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,0,3,1,1,23,198.0,103.0,5,2,1,66.7,24_25,16,0
+Amath,MC,valladolid,las palmas,0,5,0,0,0.0,0.0,0,0,0,1,100.0,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,0,1,0,0.0,0.0,0,0,1,0.0,24_25,16,0
+Stanko Jurić,MC,valladolid,las palmas,1,90,0,0,0.0,0.0,0,0,0,43,81.4,0,0,0.0,0.0,0.0,4,0,3,0,3,1,0,1,3,0,0,0,16,90.0,53.0,1,6,0,100.0,24_25,16,0
+Lucas Oliveira Rosa,DF,valladolid,las palmas,1,90,0,0,0.0,0.3,0,0,0,37,78.4,0,0,0.0,0.0,0.0,6,5,3,0,0,1,0,1,5,4,2,1,23,164.0,98.0,3,1,0,100.0,24_25,16,0
+Javi Sánchez,DF,valladolid,las palmas,1,90,0,0,0.0,0.0,0,0,0,55,80.0,0,0,0.0,0.0,0.0,0,1,1,0,0,1,0,1,1,0,0,0,33,190.0,122.0,1,2,1,66.7,24_25,16,0
+Eray Cömert,DF,valladolid,las palmas,1,85,0,0,0.0,0.0,1,1,0,43,79.1,1,0,0.0,0.0,0.0,-1,2,0,0,0,1,1,0,0,1,1,0,22,115.0,78.0,0,2,1,66.7,24_25,16,0
+Abdulai Juma Bah,DF,valladolid,las palmas,0,5,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,3,16.0,1.0,0,0,0,0.0,24_25,16,0
+Luis Pérez,DF,valladolid,las palmas,1,90,0,0,0.0,0.2,0,0,0,47,61.7,0,0,0.0,0.0,0.0,2,3,2,0,1,0,0,0,2,0,0,0,23,105.0,52.0,2,1,2,33.3,24_25,16,0
+Karl Jakob Hein,PT,valladolid,las palmas,1,90,0,0,0.0,0.0,0,0,0,43,86.0,0,0,2.0,60.0,2.2,3,0,0,0,0,0,0,0,1,0,0,0,26,151.0,117.0,0,0,0,0.0,24_25,16,0

@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Sheraldo Becker,DT,real sociedad,atletico madrid,1,81,0,0,0.1,0.0,2,2,0,24,75.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,0,0,0,14,71.0,22.0,1,1,0,100.0
-André Silva,DT,real sociedad,atletico madrid,0,9,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,1,0,0,0,2,11.0,6.0,0,0,1,0.0
-Ander Barrenetxea,DT,real sociedad,atletico madrid,1,67,0,0,0.0,0.1,0,0,0,25,84.0,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,0,2,1,1,18,94.0,22.0,0,0,0,0.0
-Mikel Oyarzabal,DT,real sociedad,atletico madrid,0,23,0,0,0.0,0.0,0,0,0,4,25.0,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,0,0,0,0,1,0.0,0.0,0,0,0,0.0
-Takefusa Kubo,DT,real sociedad,atletico madrid,1,90,0,0,0.1,0.0,1,0,1,49,71.4,0,0,0.0,0.0,0.0,6,1,0,0,0,1,0,1,0,7,4,2,31,328.0,207.0,7,0,0,0.0
-Arsen Zakharyan,MC,real sociedad,atletico madrid,1,67,0,0,0.1,0.1,3,2,1,32,81.3,0,0,0.0,0.0,0.0,5,0,3,0,3,0,0,0,1,0,0,0,19,74.0,28.0,0,0,0,0.0
-Olasagasti,MC,real sociedad,atletico madrid,0,23,0,0,0.0,0.0,1,1,0,8,75.0,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,1,0,6,29.0,25.0,2,0,1,0.0
-Beñat Turrientes,MC,real sociedad,atletico madrid,1,83,0,0,0.0,0.0,1,1,0,43,97.7,0,0,0.0,0.0,0.0,4,0,0,0,0,1,1,0,2,0,0,0,30,98.0,43.0,0,0,0,0.0
-Urko González,MC,real sociedad,atletico madrid,0,7,0,0,0.0,0.0,1,1,0,4,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,5,28.0,13.0,0,0,0,0.0
-Brais Méndez,MC,real sociedad,atletico madrid,1,90,0,0,0.2,0.0,4,4,0,74,83.8,1,0,0.0,0.0,0.0,1,4,1,0,0,1,0,1,0,2,0,2,60,214.0,127.0,0,1,1,50.0
-Kieran Tierney,DF,real sociedad,atletico madrid,1,80,0,0,0.0,0.0,0,0,0,62,88.7,0,0,0.0,0.0,0.0,4,2,1,0,1,1,0,1,4,3,1,1,33,125.0,68.0,0,0,2,0.0
-Jon Aramburu,DF,real sociedad,atletico madrid,0,10,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,0,0,0,0,0,1,0,1,0,0,0,0,1,0.0,0.0,0,0,0,0.0
-Jon Pacheco,DF,real sociedad,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,94,92.6,1,0,0.0,0.0,0.0,0,0,1,0,1,0,0,0,2,0,0,0,67,361.0,279.0,0,2,0,100.0
-Aritz Elustondo,DF,real sociedad,atletico madrid,1,90,0,0,0.1,0.0,1,1,0,76,93.4,0,0,0.0,0.0,0.0,1,3,1,0,0,0,0,0,2,0,0,0,56,278.0,144.0,0,2,2,50.0
-Hamari Traoré,DF,real sociedad,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,52,88.5,0,0,0.0,0.0,0.0,0,1,2,0,1,2,2,0,2,0,0,0,29,87.0,46.0,1,0,0,0.0
-Álex Remiro,PT,real sociedad,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,20,100.0,0,0,2.0,50.0,1.7,3,0,0,0,0,0,0,0,0,0,0,0,9,23.0,6.0,0,0,0,0.0
-Ángel Correa,DT,atletico madrid,real sociedad,1,69,0,0,0.2,0.5,2,2,0,19,78.9,0,0,0.0,0.0,0.0,6,0,0,0,0,0,0,0,0,2,2,0,18,96.0,51.0,2,0,0,0.0
-Álvaro Morata,DT,atletico madrid,real sociedad,0,21,0,1,0.4,0.5,1,1,0,2,50.0,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,0,0,0,3,25.0,21.0,1,0,1,0.0
-Antoine Griezmann,MC,atletico madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,35,85.7,0,0,0.0,0.0,0.0,6,2,2,0,0,3,1,2,2,1,0,1,18,77.0,30.0,0,0,0,0.0
-Arthur Vermeeren,MC,atletico madrid,real sociedad,1,57,0,0,0.0,0.1,0,0,0,19,94.7,1,0,0.0,0.0,0.0,1,0,0,0,0,2,0,2,1,0,0,0,18,108.0,25.0,0,0,2,0.0
-Rodrigo Riquelme,MC,atletico madrid,real sociedad,0,33,0,0,0.0,0.0,0,0,0,8,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,2,1,1,7,22.0,3.0,0,0,0,0.0
-Koke,MC,atletico madrid,real sociedad,1,90,0,0,0.0,0.4,0,0,0,49,91.8,1,0,0.0,0.0,0.0,8,4,2,0,0,2,2,0,1,0,0,0,22,102.0,63.0,1,0,0,0.0
-Rodrigo De Paul,MC,atletico madrid,real sociedad,1,69,0,0,0.0,0.1,0,0,0,40,77.5,0,0,0.0,0.0,0.0,5,0,0,0,0,2,0,2,0,3,2,1,22,170.0,113.0,3,0,0,0.0
-Saúl Ñíguez,MC,atletico madrid,real sociedad,0,20,0,0,0.0,0.0,0,0,0,4,75.0,2,1,0.0,0.0,0.0,-1,2,3,0,2,0,0,0,0,0,0,0,2,9.0,6.0,0,0,0,0.0
-Samuel Lino,MC,atletico madrid,real sociedad,1,69,1,0,1.0,0.0,4,3,1,25,80.0,0,0,0.0,0.0,0.0,12,0,2,0,2,1,0,1,1,0,0,0,20,89.0,48.0,1,0,0,0.0
-Mario Hermoso,DF,atletico madrid,real sociedad,0,21,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,1,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0
-Marcos Llorente,MC,atletico madrid,real sociedad,1,90,0,1,0.1,0.6,2,0,2,58,77.6,0,0,0.0,0.0,0.0,12,2,2,0,1,1,1,0,2,1,1,0,26,128.0,57.0,4,2,1,66.7
-César Azpilicueta,DF,atletico madrid,real sociedad,1,83,0,0,0.0,0.0,0,0,0,45,82.2,0,0,0.0,0.0,0.0,6,0,0,0,0,3,2,1,3,1,0,0,10,44.0,6.0,0,1,2,33.3
-Reinildo Mandava,DF,atletico madrid,real sociedad,0,7,1,0,0.5,0.0,1,0,1,2,100.0,1,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,0,1,0,0,4,33.0,3.0,0,0,0,0.0
-José María Giménez,DF,atletico madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,37,86.5,0,0,0.0,0.0,0.0,10,1,3,0,3,4,2,2,11,0,0,0,10,50.0,6.0,0,2,0,100.0
-Axel Witsel,DF,atletico madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,34,97.1,0,0,0.0,0.0,0.0,7,1,0,0,0,0,0,0,2,0,0,0,18,115.0,77.0,0,0,0,0.0
-Jan Oblak,PT,atletico madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,20,65.0,0,0,0.0,100.0,0.4,9,0,0,0,0,0,0,0,1,0,0,0,8,47.0,29.0,0,2,0,100.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Sheraldo Becker,DT,real sociedad,atletico madrid,1,81,0,0,0.1,0.0,2,2,0,24,75.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,0,0,0,14,71.0,22.0,1,1,0,100.0,23_24,38,1
+André Silva,DT,real sociedad,atletico madrid,0,9,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,1,0,0,0,2,11.0,6.0,0,0,1,0.0,23_24,38,1
+Ander Barrenetxea,DT,real sociedad,atletico madrid,1,67,0,0,0.0,0.1,0,0,0,25,84.0,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,0,2,1,1,18,94.0,22.0,0,0,0,0.0,23_24,38,1
+Mikel Oyarzabal,DT,real sociedad,atletico madrid,0,23,0,0,0.0,0.0,0,0,0,4,25.0,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,0,0,0,0,1,0.0,0.0,0,0,0,0.0,23_24,38,1
+Takefusa Kubo,DT,real sociedad,atletico madrid,1,90,0,0,0.1,0.0,1,0,1,49,71.4,0,0,0.0,0.0,0.0,6,1,0,0,0,1,0,1,0,7,4,2,31,328.0,207.0,7,0,0,0.0,23_24,38,1
+Arsen Zakharyan,MC,real sociedad,atletico madrid,1,67,0,0,0.1,0.1,3,2,1,32,81.3,0,0,0.0,0.0,0.0,5,0,3,0,3,0,0,0,1,0,0,0,19,74.0,28.0,0,0,0,0.0,23_24,38,1
+Olasagasti,MC,real sociedad,atletico madrid,0,23,0,0,0.0,0.0,1,1,0,8,75.0,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,1,0,6,29.0,25.0,2,0,1,0.0,23_24,38,1
+Beñat Turrientes,MC,real sociedad,atletico madrid,1,83,0,0,0.0,0.0,1,1,0,43,97.7,0,0,0.0,0.0,0.0,4,0,0,0,0,1,1,0,2,0,0,0,30,98.0,43.0,0,0,0,0.0,23_24,38,1
+Urko González,MC,real sociedad,atletico madrid,0,7,0,0,0.0,0.0,1,1,0,4,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,5,28.0,13.0,0,0,0,0.0,23_24,38,1
+Brais Méndez,MC,real sociedad,atletico madrid,1,90,0,0,0.2,0.0,4,4,0,74,83.8,1,0,0.0,0.0,0.0,1,4,1,0,0,1,0,1,0,2,0,2,60,214.0,127.0,0,1,1,50.0,23_24,38,1
+Kieran Tierney,DF,real sociedad,atletico madrid,1,80,0,0,0.0,0.0,0,0,0,62,88.7,0,0,0.0,0.0,0.0,4,2,1,0,1,1,0,1,4,3,1,1,33,125.0,68.0,0,0,2,0.0,23_24,38,1
+Jon Aramburu,DF,real sociedad,atletico madrid,0,10,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,0,0,0,0,0,1,0,1,0,0,0,0,1,0.0,0.0,0,0,0,0.0,23_24,38,1
+Jon Pacheco,DF,real sociedad,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,94,92.6,1,0,0.0,0.0,0.0,0,0,1,0,1,0,0,0,2,0,0,0,67,361.0,279.0,0,2,0,100.0,23_24,38,1
+Aritz Elustondo,DF,real sociedad,atletico madrid,1,90,0,0,0.1,0.0,1,1,0,76,93.4,0,0,0.0,0.0,0.0,1,3,1,0,0,0,0,0,2,0,0,0,56,278.0,144.0,0,2,2,50.0,23_24,38,1
+Hamari Traoré,DF,real sociedad,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,52,88.5,0,0,0.0,0.0,0.0,0,1,2,0,1,2,2,0,2,0,0,0,29,87.0,46.0,1,0,0,0.0,23_24,38,1
+Álex Remiro,PT,real sociedad,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,20,100.0,0,0,2.0,50.0,1.7,3,0,0,0,0,0,0,0,0,0,0,0,9,23.0,6.0,0,0,0,0.0,23_24,38,1
+Ángel Correa,DT,atletico madrid,real sociedad,1,69,0,0,0.2,0.5,2,2,0,19,78.9,0,0,0.0,0.0,0.0,6,0,0,0,0,0,0,0,0,2,2,0,18,96.0,51.0,2,0,0,0.0,23_24,38,0
+Álvaro Morata,DT,atletico madrid,real sociedad,0,21,0,1,0.4,0.5,1,1,0,2,50.0,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,0,0,0,3,25.0,21.0,1,0,1,0.0,23_24,38,0
+Antoine Griezmann,MC,atletico madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,35,85.7,0,0,0.0,0.0,0.0,6,2,2,0,0,3,1,2,2,1,0,1,18,77.0,30.0,0,0,0,0.0,23_24,38,0
+Arthur Vermeeren,MC,atletico madrid,real sociedad,1,57,0,0,0.0,0.1,0,0,0,19,94.7,1,0,0.0,0.0,0.0,1,0,0,0,0,2,0,2,1,0,0,0,18,108.0,25.0,0,0,2,0.0,23_24,38,0
+Rodrigo Riquelme,MC,atletico madrid,real sociedad,0,33,0,0,0.0,0.0,0,0,0,8,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,2,1,1,7,22.0,3.0,0,0,0,0.0,23_24,38,0
+Koke,MC,atletico madrid,real sociedad,1,90,0,0,0.0,0.4,0,0,0,49,91.8,1,0,0.0,0.0,0.0,8,4,2,0,0,2,2,0,1,0,0,0,22,102.0,63.0,1,0,0,0.0,23_24,38,0
+Rodrigo De Paul,MC,atletico madrid,real sociedad,1,69,0,0,0.0,0.1,0,0,0,40,77.5,0,0,0.0,0.0,0.0,5,0,0,0,0,2,0,2,0,3,2,1,22,170.0,113.0,3,0,0,0.0,23_24,38,0
+Saúl Ñíguez,MC,atletico madrid,real sociedad,0,20,0,0,0.0,0.0,0,0,0,4,75.0,2,1,0.0,0.0,0.0,-1,2,3,0,2,0,0,0,0,0,0,0,2,9.0,6.0,0,0,0,0.0,23_24,38,0
+Samuel Lino,MC,atletico madrid,real sociedad,1,69,1,0,1.0,0.0,4,3,1,25,80.0,0,0,0.0,0.0,0.0,12,0,2,0,2,1,0,1,1,0,0,0,20,89.0,48.0,1,0,0,0.0,23_24,38,0
+Mario Hermoso,DF,atletico madrid,real sociedad,0,21,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,1,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0,23_24,38,0
+Marcos Llorente,MC,atletico madrid,real sociedad,1,90,0,1,0.1,0.6,2,0,2,58,77.6,0,0,0.0,0.0,0.0,12,2,2,0,1,1,1,0,2,1,1,0,26,128.0,57.0,4,2,1,66.7,23_24,38,0
+César Azpilicueta,DF,atletico madrid,real sociedad,1,83,0,0,0.0,0.0,0,0,0,45,82.2,0,0,0.0,0.0,0.0,6,0,0,0,0,3,2,1,3,1,0,0,10,44.0,6.0,0,1,2,33.3,23_24,38,0
+Reinildo Mandava,DF,atletico madrid,real sociedad,0,7,1,0,0.5,0.0,1,0,1,2,100.0,1,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,0,1,0,0,4,33.0,3.0,0,0,0,0.0,23_24,38,0
+José María Giménez,DF,atletico madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,37,86.5,0,0,0.0,0.0,0.0,10,1,3,0,3,4,2,2,11,0,0,0,10,50.0,6.0,0,2,0,100.0,23_24,38,0
+Axel Witsel,DF,atletico madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,34,97.1,0,0,0.0,0.0,0.0,7,1,0,0,0,0,0,0,2,0,0,0,18,115.0,77.0,0,0,0,0.0,23_24,38,0
+Jan Oblak,PT,atletico madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,20,65.0,0,0,0.0,100.0,0.4,9,0,0,0,0,0,0,0,1,0,0,0,8,47.0,29.0,0,2,0,100.0,23_24,38,0

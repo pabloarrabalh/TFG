@@ -1,30 +1,30 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Hugo Duro,DT,valencia,espanyol,1,90,0,0,0.2,0.0,3,2,1,15,73.3,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,0,0,0,7,28.0,19.0,0,2,2,50.0
-Diego López,DT,valencia,espanyol,1,83,0,0,0.1,0.1,1,1,0,41,82.9,0,0,0.0,0.0,0.0,3,0,2,0,2,1,0,1,0,3,0,3,34,205.0,75.0,3,0,1,0.0
-Francisco Perez,MC,valencia,espanyol,0,7,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,5,48.0,29.0,1,0,1,0.0
-Luis Rioja,DT,valencia,espanyol,1,90,0,1,0.1,0.2,2,0,2,62,79.0,0,0,0.0,0.0,0.0,12,0,1,0,1,0,0,0,0,3,2,1,52,362.0,193.0,6,1,1,50.0
-Domingos André Ribeiro Almeida,MC,valencia,espanyol,1,53,0,0,0.0,0.0,0,0,0,32,90.6,1,0,0.0,0.0,0.0,-1,0,2,0,2,1,0,1,0,5,1,3,30,158.0,34.0,1,0,1,0.0
-Rafa Mir,DT,valencia,espanyol,0,37,0,0,0.1,0.0,2,1,1,22,86.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,2,0,2,18,78.0,28.0,2,0,2,0.0
-Javier Guerra,MC,valencia,espanyol,1,90,1,0,0.3,0.0,4,2,2,79,79.7,0,0,0.0,0.0,0.0,10,1,3,0,2,0,0,0,1,3,0,3,66,377.0,217.0,5,1,1,50.0
-Enzo Barrenechea,MC,valencia,espanyol,1,83,0,0,0.1,0.0,2,2,0,78,91.0,0,0,0.0,0.0,0.0,5,2,2,0,0,0,0,0,2,0,0,0,58,240.0,108.0,0,0,2,0.0
-José Luis García Vayá,MC,valencia,espanyol,0,7,0,0,0.0,0.0,0,0,0,10,90.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,6,30.0,20.0,0,0,0,0.0
-José Luis Gayà,DF,valencia,espanyol,1,90,0,0,0.0,0.3,1,0,1,68,80.9,0,0,0.0,0.0,0.0,6,2,3,0,1,1,1,0,1,0,0,0,39,145.0,70.0,2,1,2,33.3
-Cristhian Mosquera,DF,valencia,espanyol,1,90,0,0,0.0,0.0,0,0,0,91,96.7,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,1,0,0,0,77,470.0,279.0,3,0,2,0.0
-César Tárrega,DF,valencia,espanyol,1,90,0,0,0.0,0.0,0,0,0,92,93.5,1,0,0.0,0.0,0.0,6,5,2,0,0,3,1,2,9,1,1,0,71,360.0,242.0,1,1,0,100.0
-Dimitri Foulquier,DF,valencia,espanyol,1,90,0,0,0.1,0.0,1,1,0,82,89.0,0,0,0.0,0.0,0.0,5,3,2,0,0,1,0,1,3,0,0,0,58,212.0,102.0,0,0,2,0.0
-Giorgi Mamardashvili,PT,valencia,espanyol,1,90,0,0,0.0,0.0,0,0,0,20,75.0,0,0,1.0,66.7,0.9,6,1,1,0,0,0,0,0,1,0,0,0,17,82.0,47.0,0,0,0,0.0
-Roberto Férnandez,DT,espanyol,valencia,1,90,0,0,0.1,0.0,2,1,1,15,60.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,3,0,3,9,28.0,5.0,0,4,2,66.7
-Javi Puado,DT,espanyol,valencia,1,86,1,0,0.2,0.0,2,0,2,18,72.2,0,0,0.0,0.0,0.0,11,0,1,0,1,0,0,0,0,0,0,0,13,65.0,34.0,1,0,0,0.0
-Álvaro Tejero,DT,espanyol,valencia,0,4,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,3,15.0,12.0,1,0,0,0.0
-Jofre,DT,espanyol,valencia,1,69,0,0,0.0,0.0,0,0,0,16,68.8,0,0,0.0,0.0,0.0,3,1,0,0,0,1,0,1,1,4,1,3,14,129.0,75.0,2,0,0,0.0
-Antoniu,DT,espanyol,valencia,0,21,0,0,0.0,0.0,1,1,0,6,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,1,0,0,3,1,2,7,46.0,34.0,1,1,0,100.0
-Edu Expósito,MC,espanyol,valencia,1,69,0,1,0.0,0.2,1,1,0,33,66.7,0,0,0.0,0.0,0.0,11,2,2,0,1,0,0,0,2,5,3,2,25,178.0,82.0,3,1,0,100.0
-Pere Milla,DT,espanyol,valencia,0,21,0,0,0.0,0.0,0,0,0,7,28.6,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,8,43.0,11.0,1,1,0,100.0
-Pol Lozano,MC,espanyol,valencia,1,82,0,0,0.0,0.0,0,0,0,20,90.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,1,2,1,1,17,86.0,54.0,2,0,0,0.0
-Alex Král,MC,espanyol,valencia,0,8,0,0,0.0,0.0,0,0,0,7,57.1,0,0,0.0,0.0,0.0,2,0,0,0,0,2,1,1,0,0,0,0,6,14.0,1.0,0,1,0,100.0
-Urko González,MC,espanyol,valencia,1,90,0,0,0.0,0.0,0,0,0,29,72.4,0,0,0.0,0.0,0.0,4,3,2,0,0,0,0,0,1,1,1,0,14,63.0,49.0,1,1,1,50.0
-Carlos Romero,DF,espanyol,valencia,1,90,0,0,0.0,0.0,1,1,0,36,88.9,1,0,0.0,0.0,0.0,6,5,6,0,2,2,0,2,7,1,1,0,20,165.0,95.0,3,0,0,0.0
-Leandro Cabrera,DF,espanyol,valencia,1,90,0,0,0.0,0.0,1,1,0,39,74.4,0,0,0.0,0.0,0.0,6,2,2,0,0,2,2,0,12,0,0,0,21,80.0,55.0,0,3,0,100.0
-Marash Kumbulla,DF,espanyol,valencia,1,90,0,0,0.0,0.0,0,0,0,41,92.7,0,0,0.0,0.0,0.0,7,3,3,0,0,0,0,0,11,0,0,0,26,83.0,44.0,0,2,1,66.7
-Omar El Hilali,DF,espanyol,valencia,1,90,0,0,0.0,0.0,0,0,0,49,91.8,0,0,0.0,0.0,0.0,4,3,1,0,0,3,2,1,5,0,0,0,28,168.0,108.0,1,2,2,50.0
-Joan García,PT,espanyol,valencia,1,90,0,0,0.0,0.0,0,0,0,32,68.8,0,0,1.0,85.7,2.0,10,0,0,0,0,0,0,0,0,0,0,0,22,89.0,67.0,0,1,0,100.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Hugo Duro,DT,valencia,espanyol,1,90,0,0,0.2,0.0,3,2,1,15,73.3,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,0,0,0,7,28.0,19.0,0,2,2,50.0,24_25,33,1
+Diego López,DT,valencia,espanyol,1,83,0,0,0.1,0.1,1,1,0,41,82.9,0,0,0.0,0.0,0.0,3,0,2,0,2,1,0,1,0,3,0,3,34,205.0,75.0,3,0,1,0.0,24_25,33,1
+Francisco Perez,MC,valencia,espanyol,0,7,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,5,48.0,29.0,1,0,1,0.0,24_25,33,1
+Luis Rioja,DT,valencia,espanyol,1,90,0,1,0.1,0.2,2,0,2,62,79.0,0,0,0.0,0.0,0.0,12,0,1,0,1,0,0,0,0,3,2,1,52,362.0,193.0,6,1,1,50.0,24_25,33,1
+Domingos André Ribeiro Almeida,MC,valencia,espanyol,1,53,0,0,0.0,0.0,0,0,0,32,90.6,1,0,0.0,0.0,0.0,-1,0,2,0,2,1,0,1,0,5,1,3,30,158.0,34.0,1,0,1,0.0,24_25,33,1
+Rafa Mir,DT,valencia,espanyol,0,37,0,0,0.1,0.0,2,1,1,22,86.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,2,0,2,18,78.0,28.0,2,0,2,0.0,24_25,33,1
+Javier Guerra,MC,valencia,espanyol,1,90,1,0,0.3,0.0,4,2,2,79,79.7,0,0,0.0,0.0,0.0,10,1,3,0,2,0,0,0,1,3,0,3,66,377.0,217.0,5,1,1,50.0,24_25,33,1
+Enzo Barrenechea,MC,valencia,espanyol,1,83,0,0,0.1,0.0,2,2,0,78,91.0,0,0,0.0,0.0,0.0,5,2,2,0,0,0,0,0,2,0,0,0,58,240.0,108.0,0,0,2,0.0,24_25,33,1
+José Luis García Vayá,MC,valencia,espanyol,0,7,0,0,0.0,0.0,0,0,0,10,90.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,6,30.0,20.0,0,0,0,0.0,24_25,33,1
+José Luis Gayà,DF,valencia,espanyol,1,90,0,0,0.0,0.3,1,0,1,68,80.9,0,0,0.0,0.0,0.0,6,2,3,0,1,1,1,0,1,0,0,0,39,145.0,70.0,2,1,2,33.3,24_25,33,1
+Cristhian Mosquera,DF,valencia,espanyol,1,90,0,0,0.0,0.0,0,0,0,91,96.7,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,1,0,0,0,77,470.0,279.0,3,0,2,0.0,24_25,33,1
+César Tárrega,DF,valencia,espanyol,1,90,0,0,0.0,0.0,0,0,0,92,93.5,1,0,0.0,0.0,0.0,6,5,2,0,0,3,1,2,9,1,1,0,71,360.0,242.0,1,1,0,100.0,24_25,33,1
+Dimitri Foulquier,DF,valencia,espanyol,1,90,0,0,0.1,0.0,1,1,0,82,89.0,0,0,0.0,0.0,0.0,5,3,2,0,0,1,0,1,3,0,0,0,58,212.0,102.0,0,0,2,0.0,24_25,33,1
+Giorgi Mamardashvili,PT,valencia,espanyol,1,90,0,0,0.0,0.0,0,0,0,20,75.0,0,0,1.0,66.7,0.9,6,1,1,0,0,0,0,0,1,0,0,0,17,82.0,47.0,0,0,0,0.0,24_25,33,1
+Roberto Férnandez,DT,espanyol,valencia,1,90,0,0,0.1,0.0,2,1,1,15,60.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,3,0,3,9,28.0,5.0,0,4,2,66.7,24_25,33,0
+Javi Puado,DT,espanyol,valencia,1,86,1,0,0.2,0.0,2,0,2,18,72.2,0,0,0.0,0.0,0.0,11,0,1,0,1,0,0,0,0,0,0,0,13,65.0,34.0,1,0,0,0.0,24_25,33,0
+Álvaro Tejero,DT,espanyol,valencia,0,4,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,3,15.0,12.0,1,0,0,0.0,24_25,33,0
+Jofre,DT,espanyol,valencia,1,69,0,0,0.0,0.0,0,0,0,16,68.8,0,0,0.0,0.0,0.0,3,1,0,0,0,1,0,1,1,4,1,3,14,129.0,75.0,2,0,0,0.0,24_25,33,0
+Antoniu,DT,espanyol,valencia,0,21,0,0,0.0,0.0,1,1,0,6,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,1,0,0,3,1,2,7,46.0,34.0,1,1,0,100.0,24_25,33,0
+Edu Expósito,MC,espanyol,valencia,1,69,0,1,0.0,0.2,1,1,0,33,66.7,0,0,0.0,0.0,0.0,11,2,2,0,1,0,0,0,2,5,3,2,25,178.0,82.0,3,1,0,100.0,24_25,33,0
+Pere Milla,DT,espanyol,valencia,0,21,0,0,0.0,0.0,0,0,0,7,28.6,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,8,43.0,11.0,1,1,0,100.0,24_25,33,0
+Pol Lozano,MC,espanyol,valencia,1,82,0,0,0.0,0.0,0,0,0,20,90.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,1,2,1,1,17,86.0,54.0,2,0,0,0.0,24_25,33,0
+Alex Král,MC,espanyol,valencia,0,8,0,0,0.0,0.0,0,0,0,7,57.1,0,0,0.0,0.0,0.0,2,0,0,0,0,2,1,1,0,0,0,0,6,14.0,1.0,0,1,0,100.0,24_25,33,0
+Urko González,MC,espanyol,valencia,1,90,0,0,0.0,0.0,0,0,0,29,72.4,0,0,0.0,0.0,0.0,4,3,2,0,0,0,0,0,1,1,1,0,14,63.0,49.0,1,1,1,50.0,24_25,33,0
+Carlos Romero,DF,espanyol,valencia,1,90,0,0,0.0,0.0,1,1,0,36,88.9,1,0,0.0,0.0,0.0,6,5,6,0,2,2,0,2,7,1,1,0,20,165.0,95.0,3,0,0,0.0,24_25,33,0
+Leandro Cabrera,DF,espanyol,valencia,1,90,0,0,0.0,0.0,1,1,0,39,74.4,0,0,0.0,0.0,0.0,6,2,2,0,0,2,2,0,12,0,0,0,21,80.0,55.0,0,3,0,100.0,24_25,33,0
+Marash Kumbulla,DF,espanyol,valencia,1,90,0,0,0.0,0.0,0,0,0,41,92.7,0,0,0.0,0.0,0.0,7,3,3,0,0,0,0,0,11,0,0,0,26,83.0,44.0,0,2,1,66.7,24_25,33,0
+Omar El Hilali,DF,espanyol,valencia,1,90,0,0,0.0,0.0,0,0,0,49,91.8,0,0,0.0,0.0,0.0,4,3,1,0,0,3,2,1,5,0,0,0,28,168.0,108.0,1,2,2,50.0,24_25,33,0
+Joan García,PT,espanyol,valencia,1,90,0,0,0.0,0.0,0,0,0,32,68.8,0,0,1.0,85.7,2.0,10,0,0,0,0,0,0,0,0,0,0,0,22,89.0,67.0,0,1,0,100.0,24_25,33,0

@@ -1,31 +1,31 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Gorka Guruzeta,DT,athletic,las palmas,1,55,0,0,1.6,0.0,2,1,1,16,56.3,0,0,0.0,0.0,0.0,2,1,1,0,0,1,0,1,0,1,0,1,14,60.0,29.0,1,3,3,50.0
-Álex Berenguer,DT,athletic,las palmas,0,35,0,0,0.5,0.2,1,0,1,19,57.9,0,0,0.0,0.0,0.0,3,0,0,0,0,1,0,1,0,0,0,0,10,75.0,34.0,2,0,3,0.0
-Nico Williams,DT,athletic,las palmas,1,85,0,0,0.3,0.2,2,1,1,39,69.2,0,0,0.0,0.0,0.0,9,1,2,0,1,0,0,0,0,6,5,1,39,332.0,218.0,7,0,2,0.0
-Raúl García,DT,athletic,las palmas,0,5,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,4.0,2.0,0,0,0,0.0
-Iñaki Williams,DT,athletic,las palmas,1,90,0,0,0.4,0.4,4,0,4,18,55.6,1,0,0.0,0.0,0.0,6,1,1,0,0,2,1,1,0,3,1,2,23,191.0,103.0,4,1,0,100.0
-Oihan Sancet,MC,athletic,las palmas,1,65,0,0,0.2,0.2,1,1,0,27,63.0,0,0,0.0,0.0,0.0,5,1,0,0,0,0,0,0,0,4,2,1,19,159.0,122.0,5,2,0,100.0
-Unai Gómez,MC,athletic,las palmas,0,25,1,0,0.2,0.0,2,1,1,8,75.0,0,0,0.0,0.0,0.0,12,1,1,0,0,1,0,1,0,2,2,0,7,91.0,62.0,2,0,1,0.0
-Beñat Prados,MC,athletic,las palmas,1,85,0,0,0.0,0.1,0,0,0,34,73.5,0,0,0.0,0.0,0.0,7,2,3,0,2,7,0,7,1,1,0,1,23,69.0,21.0,1,4,3,57.1
-Mikel Jauregizar,MC,athletic,las palmas,0,5,0,0,0.0,0.0,1,1,0,9,77.8,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,8,37.0,7.0,0,0,0,0.0
-Ander Herrera,MC,athletic,las palmas,1,55,0,0,0.0,0.0,1,1,0,39,87.2,0,0,0.0,0.0,0.0,4,2,1,0,0,1,0,1,0,1,1,0,24,72.0,32.0,1,0,1,0.0
-Mikel Vesga,MC,athletic,las palmas,0,35,0,0,0.2,0.0,1,1,0,20,65.0,0,0,0.0,0.0,0.0,2,0,3,0,3,0,0,0,0,0,0,0,12,54.0,30.0,0,2,0,100.0
-Yuri Berchiche,DF,athletic,las palmas,1,90,0,0,0.2,0.4,1,1,0,80,80.0,0,0,0.0,0.0,0.0,10,3,3,0,1,1,0,1,0,2,2,0,45,178.0,89.0,1,2,1,66.7
-Aitor Paredes,DF,athletic,las palmas,1,90,0,0,0.1,0.0,2,2,0,59,89.8,0,0,0.0,0.0,0.0,11,1,1,0,1,0,0,0,7,0,0,0,37,153.0,30.0,0,1,2,33.3
-Daniel Vivian,DF,athletic,las palmas,1,90,0,0,0.0,0.0,0,0,0,65,83.1,0,0,0.0,0.0,0.0,8,0,0,0,0,1,0,1,0,0,0,0,46,266.0,159.0,0,1,3,25.0
-Iñigo Lekue,DF,athletic,las palmas,1,90,0,0,0.0,0.1,0,0,0,44,65.9,0,0,0.0,0.0,0.0,6,0,2,0,2,4,1,3,1,4,2,2,27,125.0,69.0,3,0,0,0.0
-Unai Simón,PT,athletic,las palmas,1,90,0,0,0.0,0.0,0,0,0,43,67.4,0,0,0.0,100.0,0.1,10,0,0,0,0,0,0,0,1,0,0,0,26,131.0,69.0,0,2,0,100.0
-Sory Kaba,DT,las palmas,athletic,1,58,0,0,0.0,0.0,0,0,0,12,66.7,0,0,0.0,0.0,0.0,1,0,1,0,1,1,0,1,0,0,0,0,6,6.0,0.0,0,2,5,28.6
-Sandro Ramírez,DT,las palmas,athletic,0,32,0,0,0.0,0.0,1,0,1,11,54.5,0,0,0.0,0.0,0.0,2,0,1,0,1,1,0,1,0,1,1,0,7,59.0,30.0,1,0,0,0.0
-Munir El Haddadi,DT,las palmas,athletic,1,89,0,0,0.2,0.1,2,2,0,24,66.7,0,0,0.0,0.0,0.0,6,4,4,0,3,0,0,0,0,2,2,0,22,76.0,24.0,1,3,0,100.0
-Álex Suárez,DT,las palmas,athletic,0,1,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0
-Marvin,DT,las palmas,athletic,1,77,0,0,0.0,0.0,1,1,0,30,50.0,0,0,0.0,0.0,0.0,4,1,3,0,3,1,0,1,0,2,0,2,21,120.0,57.0,2,1,2,33.3
-Omenuke Mfulu,DT,las palmas,athletic,0,13,0,0,0.0,0.0,0,0,0,10,80.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,1.0,0.0,0,1,1,50.0
-Enzo Loiodice,MC,las palmas,athletic,1,90,0,0,0.0,0.0,0,0,0,47,74.5,0,0,0.0,0.0,0.0,3,3,1,0,1,2,1,1,0,6,4,1,22,131.0,47.0,1,3,2,60.0
-Máximo Perrone,MC,las palmas,athletic,1,90,0,0,0.0,0.0,0,0,0,62,72.6,1,0,0.0,0.0,0.0,4,1,1,0,0,2,0,2,1,4,2,2,26,99.0,31.0,0,0,5,0.0
-Javier Muñoz,MC,las palmas,athletic,1,90,0,0,0.0,0.0,0,0,0,42,78.6,0,0,0.0,0.0,0.0,4,4,2,0,2,1,0,1,2,3,1,2,14,42.0,18.0,0,0,0,0.0
-Sergi Cardona,DF,las palmas,athletic,1,90,0,0,0.1,0.1,1,1,0,66,71.2,1,0,0.0,0.0,0.0,4,2,3,0,1,0,0,0,3,0,0,0,25,186.0,119.0,1,1,0,100.0
-Mika Mármol,DF,las palmas,athletic,1,90,0,0,0.0,0.0,0,0,0,57,84.2,0,0,0.0,0.0,0.0,2,3,5,0,2,1,0,1,6,0,0,0,26,102.0,48.0,0,1,0,100.0
-Saúl Coco,DF,las palmas,athletic,1,90,0,0,0.0,0.0,0,0,0,48,87.5,0,0,0.0,0.0,0.0,5,0,0,0,0,1,1,0,6,0,0,0,24,156.0,91.0,0,6,1,85.7
-Julian Araujo,DF,las palmas,athletic,1,90,0,0,0.0,0.1,0,0,0,46,80.4,1,0,0.0,0.0,0.0,5,4,1,0,0,2,1,1,4,1,0,1,15,77.0,53.0,2,0,2,0.0
-Álvaro Vallés,PT,las palmas,athletic,1,90,0,0,0.0,0.0,0,0,0,60,56.7,0,0,1.0,88.9,4.8,16,0,1,0,1,0,0,0,4,0,0,0,41,239.0,154.0,0,1,0,100.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Gorka Guruzeta,DT,athletic,las palmas,1,55,0,0,1.6,0.0,2,1,1,16,56.3,0,0,0.0,0.0,0.0,2,1,1,0,0,1,0,1,0,1,0,1,14,60.0,29.0,1,3,3,50.0,23_24,18,1
+Álex Berenguer,DT,athletic,las palmas,0,35,0,0,0.5,0.2,1,0,1,19,57.9,0,0,0.0,0.0,0.0,3,0,0,0,0,1,0,1,0,0,0,0,10,75.0,34.0,2,0,3,0.0,23_24,18,1
+Nico Williams,DT,athletic,las palmas,1,85,0,0,0.3,0.2,2,1,1,39,69.2,0,0,0.0,0.0,0.0,9,1,2,0,1,0,0,0,0,6,5,1,39,332.0,218.0,7,0,2,0.0,23_24,18,1
+Raúl García,DT,athletic,las palmas,0,5,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,4.0,2.0,0,0,0,0.0,23_24,18,1
+Iñaki Williams,DT,athletic,las palmas,1,90,0,0,0.4,0.4,4,0,4,18,55.6,1,0,0.0,0.0,0.0,6,1,1,0,0,2,1,1,0,3,1,2,23,191.0,103.0,4,1,0,100.0,23_24,18,1
+Oihan Sancet,MC,athletic,las palmas,1,65,0,0,0.2,0.2,1,1,0,27,63.0,0,0,0.0,0.0,0.0,5,1,0,0,0,0,0,0,0,4,2,1,19,159.0,122.0,5,2,0,100.0,23_24,18,1
+Unai Gómez,MC,athletic,las palmas,0,25,1,0,0.2,0.0,2,1,1,8,75.0,0,0,0.0,0.0,0.0,12,1,1,0,0,1,0,1,0,2,2,0,7,91.0,62.0,2,0,1,0.0,23_24,18,1
+Beñat Prados,MC,athletic,las palmas,1,85,0,0,0.0,0.1,0,0,0,34,73.5,0,0,0.0,0.0,0.0,7,2,3,0,2,7,0,7,1,1,0,1,23,69.0,21.0,1,4,3,57.1,23_24,18,1
+Mikel Jauregizar,MC,athletic,las palmas,0,5,0,0,0.0,0.0,1,1,0,9,77.8,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,8,37.0,7.0,0,0,0,0.0,23_24,18,1
+Ander Herrera,MC,athletic,las palmas,1,55,0,0,0.0,0.0,1,1,0,39,87.2,0,0,0.0,0.0,0.0,4,2,1,0,0,1,0,1,0,1,1,0,24,72.0,32.0,1,0,1,0.0,23_24,18,1
+Mikel Vesga,MC,athletic,las palmas,0,35,0,0,0.2,0.0,1,1,0,20,65.0,0,0,0.0,0.0,0.0,2,0,3,0,3,0,0,0,0,0,0,0,12,54.0,30.0,0,2,0,100.0,23_24,18,1
+Yuri Berchiche,DF,athletic,las palmas,1,90,0,0,0.2,0.4,1,1,0,80,80.0,0,0,0.0,0.0,0.0,10,3,3,0,1,1,0,1,0,2,2,0,45,178.0,89.0,1,2,1,66.7,23_24,18,1
+Aitor Paredes,DF,athletic,las palmas,1,90,0,0,0.1,0.0,2,2,0,59,89.8,0,0,0.0,0.0,0.0,11,1,1,0,1,0,0,0,7,0,0,0,37,153.0,30.0,0,1,2,33.3,23_24,18,1
+Daniel Vivian,DF,athletic,las palmas,1,90,0,0,0.0,0.0,0,0,0,65,83.1,0,0,0.0,0.0,0.0,8,0,0,0,0,1,0,1,0,0,0,0,46,266.0,159.0,0,1,3,25.0,23_24,18,1
+Iñigo Lekue,DF,athletic,las palmas,1,90,0,0,0.0,0.1,0,0,0,44,65.9,0,0,0.0,0.0,0.0,6,0,2,0,2,4,1,3,1,4,2,2,27,125.0,69.0,3,0,0,0.0,23_24,18,1
+Unai Simón,PT,athletic,las palmas,1,90,0,0,0.0,0.0,0,0,0,43,67.4,0,0,0.0,100.0,0.1,10,0,0,0,0,0,0,0,1,0,0,0,26,131.0,69.0,0,2,0,100.0,23_24,18,1
+Sory Kaba,DT,las palmas,athletic,1,58,0,0,0.0,0.0,0,0,0,12,66.7,0,0,0.0,0.0,0.0,1,0,1,0,1,1,0,1,0,0,0,0,6,6.0,0.0,0,2,5,28.6,23_24,18,0
+Sandro Ramírez,DT,las palmas,athletic,0,32,0,0,0.0,0.0,1,0,1,11,54.5,0,0,0.0,0.0,0.0,2,0,1,0,1,1,0,1,0,1,1,0,7,59.0,30.0,1,0,0,0.0,23_24,18,0
+Munir El Haddadi,DT,las palmas,athletic,1,89,0,0,0.2,0.1,2,2,0,24,66.7,0,0,0.0,0.0,0.0,6,4,4,0,3,0,0,0,0,2,2,0,22,76.0,24.0,1,3,0,100.0,23_24,18,0
+Álex Suárez,DT,las palmas,athletic,0,1,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0,23_24,18,0
+Marvin,DT,las palmas,athletic,1,77,0,0,0.0,0.0,1,1,0,30,50.0,0,0,0.0,0.0,0.0,4,1,3,0,3,1,0,1,0,2,0,2,21,120.0,57.0,2,1,2,33.3,23_24,18,0
+Omenuke Mfulu,DT,las palmas,athletic,0,13,0,0,0.0,0.0,0,0,0,10,80.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,1.0,0.0,0,1,1,50.0,23_24,18,0
+Enzo Loiodice,MC,las palmas,athletic,1,90,0,0,0.0,0.0,0,0,0,47,74.5,0,0,0.0,0.0,0.0,3,3,1,0,1,2,1,1,0,6,4,1,22,131.0,47.0,1,3,2,60.0,23_24,18,0
+Máximo Perrone,MC,las palmas,athletic,1,90,0,0,0.0,0.0,0,0,0,62,72.6,1,0,0.0,0.0,0.0,4,1,1,0,0,2,0,2,1,4,2,2,26,99.0,31.0,0,0,5,0.0,23_24,18,0
+Javier Muñoz,MC,las palmas,athletic,1,90,0,0,0.0,0.0,0,0,0,42,78.6,0,0,0.0,0.0,0.0,4,4,2,0,2,1,0,1,2,3,1,2,14,42.0,18.0,0,0,0,0.0,23_24,18,0
+Sergi Cardona,DF,las palmas,athletic,1,90,0,0,0.1,0.1,1,1,0,66,71.2,1,0,0.0,0.0,0.0,4,2,3,0,1,0,0,0,3,0,0,0,25,186.0,119.0,1,1,0,100.0,23_24,18,0
+Mika Mármol,DF,las palmas,athletic,1,90,0,0,0.0,0.0,0,0,0,57,84.2,0,0,0.0,0.0,0.0,2,3,5,0,2,1,0,1,6,0,0,0,26,102.0,48.0,0,1,0,100.0,23_24,18,0
+Saúl Coco,DF,las palmas,athletic,1,90,0,0,0.0,0.0,0,0,0,48,87.5,0,0,0.0,0.0,0.0,5,0,0,0,0,1,1,0,6,0,0,0,24,156.0,91.0,0,6,1,85.7,23_24,18,0
+Julian Araujo,DF,las palmas,athletic,1,90,0,0,0.0,0.1,0,0,0,46,80.4,1,0,0.0,0.0,0.0,5,4,1,0,0,2,1,1,4,1,0,1,15,77.0,53.0,2,0,2,0.0,23_24,18,0
+Álvaro Vallés,PT,las palmas,athletic,1,90,0,0,0.0,0.0,0,0,0,60,56.7,0,0,1.0,88.9,4.8,16,0,1,0,1,0,0,0,4,0,0,0,41,239.0,154.0,0,1,0,100.0,23_24,18,0

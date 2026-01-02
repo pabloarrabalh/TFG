@@ -1,31 +1,31 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Umar Sadiq,DT,real sociedad,real madrid,1,62,0,0,0.1,0.2,1,1,0,11,72.7,1,0,0.0,0.0,0.0,4,0,0,0,0,1,0,1,0,2,0,2,14,139.0,57.0,1,0,4,0.0
-Orri Steinn Óskarsson,DT,real sociedad,real madrid,0,28,0,0,0.0,0.0,0,0,0,6,33.3,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,3,10.0,1.0,0,1,1,50.0
-Sheraldo Becker,DT,real sociedad,real madrid,1,62,0,0,0.2,0.0,1,1,0,15,53.3,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,1,2,2,0,12,127.0,66.0,2,0,1,0.0
-Ander Barrenetxea,DT,real sociedad,real madrid,0,28,0,0,0.0,0.0,0,0,0,16,68.8,1,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,9,54.0,34.0,1,0,0,0.0
-Takefusa Kubo,DT,real sociedad,real madrid,1,90,0,0,0.1,0.2,1,1,0,42,83.3,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,5,1,4,39,272.0,158.0,5,0,0,0.0
-Sergio Gómez,MC,real sociedad,real madrid,1,90,0,0,0.0,0.0,1,0,1,63,79.4,0,0,0.0,0.0,0.0,2,2,3,0,2,1,1,0,1,1,0,0,37,191.0,95.0,1,0,0,0.0
-Martín Zubimendi,MC,real sociedad,real madrid,1,90,0,0,0.0,0.0,0,0,0,71,93.0,0,0,0.0,0.0,0.0,3,3,1,0,0,2,0,2,1,0,0,0,50,291.0,146.0,3,3,0,100.0
-Luka Sučić,MC,real sociedad,real madrid,1,74,0,0,0.4,0.2,4,4,0,39,84.6,0,0,0.0,0.0,0.0,5,2,1,0,0,1,1,0,1,0,0,0,32,217.0,98.0,1,0,0,0.0
-Beñat Turrientes,MC,real sociedad,real madrid,0,16,0,0,0.0,0.0,0,0,0,13,84.6,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,0,1,8,51.0,5.0,1,0,0,0.0
-Javi López,DF,real sociedad,real madrid,1,77,0,0,0.0,0.0,0,0,0,34,91.2,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,2,1,1,0,24,163.0,72.0,2,0,0,0.0
-Aihen Muñoz,DF,real sociedad,real madrid,0,13,0,0,0.0,0.0,0,0,0,16,87.5,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,11,39.0,22.0,2,0,0,0.0
-Nayef Aguerd,DF,real sociedad,real madrid,1,74,0,0,0.3,0.0,2,1,1,34,97.1,0,0,0.0,0.0,0.0,3,2,2,0,0,2,1,1,3,0,0,0,28,149.0,119.0,0,1,0,100.0
-Jon Pacheco,DF,real sociedad,real madrid,0,16,0,0,0.0,0.0,0,0,0,14,100.0,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,12,47.0,21.0,0,0,1,0.0
-Igor Zubeldia,DF,real sociedad,real madrid,1,90,0,0,0.0,0.3,0,0,0,47,83.0,0,0,0.0,0.0,0.0,1,1,2,0,1,4,4,0,0,0,0,0,24,140.0,70.0,0,3,0,100.0
-Jon Aramburu,DF,real sociedad,real madrid,1,90,0,0,0.0,0.1,1,1,0,49,89.8,1,0,0.0,0.0,0.0,-3,3,4,0,2,0,0,0,2,0,0,0,32,167.0,109.0,3,0,1,0.0
-Álex Remiro,PT,real sociedad,real madrid,1,90,0,0,0.0,0.0,0,0,0,19,73.7,0,0,2.0,100.0,2.2,5,0,0,0,0,0,0,0,0,0,0,0,9,41.0,16.0,0,0,0,0.0
-Kylian Mbappé,DT,real madrid,real sociedad,1,89,1,0,0.9,0.1,2,1,1,23,82.6,0,0,0.0,0.0,0.0,12,0,0,0,0,0,0,0,0,8,2,5,26,192.0,65.0,3,0,1,0.0
-Endrick,DT,real madrid,real sociedad,0,1,0,0,0.0,0.0,0,0,0,2,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,11.0,3.0,0,0,1,0.0
-Vinicius Júnior,DT,real madrid,real sociedad,1,90,1,0,1.0,0.0,4,4,0,26,73.1,0,0,0.0,0.0,0.0,13,2,0,0,0,0,0,0,0,3,1,2,30,165.0,110.0,4,0,0,0.0
-Brahim Díaz,DT,real madrid,real sociedad,1,24,0,0,0.0,0.0,0,0,0,14,92.9,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,1,1,0,11,55.0,30.0,1,0,0,0.0
-Rodrygo,DT,real madrid,real sociedad,0,66,0,0,0.0,0.1,0,0,0,20,85.0,0,0,0.0,0.0,0.0,5,1,0,0,0,1,0,1,1,3,0,1,20,194.0,122.0,4,0,1,0.0
-Arda Güler,MC,real madrid,real sociedad,1,76,0,0,0.1,0.1,2,2,0,35,97.1,0,0,0.0,0.0,0.0,6,0,1,0,1,1,0,1,0,3,1,1,29,142.0,64.0,0,0,1,0.0
-Lucas Vázquez,MC,real madrid,real sociedad,0,14,0,0,0.0,0.0,0,0,0,9,77.8,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,7,22.0,4.0,0,1,1,50.0
-Luka Modrić,MC,real madrid,real sociedad,1,90,0,0,0.1,0.2,2,1,1,66,89.4,1,0,0.0,0.0,0.0,8,1,2,0,1,1,0,1,0,0,0,0,42,244.0,112.0,0,0,0,0.0
-Federico Valverde,MC,real madrid,real sociedad,1,90,0,0,0.0,0.0,1,1,0,63,93.7,0,0,0.0,0.0,0.0,7,3,1,0,1,0,0,0,0,0,0,0,41,276.0,139.0,1,1,0,100.0
-Ferland Mendy,DF,real madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,53,92.5,0,0,0.0,0.0,0.0,8,5,3,0,0,2,0,2,1,0,0,0,32,127.0,53.0,0,0,1,0.0
-Antonio Rüdiger,DF,real madrid,real sociedad,1,90,0,0,0.1,0.0,1,0,1,56,83.9,0,0,0.0,0.0,0.0,9,1,1,0,0,1,1,0,3,0,0,0,48,243.0,124.0,0,1,1,50.0
-Éder Militão,DF,real madrid,real sociedad,1,90,0,0,0.1,0.0,1,0,1,66,80.3,0,0,0.0,0.0,0.0,8,3,3,0,1,2,2,0,4,0,0,0,52,295.0,120.0,0,2,0,100.0
-Dani Carvajal,DF,real madrid,real sociedad,1,90,0,0,0.1,0.1,1,1,0,60,88.3,0,0,0.0,0.0,0.0,7,1,0,0,0,2,1,1,3,0,0,0,39,142.0,52.0,1,2,1,66.7
-Thibaut Courtois,PT,real madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,35,80.0,0,0,0.0,100.0,0.9,11,0,0,0,0,0,0,0,0,0,0,0,24,111.0,64.0,0,1,0,100.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Umar Sadiq,DT,real sociedad,real madrid,1,62,0,0,0.1,0.2,1,1,0,11,72.7,1,0,0.0,0.0,0.0,4,0,0,0,0,1,0,1,0,2,0,2,14,139.0,57.0,1,0,4,0.0,24_25,5,1
+Orri Steinn Óskarsson,DT,real sociedad,real madrid,0,28,0,0,0.0,0.0,0,0,0,6,33.3,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,3,10.0,1.0,0,1,1,50.0,24_25,5,1
+Sheraldo Becker,DT,real sociedad,real madrid,1,62,0,0,0.2,0.0,1,1,0,15,53.3,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,1,2,2,0,12,127.0,66.0,2,0,1,0.0,24_25,5,1
+Ander Barrenetxea,DT,real sociedad,real madrid,0,28,0,0,0.0,0.0,0,0,0,16,68.8,1,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,9,54.0,34.0,1,0,0,0.0,24_25,5,1
+Takefusa Kubo,DT,real sociedad,real madrid,1,90,0,0,0.1,0.2,1,1,0,42,83.3,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,5,1,4,39,272.0,158.0,5,0,0,0.0,24_25,5,1
+Sergio Gómez,MC,real sociedad,real madrid,1,90,0,0,0.0,0.0,1,0,1,63,79.4,0,0,0.0,0.0,0.0,2,2,3,0,2,1,1,0,1,1,0,0,37,191.0,95.0,1,0,0,0.0,24_25,5,1
+Martín Zubimendi,MC,real sociedad,real madrid,1,90,0,0,0.0,0.0,0,0,0,71,93.0,0,0,0.0,0.0,0.0,3,3,1,0,0,2,0,2,1,0,0,0,50,291.0,146.0,3,3,0,100.0,24_25,5,1
+Luka Sučić,MC,real sociedad,real madrid,1,74,0,0,0.4,0.2,4,4,0,39,84.6,0,0,0.0,0.0,0.0,5,2,1,0,0,1,1,0,1,0,0,0,32,217.0,98.0,1,0,0,0.0,24_25,5,1
+Beñat Turrientes,MC,real sociedad,real madrid,0,16,0,0,0.0,0.0,0,0,0,13,84.6,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,0,1,8,51.0,5.0,1,0,0,0.0,24_25,5,1
+Javi López,DF,real sociedad,real madrid,1,77,0,0,0.0,0.0,0,0,0,34,91.2,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,2,1,1,0,24,163.0,72.0,2,0,0,0.0,24_25,5,1
+Aihen Muñoz,DF,real sociedad,real madrid,0,13,0,0,0.0,0.0,0,0,0,16,87.5,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,11,39.0,22.0,2,0,0,0.0,24_25,5,1
+Nayef Aguerd,DF,real sociedad,real madrid,1,74,0,0,0.3,0.0,2,1,1,34,97.1,0,0,0.0,0.0,0.0,3,2,2,0,0,2,1,1,3,0,0,0,28,149.0,119.0,0,1,0,100.0,24_25,5,1
+Jon Pacheco,DF,real sociedad,real madrid,0,16,0,0,0.0,0.0,0,0,0,14,100.0,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,12,47.0,21.0,0,0,1,0.0,24_25,5,1
+Igor Zubeldia,DF,real sociedad,real madrid,1,90,0,0,0.0,0.3,0,0,0,47,83.0,0,0,0.0,0.0,0.0,1,1,2,0,1,4,4,0,0,0,0,0,24,140.0,70.0,0,3,0,100.0,24_25,5,1
+Jon Aramburu,DF,real sociedad,real madrid,1,90,0,0,0.0,0.1,1,1,0,49,89.8,1,0,0.0,0.0,0.0,-3,3,4,0,2,0,0,0,2,0,0,0,32,167.0,109.0,3,0,1,0.0,24_25,5,1
+Álex Remiro,PT,real sociedad,real madrid,1,90,0,0,0.0,0.0,0,0,0,19,73.7,0,0,2.0,100.0,2.2,5,0,0,0,0,0,0,0,0,0,0,0,9,41.0,16.0,0,0,0,0.0,24_25,5,1
+Kylian Mbappé,DT,real madrid,real sociedad,1,89,1,0,0.9,0.1,2,1,1,23,82.6,0,0,0.0,0.0,0.0,12,0,0,0,0,0,0,0,0,8,2,5,26,192.0,65.0,3,0,1,0.0,24_25,5,0
+Endrick,DT,real madrid,real sociedad,0,1,0,0,0.0,0.0,0,0,0,2,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,11.0,3.0,0,0,1,0.0,24_25,5,0
+Vinicius Júnior,DT,real madrid,real sociedad,1,90,1,0,1.0,0.0,4,4,0,26,73.1,0,0,0.0,0.0,0.0,13,2,0,0,0,0,0,0,0,3,1,2,30,165.0,110.0,4,0,0,0.0,24_25,5,0
+Brahim Díaz,DT,real madrid,real sociedad,1,24,0,0,0.0,0.0,0,0,0,14,92.9,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,1,1,0,11,55.0,30.0,1,0,0,0.0,24_25,5,0
+Rodrygo,DT,real madrid,real sociedad,0,66,0,0,0.0,0.1,0,0,0,20,85.0,0,0,0.0,0.0,0.0,5,1,0,0,0,1,0,1,1,3,0,1,20,194.0,122.0,4,0,1,0.0,24_25,5,0
+Arda Güler,MC,real madrid,real sociedad,1,76,0,0,0.1,0.1,2,2,0,35,97.1,0,0,0.0,0.0,0.0,6,0,1,0,1,1,0,1,0,3,1,1,29,142.0,64.0,0,0,1,0.0,24_25,5,0
+Lucas Vázquez,MC,real madrid,real sociedad,0,14,0,0,0.0,0.0,0,0,0,9,77.8,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,7,22.0,4.0,0,1,1,50.0,24_25,5,0
+Luka Modrić,MC,real madrid,real sociedad,1,90,0,0,0.1,0.2,2,1,1,66,89.4,1,0,0.0,0.0,0.0,8,1,2,0,1,1,0,1,0,0,0,0,42,244.0,112.0,0,0,0,0.0,24_25,5,0
+Federico Valverde,MC,real madrid,real sociedad,1,90,0,0,0.0,0.0,1,1,0,63,93.7,0,0,0.0,0.0,0.0,7,3,1,0,1,0,0,0,0,0,0,0,41,276.0,139.0,1,1,0,100.0,24_25,5,0
+Ferland Mendy,DF,real madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,53,92.5,0,0,0.0,0.0,0.0,8,5,3,0,0,2,0,2,1,0,0,0,32,127.0,53.0,0,0,1,0.0,24_25,5,0
+Antonio Rüdiger,DF,real madrid,real sociedad,1,90,0,0,0.1,0.0,1,0,1,56,83.9,0,0,0.0,0.0,0.0,9,1,1,0,0,1,1,0,3,0,0,0,48,243.0,124.0,0,1,1,50.0,24_25,5,0
+Éder Militão,DF,real madrid,real sociedad,1,90,0,0,0.1,0.0,1,0,1,66,80.3,0,0,0.0,0.0,0.0,8,3,3,0,1,2,2,0,4,0,0,0,52,295.0,120.0,0,2,0,100.0,24_25,5,0
+Dani Carvajal,DF,real madrid,real sociedad,1,90,0,0,0.1,0.1,1,1,0,60,88.3,0,0,0.0,0.0,0.0,7,1,0,0,0,2,1,1,3,0,0,0,39,142.0,52.0,1,2,1,66.7,24_25,5,0
+Thibaut Courtois,PT,real madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,35,80.0,0,0,0.0,100.0,0.9,11,0,0,0,0,0,0,0,0,0,0,0,24,111.0,64.0,0,1,0,100.0,24_25,5,0

@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Julián Álvarez,DT,atletico madrid,valladolid,1,90,2,0,1.7,0.1,4,2,2,42,83.3,0,0,0.0,0.0,0.0,15,2,3,0,2,0,0,0,0,1,0,1,33,224.0,90.0,0,0,0,0.0
-Antoine Griezmann,DT,atletico madrid,valladolid,1,58,0,0,0.1,0.1,2,2,0,48,91.7,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,1,1,0,34,130.0,49.0,0,1,0,100.0
-Alexander Sørloth,DT,atletico madrid,valladolid,0,32,1,0,0.5,0.0,3,1,2,7,100.0,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,1,0,1,4,53.0,36.0,1,2,2,50.0
-Conor Gallagher,MC,atletico madrid,valladolid,1,64,0,0,0.1,0.0,3,3,0,40,90.0,0,0,0.0,0.0,0.0,1,2,3,0,2,0,0,0,0,0,0,0,35,173.0,63.0,1,0,0,0.0
-Nahuel Molina,DF,atletico madrid,valladolid,0,26,0,0,0.0,0.0,0,0,0,20,90.0,0,0,0.0,0.0,0.0,3,2,2,0,0,0,0,0,2,1,1,0,17,112.0,75.0,2,0,0,0.0
-Koke,MC,atletico madrid,valladolid,1,58,0,0,0.0,0.1,0,0,0,69,85.5,0,0,0.0,0.0,0.0,2,0,0,0,0,2,0,2,0,0,0,0,53,258.0,115.0,1,0,0,0.0
-Rodrigo Riquelme,MC,atletico madrid,valladolid,0,32,0,0,0.0,0.1,1,1,0,22,72.7,0,0,0.0,0.0,0.0,5,2,1,0,0,1,0,1,0,2,1,1,21,136.0,82.0,5,0,0,0.0
-Pablo Barrios,MC,atletico madrid,valladolid,1,90,0,1,0.3,0.2,3,2,1,85,90.6,0,0,0.0,0.0,0.0,9,1,3,0,2,0,0,0,0,0,0,0,65,261.0,156.0,2,1,0,100.0
-Giuliano Simeone,MC,atletico madrid,valladolid,1,73,1,0,0.2,0.0,2,1,1,37,78.4,0,0,0.0,0.0,0.0,10,1,1,0,0,0,0,0,0,4,3,1,34,140.0,59.0,1,1,0,100.0
-Thomas Lemar,MC,atletico madrid,valladolid,0,17,0,0,0.2,0.0,1,0,1,22,81.8,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,21,62.0,19.0,1,0,0,0.0
-Javi Galán,DF,atletico madrid,valladolid,1,90,0,0,0.0,0.0,2,2,0,40,92.5,0,0,0.0,0.0,0.0,0,1,1,0,1,0,0,0,0,3,0,2,32,120.0,43.0,0,1,1,50.0
-Clément Lenglet,DF,atletico madrid,valladolid,1,59,0,0,0.0,0.0,0,0,0,41,95.1,1,0,0.0,0.0,0.0,-2,0,0,0,0,0,0,0,3,0,0,0,36,203.0,136.0,1,2,0,100.0
-Robin Le Normand,DF,atletico madrid,valladolid,0,31,0,0,0.0,0.0,0,0,0,18,94.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,16,63.0,28.0,0,1,1,50.0
-José María Giménez,DF,atletico madrid,valladolid,1,90,0,0,0.1,0.0,1,1,0,52,100.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,3,0,0,0,46,285.0,190.0,2,1,0,100.0
-Marcos Llorente,DF,atletico madrid,valladolid,1,90,0,0,0.0,0.3,0,0,0,81,87.7,0,0,0.0,0.0,0.0,7,2,1,0,1,1,0,1,0,2,1,0,65,262.0,147.0,5,0,0,0.0
-Jan Oblak,PT,atletico madrid,valladolid,1,90,0,0,0.0,0.0,0,0,0,18,83.3,0,0,2.0,66.7,0.9,2,0,0,0,0,0,0,0,1,0,0,0,12,40.0,20.0,0,0,0,0.0
-Mamadou Sylla,DT,valladolid,atletico madrid,1,90,1,0,0.8,0.1,0,0,0,18,61.1,0,0,0.0,0.0,0.0,4,1,1,0,1,0,0,0,1,2,0,1,9,25.0,12.0,0,0,4,0.0
-Darwin Machís,MC,valladolid,atletico madrid,1,72,0,0,0.0,0.0,1,0,1,26,73.1,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,4,2,1,1,18,87.0,35.0,1,0,1,0.0
-Raúl Moro,MC,valladolid,atletico madrid,0,18,0,0,0.3,0.0,2,2,0,8,75.0,0,0,0.0,0.0,0.0,2,1,2,0,1,0,0,0,0,3,0,3,9,72.0,38.0,2,0,0,0.0
-Florian Grillitsch,MC,valladolid,atletico madrid,1,81,0,0,0.0,0.0,0,0,0,56,82.1,0,0,0.0,0.0,0.0,2,2,1,0,0,1,0,1,0,2,2,0,39,276.0,123.0,0,0,0,0.0
-Amath,MC,valladolid,atletico madrid,0,9,0,0,0.0,0.0,0,0,0,13,84.6,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,0,1,7,59.0,52.0,1,0,0,0.0
-Chuky san jose,MC,valladolid,atletico madrid,1,72,0,0,0.0,0.0,0,0,0,12,75.0,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,0,0,0,4,16.0,2.0,0,0,0,0.0
-Iván Sánchez,MC,valladolid,atletico madrid,0,18,0,0,0.0,0.3,1,1,0,24,91.7,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,1,0,1,18,144.0,98.0,2,0,0,0.0
-Anuar,MC,valladolid,atletico madrid,1,81,0,0,0.0,0.0,0,0,0,28,92.9,1,0,0.0,0.0,0.0,0,5,1,0,0,1,1,0,0,2,2,0,21,159.0,82.0,2,1,1,50.0
-Selim Amallah,MC,valladolid,atletico madrid,0,9,0,0,0.0,0.0,0,0,0,11,90.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,6,41.0,14.0,1,0,0,0.0
-Stanko Jurić,MC,valladolid,atletico madrid,1,71,0,0,0.0,0.0,0,0,0,40,90.0,0,0,0.0,0.0,0.0,1,1,1,0,1,1,0,1,2,0,0,0,19,85.0,37.0,0,0,1,0.0
-Tamás Nikitscher,MC,valladolid,atletico madrid,0,19,0,0,0.0,0.0,0,0,0,11,90.9,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,1,0,0,0,4,7.0,2.0,0,1,1,50.0
-Henrique,DF,valladolid,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,49,89.8,0,0,0.0,0.0,0.0,0,1,3,0,3,2,0,2,2,2,1,1,33,221.0,119.0,0,0,0,0.0
-Javi Sánchez,DF,valladolid,atletico madrid,1,90,1,0,0.1,0.0,1,0,1,66,92.4,0,0,0.0,0.0,0.0,5,1,1,0,0,4,2,2,5,0,0,0,35,181.0,113.0,0,1,0,100.0
-Joseph Aidoo,DF,valladolid,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,80,97.5,0,0,0.0,0.0,0.0,-1,0,0,0,0,1,0,1,3,1,1,0,53,249.0,140.0,0,1,2,33.3
-Antonio Candela,DF,valladolid,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,53,83.0,0,0,0.0,0.0,0.0,-1,1,1,0,0,1,1,0,3,2,1,1,33,197.0,134.0,3,0,0,0.0
-André Ferreira,PT,valladolid,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,41,82.9,0,0,4.0,77.8,3.4,2,0,0,0,0,0,0,0,1,0,0,0,21,107.0,67.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Julián Álvarez,DT,atletico madrid,valladolid,1,90,2,0,1.7,0.1,4,2,2,42,83.3,0,0,0.0,0.0,0.0,15,2,3,0,2,0,0,0,0,1,0,1,33,224.0,90.0,0,0,0,0.0,24_25,31,1
+Antoine Griezmann,DT,atletico madrid,valladolid,1,58,0,0,0.1,0.1,2,2,0,48,91.7,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,1,1,0,34,130.0,49.0,0,1,0,100.0,24_25,31,1
+Alexander Sørloth,DT,atletico madrid,valladolid,0,32,1,0,0.5,0.0,3,1,2,7,100.0,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,1,0,1,4,53.0,36.0,1,2,2,50.0,24_25,31,1
+Conor Gallagher,MC,atletico madrid,valladolid,1,64,0,0,0.1,0.0,3,3,0,40,90.0,0,0,0.0,0.0,0.0,1,2,3,0,2,0,0,0,0,0,0,0,35,173.0,63.0,1,0,0,0.0,24_25,31,1
+Nahuel Molina,DF,atletico madrid,valladolid,0,26,0,0,0.0,0.0,0,0,0,20,90.0,0,0,0.0,0.0,0.0,3,2,2,0,0,0,0,0,2,1,1,0,17,112.0,75.0,2,0,0,0.0,24_25,31,1
+Koke,MC,atletico madrid,valladolid,1,58,0,0,0.0,0.1,0,0,0,69,85.5,0,0,0.0,0.0,0.0,2,0,0,0,0,2,0,2,0,0,0,0,53,258.0,115.0,1,0,0,0.0,24_25,31,1
+Rodrigo Riquelme,MC,atletico madrid,valladolid,0,32,0,0,0.0,0.1,1,1,0,22,72.7,0,0,0.0,0.0,0.0,5,2,1,0,0,1,0,1,0,2,1,1,21,136.0,82.0,5,0,0,0.0,24_25,31,1
+Pablo Barrios,MC,atletico madrid,valladolid,1,90,0,1,0.3,0.2,3,2,1,85,90.6,0,0,0.0,0.0,0.0,9,1,3,0,2,0,0,0,0,0,0,0,65,261.0,156.0,2,1,0,100.0,24_25,31,1
+Giuliano Simeone,MC,atletico madrid,valladolid,1,73,1,0,0.2,0.0,2,1,1,37,78.4,0,0,0.0,0.0,0.0,10,1,1,0,0,0,0,0,0,4,3,1,34,140.0,59.0,1,1,0,100.0,24_25,31,1
+Thomas Lemar,MC,atletico madrid,valladolid,0,17,0,0,0.2,0.0,1,0,1,22,81.8,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,21,62.0,19.0,1,0,0,0.0,24_25,31,1
+Javi Galán,DF,atletico madrid,valladolid,1,90,0,0,0.0,0.0,2,2,0,40,92.5,0,0,0.0,0.0,0.0,0,1,1,0,1,0,0,0,0,3,0,2,32,120.0,43.0,0,1,1,50.0,24_25,31,1
+Clément Lenglet,DF,atletico madrid,valladolid,1,59,0,0,0.0,0.0,0,0,0,41,95.1,1,0,0.0,0.0,0.0,-2,0,0,0,0,0,0,0,3,0,0,0,36,203.0,136.0,1,2,0,100.0,24_25,31,1
+Robin Le Normand,DF,atletico madrid,valladolid,0,31,0,0,0.0,0.0,0,0,0,18,94.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,16,63.0,28.0,0,1,1,50.0,24_25,31,1
+José María Giménez,DF,atletico madrid,valladolid,1,90,0,0,0.1,0.0,1,1,0,52,100.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,3,0,0,0,46,285.0,190.0,2,1,0,100.0,24_25,31,1
+Marcos Llorente,DF,atletico madrid,valladolid,1,90,0,0,0.0,0.3,0,0,0,81,87.7,0,0,0.0,0.0,0.0,7,2,1,0,1,1,0,1,0,2,1,0,65,262.0,147.0,5,0,0,0.0,24_25,31,1
+Jan Oblak,PT,atletico madrid,valladolid,1,90,0,0,0.0,0.0,0,0,0,18,83.3,0,0,2.0,66.7,0.9,2,0,0,0,0,0,0,0,1,0,0,0,12,40.0,20.0,0,0,0,0.0,24_25,31,1
+Mamadou Sylla,DT,valladolid,atletico madrid,1,90,1,0,0.8,0.1,0,0,0,18,61.1,0,0,0.0,0.0,0.0,4,1,1,0,1,0,0,0,1,2,0,1,9,25.0,12.0,0,0,4,0.0,24_25,31,0
+Darwin Machís,MC,valladolid,atletico madrid,1,72,0,0,0.0,0.0,1,0,1,26,73.1,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,4,2,1,1,18,87.0,35.0,1,0,1,0.0,24_25,31,0
+Raúl Moro,MC,valladolid,atletico madrid,0,18,0,0,0.3,0.0,2,2,0,8,75.0,0,0,0.0,0.0,0.0,2,1,2,0,1,0,0,0,0,3,0,3,9,72.0,38.0,2,0,0,0.0,24_25,31,0
+Florian Grillitsch,MC,valladolid,atletico madrid,1,81,0,0,0.0,0.0,0,0,0,56,82.1,0,0,0.0,0.0,0.0,2,2,1,0,0,1,0,1,0,2,2,0,39,276.0,123.0,0,0,0,0.0,24_25,31,0
+Amath,MC,valladolid,atletico madrid,0,9,0,0,0.0,0.0,0,0,0,13,84.6,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,0,1,7,59.0,52.0,1,0,0,0.0,24_25,31,0
+Chuky san jose,MC,valladolid,atletico madrid,1,72,0,0,0.0,0.0,0,0,0,12,75.0,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,0,0,0,4,16.0,2.0,0,0,0,0.0,24_25,31,0
+Iván Sánchez,MC,valladolid,atletico madrid,0,18,0,0,0.0,0.3,1,1,0,24,91.7,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,1,0,1,18,144.0,98.0,2,0,0,0.0,24_25,31,0
+Anuar,MC,valladolid,atletico madrid,1,81,0,0,0.0,0.0,0,0,0,28,92.9,1,0,0.0,0.0,0.0,0,5,1,0,0,1,1,0,0,2,2,0,21,159.0,82.0,2,1,1,50.0,24_25,31,0
+Selim Amallah,MC,valladolid,atletico madrid,0,9,0,0,0.0,0.0,0,0,0,11,90.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,6,41.0,14.0,1,0,0,0.0,24_25,31,0
+Stanko Jurić,MC,valladolid,atletico madrid,1,71,0,0,0.0,0.0,0,0,0,40,90.0,0,0,0.0,0.0,0.0,1,1,1,0,1,1,0,1,2,0,0,0,19,85.0,37.0,0,0,1,0.0,24_25,31,0
+Tamás Nikitscher,MC,valladolid,atletico madrid,0,19,0,0,0.0,0.0,0,0,0,11,90.9,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,1,0,0,0,4,7.0,2.0,0,1,1,50.0,24_25,31,0
+Henrique,DF,valladolid,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,49,89.8,0,0,0.0,0.0,0.0,0,1,3,0,3,2,0,2,2,2,1,1,33,221.0,119.0,0,0,0,0.0,24_25,31,0
+Javi Sánchez,DF,valladolid,atletico madrid,1,90,1,0,0.1,0.0,1,0,1,66,92.4,0,0,0.0,0.0,0.0,5,1,1,0,0,4,2,2,5,0,0,0,35,181.0,113.0,0,1,0,100.0,24_25,31,0
+Joseph Aidoo,DF,valladolid,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,80,97.5,0,0,0.0,0.0,0.0,-1,0,0,0,0,1,0,1,3,1,1,0,53,249.0,140.0,0,1,2,33.3,24_25,31,0
+Antonio Candela,DF,valladolid,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,53,83.0,0,0,0.0,0.0,0.0,-1,1,1,0,0,1,1,0,3,2,1,1,33,197.0,134.0,3,0,0,0.0,24_25,31,0
+André Ferreira,PT,valladolid,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,41,82.9,0,0,4.0,77.8,3.4,2,0,0,0,0,0,0,0,1,0,0,0,21,107.0,67.0,0,0,0,0.0,24_25,31,0

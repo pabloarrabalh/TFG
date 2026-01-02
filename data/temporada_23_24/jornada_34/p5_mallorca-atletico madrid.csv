@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Abdón Prats,DT,mallorca,atletico madrid,1,61,0,0,0.0,0.0,0,0,0,7,42.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,2,12.0,0.0,0,0,2,0.0
-Cyle Larin,DT,mallorca,atletico madrid,0,29,0,0,0.1,0.0,2,1,1,6,66.7,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,1,1,0,6,44.0,10.0,1,2,0,100.0
-Vedat Muriqi,DT,mallorca,atletico madrid,1,90,0,0,0.1,0.0,2,1,1,23,60.9,1,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,0,1,14,46.0,3.0,0,6,2,75.0
-Sergi Darder,MC,mallorca,atletico madrid,1,90,0,0,0.0,0.1,1,0,1,63,77.8,0,0,0.0,0.0,0.0,7,1,1,0,0,1,0,1,0,0,0,0,38,218.0,95.0,1,0,0,0.0
-Omar Mascarell,MC,mallorca,atletico madrid,1,85,0,0,0.0,0.0,0,0,0,53,94.3,0,0,0.0,0.0,0.0,4,0,1,0,1,0,0,0,1,0,0,0,38,232.0,121.0,2,0,0,0.0
-Javier Llabrés,MC,mallorca,atletico madrid,0,5,0,0,0.0,0.1,1,0,1,2,100.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,1,0,1,1,2.0,0.0,0,0,0,0.0
-Dani Rodríguez,MC,mallorca,atletico madrid,1,75,0,0,0.0,0.0,0,0,0,28,71.4,0,0,0.0,0.0,0.0,1,0,1,0,1,1,0,1,2,0,0,0,23,136.0,42.0,0,0,2,0.0
-Giovanni González,DF,mallorca,atletico madrid,0,15,0,0,0.0,0.0,0,0,0,18,77.8,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,0,0,0,0,11,52.0,35.0,0,0,0,0.0
-Toni Lato,DF,mallorca,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,57,86.0,0,0,0.0,0.0,0.0,4,2,0,0,0,1,0,1,2,1,1,0,25,75.0,18.0,0,1,2,33.3
-Matija Nastasić,DF,mallorca,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,93,82.8,0,0,0.0,0.0,0.0,4,2,2,0,0,1,1,0,5,0,0,0,62,351.0,220.0,4,1,0,100.0
-Antonio Raillo,DF,mallorca,atletico madrid,1,90,0,0,0.0,0.0,1,1,0,101,88.1,1,0,0.0,0.0,0.0,3,0,0,0,0,1,0,1,1,0,0,0,73,682.0,530.0,6,2,1,66.7
-Martin Valjent,DF,mallorca,atletico madrid,1,75,0,0,0.0,0.0,0,0,0,57,86.0,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,1,0,0,0,46,224.0,130.0,3,1,1,50.0
-Nemanja Radonjić,DF,mallorca,atletico madrid,0,15,0,0,0.0,0.0,0,0,0,5,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,2,1,1,5,63.0,33.0,1,0,0,0.0
-Pablo Maffeo,DF,mallorca,atletico madrid,1,61,0,0,0.0,0.0,0,0,0,26,53.8,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,15,96.0,20.0,1,0,3,0.0
-Manu Morlanes,MC,mallorca,atletico madrid,0,29,0,0,0.0,0.0,0,0,0,17,82.4,0,0,0.0,0.0,0.0,1,1,1,0,1,0,0,0,0,0,0,0,9,37.0,19.0,0,0,0,0.0
-Predrag Rajković,PT,mallorca,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,30,76.7,0,0,1.0,75.0,0.2,4,0,0,0,0,0,0,0,2,0,0,0,18,82.0,64.0,0,0,0,0.0
-Ángel Correa,DT,atletico madrid,mallorca,1,79,0,0,0.0,0.1,1,0,1,19,63.2,0,0,0.0,0.0,0.0,4,0,1,0,1,0,0,0,1,1,0,1,13,93.0,47.0,2,0,0,0.0
-Rodrigo De Paul,MC,atletico madrid,mallorca,0,11,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,2,9.0,0.0,0,0,0,0.0
-Samuel Lino,MC,atletico madrid,mallorca,1,82,0,0,0.0,0.1,2,1,1,26,88.5,0,0,0.0,0.0,0.0,9,4,0,0,0,0,0,0,0,2,1,1,27,122.0,48.0,1,0,1,0.0
-Álvaro Morata,DT,atletico madrid,mallorca,0,8,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,3,2.0,0.0,0,0,1,0.0
-Marcos Llorente,MC,atletico madrid,mallorca,1,90,0,0,0.4,0.0,2,2,0,23,73.9,0,0,0.0,0.0,0.0,4,0,0,0,0,1,0,1,1,1,0,0,23,136.0,72.0,1,0,0,0.0
-Koke,MC,atletico madrid,mallorca,1,90,0,0,0.0,0.0,0,0,0,53,86.8,0,0,0.0,0.0,0.0,7,2,1,0,0,0,0,0,2,1,1,0,32,123.0,32.0,0,1,1,50.0
-Pablo Barrios,MC,atletico madrid,mallorca,1,90,0,0,0.0,0.0,1,0,1,37,73.0,0,0,0.0,0.0,0.0,6,4,2,0,1,0,0,0,2,1,0,1,34,124.0,36.0,0,1,4,20.0
-Rodrigo Riquelme,MC,atletico madrid,mallorca,1,90,1,0,0.1,0.0,1,0,1,24,62.5,0,0,0.0,0.0,0.0,13,3,2,0,1,0,0,0,3,2,1,1,15,110.0,54.0,1,2,0,100.0
-César Azpilicueta,DF,atletico madrid,mallorca,1,89,0,0,0.0,0.0,0,0,0,63,69.8,0,0,0.0,0.0,0.0,6,1,0,0,0,0,0,0,3,0,0,0,38,204.0,169.0,4,2,0,100.0
-Reinildo Mandava,MC,atletico madrid,mallorca,0,1,0,0,0.0,0.0,0,0,0,4,50.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,1,2.0,2.0,0,0,0,0.0
-Mario Hermoso,DF,atletico madrid,mallorca,1,45,0,0,0.1,0.0,1,1,0,32,93.8,0,0,0.0,0.0,0.0,4,2,0,0,0,1,0,1,1,1,1,0,29,124.0,73.0,1,0,1,0.0
-Nahuel Molina,MC,atletico madrid,mallorca,0,44,0,0,0.0,0.0,0,0,0,26,61.5,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,1,0,0,0,9,29.0,16.0,0,2,0,100.0
-Stefan Savić,DF,atletico madrid,mallorca,0,1,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,1,0.0
-José María Giménez,DF,atletico madrid,mallorca,1,90,0,0,0.0,0.0,0,0,0,30,93.3,0,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,10,0,0,0,18,85.0,46.0,1,3,1,75.0
-Axel Witsel,DF,atletico madrid,mallorca,1,90,0,0,0.0,0.0,1,1,0,34,97.1,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,4,0,0,0,30,102.0,42.0,0,1,3,25.0
-Jan Oblak,PT,atletico madrid,mallorca,1,90,0,0,0.0,0.0,0,0,0,30,40.0,0,0,0.0,100.0,0.6,12,0,0,0,0,0,0,0,0,0,0,0,15,128.0,86.0,0,1,0,100.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Abdón Prats,DT,mallorca,atletico madrid,1,61,0,0,0.0,0.0,0,0,0,7,42.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,2,12.0,0.0,0,0,2,0.0,23_24,34,1
+Cyle Larin,DT,mallorca,atletico madrid,0,29,0,0,0.1,0.0,2,1,1,6,66.7,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,1,1,0,6,44.0,10.0,1,2,0,100.0,23_24,34,1
+Vedat Muriqi,DT,mallorca,atletico madrid,1,90,0,0,0.1,0.0,2,1,1,23,60.9,1,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,0,1,14,46.0,3.0,0,6,2,75.0,23_24,34,1
+Sergi Darder,MC,mallorca,atletico madrid,1,90,0,0,0.0,0.1,1,0,1,63,77.8,0,0,0.0,0.0,0.0,7,1,1,0,0,1,0,1,0,0,0,0,38,218.0,95.0,1,0,0,0.0,23_24,34,1
+Omar Mascarell,MC,mallorca,atletico madrid,1,85,0,0,0.0,0.0,0,0,0,53,94.3,0,0,0.0,0.0,0.0,4,0,1,0,1,0,0,0,1,0,0,0,38,232.0,121.0,2,0,0,0.0,23_24,34,1
+Javier Llabrés,MC,mallorca,atletico madrid,0,5,0,0,0.0,0.1,1,0,1,2,100.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,1,0,1,1,2.0,0.0,0,0,0,0.0,23_24,34,1
+Dani Rodríguez,MC,mallorca,atletico madrid,1,75,0,0,0.0,0.0,0,0,0,28,71.4,0,0,0.0,0.0,0.0,1,0,1,0,1,1,0,1,2,0,0,0,23,136.0,42.0,0,0,2,0.0,23_24,34,1
+Giovanni González,DF,mallorca,atletico madrid,0,15,0,0,0.0,0.0,0,0,0,18,77.8,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,0,0,0,0,11,52.0,35.0,0,0,0,0.0,23_24,34,1
+Toni Lato,DF,mallorca,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,57,86.0,0,0,0.0,0.0,0.0,4,2,0,0,0,1,0,1,2,1,1,0,25,75.0,18.0,0,1,2,33.3,23_24,34,1
+Matija Nastasić,DF,mallorca,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,93,82.8,0,0,0.0,0.0,0.0,4,2,2,0,0,1,1,0,5,0,0,0,62,351.0,220.0,4,1,0,100.0,23_24,34,1
+Antonio Raillo,DF,mallorca,atletico madrid,1,90,0,0,0.0,0.0,1,1,0,101,88.1,1,0,0.0,0.0,0.0,3,0,0,0,0,1,0,1,1,0,0,0,73,682.0,530.0,6,2,1,66.7,23_24,34,1
+Martin Valjent,DF,mallorca,atletico madrid,1,75,0,0,0.0,0.0,0,0,0,57,86.0,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,1,0,0,0,46,224.0,130.0,3,1,1,50.0,23_24,34,1
+Nemanja Radonjić,DF,mallorca,atletico madrid,0,15,0,0,0.0,0.0,0,0,0,5,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,2,1,1,5,63.0,33.0,1,0,0,0.0,23_24,34,1
+Pablo Maffeo,DF,mallorca,atletico madrid,1,61,0,0,0.0,0.0,0,0,0,26,53.8,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,15,96.0,20.0,1,0,3,0.0,23_24,34,1
+Manu Morlanes,MC,mallorca,atletico madrid,0,29,0,0,0.0,0.0,0,0,0,17,82.4,0,0,0.0,0.0,0.0,1,1,1,0,1,0,0,0,0,0,0,0,9,37.0,19.0,0,0,0,0.0,23_24,34,1
+Predrag Rajković,PT,mallorca,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,30,76.7,0,0,1.0,75.0,0.2,4,0,0,0,0,0,0,0,2,0,0,0,18,82.0,64.0,0,0,0,0.0,23_24,34,1
+Ángel Correa,DT,atletico madrid,mallorca,1,79,0,0,0.0,0.1,1,0,1,19,63.2,0,0,0.0,0.0,0.0,4,0,1,0,1,0,0,0,1,1,0,1,13,93.0,47.0,2,0,0,0.0,23_24,34,0
+Rodrigo De Paul,MC,atletico madrid,mallorca,0,11,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,2,9.0,0.0,0,0,0,0.0,23_24,34,0
+Samuel Lino,MC,atletico madrid,mallorca,1,82,0,0,0.0,0.1,2,1,1,26,88.5,0,0,0.0,0.0,0.0,9,4,0,0,0,0,0,0,0,2,1,1,27,122.0,48.0,1,0,1,0.0,23_24,34,0
+Álvaro Morata,DT,atletico madrid,mallorca,0,8,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,3,2.0,0.0,0,0,1,0.0,23_24,34,0
+Marcos Llorente,MC,atletico madrid,mallorca,1,90,0,0,0.4,0.0,2,2,0,23,73.9,0,0,0.0,0.0,0.0,4,0,0,0,0,1,0,1,1,1,0,0,23,136.0,72.0,1,0,0,0.0,23_24,34,0
+Koke,MC,atletico madrid,mallorca,1,90,0,0,0.0,0.0,0,0,0,53,86.8,0,0,0.0,0.0,0.0,7,2,1,0,0,0,0,0,2,1,1,0,32,123.0,32.0,0,1,1,50.0,23_24,34,0
+Pablo Barrios,MC,atletico madrid,mallorca,1,90,0,0,0.0,0.0,1,0,1,37,73.0,0,0,0.0,0.0,0.0,6,4,2,0,1,0,0,0,2,1,0,1,34,124.0,36.0,0,1,4,20.0,23_24,34,0
+Rodrigo Riquelme,MC,atletico madrid,mallorca,1,90,1,0,0.1,0.0,1,0,1,24,62.5,0,0,0.0,0.0,0.0,13,3,2,0,1,0,0,0,3,2,1,1,15,110.0,54.0,1,2,0,100.0,23_24,34,0
+César Azpilicueta,DF,atletico madrid,mallorca,1,89,0,0,0.0,0.0,0,0,0,63,69.8,0,0,0.0,0.0,0.0,6,1,0,0,0,0,0,0,3,0,0,0,38,204.0,169.0,4,2,0,100.0,23_24,34,0
+Reinildo Mandava,MC,atletico madrid,mallorca,0,1,0,0,0.0,0.0,0,0,0,4,50.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,1,2.0,2.0,0,0,0,0.0,23_24,34,0
+Mario Hermoso,DF,atletico madrid,mallorca,1,45,0,0,0.1,0.0,1,1,0,32,93.8,0,0,0.0,0.0,0.0,4,2,0,0,0,1,0,1,1,1,1,0,29,124.0,73.0,1,0,1,0.0,23_24,34,0
+Nahuel Molina,MC,atletico madrid,mallorca,0,44,0,0,0.0,0.0,0,0,0,26,61.5,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,1,0,0,0,9,29.0,16.0,0,2,0,100.0,23_24,34,0
+Stefan Savić,DF,atletico madrid,mallorca,0,1,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,1,0.0,23_24,34,0
+José María Giménez,DF,atletico madrid,mallorca,1,90,0,0,0.0,0.0,0,0,0,30,93.3,0,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,10,0,0,0,18,85.0,46.0,1,3,1,75.0,23_24,34,0
+Axel Witsel,DF,atletico madrid,mallorca,1,90,0,0,0.0,0.0,1,1,0,34,97.1,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,4,0,0,0,30,102.0,42.0,0,1,3,25.0,23_24,34,0
+Jan Oblak,PT,atletico madrid,mallorca,1,90,0,0,0.0,0.0,0,0,0,30,40.0,0,0,0.0,100.0,0.6,12,0,0,0,0,0,0,0,0,0,0,0,15,128.0,86.0,0,1,0,100.0,23_24,34,0

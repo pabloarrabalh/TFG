@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Mikel Oyarzabal,DT,real sociedad,sevilla,1,90,2,0,0.8,0.0,1,0,1,22,54.5,1,0,0.0,0.0,0.0,13,1,2,0,1,1,0,1,2,3,1,1,19,78.0,17.0,0,5,3,62.5
-Ander Barrenetxea,DT,real sociedad,sevilla,1,68,0,0,0.0,0.1,0,0,0,20,65.0,0,0,0.0,0.0,0.0,5,1,1,0,1,3,1,2,0,1,0,1,18,90.0,49.0,1,0,1,0.0
-Arsen Zakharyan,DT,real sociedad,sevilla,0,22,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,0,2,0,2,4,26.0,9.0,0,1,0,100.0
-Gonçalo Guedes,DT,real sociedad,sevilla,1,68,0,0,0.0,0.0,0,0,0,25,48.0,0,0,0.0,0.0,0.0,4,3,1,0,0,0,0,0,1,0,0,0,19,85.0,29.0,1,1,1,50.0
-Aihen Muñoz,DF,real sociedad,sevilla,0,22,0,0,0.0,0.0,0,0,0,5,100.0,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,2,0,0,0,1,1.0,0.0,0,0,2,0.0
-Brais Méndez,MC,real sociedad,sevilla,1,68,0,0,0.0,0.1,0,0,0,22,68.2,0,0,0.0,0.0,0.0,4,1,1,0,1,1,0,1,1,1,0,1,17,41.0,15.0,1,0,0,0.0
-Beñat Turrientes,MC,real sociedad,sevilla,0,22,0,0,0.0,0.0,0,0,0,4,50.0,0,0,0.0,0.0,0.0,1,2,2,0,1,0,0,0,1,0,0,0,2,7.0,0.0,0,1,1,50.0
-Jon Gorrotxategi,MC,real sociedad,sevilla,1,90,0,0,0.0,0.0,0,0,0,34,67.6,0,0,0.0,0.0,0.0,2,2,4,0,2,2,0,2,0,0,0,0,13,73.0,26.0,0,1,1,50.0
-Yangel Herrera,MC,real sociedad,sevilla,1,32,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,1,0,0,0,5,34.0,6.0,0,3,1,75.0
-Carlos Soler,MC,real sociedad,sevilla,0,58,0,0,0.2,0.0,2,1,1,14,64.3,0,0,0.0,0.0,0.0,1,2,0,0,0,2,0,2,0,1,1,0,8,40.0,12.0,0,0,0,0.0
-Sergio Gómez,DF,real sociedad,sevilla,1,85,0,0,0.5,0.0,1,1,0,34,70.6,0,0,0.0,0.0,0.0,3,2,3,0,3,2,0,2,1,0,0,0,19,92.0,32.0,2,0,1,0.0
-Pablo Marín,DT,real sociedad,sevilla,0,5,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0
-Igor Zubeldia,DF,real sociedad,sevilla,1,90,0,0,0.0,0.0,0,0,0,38,84.2,0,0,0.0,0.0,0.0,5,1,2,0,1,0,0,0,5,0,0,0,26,167.0,98.0,0,2,0,100.0
-Jon Martin,DF,real sociedad,sevilla,1,90,0,0,0.0,0.0,0,0,0,36,83.3,0,0,0.0,0.0,0.0,3,1,1,0,0,2,1,1,4,1,1,0,26,186.0,112.0,1,3,1,75.0
-Jon Aramburu,DF,real sociedad,sevilla,1,90,0,0,0.0,0.0,0,0,0,34,50.0,0,0,0.0,0.0,0.0,5,4,2,0,0,0,0,0,9,0,0,0,13,46.0,19.0,1,3,1,75.0
-Álex Remiro,PT,real sociedad,sevilla,1,90,0,0,0.0,0.0,0,0,0,42,66.7,0,0,1.0,0.0,0.5,4,0,0,0,0,0,0,0,0,0,0,0,31,155.0,92.0,0,1,0,100.0
-Isaac Romero,DT,sevilla,real sociedad,1,65,0,0,0.0,0.0,0,0,0,8,75.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,2,0,2,7,25.0,0.0,0,2,1,66.7
-Akor Adams,DT,sevilla,real sociedad,0,25,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,2,3.0,2.0,1,0,2,0.0
-Ruben Vargas,DT,sevilla,real sociedad,1,90,0,0,0.1,0.0,2,2,0,40,77.5,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,3,0,1,30,106.0,27.0,0,0,5,0.0
-Alexis Sánchez,DT,sevilla,real sociedad,1,51,0,0,0.0,0.0,0,0,0,20,35.0,0,0,0.0,0.0,0.0,0,2,0,0,0,0,0,0,0,1,0,1,13,76.0,39.0,1,0,1,0.0
-Juanlu Sánchez,DF,sevilla,real sociedad,0,39,0,0,0.0,0.0,0,0,0,27,81.5,0,0,0.0,0.0,0.0,3,1,1,0,0,2,0,2,1,1,0,1,20,65.0,36.0,1,0,0,0.0
-Djibril Sow,MC,sevilla,real sociedad,1,78,0,0,0.0,0.0,0,0,0,36,77.8,1,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,3,1,1,33,139.0,36.0,1,0,0,0.0
-Alfon,DT,sevilla,real sociedad,0,12,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,8,34.0,19.0,1,0,0,0.0
-Nemanja Gudelj,MC,sevilla,real sociedad,1,90,1,0,0.1,0.0,2,1,1,48,83.3,0,0,0.0,0.0,0.0,13,2,3,0,2,1,0,1,6,1,1,0,32,122.0,61.0,0,2,1,66.7
-Lucien Agoume,MC,sevilla,real sociedad,1,52,0,0,0.0,0.0,0,0,0,30,76.7,1,0,0.0,0.0,0.0,-1,1,1,0,0,2,0,2,0,0,0,0,18,24.0,12.0,0,1,2,33.3
-Peque,MC,sevilla,real sociedad,0,38,0,0,0.0,0.0,1,1,0,29,72.4,0,0,0.0,0.0,0.0,3,0,0,0,0,1,0,1,0,4,2,2,23,106.0,51.0,2,1,1,50.0
-Gabriel Suazo,DF,sevilla,real sociedad,1,90,0,1,0.0,0.1,0,0,0,71,74.6,0,0,0.0,0.0,0.0,6,4,3,0,1,1,0,1,1,1,1,0,36,102.0,35.0,1,0,1,0.0
-Marcão,DF,sevilla,real sociedad,1,90,0,0,0.0,0.0,0,0,0,53,88.7,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,5,0,0,0,40,276.0,217.0,2,3,5,37.5
-Fábio Cardoso,DF,sevilla,real sociedad,1,51,0,0,0.0,0.0,0,0,0,17,82.4,0,0,0.0,0.0,0.0,-3,1,0,0,0,0,0,0,2,0,0,0,11,48.0,17.0,0,0,2,0.0
-Chidera Ejuke,DT,sevilla,real sociedad,0,39,0,0,0.0,0.0,0,0,0,9,55.6,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,0,3,2,1,11,94.0,27.0,2,1,0,100.0
-Carmona,DF,sevilla,real sociedad,1,90,0,0,0.0,0.0,1,1,0,76,76.3,1,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,4,3,3,0,47,258.0,172.0,0,3,0,100.0
-Odysseas Vlachodimos,PT,sevilla,real sociedad,1,90,0,0,0.0,0.0,0,0,0,41,63.4,0,0,2.0,66.7,1.6,1,0,0,0,0,0,0,0,0,0,0,0,28,113.0,71.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Mikel Oyarzabal,DT,real sociedad,sevilla,1,90,2,0,0.8,0.0,1,0,1,22,54.5,1,0,0.0,0.0,0.0,13,1,2,0,1,1,0,1,2,3,1,1,19,78.0,17.0,0,5,3,62.5,25_26,10,1
+Ander Barrenetxea,DT,real sociedad,sevilla,1,68,0,0,0.0,0.1,0,0,0,20,65.0,0,0,0.0,0.0,0.0,5,1,1,0,1,3,1,2,0,1,0,1,18,90.0,49.0,1,0,1,0.0,25_26,10,1
+Arsen Zakharyan,DT,real sociedad,sevilla,0,22,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,0,2,0,2,4,26.0,9.0,0,1,0,100.0,25_26,10,1
+Gonçalo Guedes,DT,real sociedad,sevilla,1,68,0,0,0.0,0.0,0,0,0,25,48.0,0,0,0.0,0.0,0.0,4,3,1,0,0,0,0,0,1,0,0,0,19,85.0,29.0,1,1,1,50.0,25_26,10,1
+Aihen Muñoz,DF,real sociedad,sevilla,0,22,0,0,0.0,0.0,0,0,0,5,100.0,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,2,0,0,0,1,1.0,0.0,0,0,2,0.0,25_26,10,1
+Brais Méndez,MC,real sociedad,sevilla,1,68,0,0,0.0,0.1,0,0,0,22,68.2,0,0,0.0,0.0,0.0,4,1,1,0,1,1,0,1,1,1,0,1,17,41.0,15.0,1,0,0,0.0,25_26,10,1
+Beñat Turrientes,MC,real sociedad,sevilla,0,22,0,0,0.0,0.0,0,0,0,4,50.0,0,0,0.0,0.0,0.0,1,2,2,0,1,0,0,0,1,0,0,0,2,7.0,0.0,0,1,1,50.0,25_26,10,1
+Jon Gorrotxategi,MC,real sociedad,sevilla,1,90,0,0,0.0,0.0,0,0,0,34,67.6,0,0,0.0,0.0,0.0,2,2,4,0,2,2,0,2,0,0,0,0,13,73.0,26.0,0,1,1,50.0,25_26,10,1
+Yangel Herrera,MC,real sociedad,sevilla,1,32,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,1,0,0,0,5,34.0,6.0,0,3,1,75.0,25_26,10,1
+Carlos Soler,MC,real sociedad,sevilla,0,58,0,0,0.2,0.0,2,1,1,14,64.3,0,0,0.0,0.0,0.0,1,2,0,0,0,2,0,2,0,1,1,0,8,40.0,12.0,0,0,0,0.0,25_26,10,1
+Sergio Gómez,DF,real sociedad,sevilla,1,85,0,0,0.5,0.0,1,1,0,34,70.6,0,0,0.0,0.0,0.0,3,2,3,0,3,2,0,2,1,0,0,0,19,92.0,32.0,2,0,1,0.0,25_26,10,1
+Pablo Marín,DT,real sociedad,sevilla,0,5,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0,25_26,10,1
+Igor Zubeldia,DF,real sociedad,sevilla,1,90,0,0,0.0,0.0,0,0,0,38,84.2,0,0,0.0,0.0,0.0,5,1,2,0,1,0,0,0,5,0,0,0,26,167.0,98.0,0,2,0,100.0,25_26,10,1
+Jon Martin,DF,real sociedad,sevilla,1,90,0,0,0.0,0.0,0,0,0,36,83.3,0,0,0.0,0.0,0.0,3,1,1,0,0,2,1,1,4,1,1,0,26,186.0,112.0,1,3,1,75.0,25_26,10,1
+Jon Aramburu,DF,real sociedad,sevilla,1,90,0,0,0.0,0.0,0,0,0,34,50.0,0,0,0.0,0.0,0.0,5,4,2,0,0,0,0,0,9,0,0,0,13,46.0,19.0,1,3,1,75.0,25_26,10,1
+Álex Remiro,PT,real sociedad,sevilla,1,90,0,0,0.0,0.0,0,0,0,42,66.7,0,0,1.0,0.0,0.5,4,0,0,0,0,0,0,0,0,0,0,0,31,155.0,92.0,0,1,0,100.0,25_26,10,1
+Isaac Romero,DT,sevilla,real sociedad,1,65,0,0,0.0,0.0,0,0,0,8,75.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,2,0,2,7,25.0,0.0,0,2,1,66.7,25_26,10,0
+Akor Adams,DT,sevilla,real sociedad,0,25,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,2,3.0,2.0,1,0,2,0.0,25_26,10,0
+Ruben Vargas,DT,sevilla,real sociedad,1,90,0,0,0.1,0.0,2,2,0,40,77.5,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,3,0,1,30,106.0,27.0,0,0,5,0.0,25_26,10,0
+Alexis Sánchez,DT,sevilla,real sociedad,1,51,0,0,0.0,0.0,0,0,0,20,35.0,0,0,0.0,0.0,0.0,0,2,0,0,0,0,0,0,0,1,0,1,13,76.0,39.0,1,0,1,0.0,25_26,10,0
+Juanlu Sánchez,DF,sevilla,real sociedad,0,39,0,0,0.0,0.0,0,0,0,27,81.5,0,0,0.0,0.0,0.0,3,1,1,0,0,2,0,2,1,1,0,1,20,65.0,36.0,1,0,0,0.0,25_26,10,0
+Djibril Sow,MC,sevilla,real sociedad,1,78,0,0,0.0,0.0,0,0,0,36,77.8,1,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,3,1,1,33,139.0,36.0,1,0,0,0.0,25_26,10,0
+Alfon,DT,sevilla,real sociedad,0,12,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,8,34.0,19.0,1,0,0,0.0,25_26,10,0
+Nemanja Gudelj,MC,sevilla,real sociedad,1,90,1,0,0.1,0.0,2,1,1,48,83.3,0,0,0.0,0.0,0.0,13,2,3,0,2,1,0,1,6,1,1,0,32,122.0,61.0,0,2,1,66.7,25_26,10,0
+Lucien Agoume,MC,sevilla,real sociedad,1,52,0,0,0.0,0.0,0,0,0,30,76.7,1,0,0.0,0.0,0.0,-1,1,1,0,0,2,0,2,0,0,0,0,18,24.0,12.0,0,1,2,33.3,25_26,10,0
+Peque,MC,sevilla,real sociedad,0,38,0,0,0.0,0.0,1,1,0,29,72.4,0,0,0.0,0.0,0.0,3,0,0,0,0,1,0,1,0,4,2,2,23,106.0,51.0,2,1,1,50.0,25_26,10,0
+Gabriel Suazo,DF,sevilla,real sociedad,1,90,0,1,0.0,0.1,0,0,0,71,74.6,0,0,0.0,0.0,0.0,6,4,3,0,1,1,0,1,1,1,1,0,36,102.0,35.0,1,0,1,0.0,25_26,10,0
+Marcão,DF,sevilla,real sociedad,1,90,0,0,0.0,0.0,0,0,0,53,88.7,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,5,0,0,0,40,276.0,217.0,2,3,5,37.5,25_26,10,0
+Fábio Cardoso,DF,sevilla,real sociedad,1,51,0,0,0.0,0.0,0,0,0,17,82.4,0,0,0.0,0.0,0.0,-3,1,0,0,0,0,0,0,2,0,0,0,11,48.0,17.0,0,0,2,0.0,25_26,10,0
+Chidera Ejuke,DT,sevilla,real sociedad,0,39,0,0,0.0,0.0,0,0,0,9,55.6,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,0,3,2,1,11,94.0,27.0,2,1,0,100.0,25_26,10,0
+Carmona,DF,sevilla,real sociedad,1,90,0,0,0.0,0.0,1,1,0,76,76.3,1,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,4,3,3,0,47,258.0,172.0,0,3,0,100.0,25_26,10,0
+Odysseas Vlachodimos,PT,sevilla,real sociedad,1,90,0,0,0.0,0.0,0,0,0,41,63.4,0,0,2.0,66.7,1.6,1,0,0,0,0,0,0,0,0,0,0,0,28,113.0,71.0,0,0,0,0.0,25_26,10,0

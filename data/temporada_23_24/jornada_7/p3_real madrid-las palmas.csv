@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Rodrygo,DT,real madrid,las palmas,1,90,0,1,0.2,0.2,3,2,1,30,86.7,0,0,0.0,0.0,0.0,10,1,0,0,0,0,0,0,1,3,1,2,29,192.0,102.0,6,1,0,100.0
-Joselu,DT,real madrid,las palmas,1,56,1,0,0.9,0.3,7,2,5,23,65.2,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,0,0,0,20,82.0,41.0,1,2,1,66.7
-Vinicius Júnior,DT,real madrid,las palmas,0,34,0,0,0.1,0.0,1,1,0,10,60.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,6,2,4,14,97.0,25.0,2,0,0,0.0
-Brahim Díaz,MC,real madrid,las palmas,1,56,1,0,0.2,0.0,2,0,2,26,73.1,0,0,0.0,0.0,0.0,9,0,1,0,1,1,0,1,0,4,1,3,24,154.0,60.0,2,0,0,0.0
-Dani Ceballos,MC,real madrid,las palmas,0,34,0,0,0.0,0.0,0,0,0,36,97.2,0,0,0.0,0.0,0.0,2,1,1,0,1,1,0,1,0,0,0,0,28,149.0,77.0,2,0,0,0.0
-Eduardo Camavinga,MC,real madrid,las palmas,1,76,0,0,0.0,0.1,0,0,0,51,80.4,0,0,0.0,0.0,0.0,9,3,2,0,1,0,0,0,1,5,4,1,37,249.0,126.0,2,1,0,100.0
-Toni Kroos,MC,real madrid,las palmas,0,14,0,0,0.0,0.0,0,0,0,18,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,11,60.0,37.0,0,0,0,0.0
-Aurélien Tchouaméni,MC,real madrid,las palmas,1,90,0,0,0.1,0.0,3,3,0,64,87.5,0,0,0.0,0.0,0.0,5,1,0,0,0,0,0,0,0,0,0,0,59,287.0,156.0,1,0,0,0.0
-Federico Valverde,MC,real madrid,las palmas,1,90,0,0,0.0,0.4,0,0,0,63,85.7,0,0,0.0,0.0,0.0,8,1,0,0,0,1,0,1,0,4,1,3,62,360.0,202.0,7,0,0,0.0
-Ferland Mendy,DF,real madrid,las palmas,1,76,0,0,0.0,0.1,1,1,0,47,91.5,0,0,0.0,0.0,0.0,8,0,0,0,0,2,2,0,1,1,0,0,30,143.0,69.0,2,0,0,0.0
-Fran Garcia,DF,real madrid,las palmas,0,14,0,0,0.0,0.0,0,0,0,9,88.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,8,93.0,78.0,1,0,1,0.0
-David Alaba,DF,real madrid,las palmas,1,40,0,0,0.0,0.0,0,0,0,30,86.7,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,26,145.0,100.0,0,0,0,0.0
-Lucas Vázquez,DF,real madrid,las palmas,0,50,0,1,0.0,0.2,0,0,0,34,82.4,0,0,0.0,0.0,0.0,6,0,1,0,1,2,0,2,1,2,1,1,21,91.0,48.0,0,0,0,0.0
-Antonio Rüdiger,DF,real madrid,las palmas,1,90,0,0,0.0,0.4,1,1,0,76,89.5,0,0,0.0,0.0,0.0,9,1,2,0,1,1,1,0,3,0,0,0,62,454.0,366.0,3,0,0,0.0
-Nacho,DF,real madrid,las palmas,1,90,0,0,0.3,0.1,3,2,1,65,90.8,0,0,0.0,0.0,0.0,9,4,3,0,1,4,3,1,0,0,0,0,42,152.0,97.0,2,1,1,50.0
-Kepa Arrizabalaga,PT,real madrid,las palmas,1,90,0,0,0.0,0.0,0,0,0,36,88.9,0,0,0.0,100.0,0.2,10,0,0,0,0,0,0,0,1,0,0,0,27,133.0,102.0,0,0,0,0.0
-Sory Kaba,DT,las palmas,real madrid,1,56,0,0,0.2,0.0,2,2,0,21,95.2,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,1,1,1,0,21,78.0,25.0,0,2,0,100.0
-Marvin,DT,las palmas,real madrid,0,34,0,0,0.1,0.0,2,2,0,22,90.9,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,0,1,0,1,22,91.0,30.0,0,1,0,100.0
-Cristian Herrera,DT,las palmas,real madrid,1,90,0,0,0.0,0.0,0,0,0,58,93.1,0,0,0.0,0.0,0.0,3,1,2,0,1,1,0,1,2,2,1,1,43,188.0,105.0,2,0,0,0.0
-Munir El Haddadi,DT,las palmas,real madrid,1,90,0,0,0.1,0.0,3,3,0,41,85.4,0,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,2,2,1,1,38,184.0,70.0,1,0,0,0.0
-Jonathan Viera,MC,las palmas,real madrid,1,76,0,0,0.0,0.1,1,0,1,97,89.7,0,0,0.0,0.0,0.0,4,0,1,0,1,0,0,0,1,2,1,0,77,291.0,169.0,4,0,0,0.0
-Máximo Perrone,MC,las palmas,real madrid,0,14,0,0,0.0,0.1,1,1,0,24,100.0,0,0,0.0,0.0,0.0,3,1,2,0,1,0,0,0,0,0,0,0,21,64.0,35.0,0,0,0,0.0
-Omenuke Mfulu,MC,las palmas,real madrid,1,45,0,0,0.0,0.0,0,0,0,28,85.7,0,0,0.0,0.0,0.0,4,3,0,0,0,1,1,0,4,0,0,0,23,80.0,48.0,1,0,1,0.0
-Kirian Rodríguez,MC,las palmas,real madrid,0,45,0,0,0.1,0.1,3,2,1,59,93.2,0,0,0.0,0.0,0.0,4,2,1,0,0,0,0,0,0,0,0,0,55,219.0,123.0,4,0,0,0.0
-Javier Muñoz,MC,las palmas,real madrid,1,76,0,0,0.0,0.0,1,1,0,56,87.5,0,0,0.0,0.0,0.0,1,1,2,0,1,2,2,0,0,0,0,0,46,167.0,75.0,1,0,1,0.0
-Enzo Loiodice,MC,las palmas,real madrid,0,14,0,0,0.0,0.1,0,0,0,14,85.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,14,39.0,15.0,1,0,0,0.0
-Daley Sinkgraven,DF,las palmas,real madrid,1,45,0,0,0.0,0.0,0,0,0,25,84.0,0,0,0.0,0.0,0.0,1,2,1,0,1,1,1,0,1,1,0,1,17,100.0,66.0,0,0,0,0.0
-Sergi Cardona,DF,las palmas,real madrid,0,45,0,0,0.2,0.0,2,2,0,38,92.1,0,0,0.0,0.0,0.0,3,2,4,0,2,0,0,0,2,1,1,0,35,190.0,109.0,1,0,0,0.0
-Eric Curbelo,DF,las palmas,real madrid,1,90,0,0,0.0,0.0,0,0,0,53,96.2,0,0,0.0,0.0,0.0,5,2,2,0,1,3,1,2,5,0,0,0,36,113.0,51.0,0,0,1,0.0
-Saúl Coco,DF,las palmas,real madrid,1,90,0,0,0.0,0.0,1,1,0,44,90.9,1,0,0.0,0.0,0.0,0,3,4,0,2,3,3,0,3,0,0,0,35,151.0,90.0,0,0,1,0.0
-Julian Araujo,DF,las palmas,real madrid,1,90,0,0,0.0,0.2,0,0,0,58,93.1,0,0,0.0,0.0,0.0,4,3,3,0,0,1,1,0,3,0,0,0,39,126.0,49.0,0,0,1,0.0
-Álvaro Vallés,PT,las palmas,real madrid,1,90,0,0,0.0,0.0,0,0,0,42,81.0,0,0,2.0,77.8,3.1,9,1,1,0,0,0,0,0,2,0,0,0,32,129.0,74.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Rodrygo,DT,real madrid,las palmas,1,90,0,1,0.2,0.2,3,2,1,30,86.7,0,0,0.0,0.0,0.0,10,1,0,0,0,0,0,0,1,3,1,2,29,192.0,102.0,6,1,0,100.0,23_24,7,1
+Joselu,DT,real madrid,las palmas,1,56,1,0,0.9,0.3,7,2,5,23,65.2,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,0,0,0,20,82.0,41.0,1,2,1,66.7,23_24,7,1
+Vinicius Júnior,DT,real madrid,las palmas,0,34,0,0,0.1,0.0,1,1,0,10,60.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,6,2,4,14,97.0,25.0,2,0,0,0.0,23_24,7,1
+Brahim Díaz,MC,real madrid,las palmas,1,56,1,0,0.2,0.0,2,0,2,26,73.1,0,0,0.0,0.0,0.0,9,0,1,0,1,1,0,1,0,4,1,3,24,154.0,60.0,2,0,0,0.0,23_24,7,1
+Dani Ceballos,MC,real madrid,las palmas,0,34,0,0,0.0,0.0,0,0,0,36,97.2,0,0,0.0,0.0,0.0,2,1,1,0,1,1,0,1,0,0,0,0,28,149.0,77.0,2,0,0,0.0,23_24,7,1
+Eduardo Camavinga,MC,real madrid,las palmas,1,76,0,0,0.0,0.1,0,0,0,51,80.4,0,0,0.0,0.0,0.0,9,3,2,0,1,0,0,0,1,5,4,1,37,249.0,126.0,2,1,0,100.0,23_24,7,1
+Toni Kroos,MC,real madrid,las palmas,0,14,0,0,0.0,0.0,0,0,0,18,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,11,60.0,37.0,0,0,0,0.0,23_24,7,1
+Aurélien Tchouaméni,MC,real madrid,las palmas,1,90,0,0,0.1,0.0,3,3,0,64,87.5,0,0,0.0,0.0,0.0,5,1,0,0,0,0,0,0,0,0,0,0,59,287.0,156.0,1,0,0,0.0,23_24,7,1
+Federico Valverde,MC,real madrid,las palmas,1,90,0,0,0.0,0.4,0,0,0,63,85.7,0,0,0.0,0.0,0.0,8,1,0,0,0,1,0,1,0,4,1,3,62,360.0,202.0,7,0,0,0.0,23_24,7,1
+Ferland Mendy,DF,real madrid,las palmas,1,76,0,0,0.0,0.1,1,1,0,47,91.5,0,0,0.0,0.0,0.0,8,0,0,0,0,2,2,0,1,1,0,0,30,143.0,69.0,2,0,0,0.0,23_24,7,1
+Fran Garcia,DF,real madrid,las palmas,0,14,0,0,0.0,0.0,0,0,0,9,88.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,8,93.0,78.0,1,0,1,0.0,23_24,7,1
+David Alaba,DF,real madrid,las palmas,1,40,0,0,0.0,0.0,0,0,0,30,86.7,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,26,145.0,100.0,0,0,0,0.0,23_24,7,1
+Lucas Vázquez,DF,real madrid,las palmas,0,50,0,1,0.0,0.2,0,0,0,34,82.4,0,0,0.0,0.0,0.0,6,0,1,0,1,2,0,2,1,2,1,1,21,91.0,48.0,0,0,0,0.0,23_24,7,1
+Antonio Rüdiger,DF,real madrid,las palmas,1,90,0,0,0.0,0.4,1,1,0,76,89.5,0,0,0.0,0.0,0.0,9,1,2,0,1,1,1,0,3,0,0,0,62,454.0,366.0,3,0,0,0.0,23_24,7,1
+Nacho,DF,real madrid,las palmas,1,90,0,0,0.3,0.1,3,2,1,65,90.8,0,0,0.0,0.0,0.0,9,4,3,0,1,4,3,1,0,0,0,0,42,152.0,97.0,2,1,1,50.0,23_24,7,1
+Kepa Arrizabalaga,PT,real madrid,las palmas,1,90,0,0,0.0,0.0,0,0,0,36,88.9,0,0,0.0,100.0,0.2,10,0,0,0,0,0,0,0,1,0,0,0,27,133.0,102.0,0,0,0,0.0,23_24,7,1
+Sory Kaba,DT,las palmas,real madrid,1,56,0,0,0.2,0.0,2,2,0,21,95.2,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,1,1,1,0,21,78.0,25.0,0,2,0,100.0,23_24,7,0
+Marvin,DT,las palmas,real madrid,0,34,0,0,0.1,0.0,2,2,0,22,90.9,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,0,1,0,1,22,91.0,30.0,0,1,0,100.0,23_24,7,0
+Cristian Herrera,DT,las palmas,real madrid,1,90,0,0,0.0,0.0,0,0,0,58,93.1,0,0,0.0,0.0,0.0,3,1,2,0,1,1,0,1,2,2,1,1,43,188.0,105.0,2,0,0,0.0,23_24,7,0
+Munir El Haddadi,DT,las palmas,real madrid,1,90,0,0,0.1,0.0,3,3,0,41,85.4,0,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,2,2,1,1,38,184.0,70.0,1,0,0,0.0,23_24,7,0
+Jonathan Viera,MC,las palmas,real madrid,1,76,0,0,0.0,0.1,1,0,1,97,89.7,0,0,0.0,0.0,0.0,4,0,1,0,1,0,0,0,1,2,1,0,77,291.0,169.0,4,0,0,0.0,23_24,7,0
+Máximo Perrone,MC,las palmas,real madrid,0,14,0,0,0.0,0.1,1,1,0,24,100.0,0,0,0.0,0.0,0.0,3,1,2,0,1,0,0,0,0,0,0,0,21,64.0,35.0,0,0,0,0.0,23_24,7,0
+Omenuke Mfulu,MC,las palmas,real madrid,1,45,0,0,0.0,0.0,0,0,0,28,85.7,0,0,0.0,0.0,0.0,4,3,0,0,0,1,1,0,4,0,0,0,23,80.0,48.0,1,0,1,0.0,23_24,7,0
+Kirian Rodríguez,MC,las palmas,real madrid,0,45,0,0,0.1,0.1,3,2,1,59,93.2,0,0,0.0,0.0,0.0,4,2,1,0,0,0,0,0,0,0,0,0,55,219.0,123.0,4,0,0,0.0,23_24,7,0
+Javier Muñoz,MC,las palmas,real madrid,1,76,0,0,0.0,0.0,1,1,0,56,87.5,0,0,0.0,0.0,0.0,1,1,2,0,1,2,2,0,0,0,0,0,46,167.0,75.0,1,0,1,0.0,23_24,7,0
+Enzo Loiodice,MC,las palmas,real madrid,0,14,0,0,0.0,0.1,0,0,0,14,85.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,14,39.0,15.0,1,0,0,0.0,23_24,7,0
+Daley Sinkgraven,DF,las palmas,real madrid,1,45,0,0,0.0,0.0,0,0,0,25,84.0,0,0,0.0,0.0,0.0,1,2,1,0,1,1,1,0,1,1,0,1,17,100.0,66.0,0,0,0,0.0,23_24,7,0
+Sergi Cardona,DF,las palmas,real madrid,0,45,0,0,0.2,0.0,2,2,0,38,92.1,0,0,0.0,0.0,0.0,3,2,4,0,2,0,0,0,2,1,1,0,35,190.0,109.0,1,0,0,0.0,23_24,7,0
+Eric Curbelo,DF,las palmas,real madrid,1,90,0,0,0.0,0.0,0,0,0,53,96.2,0,0,0.0,0.0,0.0,5,2,2,0,1,3,1,2,5,0,0,0,36,113.0,51.0,0,0,1,0.0,23_24,7,0
+Saúl Coco,DF,las palmas,real madrid,1,90,0,0,0.0,0.0,1,1,0,44,90.9,1,0,0.0,0.0,0.0,0,3,4,0,2,3,3,0,3,0,0,0,35,151.0,90.0,0,0,1,0.0,23_24,7,0
+Julian Araujo,DF,las palmas,real madrid,1,90,0,0,0.0,0.2,0,0,0,58,93.1,0,0,0.0,0.0,0.0,4,3,3,0,0,1,1,0,3,0,0,0,39,126.0,49.0,0,0,1,0.0,23_24,7,0
+Álvaro Vallés,PT,las palmas,real madrid,1,90,0,0,0.0,0.0,0,0,0,42,81.0,0,0,2.0,77.8,3.1,9,1,1,0,0,0,0,0,2,0,0,0,32,129.0,74.0,0,0,0,0.0,23_24,7,0

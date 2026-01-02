@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Roman Yaremchuk,DT,valencia,villarreal,1,69,1,0,0.7,0.0,2,0,2,12,58.3,0,0,0.0,0.0,0.0,12,2,2,0,0,0,0,0,1,2,2,0,12,67.0,38.0,2,4,0,100.0
-Javier Guerra,DT,valencia,villarreal,0,21,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,1,0,2,0,2,0,0,0,0,1,1,0,5,11.0,2.0,0,0,0,0.0
-Hugo Duro,DT,valencia,villarreal,1,85,0,0,0.2,0.0,2,1,1,25,76.0,0,0,0.0,0.0,0.0,7,0,1,0,1,0,0,0,1,2,0,1,27,164.0,115.0,4,1,3,25.0
-Alberto Marí,DT,valencia,villarreal,0,5,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,2.0,2.0,0,0,2,0.0
-Sergi Canós,MC,valencia,villarreal,1,68,0,0,0.0,0.5,1,1,0,25,40.0,0,0,0.0,0.0,0.0,8,1,2,0,1,2,0,2,0,3,3,0,23,141.0,65.0,2,1,0,100.0
-Diego López,MC,valencia,villarreal,0,22,0,0,0.0,0.0,0,0,0,10,30.0,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,1,0,8,79.0,71.0,2,1,0,100.0
-José Luis García Vayá,MC,valencia,villarreal,1,90,2,0,1.7,0.0,1,0,1,58,82.8,0,0,0.0,0.0,0.0,17,3,6,0,3,0,0,0,1,0,0,0,48,169.0,35.0,0,2,0,100.0
-Hugo Guillamón,MC,valencia,villarreal,1,90,0,0,0.1,0.0,1,0,1,40,85.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,0,0,0,30,92.0,26.0,0,1,0,100.0
-Francisco Perez,MC,valencia,villarreal,1,85,0,0,0.0,0.0,1,0,1,21,85.7,0,0,0.0,0.0,0.0,5,1,1,0,1,0,0,0,0,4,4,0,24,152.0,35.0,1,0,2,0.0
-Yarek Gasiorowski,DF,valencia,villarreal,0,5,0,0,0.0,0.0,0,0,0,5,40.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,4.0,0.0,0,0,0,0.0
-José Luis Gayà,DF,valencia,villarreal,1,77,0,1,0.0,0.4,0,0,0,43,93.0,1,0,0.0,0.0,0.0,8,4,7,0,3,2,0,2,1,0,0,0,34,102.0,49.0,1,0,0,0.0
-Jesus Vazquez,DT,valencia,villarreal,0,13,0,0,0.0,0.0,1,1,0,5,60.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,2,10.0,0.0,0,0,0,0.0
-Gabriel Paulista,DF,valencia,villarreal,1,90,0,0,0.0,0.0,0,0,0,61,95.1,0,0,0.0,0.0,0.0,6,0,0,0,0,1,0,1,5,0,0,0,49,232.0,57.0,0,0,0,0.0
-Cristhian Mosquera,DF,valencia,villarreal,1,90,0,0,0.0,0.0,0,0,0,56,98.2,0,0,0.0,0.0,0.0,5,1,1,0,0,1,1,0,3,0,0,0,51,221.0,50.0,0,0,0,0.0
-Dimitri Foulquier,DF,valencia,villarreal,1,90,0,0,0.0,0.0,0,0,0,56,78.6,0,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,1,2,1,1,38,191.0,96.0,3,0,0,0.0
-Giorgi Mamardashvili,PT,valencia,villarreal,1,90,0,0,0.0,0.0,0,0,0,33,63.6,0,0,1.0,75.0,1.9,6,0,0,0,0,0,0,0,1,0,0,0,22,108.0,57.0,0,0,0,0.0
-Gerard Moreno,DT,villarreal,valencia,1,90,1,0,0.3,0.1,3,2,1,48,83.3,0,0,0.0,0.0,0.0,9,1,1,0,1,0,0,0,0,3,0,3,37,211.0,103.0,3,0,1,0.0
-José Luis Morales,DT,villarreal,valencia,1,64,0,0,0.0,0.1,0,0,0,5,60.0,0,0,0.0,0.0,0.0,1,0,0,0,0,2,0,2,0,0,0,0,4,18.0,3.0,0,0,0,0.0
-Francis Coquelin,MC,villarreal,valencia,0,26,0,0,0.0,0.0,0,0,0,17,88.2,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,12,70.0,38.0,0,0,0,0.0
-Ilias Akhomach,DT,villarreal,valencia,1,90,0,1,0.0,0.2,1,1,0,38,68.4,0,0,0.0,0.0,0.0,11,2,0,0,0,0,0,0,2,12,7,5,28,177.0,98.0,4,0,1,0.0
-Ramón Terrats,MC,villarreal,valencia,1,90,0,0,0.0,0.0,0,0,0,52,73.1,1,0,0.0,0.0,0.0,-2,2,1,0,1,2,0,2,0,3,0,2,30,188.0,101.0,6,1,0,100.0
-Étienne Capoue,MC,villarreal,valencia,1,64,0,0,0.0,0.0,0,0,0,36,77.8,1,0,0.0,0.0,0.0,-1,0,0,0,0,2,0,2,0,2,1,1,24,120.0,50.0,0,0,1,0.0
-Ben Brereton,DT,villarreal,valencia,0,26,0,0,0.0,0.0,1,0,1,5,80.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,26.0,22.0,1,0,0,0.0
-Daniel Parejo,MC,villarreal,valencia,1,90,0,0,0.0,0.1,0,0,0,89,82.0,1,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,1,2,1,1,51,351.0,144.0,1,2,2,50.0
-Alberto Moreno,DF,villarreal,valencia,1,77,0,0,0.1,0.0,2,0,2,28,92.9,0,0,0.0,0.0,0.0,1,3,2,0,2,1,0,1,0,1,1,0,12,56.0,8.0,0,1,0,100.0
-Manu Trigueros,MC,villarreal,valencia,0,13,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,6.0,1.0,0,0,0,0.0
-Jorge Cuenca,DF,villarreal,valencia,1,90,0,0,0.0,0.0,0,0,0,53,90.6,1,0,0.0,0.0,0.0,-1,3,2,0,1,0,0,0,3,0,0,0,27,177.0,128.0,0,1,3,25.0
-Raúl Albiol,DF,villarreal,valencia,1,16,0,0,0.0,0.0,0,0,0,9,88.9,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,2,0,0,0,5,41.0,26.0,0,0,0,0.0
-Eric Bailly,DF,villarreal,valencia,0,74,0,0,0.1,0.0,1,1,0,58,86.2,1,0,0.0,0.0,0.0,0,1,0,0,0,0,0,0,1,1,1,0,37,285.0,145.0,2,2,0,100.0
-Adrià Altimira,DF,villarreal,valencia,1,77,0,0,0.0,0.0,0,0,0,62,85.5,0,0,0.0,0.0,0.0,-2,1,6,0,6,1,0,1,2,1,0,1,28,190.0,91.0,0,0,2,0.0
-Kiko Femenía,DF,villarreal,valencia,0,13,0,0,0.0,0.0,0,0,0,18,88.9,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,1,0,0,0,9,63.0,23.0,1,0,0,0.0
-Filip Jørgensen,PT,villarreal,valencia,1,90,0,0,0.0,0.0,0,0,0,19,94.7,0,0,3.0,87.5,4.0,4,0,0,0,0,0,0,0,0,0,0,0,12,100.0,57.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Roman Yaremchuk,DT,valencia,villarreal,1,69,1,0,0.7,0.0,2,0,2,12,58.3,0,0,0.0,0.0,0.0,12,2,2,0,0,0,0,0,1,2,2,0,12,67.0,38.0,2,4,0,100.0,23_24,19,1
+Javier Guerra,DT,valencia,villarreal,0,21,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,1,0,2,0,2,0,0,0,0,1,1,0,5,11.0,2.0,0,0,0,0.0,23_24,19,1
+Hugo Duro,DT,valencia,villarreal,1,85,0,0,0.2,0.0,2,1,1,25,76.0,0,0,0.0,0.0,0.0,7,0,1,0,1,0,0,0,1,2,0,1,27,164.0,115.0,4,1,3,25.0,23_24,19,1
+Alberto Marí,DT,valencia,villarreal,0,5,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,2.0,2.0,0,0,2,0.0,23_24,19,1
+Sergi Canós,MC,valencia,villarreal,1,68,0,0,0.0,0.5,1,1,0,25,40.0,0,0,0.0,0.0,0.0,8,1,2,0,1,2,0,2,0,3,3,0,23,141.0,65.0,2,1,0,100.0,23_24,19,1
+Diego López,MC,valencia,villarreal,0,22,0,0,0.0,0.0,0,0,0,10,30.0,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,1,0,8,79.0,71.0,2,1,0,100.0,23_24,19,1
+José Luis García Vayá,MC,valencia,villarreal,1,90,2,0,1.7,0.0,1,0,1,58,82.8,0,0,0.0,0.0,0.0,17,3,6,0,3,0,0,0,1,0,0,0,48,169.0,35.0,0,2,0,100.0,23_24,19,1
+Hugo Guillamón,MC,valencia,villarreal,1,90,0,0,0.1,0.0,1,0,1,40,85.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,0,0,0,30,92.0,26.0,0,1,0,100.0,23_24,19,1
+Francisco Perez,MC,valencia,villarreal,1,85,0,0,0.0,0.0,1,0,1,21,85.7,0,0,0.0,0.0,0.0,5,1,1,0,1,0,0,0,0,4,4,0,24,152.0,35.0,1,0,2,0.0,23_24,19,1
+Yarek Gasiorowski,DF,valencia,villarreal,0,5,0,0,0.0,0.0,0,0,0,5,40.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,4.0,0.0,0,0,0,0.0,23_24,19,1
+José Luis Gayà,DF,valencia,villarreal,1,77,0,1,0.0,0.4,0,0,0,43,93.0,1,0,0.0,0.0,0.0,8,4,7,0,3,2,0,2,1,0,0,0,34,102.0,49.0,1,0,0,0.0,23_24,19,1
+Jesus Vazquez,DT,valencia,villarreal,0,13,0,0,0.0,0.0,1,1,0,5,60.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,2,10.0,0.0,0,0,0,0.0,23_24,19,1
+Gabriel Paulista,DF,valencia,villarreal,1,90,0,0,0.0,0.0,0,0,0,61,95.1,0,0,0.0,0.0,0.0,6,0,0,0,0,1,0,1,5,0,0,0,49,232.0,57.0,0,0,0,0.0,23_24,19,1
+Cristhian Mosquera,DF,valencia,villarreal,1,90,0,0,0.0,0.0,0,0,0,56,98.2,0,0,0.0,0.0,0.0,5,1,1,0,0,1,1,0,3,0,0,0,51,221.0,50.0,0,0,0,0.0,23_24,19,1
+Dimitri Foulquier,DF,valencia,villarreal,1,90,0,0,0.0,0.0,0,0,0,56,78.6,0,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,1,2,1,1,38,191.0,96.0,3,0,0,0.0,23_24,19,1
+Giorgi Mamardashvili,PT,valencia,villarreal,1,90,0,0,0.0,0.0,0,0,0,33,63.6,0,0,1.0,75.0,1.9,6,0,0,0,0,0,0,0,1,0,0,0,22,108.0,57.0,0,0,0,0.0,23_24,19,1
+Gerard Moreno,DT,villarreal,valencia,1,90,1,0,0.3,0.1,3,2,1,48,83.3,0,0,0.0,0.0,0.0,9,1,1,0,1,0,0,0,0,3,0,3,37,211.0,103.0,3,0,1,0.0,23_24,19,0
+José Luis Morales,DT,villarreal,valencia,1,64,0,0,0.0,0.1,0,0,0,5,60.0,0,0,0.0,0.0,0.0,1,0,0,0,0,2,0,2,0,0,0,0,4,18.0,3.0,0,0,0,0.0,23_24,19,0
+Francis Coquelin,MC,villarreal,valencia,0,26,0,0,0.0,0.0,0,0,0,17,88.2,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,12,70.0,38.0,0,0,0,0.0,23_24,19,0
+Ilias Akhomach,DT,villarreal,valencia,1,90,0,1,0.0,0.2,1,1,0,38,68.4,0,0,0.0,0.0,0.0,11,2,0,0,0,0,0,0,2,12,7,5,28,177.0,98.0,4,0,1,0.0,23_24,19,0
+Ramón Terrats,MC,villarreal,valencia,1,90,0,0,0.0,0.0,0,0,0,52,73.1,1,0,0.0,0.0,0.0,-2,2,1,0,1,2,0,2,0,3,0,2,30,188.0,101.0,6,1,0,100.0,23_24,19,0
+Étienne Capoue,MC,villarreal,valencia,1,64,0,0,0.0,0.0,0,0,0,36,77.8,1,0,0.0,0.0,0.0,-1,0,0,0,0,2,0,2,0,2,1,1,24,120.0,50.0,0,0,1,0.0,23_24,19,0
+Ben Brereton,DT,villarreal,valencia,0,26,0,0,0.0,0.0,1,0,1,5,80.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,26.0,22.0,1,0,0,0.0,23_24,19,0
+Daniel Parejo,MC,villarreal,valencia,1,90,0,0,0.0,0.1,0,0,0,89,82.0,1,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,1,2,1,1,51,351.0,144.0,1,2,2,50.0,23_24,19,0
+Alberto Moreno,DF,villarreal,valencia,1,77,0,0,0.1,0.0,2,0,2,28,92.9,0,0,0.0,0.0,0.0,1,3,2,0,2,1,0,1,0,1,1,0,12,56.0,8.0,0,1,0,100.0,23_24,19,0
+Manu Trigueros,MC,villarreal,valencia,0,13,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,6.0,1.0,0,0,0,0.0,23_24,19,0
+Jorge Cuenca,DF,villarreal,valencia,1,90,0,0,0.0,0.0,0,0,0,53,90.6,1,0,0.0,0.0,0.0,-1,3,2,0,1,0,0,0,3,0,0,0,27,177.0,128.0,0,1,3,25.0,23_24,19,0
+Raúl Albiol,DF,villarreal,valencia,1,16,0,0,0.0,0.0,0,0,0,9,88.9,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,2,0,0,0,5,41.0,26.0,0,0,0,0.0,23_24,19,0
+Eric Bailly,DF,villarreal,valencia,0,74,0,0,0.1,0.0,1,1,0,58,86.2,1,0,0.0,0.0,0.0,0,1,0,0,0,0,0,0,1,1,1,0,37,285.0,145.0,2,2,0,100.0,23_24,19,0
+Adrià Altimira,DF,villarreal,valencia,1,77,0,0,0.0,0.0,0,0,0,62,85.5,0,0,0.0,0.0,0.0,-2,1,6,0,6,1,0,1,2,1,0,1,28,190.0,91.0,0,0,2,0.0,23_24,19,0
+Kiko Femenía,DF,villarreal,valencia,0,13,0,0,0.0,0.0,0,0,0,18,88.9,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,1,0,0,0,9,63.0,23.0,1,0,0,0.0,23_24,19,0
+Filip Jørgensen,PT,villarreal,valencia,1,90,0,0,0.0,0.0,0,0,0,19,94.7,0,0,3.0,87.5,4.0,4,0,0,0,0,0,0,0,0,0,0,0,12,100.0,57.0,0,0,0,0.0,23_24,19,0

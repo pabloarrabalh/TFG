@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Orri Steinn Óskarsson,DT,real sociedad,espanyol,1,61,0,0,0.0,0.0,0,0,0,14,42.9,0,0,0.0,0.0,0.0,2,0,1,0,1,1,0,1,0,1,0,0,8,12.0,3.0,0,2,2,50.0
-Mikel Oyarzabal,DT,real sociedad,espanyol,0,29,0,0,0.0,0.0,0,0,0,9,88.9,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,0,0,0,7,36.0,6.0,0,0,0,0.0
-Sergio Gómez,DT,real sociedad,espanyol,1,61,0,0,0.1,0.8,1,1,0,32,62.5,0,0,0.0,0.0,0.0,7,2,2,0,0,1,0,1,0,0,0,0,17,115.0,72.0,3,0,0,0.0
-Ander Barrenetxea,DT,real sociedad,espanyol,0,29,0,0,0.0,0.0,0,0,0,20,80.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,4,3,1,15,116.0,59.0,3,0,0,0.0
-Sheraldo Becker,DT,real sociedad,espanyol,1,75,1,0,0.2,0.0,2,1,1,37,70.3,0,0,0.0,0.0,0.0,11,0,0,0,0,0,0,0,0,2,0,1,27,245.0,135.0,8,0,2,0.0
-Takefusa Kubo,DT,real sociedad,espanyol,0,15,0,0,0.1,0.0,1,1,0,13,76.9,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,0,0,0,10,113.0,74.0,3,0,0,0.0
-Pablo Marín,MC,real sociedad,espanyol,1,61,0,0,0.0,0.0,0,0,0,24,70.8,0,0,0.0,0.0,0.0,5,2,1,0,0,0,0,0,0,3,2,1,16,65.0,38.0,0,2,3,40.0
-Olasagasti,MC,real sociedad,espanyol,0,29,0,1,0.0,0.3,0,0,0,27,74.1,0,0,0.0,0.0,0.0,9,1,0,0,0,0,0,0,1,1,0,1,12,49.0,4.0,0,0,2,0.0
-Martín Zubimendi,MC,real sociedad,espanyol,1,90,0,0,0.0,0.1,0,0,0,54,83.3,0,0,0.0,0.0,0.0,2,2,2,0,0,0,0,0,1,0,0,0,24,139.0,73.0,1,0,2,0.0
-Luka Sučić,MC,real sociedad,espanyol,1,79,0,0,0.7,0.0,3,2,1,53,83.0,0,0,0.0,0.0,0.0,5,0,1,0,1,0,0,0,0,3,3,0,35,293.0,166.0,6,1,1,50.0
-Brais Méndez,MC,real sociedad,espanyol,0,11,1,0,0.4,0.0,2,1,1,14,100.0,0,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,0,2,1,1,6,14.0,1.0,0,1,1,50.0
-Javi López,DF,real sociedad,espanyol,1,90,0,0,0.0,0.0,0,0,0,57,75.4,0,0,0.0,0.0,0.0,1,1,1,0,0,0,0,0,1,0,0,0,28,176.0,67.0,2,0,0,0.0
-Nayef Aguerd,DF,real sociedad,espanyol,1,90,0,0,0.0,0.0,0,0,0,83,86.7,1,0,0.0,0.0,0.0,3,2,0,0,0,1,1,0,8,1,1,0,53,470.0,385.0,6,3,0,100.0
-Aritz Elustondo,DF,real sociedad,espanyol,1,90,0,0,0.1,0.0,1,1,0,78,87.2,0,0,0.0,0.0,0.0,5,1,1,0,1,2,1,1,6,0,0,0,50,322.0,187.0,1,2,4,33.3
-Jon Aramburu,DF,real sociedad,espanyol,1,90,0,0,0.2,0.0,3,3,0,63,85.7,0,0,0.0,0.0,0.0,4,6,5,0,2,0,0,0,5,0,0,0,32,79.0,41.0,0,1,1,50.0
-Álex Remiro,PT,real sociedad,espanyol,1,90,0,0,0.0,0.0,0,0,0,28,82.1,0,0,1.0,100.0,0.8,4,0,0,0,0,0,0,0,0,0,0,0,13,49.0,32.0,0,0,0,0.0
-Roberto Férnandez,DT,espanyol,real sociedad,1,69,0,0,0.0,0.0,0,0,0,7,42.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,7,10.0,0.0,0,2,1,66.7
-Álvaro Tejero,DT,espanyol,real sociedad,0,21,0,0,0.0,0.0,0,0,0,7,57.1,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,2,0,2,7,31.0,22.0,1,1,0,100.0
-Edu Expósito,DT,espanyol,real sociedad,1,45,0,0,0.0,0.0,0,0,0,12,16.7,0,0,0.0,0.0,0.0,0,0,1,0,1,0,0,0,0,2,0,2,8,35.0,20.0,0,0,0,0.0
-Alejo Véliz,DT,espanyol,real sociedad,0,45,0,0,0.0,0.0,0,0,0,9,22.2,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,2,0,0,0,5,9.0,0.0,0,3,3,50.0
-Antoniu,MC,espanyol,real sociedad,1,45,0,0,0.0,0.0,1,1,0,4,25.0,0,0,0.0,0.0,0.0,1,2,3,0,2,1,0,1,0,2,1,1,6,41.0,30.0,2,0,1,0.0
-Jofre,MC,espanyol,real sociedad,0,45,0,0,0.0,0.0,0,0,0,11,72.7,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,1,2,1,1,8,55.0,44.0,1,0,0,0.0
-Alex Král,MC,espanyol,real sociedad,1,90,0,0,0.0,0.0,0,0,0,16,75.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,4,2,2,12,96.0,30.0,2,4,0,100.0
-Álvaro Aguado,MC,espanyol,real sociedad,1,81,0,0,0.0,0.0,0,0,0,36,86.1,1,0,0.0,0.0,0.0,2,0,2,0,2,1,1,0,0,1,1,0,21,169.0,85.0,1,1,1,50.0
-Rafael Bauza,MC,espanyol,real sociedad,0,9,0,0,0.0,0.0,0,0,0,2,100.0,0,0,0.0,0.0,0.0,1,1,2,0,1,0,0,0,1,0,0,0,1,2.0,1.0,0,0,0,0.0
-Javi Puado,MC,espanyol,real sociedad,1,90,1,0,0.8,0.0,1,1,0,10,80.0,0,0,0.0,0.0,0.0,10,0,1,0,1,1,0,1,0,1,0,1,12,159.0,101.0,4,0,1,0.0
-Leandro Cabrera,DF,espanyol,real sociedad,1,90,0,0,0.0,0.0,0,0,0,28,57.1,1,0,0.0,0.0,0.0,-1,1,1,0,1,1,0,1,5,0,0,0,10,45.0,23.0,0,5,1,83.3
-Fernando Calero,DF,espanyol,real sociedad,1,86,0,0,0.0,0.0,0,0,0,27,81.5,0,0,0.0,0.0,0.0,1,1,1,0,0,4,2,2,3,0,0,0,15,82.0,37.0,0,0,3,0.0
-Walid Cheddira,DT,espanyol,real sociedad,0,4,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0
-Marash Kumbulla,DF,espanyol,real sociedad,1,90,0,0,0.0,0.0,1,1,0,30,66.7,0,0,0.0,0.0,0.0,3,2,2,0,1,2,2,0,6,0,0,0,18,77.0,54.0,0,1,1,50.0
-Omar El Hilali,DF,espanyol,real sociedad,1,90,0,0,0.0,0.0,0,0,0,46,80.4,0,0,0.0,0.0,0.0,4,5,1,0,0,2,0,2,5,1,1,0,18,88.0,58.0,1,1,0,100.0
-Joan García,PT,espanyol,real sociedad,1,90,0,0,0.0,0.0,0,0,0,36,61.1,0,0,2.0,33.3,1.7,3,0,0,0,0,0,0,0,0,0,0,0,21,181.0,81.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Orri Steinn Óskarsson,DT,real sociedad,espanyol,1,61,0,0,0.0,0.0,0,0,0,14,42.9,0,0,0.0,0.0,0.0,2,0,1,0,1,1,0,1,0,1,0,0,8,12.0,3.0,0,2,2,50.0,24_25,23,1
+Mikel Oyarzabal,DT,real sociedad,espanyol,0,29,0,0,0.0,0.0,0,0,0,9,88.9,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,0,0,0,7,36.0,6.0,0,0,0,0.0,24_25,23,1
+Sergio Gómez,DT,real sociedad,espanyol,1,61,0,0,0.1,0.8,1,1,0,32,62.5,0,0,0.0,0.0,0.0,7,2,2,0,0,1,0,1,0,0,0,0,17,115.0,72.0,3,0,0,0.0,24_25,23,1
+Ander Barrenetxea,DT,real sociedad,espanyol,0,29,0,0,0.0,0.0,0,0,0,20,80.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,4,3,1,15,116.0,59.0,3,0,0,0.0,24_25,23,1
+Sheraldo Becker,DT,real sociedad,espanyol,1,75,1,0,0.2,0.0,2,1,1,37,70.3,0,0,0.0,0.0,0.0,11,0,0,0,0,0,0,0,0,2,0,1,27,245.0,135.0,8,0,2,0.0,24_25,23,1
+Takefusa Kubo,DT,real sociedad,espanyol,0,15,0,0,0.1,0.0,1,1,0,13,76.9,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,0,0,0,10,113.0,74.0,3,0,0,0.0,24_25,23,1
+Pablo Marín,MC,real sociedad,espanyol,1,61,0,0,0.0,0.0,0,0,0,24,70.8,0,0,0.0,0.0,0.0,5,2,1,0,0,0,0,0,0,3,2,1,16,65.0,38.0,0,2,3,40.0,24_25,23,1
+Olasagasti,MC,real sociedad,espanyol,0,29,0,1,0.0,0.3,0,0,0,27,74.1,0,0,0.0,0.0,0.0,9,1,0,0,0,0,0,0,1,1,0,1,12,49.0,4.0,0,0,2,0.0,24_25,23,1
+Martín Zubimendi,MC,real sociedad,espanyol,1,90,0,0,0.0,0.1,0,0,0,54,83.3,0,0,0.0,0.0,0.0,2,2,2,0,0,0,0,0,1,0,0,0,24,139.0,73.0,1,0,2,0.0,24_25,23,1
+Luka Sučić,MC,real sociedad,espanyol,1,79,0,0,0.7,0.0,3,2,1,53,83.0,0,0,0.0,0.0,0.0,5,0,1,0,1,0,0,0,0,3,3,0,35,293.0,166.0,6,1,1,50.0,24_25,23,1
+Brais Méndez,MC,real sociedad,espanyol,0,11,1,0,0.4,0.0,2,1,1,14,100.0,0,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,0,2,1,1,6,14.0,1.0,0,1,1,50.0,24_25,23,1
+Javi López,DF,real sociedad,espanyol,1,90,0,0,0.0,0.0,0,0,0,57,75.4,0,0,0.0,0.0,0.0,1,1,1,0,0,0,0,0,1,0,0,0,28,176.0,67.0,2,0,0,0.0,24_25,23,1
+Nayef Aguerd,DF,real sociedad,espanyol,1,90,0,0,0.0,0.0,0,0,0,83,86.7,1,0,0.0,0.0,0.0,3,2,0,0,0,1,1,0,8,1,1,0,53,470.0,385.0,6,3,0,100.0,24_25,23,1
+Aritz Elustondo,DF,real sociedad,espanyol,1,90,0,0,0.1,0.0,1,1,0,78,87.2,0,0,0.0,0.0,0.0,5,1,1,0,1,2,1,1,6,0,0,0,50,322.0,187.0,1,2,4,33.3,24_25,23,1
+Jon Aramburu,DF,real sociedad,espanyol,1,90,0,0,0.2,0.0,3,3,0,63,85.7,0,0,0.0,0.0,0.0,4,6,5,0,2,0,0,0,5,0,0,0,32,79.0,41.0,0,1,1,50.0,24_25,23,1
+Álex Remiro,PT,real sociedad,espanyol,1,90,0,0,0.0,0.0,0,0,0,28,82.1,0,0,1.0,100.0,0.8,4,0,0,0,0,0,0,0,0,0,0,0,13,49.0,32.0,0,0,0,0.0,24_25,23,1
+Roberto Férnandez,DT,espanyol,real sociedad,1,69,0,0,0.0,0.0,0,0,0,7,42.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,7,10.0,0.0,0,2,1,66.7,24_25,23,0
+Álvaro Tejero,DT,espanyol,real sociedad,0,21,0,0,0.0,0.0,0,0,0,7,57.1,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,2,0,2,7,31.0,22.0,1,1,0,100.0,24_25,23,0
+Edu Expósito,DT,espanyol,real sociedad,1,45,0,0,0.0,0.0,0,0,0,12,16.7,0,0,0.0,0.0,0.0,0,0,1,0,1,0,0,0,0,2,0,2,8,35.0,20.0,0,0,0,0.0,24_25,23,0
+Alejo Véliz,DT,espanyol,real sociedad,0,45,0,0,0.0,0.0,0,0,0,9,22.2,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,2,0,0,0,5,9.0,0.0,0,3,3,50.0,24_25,23,0
+Antoniu,MC,espanyol,real sociedad,1,45,0,0,0.0,0.0,1,1,0,4,25.0,0,0,0.0,0.0,0.0,1,2,3,0,2,1,0,1,0,2,1,1,6,41.0,30.0,2,0,1,0.0,24_25,23,0
+Jofre,MC,espanyol,real sociedad,0,45,0,0,0.0,0.0,0,0,0,11,72.7,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,1,2,1,1,8,55.0,44.0,1,0,0,0.0,24_25,23,0
+Alex Král,MC,espanyol,real sociedad,1,90,0,0,0.0,0.0,0,0,0,16,75.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,4,2,2,12,96.0,30.0,2,4,0,100.0,24_25,23,0
+Álvaro Aguado,MC,espanyol,real sociedad,1,81,0,0,0.0,0.0,0,0,0,36,86.1,1,0,0.0,0.0,0.0,2,0,2,0,2,1,1,0,0,1,1,0,21,169.0,85.0,1,1,1,50.0,24_25,23,0
+Rafael Bauza,MC,espanyol,real sociedad,0,9,0,0,0.0,0.0,0,0,0,2,100.0,0,0,0.0,0.0,0.0,1,1,2,0,1,0,0,0,1,0,0,0,1,2.0,1.0,0,0,0,0.0,24_25,23,0
+Javi Puado,MC,espanyol,real sociedad,1,90,1,0,0.8,0.0,1,1,0,10,80.0,0,0,0.0,0.0,0.0,10,0,1,0,1,1,0,1,0,1,0,1,12,159.0,101.0,4,0,1,0.0,24_25,23,0
+Leandro Cabrera,DF,espanyol,real sociedad,1,90,0,0,0.0,0.0,0,0,0,28,57.1,1,0,0.0,0.0,0.0,-1,1,1,0,1,1,0,1,5,0,0,0,10,45.0,23.0,0,5,1,83.3,24_25,23,0
+Fernando Calero,DF,espanyol,real sociedad,1,86,0,0,0.0,0.0,0,0,0,27,81.5,0,0,0.0,0.0,0.0,1,1,1,0,0,4,2,2,3,0,0,0,15,82.0,37.0,0,0,3,0.0,24_25,23,0
+Walid Cheddira,DT,espanyol,real sociedad,0,4,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0,24_25,23,0
+Marash Kumbulla,DF,espanyol,real sociedad,1,90,0,0,0.0,0.0,1,1,0,30,66.7,0,0,0.0,0.0,0.0,3,2,2,0,1,2,2,0,6,0,0,0,18,77.0,54.0,0,1,1,50.0,24_25,23,0
+Omar El Hilali,DF,espanyol,real sociedad,1,90,0,0,0.0,0.0,0,0,0,46,80.4,0,0,0.0,0.0,0.0,4,5,1,0,0,2,0,2,5,1,1,0,18,88.0,58.0,1,1,0,100.0,24_25,23,0
+Joan García,PT,espanyol,real sociedad,1,90,0,0,0.0,0.0,0,0,0,36,61.1,0,0,2.0,33.3,1.7,3,0,0,0,0,0,0,0,0,0,0,0,21,181.0,81.0,0,0,0,0.0,24_25,23,0

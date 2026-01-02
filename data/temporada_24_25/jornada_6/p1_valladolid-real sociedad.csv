@@ -1,32 +1,32 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Juanmi Latasa,DT,valladolid,real sociedad,1,90,0,0,0.2,0.0,3,3,0,22,54.5,1,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,1,3,3,0,17,85.0,30.0,1,9,5,64.3
-Raúl Moro,DT,valladolid,real sociedad,1,77,0,0,0.3,0.0,4,3,1,16,75.0,0,0,0.0,0.0,0.0,7,2,3,0,1,0,0,0,1,6,2,4,17,260.0,178.0,7,1,1,50.0
-Mamadou Sylla,DT,valladolid,real sociedad,0,13,0,0,0.3,0.0,1,1,0,7,42.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,6.0,0.0,0,2,1,66.7
-Darwin Machís,DT,valladolid,real sociedad,1,60,0,0,0.1,0.0,2,2,0,28,53.6,0,0,0.0,0.0,0.0,4,0,1,0,1,2,0,2,0,1,0,1,9,24.0,4.0,0,1,0,100.0
-Iván Sánchez,DT,valladolid,real sociedad,0,30,0,0,0.0,0.3,0,0,0,11,63.6,0,0,0.0,0.0,0.0,3,0,0,0,0,2,1,1,0,2,1,1,7,50.0,16.0,0,0,0,0.0
-Selim Amallah,MC,valladolid,real sociedad,1,45,0,0,0.0,0.0,1,1,0,11,72.7,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,3,1,2,10,39.0,4.0,0,1,0,100.0
-Kike Pérez,MC,valladolid,real sociedad,0,45,0,0,0.0,0.0,1,1,0,15,66.7,0,0,0.0,0.0,0.0,2,1,1,0,0,2,1,1,1,0,0,0,7,75.0,18.0,1,2,0,100.0
-Stanko Jurić,MC,valladolid,real sociedad,1,90,0,0,0.0,0.2,0,0,0,26,84.6,1,0,0.0,0.0,0.0,8,5,2,0,1,1,0,1,3,0,0,0,3,7.0,0.0,0,3,2,60.0
-Víctor Meseguer,MC,valladolid,real sociedad,1,90,0,0,0.0,0.0,1,1,0,31,64.5,0,0,0.0,0.0,0.0,5,1,1,0,1,0,0,0,2,0,0,0,9,16.0,8.0,0,2,1,66.7
-Lucas Oliveira Rosa,DF,valladolid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,36,66.7,1,0,0.0,0.0,0.0,7,2,0,0,0,0,0,0,4,2,1,1,14,169.0,123.0,2,0,0,0.0
-Cenk Özkacar,DF,valladolid,real sociedad,1,13,0,0,0.0,0.0,0,0,0,4,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,1,0.0,0.0,0,0,0,0.0
-David Torres,DF,valladolid,real sociedad,0,77,0,0,0.0,0.0,1,1,0,14,71.4,0,0,0.0,0.0,0.0,8,1,0,0,0,3,2,1,4,0,0,0,8,54.0,2.0,0,5,2,71.4
-Abdulai Juma Bah,DF,valladolid,real sociedad,1,77,0,0,0.0,0.0,0,0,0,20,80.0,0,0,0.0,0.0,0.0,0,1,1,0,1,2,1,1,3,0,0,0,6,30.0,14.0,0,1,2,33.3
-Eray Cömert,DF,valladolid,real sociedad,0,13,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,1,1.0,0.0,0,0,0,0.0
-Luis Pérez,DF,valladolid,real sociedad,1,90,0,0,0.0,0.2,1,0,1,48,77.1,1,0,0.0,0.0,0.0,8,1,3,0,2,1,0,1,0,1,0,1,20,106.0,49.0,2,0,0,0.0
-Karl Jakob Hein,PT,valladolid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,28,71.4,0,0,0.0,100.0,0.5,10,0,1,0,1,0,0,0,0,0,0,0,8,37.0,25.0,0,1,0,100.0
-Orri Steinn Óskarsson,DT,real sociedad,valladolid,1,60,0,0,0.0,0.0,0,0,0,7,85.7,0,0,0.0,0.0,0.0,4,2,1,0,1,1,0,1,1,0,0,0,2,5.0,3.0,0,1,1,50.0
-Mikel Oyarzabal,DT,real sociedad,valladolid,0,30,0,0,0.4,0.0,2,2,0,5,80.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,5,21.0,0.0,0,1,1,50.0
-Sheraldo Becker,DT,real sociedad,valladolid,1,90,0,0,0.4,0.0,6,3,3,20,60.0,0,0,0.0,0.0,0.0,9,0,1,0,1,0,0,0,1,0,0,0,15,193.0,106.0,4,2,3,40.0
-Takefusa Kubo,MC,real sociedad,valladolid,1,80,0,0,0.0,0.2,0,0,0,36,69.4,0,0,0.0,0.0,0.0,6,2,4,0,2,2,1,1,0,4,2,2,35,245.0,105.0,4,0,0,0.0
-Umar Sadiq,DT,real sociedad,valladolid,0,10,0,0,0.1,0.0,1,1,0,3,33.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,1,1,4,20.0,1.0,0,0,1,0.0
-Beñat Turrientes,MC,real sociedad,valladolid,1,90,0,0,0.0,0.0,1,1,0,48,93.8,0,0,0.0,0.0,0.0,7,1,1,0,1,3,1,2,0,3,2,0,33,227.0,114.0,4,0,2,0.0
-Luka Sučić,MC,real sociedad,valladolid,1,60,0,0,0.1,0.0,1,1,0,35,71.4,0,0,0.0,0.0,0.0,4,2,1,0,1,0,0,0,0,2,0,1,20,94.0,38.0,0,0,1,0.0
-Olasagasti,MC,real sociedad,valladolid,0,30,0,0,0.1,0.0,1,1,0,11,90.9,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,1,2,1,1,6,45.0,34.0,0,1,1,50.0
-Martín Zubimendi,MC,real sociedad,valladolid,1,90,0,0,0.3,0.0,1,1,0,71,83.1,1,0,0.0,0.0,0.0,10,5,1,0,0,1,0,1,6,2,2,0,40,255.0,140.0,4,2,2,50.0
-Sergio Gómez,DF,real sociedad,valladolid,1,90,0,0,0.0,0.3,0,0,0,68,66.2,0,0,0.0,0.0,0.0,6,4,3,0,0,0,0,0,0,1,0,1,30,272.0,130.0,4,0,0,0.0
-Nayef Aguerd,DF,real sociedad,valladolid,1,80,0,0,0.0,0.0,0,0,0,79,96.2,1,0,0.0,0.0,0.0,8,0,1,0,1,1,0,1,4,0,0,0,57,384.0,284.0,2,1,3,25.0
-Jon Pacheco,DF,real sociedad,valladolid,0,10,0,0,0.0,0.0,0,0,0,15,93.3,0,0,0.0,0.0,0.0,2,0,0,0,0,1,1,0,1,0,0,0,10,77.0,70.0,0,1,2,33.3
-Igor Zubeldia,DF,real sociedad,valladolid,1,90,0,0,0.0,0.0,0,0,0,84,89.3,1,0,0.0,0.0,0.0,6,1,0,0,0,2,2,0,4,0,0,0,52,250.0,167.0,0,3,8,27.3
-Jon Aramburu,DF,real sociedad,valladolid,1,90,0,0,0.0,0.2,1,1,0,64,79.7,1,0,0.0,0.0,0.0,7,4,5,0,1,2,2,0,3,0,0,0,32,219.0,106.0,3,2,3,40.0
-Álex Remiro,PT,real sociedad,valladolid,1,90,0,0,0.0,0.0,0,0,0,30,76.7,0,0,0.0,100.0,0.2,10,0,0,0,0,0,0,0,1,0,0,0,21,96.0,55.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Juanmi Latasa,DT,valladolid,real sociedad,1,90,0,0,0.2,0.0,3,3,0,22,54.5,1,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,1,3,3,0,17,85.0,30.0,1,9,5,64.3,24_25,6,1
+Raúl Moro,DT,valladolid,real sociedad,1,77,0,0,0.3,0.0,4,3,1,16,75.0,0,0,0.0,0.0,0.0,7,2,3,0,1,0,0,0,1,6,2,4,17,260.0,178.0,7,1,1,50.0,24_25,6,1
+Mamadou Sylla,DT,valladolid,real sociedad,0,13,0,0,0.3,0.0,1,1,0,7,42.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,6.0,0.0,0,2,1,66.7,24_25,6,1
+Darwin Machís,DT,valladolid,real sociedad,1,60,0,0,0.1,0.0,2,2,0,28,53.6,0,0,0.0,0.0,0.0,4,0,1,0,1,2,0,2,0,1,0,1,9,24.0,4.0,0,1,0,100.0,24_25,6,1
+Iván Sánchez,DT,valladolid,real sociedad,0,30,0,0,0.0,0.3,0,0,0,11,63.6,0,0,0.0,0.0,0.0,3,0,0,0,0,2,1,1,0,2,1,1,7,50.0,16.0,0,0,0,0.0,24_25,6,1
+Selim Amallah,MC,valladolid,real sociedad,1,45,0,0,0.0,0.0,1,1,0,11,72.7,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,3,1,2,10,39.0,4.0,0,1,0,100.0,24_25,6,1
+Kike Pérez,MC,valladolid,real sociedad,0,45,0,0,0.0,0.0,1,1,0,15,66.7,0,0,0.0,0.0,0.0,2,1,1,0,0,2,1,1,1,0,0,0,7,75.0,18.0,1,2,0,100.0,24_25,6,1
+Stanko Jurić,MC,valladolid,real sociedad,1,90,0,0,0.0,0.2,0,0,0,26,84.6,1,0,0.0,0.0,0.0,8,5,2,0,1,1,0,1,3,0,0,0,3,7.0,0.0,0,3,2,60.0,24_25,6,1
+Víctor Meseguer,MC,valladolid,real sociedad,1,90,0,0,0.0,0.0,1,1,0,31,64.5,0,0,0.0,0.0,0.0,5,1,1,0,1,0,0,0,2,0,0,0,9,16.0,8.0,0,2,1,66.7,24_25,6,1
+Lucas Oliveira Rosa,DF,valladolid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,36,66.7,1,0,0.0,0.0,0.0,7,2,0,0,0,0,0,0,4,2,1,1,14,169.0,123.0,2,0,0,0.0,24_25,6,1
+Cenk Özkacar,DF,valladolid,real sociedad,1,13,0,0,0.0,0.0,0,0,0,4,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,1,0.0,0.0,0,0,0,0.0,24_25,6,1
+David Torres,DF,valladolid,real sociedad,0,77,0,0,0.0,0.0,1,1,0,14,71.4,0,0,0.0,0.0,0.0,8,1,0,0,0,3,2,1,4,0,0,0,8,54.0,2.0,0,5,2,71.4,24_25,6,1
+Abdulai Juma Bah,DF,valladolid,real sociedad,1,77,0,0,0.0,0.0,0,0,0,20,80.0,0,0,0.0,0.0,0.0,0,1,1,0,1,2,1,1,3,0,0,0,6,30.0,14.0,0,1,2,33.3,24_25,6,1
+Eray Cömert,DF,valladolid,real sociedad,0,13,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,1,1.0,0.0,0,0,0,0.0,24_25,6,1
+Luis Pérez,DF,valladolid,real sociedad,1,90,0,0,0.0,0.2,1,0,1,48,77.1,1,0,0.0,0.0,0.0,8,1,3,0,2,1,0,1,0,1,0,1,20,106.0,49.0,2,0,0,0.0,24_25,6,1
+Karl Jakob Hein,PT,valladolid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,28,71.4,0,0,0.0,100.0,0.5,10,0,1,0,1,0,0,0,0,0,0,0,8,37.0,25.0,0,1,0,100.0,24_25,6,1
+Orri Steinn Óskarsson,DT,real sociedad,valladolid,1,60,0,0,0.0,0.0,0,0,0,7,85.7,0,0,0.0,0.0,0.0,4,2,1,0,1,1,0,1,1,0,0,0,2,5.0,3.0,0,1,1,50.0,24_25,6,0
+Mikel Oyarzabal,DT,real sociedad,valladolid,0,30,0,0,0.4,0.0,2,2,0,5,80.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,5,21.0,0.0,0,1,1,50.0,24_25,6,0
+Sheraldo Becker,DT,real sociedad,valladolid,1,90,0,0,0.4,0.0,6,3,3,20,60.0,0,0,0.0,0.0,0.0,9,0,1,0,1,0,0,0,1,0,0,0,15,193.0,106.0,4,2,3,40.0,24_25,6,0
+Takefusa Kubo,MC,real sociedad,valladolid,1,80,0,0,0.0,0.2,0,0,0,36,69.4,0,0,0.0,0.0,0.0,6,2,4,0,2,2,1,1,0,4,2,2,35,245.0,105.0,4,0,0,0.0,24_25,6,0
+Umar Sadiq,DT,real sociedad,valladolid,0,10,0,0,0.1,0.0,1,1,0,3,33.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,1,1,4,20.0,1.0,0,0,1,0.0,24_25,6,0
+Beñat Turrientes,MC,real sociedad,valladolid,1,90,0,0,0.0,0.0,1,1,0,48,93.8,0,0,0.0,0.0,0.0,7,1,1,0,1,3,1,2,0,3,2,0,33,227.0,114.0,4,0,2,0.0,24_25,6,0
+Luka Sučić,MC,real sociedad,valladolid,1,60,0,0,0.1,0.0,1,1,0,35,71.4,0,0,0.0,0.0,0.0,4,2,1,0,1,0,0,0,0,2,0,1,20,94.0,38.0,0,0,1,0.0,24_25,6,0
+Olasagasti,MC,real sociedad,valladolid,0,30,0,0,0.1,0.0,1,1,0,11,90.9,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,1,2,1,1,6,45.0,34.0,0,1,1,50.0,24_25,6,0
+Martín Zubimendi,MC,real sociedad,valladolid,1,90,0,0,0.3,0.0,1,1,0,71,83.1,1,0,0.0,0.0,0.0,10,5,1,0,0,1,0,1,6,2,2,0,40,255.0,140.0,4,2,2,50.0,24_25,6,0
+Sergio Gómez,DF,real sociedad,valladolid,1,90,0,0,0.0,0.3,0,0,0,68,66.2,0,0,0.0,0.0,0.0,6,4,3,0,0,0,0,0,0,1,0,1,30,272.0,130.0,4,0,0,0.0,24_25,6,0
+Nayef Aguerd,DF,real sociedad,valladolid,1,80,0,0,0.0,0.0,0,0,0,79,96.2,1,0,0.0,0.0,0.0,8,0,1,0,1,1,0,1,4,0,0,0,57,384.0,284.0,2,1,3,25.0,24_25,6,0
+Jon Pacheco,DF,real sociedad,valladolid,0,10,0,0,0.0,0.0,0,0,0,15,93.3,0,0,0.0,0.0,0.0,2,0,0,0,0,1,1,0,1,0,0,0,10,77.0,70.0,0,1,2,33.3,24_25,6,0
+Igor Zubeldia,DF,real sociedad,valladolid,1,90,0,0,0.0,0.0,0,0,0,84,89.3,1,0,0.0,0.0,0.0,6,1,0,0,0,2,2,0,4,0,0,0,52,250.0,167.0,0,3,8,27.3,24_25,6,0
+Jon Aramburu,DF,real sociedad,valladolid,1,90,0,0,0.0,0.2,1,1,0,64,79.7,1,0,0.0,0.0,0.0,7,4,5,0,1,2,2,0,3,0,0,0,32,219.0,106.0,3,2,3,40.0,24_25,6,0
+Álex Remiro,PT,real sociedad,valladolid,1,90,0,0,0.0,0.0,0,0,0,30,76.7,0,0,0.0,100.0,0.2,10,0,0,0,0,0,0,0,1,0,0,0,21,96.0,55.0,0,0,0,0.0,24_25,6,0

@@ -1,32 +1,32 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Léo Baptistão,DT,almeria,real sociedad,1,90,0,0,0.0,0.0,1,1,0,23,56.5,0,0,0.0,0.0,0.0,3,1,1,0,1,0,0,0,1,1,0,0,15,38.0,9.0,0,4,6,40.0
-Largie Ramazani,DT,almeria,real sociedad,1,90,0,0,0.0,0.0,0,0,0,9,55.6,0,0,0.0,0.0,0.0,1,2,0,0,0,2,0,2,0,1,0,1,10,63.0,34.0,1,0,2,0.0
-Adri Embarba,DT,almeria,real sociedad,1,71,0,0,0.0,0.0,1,1,0,15,40.0,1,0,0.0,0.0,0.0,1,2,2,0,1,1,0,1,1,2,0,2,12,38.0,9.0,0,0,2,0.0
-Lázaro,DT,almeria,real sociedad,0,19,0,0,0.2,0.0,1,0,1,8,50.0,0,0,0.0,0.0,0.0,1,1,1,0,1,0,0,0,1,0,0,0,6,49.0,38.0,2,0,0,0.0
-Sergio Arribas,MC,almeria,real sociedad,1,86,1,0,0.2,0.0,2,1,1,20,75.0,0,0,0.0,0.0,0.0,9,1,0,0,0,0,0,0,1,3,0,3,14,83.0,14.0,0,1,2,33.3
-Iddrisu Baba,MC,almeria,real sociedad,0,4,0,0,0.0,0.0,0,0,0,4,100.0,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,5,16.0,5.0,0,0,0,0.0
-Lucas Robertone,MC,almeria,real sociedad,1,70,0,0,0.0,0.0,0,0,0,24,70.8,1,0,0.0,0.0,0.0,2,3,4,0,1,2,0,2,2,0,0,0,13,45.0,10.0,0,1,0,100.0
-Gonzalo Melero,MC,almeria,real sociedad,0,20,0,0,0.0,0.0,0,0,0,7,71.4,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,1,0,0,0,4,14.0,9.0,0,0,3,0.0
-Dion Lopy,MC,almeria,real sociedad,1,89,0,0,0.0,0.2,0,0,0,41,75.6,1,0,0.0,0.0,0.0,3,5,2,0,1,2,0,2,0,0,0,0,20,97.0,15.0,0,2,1,66.7
-Marciano Tchami,MC,almeria,real sociedad,0,1,0,0,0.0,0.0,1,1,0,4,50.0,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,1,3.0,2.0,0,1,1,50.0
-Sergio Akieme,DF,almeria,real sociedad,1,90,0,0,0.0,0.0,0,0,0,30,70.0,0,0,0.0,0.0,0.0,-3,0,0,0,0,1,0,1,1,1,0,0,18,73.0,8.0,0,0,1,0.0
-Édgar González,DF,almeria,real sociedad,1,90,0,0,0.0,0.0,1,1,0,33,72.7,0,0,0.0,0.0,0.0,1,0,1,0,1,1,1,0,7,0,0,0,21,75.0,12.0,0,3,2,60.0
-Chumi,DF,almeria,real sociedad,1,90,0,0,0.0,0.0,0,0,0,42,59.5,0,0,0.0,0.0,0.0,-1,0,0,0,0,2,2,0,3,0,0,0,25,97.0,18.0,0,3,1,75.0
-Houboulang Mendes,DF,almeria,real sociedad,1,90,0,0,0.0,0.0,0,0,0,47,70.2,0,0,0.0,0.0,0.0,1,6,7,0,4,1,1,0,3,3,1,1,29,128.0,57.0,2,3,2,60.0
-Luís Maximiano,PT,almeria,real sociedad,1,90,0,0,0.0,0.0,0,0,0,37,54.1,0,0,3.0,66.7,2.5,-1,0,0,0,0,0,0,0,0,0,0,0,22,80.0,31.0,0,0,0,0.0
-Umar Sadiq,DT,real sociedad,almeria,1,45,0,0,0.3,0.0,4,3,1,7,85.7,1,0,0.0,0.0,0.0,3,1,0,0,0,1,0,1,0,3,3,0,11,70.0,34.0,2,1,2,33.3
-Mikel Merino,MC,real sociedad,almeria,0,45,0,0,0.0,0.0,0,0,0,28,78.6,0,0,0.0,0.0,0.0,4,0,0,0,0,2,1,1,2,0,0,0,15,32.0,12.0,0,4,2,66.7
-Mikel Oyarzabal,DT,real sociedad,almeria,1,65,1,0,0.8,0.0,3,1,2,10,90.0,0,0,0.0,0.0,0.0,11,0,0,0,0,0,0,0,1,0,0,0,11,65.0,27.0,1,0,2,0.0
-Carlos Fernández,DT,real sociedad,almeria,0,25,1,0,0.9,0.0,1,1,0,5,40.0,0,0,0.0,0.0,0.0,8,1,0,0,0,1,0,1,0,1,0,1,3,22.0,18.0,1,0,0,0.0
-Ander Barrenetxea,MC,real sociedad,almeria,1,45,0,0,0.0,0.0,2,2,0,20,70.0,0,0,0.0,0.0,0.0,2,1,1,0,1,1,0,1,0,6,1,3,23,149.0,62.0,3,1,4,20.0
-Takefusa Kubo,DT,real sociedad,almeria,0,45,0,0,0.0,0.0,0,0,0,13,53.8,0,0,0.0,0.0,0.0,3,1,1,0,0,0,0,0,0,1,1,0,10,78.0,51.0,3,0,0,0.0
-Beñat Turrientes,MC,real sociedad,almeria,1,80,0,0,0.1,0.1,2,2,0,16,93.8,0,0,0.0,0.0,0.0,4,1,0,0,0,0,0,0,0,4,0,1,13,79.0,15.0,0,0,2,0.0
-Olasagasti,MC,real sociedad,almeria,0,10,0,0,0.0,0.0,1,1,0,7,85.7,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,0,1,1,0,5,22.0,12.0,1,0,0,0.0
-Arsen Zakharyan,MC,real sociedad,almeria,1,73,0,0,0.0,0.0,1,1,0,27,63.0,0,0,0.0,0.0,0.0,5,2,1,0,0,0,0,0,0,1,0,0,16,84.0,46.0,0,1,0,100.0
-Mohamed Ali Cho,MC,real sociedad,almeria,0,17,0,0,0.0,0.1,0,0,0,5,60.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,1,1,5,34.0,17.0,1,0,0,0.0
-Martín Zubimendi,MC,real sociedad,almeria,1,90,1,0,0.2,0.1,1,0,1,39,84.6,0,0,0.0,0.0,0.0,12,1,1,0,0,0,0,0,5,1,0,0,15,70.0,17.0,1,2,1,66.7
-Aihen Muñoz,DF,real sociedad,almeria,1,90,0,0,0.0,0.0,0,0,0,58,58.6,1,0,0.0,0.0,0.0,1,3,3,0,0,1,0,1,1,2,2,0,24,164.0,54.0,2,4,2,66.7
-Robin Le Normand,DF,real sociedad,almeria,1,90,0,0,0.0,0.0,0,0,0,47,78.7,0,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,1,0,0,0,24,141.0,81.0,1,4,3,57.1
-Aritz Elustondo,DF,real sociedad,almeria,1,90,0,1,0.1,0.3,2,1,1,41,87.8,0,0,0.0,0.0,0.0,11,0,0,0,0,0,0,0,3,0,0,0,25,143.0,89.0,1,6,0,100.0
-Hamari Traoré,DF,real sociedad,almeria,1,90,0,0,0.0,0.1,0,0,0,41,73.2,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,3,3,1,2,27,104.0,43.0,2,0,0,0.0
-Álex Remiro,PT,real sociedad,almeria,1,90,0,0,0.0,0.0,0,0,0,31,64.5,0,0,1.0,50.0,0.5,2,0,0,0,0,0,0,0,0,0,0,0,19,81.0,30.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Léo Baptistão,DT,almeria,real sociedad,1,90,0,0,0.0,0.0,1,1,0,23,56.5,0,0,0.0,0.0,0.0,3,1,1,0,1,0,0,0,1,1,0,0,15,38.0,9.0,0,4,6,40.0,23_24,13,1
+Largie Ramazani,DT,almeria,real sociedad,1,90,0,0,0.0,0.0,0,0,0,9,55.6,0,0,0.0,0.0,0.0,1,2,0,0,0,2,0,2,0,1,0,1,10,63.0,34.0,1,0,2,0.0,23_24,13,1
+Adri Embarba,DT,almeria,real sociedad,1,71,0,0,0.0,0.0,1,1,0,15,40.0,1,0,0.0,0.0,0.0,1,2,2,0,1,1,0,1,1,2,0,2,12,38.0,9.0,0,0,2,0.0,23_24,13,1
+Lázaro,DT,almeria,real sociedad,0,19,0,0,0.2,0.0,1,0,1,8,50.0,0,0,0.0,0.0,0.0,1,1,1,0,1,0,0,0,1,0,0,0,6,49.0,38.0,2,0,0,0.0,23_24,13,1
+Sergio Arribas,MC,almeria,real sociedad,1,86,1,0,0.2,0.0,2,1,1,20,75.0,0,0,0.0,0.0,0.0,9,1,0,0,0,0,0,0,1,3,0,3,14,83.0,14.0,0,1,2,33.3,23_24,13,1
+Iddrisu Baba,MC,almeria,real sociedad,0,4,0,0,0.0,0.0,0,0,0,4,100.0,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,5,16.0,5.0,0,0,0,0.0,23_24,13,1
+Lucas Robertone,MC,almeria,real sociedad,1,70,0,0,0.0,0.0,0,0,0,24,70.8,1,0,0.0,0.0,0.0,2,3,4,0,1,2,0,2,2,0,0,0,13,45.0,10.0,0,1,0,100.0,23_24,13,1
+Gonzalo Melero,MC,almeria,real sociedad,0,20,0,0,0.0,0.0,0,0,0,7,71.4,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,1,0,0,0,4,14.0,9.0,0,0,3,0.0,23_24,13,1
+Dion Lopy,MC,almeria,real sociedad,1,89,0,0,0.0,0.2,0,0,0,41,75.6,1,0,0.0,0.0,0.0,3,5,2,0,1,2,0,2,0,0,0,0,20,97.0,15.0,0,2,1,66.7,23_24,13,1
+Marciano Tchami,MC,almeria,real sociedad,0,1,0,0,0.0,0.0,1,1,0,4,50.0,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,1,3.0,2.0,0,1,1,50.0,23_24,13,1
+Sergio Akieme,DF,almeria,real sociedad,1,90,0,0,0.0,0.0,0,0,0,30,70.0,0,0,0.0,0.0,0.0,-3,0,0,0,0,1,0,1,1,1,0,0,18,73.0,8.0,0,0,1,0.0,23_24,13,1
+Édgar González,DF,almeria,real sociedad,1,90,0,0,0.0,0.0,1,1,0,33,72.7,0,0,0.0,0.0,0.0,1,0,1,0,1,1,1,0,7,0,0,0,21,75.0,12.0,0,3,2,60.0,23_24,13,1
+Chumi,DF,almeria,real sociedad,1,90,0,0,0.0,0.0,0,0,0,42,59.5,0,0,0.0,0.0,0.0,-1,0,0,0,0,2,2,0,3,0,0,0,25,97.0,18.0,0,3,1,75.0,23_24,13,1
+Houboulang Mendes,DF,almeria,real sociedad,1,90,0,0,0.0,0.0,0,0,0,47,70.2,0,0,0.0,0.0,0.0,1,6,7,0,4,1,1,0,3,3,1,1,29,128.0,57.0,2,3,2,60.0,23_24,13,1
+Luís Maximiano,PT,almeria,real sociedad,1,90,0,0,0.0,0.0,0,0,0,37,54.1,0,0,3.0,66.7,2.5,-1,0,0,0,0,0,0,0,0,0,0,0,22,80.0,31.0,0,0,0,0.0,23_24,13,1
+Umar Sadiq,DT,real sociedad,almeria,1,45,0,0,0.3,0.0,4,3,1,7,85.7,1,0,0.0,0.0,0.0,3,1,0,0,0,1,0,1,0,3,3,0,11,70.0,34.0,2,1,2,33.3,23_24,13,0
+Mikel Merino,MC,real sociedad,almeria,0,45,0,0,0.0,0.0,0,0,0,28,78.6,0,0,0.0,0.0,0.0,4,0,0,0,0,2,1,1,2,0,0,0,15,32.0,12.0,0,4,2,66.7,23_24,13,0
+Mikel Oyarzabal,DT,real sociedad,almeria,1,65,1,0,0.8,0.0,3,1,2,10,90.0,0,0,0.0,0.0,0.0,11,0,0,0,0,0,0,0,1,0,0,0,11,65.0,27.0,1,0,2,0.0,23_24,13,0
+Carlos Fernández,DT,real sociedad,almeria,0,25,1,0,0.9,0.0,1,1,0,5,40.0,0,0,0.0,0.0,0.0,8,1,0,0,0,1,0,1,0,1,0,1,3,22.0,18.0,1,0,0,0.0,23_24,13,0
+Ander Barrenetxea,MC,real sociedad,almeria,1,45,0,0,0.0,0.0,2,2,0,20,70.0,0,0,0.0,0.0,0.0,2,1,1,0,1,1,0,1,0,6,1,3,23,149.0,62.0,3,1,4,20.0,23_24,13,0
+Takefusa Kubo,DT,real sociedad,almeria,0,45,0,0,0.0,0.0,0,0,0,13,53.8,0,0,0.0,0.0,0.0,3,1,1,0,0,0,0,0,0,1,1,0,10,78.0,51.0,3,0,0,0.0,23_24,13,0
+Beñat Turrientes,MC,real sociedad,almeria,1,80,0,0,0.1,0.1,2,2,0,16,93.8,0,0,0.0,0.0,0.0,4,1,0,0,0,0,0,0,0,4,0,1,13,79.0,15.0,0,0,2,0.0,23_24,13,0
+Olasagasti,MC,real sociedad,almeria,0,10,0,0,0.0,0.0,1,1,0,7,85.7,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,0,1,1,0,5,22.0,12.0,1,0,0,0.0,23_24,13,0
+Arsen Zakharyan,MC,real sociedad,almeria,1,73,0,0,0.0,0.0,1,1,0,27,63.0,0,0,0.0,0.0,0.0,5,2,1,0,0,0,0,0,0,1,0,0,16,84.0,46.0,0,1,0,100.0,23_24,13,0
+Mohamed Ali Cho,MC,real sociedad,almeria,0,17,0,0,0.0,0.1,0,0,0,5,60.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,1,1,5,34.0,17.0,1,0,0,0.0,23_24,13,0
+Martín Zubimendi,MC,real sociedad,almeria,1,90,1,0,0.2,0.1,1,0,1,39,84.6,0,0,0.0,0.0,0.0,12,1,1,0,0,0,0,0,5,1,0,0,15,70.0,17.0,1,2,1,66.7,23_24,13,0
+Aihen Muñoz,DF,real sociedad,almeria,1,90,0,0,0.0,0.0,0,0,0,58,58.6,1,0,0.0,0.0,0.0,1,3,3,0,0,1,0,1,1,2,2,0,24,164.0,54.0,2,4,2,66.7,23_24,13,0
+Robin Le Normand,DF,real sociedad,almeria,1,90,0,0,0.0,0.0,0,0,0,47,78.7,0,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,1,0,0,0,24,141.0,81.0,1,4,3,57.1,23_24,13,0
+Aritz Elustondo,DF,real sociedad,almeria,1,90,0,1,0.1,0.3,2,1,1,41,87.8,0,0,0.0,0.0,0.0,11,0,0,0,0,0,0,0,3,0,0,0,25,143.0,89.0,1,6,0,100.0,23_24,13,0
+Hamari Traoré,DF,real sociedad,almeria,1,90,0,0,0.0,0.1,0,0,0,41,73.2,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,3,3,1,2,27,104.0,43.0,2,0,0,0.0,23_24,13,0
+Álex Remiro,PT,real sociedad,almeria,1,90,0,0,0.0,0.0,0,0,0,31,64.5,0,0,1.0,50.0,0.5,2,0,0,0,0,0,0,0,0,0,0,0,19,81.0,30.0,0,0,0,0.0,23_24,13,0

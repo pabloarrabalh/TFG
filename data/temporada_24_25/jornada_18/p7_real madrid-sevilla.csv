@@ -1,31 +1,31 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Kylian Mbappé,DT,real madrid,sevilla,1,90,1,1,0.5,0.7,5,3,2,34,85.3,0,0,0.0,0.0,0.0,15,0,0,0,0,0,0,0,0,3,1,2,21,138.0,106.0,4,0,0,0.0
-Rodrygo,DT,real madrid,sevilla,1,70,1,1,0.4,0.1,4,2,2,42,78.6,0,0,0.0,0.0,0.0,14,2,2,0,2,0,0,0,0,3,0,2,31,193.0,120.0,4,0,0,0.0
-Luka Modrić,MC,real madrid,sevilla,0,20,0,0,0.0,0.0,0,0,0,21,85.7,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,0,0,0,16,70.0,37.0,0,0,0,0.0
-Brahim Díaz,DT,real madrid,sevilla,1,90,1,0,0.3,0.2,1,0,1,45,84.4,0,0,0.0,0.0,0.0,10,1,2,0,1,3,0,3,1,3,2,1,27,207.0,127.0,4,0,0,0.0
-Jude Bellingham,MC,real madrid,sevilla,1,76,0,0,0.1,0.2,1,1,0,45,86.7,0,0,0.0,0.0,0.0,3,1,1,0,1,0,0,0,1,1,0,1,32,152.0,67.0,1,0,0,0.0
-Raúl Asencio,DF,real madrid,sevilla,0,14,0,0,0.0,0.0,0,0,0,11,90.9,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,1,0,0,0,8,25.0,1.0,0,0,0,0.0
-Federico Valverde,MC,real madrid,sevilla,1,90,1,0,0.0,0.3,1,0,1,62,83.9,1,0,0.0,0.0,0.0,8,2,0,0,0,0,0,0,1,0,0,0,35,162.0,77.0,1,1,2,33.3
-Dani Ceballos,MC,real madrid,sevilla,1,70,0,0,0.2,0.0,1,1,0,61,95.1,0,0,0.0,0.0,0.0,4,5,5,0,3,0,0,0,0,2,0,0,40,180.0,65.0,0,0,0,0.0
-Arda Güler,MC,real madrid,sevilla,0,20,0,0,0.0,0.0,0,0,0,11,81.8,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,0,7,19.0,8.0,0,1,0,100.0
-Eduardo Camavinga,DF,real madrid,sevilla,1,90,0,1,0.0,0.0,0,0,0,80,90.0,0,0,0.0,0.0,0.0,9,7,5,0,1,2,1,1,1,0,0,0,42,203.0,127.0,2,0,1,0.0
-Antonio Rüdiger,DF,real madrid,sevilla,1,90,0,0,0.2,0.0,1,1,0,75,96.0,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,2,0,0,0,62,239.0,136.0,0,0,1,0.0
-Aurélien Tchouaméni,DF,real madrid,sevilla,1,90,0,0,0.0,0.0,0,0,0,86,93.0,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,3,0,0,0,54,328.0,202.0,1,2,1,66.7
-Lucas Vázquez,DF,real madrid,sevilla,1,90,0,1,0.3,0.5,2,1,1,57,91.2,0,0,0.0,0.0,0.0,12,5,5,0,3,0,0,0,3,4,4,0,35,201.0,138.0,6,0,2,0.0
-Thibaut Courtois,PT,real madrid,sevilla,1,90,0,0,0.0,0.0,0,0,0,39,84.6,0,0,2.0,50.0,1.3,4,0,0,0,0,0,0,0,2,0,0,0,26,127.0,55.0,0,0,0,0.0
-Isaac Romero,DT,sevilla,real madrid,1,73,1,0,1.0,0.0,5,3,2,14,92.9,0,0,0.0,0.0,0.0,8,1,1,0,1,1,0,1,0,0,0,0,13,52.0,13.0,1,0,0,0.0
-Álvaro Pascual,DT,sevilla,real madrid,0,17,0,0,0.0,0.0,0,0,0,1,100.0,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,1,1,0,1,6,26.0,0.0,0,1,0,100.0
-Juanlu Sánchez,DT,sevilla,real madrid,1,72,0,1,0.1,0.5,1,1,0,24,95.8,0,0,0.0,0.0,0.0,6,3,3,0,0,3,0,3,0,2,0,2,17,92.0,44.0,2,1,1,50.0
-Peque,MC,sevilla,real madrid,0,18,0,1,0.0,0.2,0,0,0,5,100.0,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,1,1,0,3,4.0,1.0,0,0,0,0.0
-Stanis Idumbo,MC,sevilla,real madrid,1,64,0,0,0.0,0.3,1,1,0,16,87.5,0,0,0.0,0.0,0.0,3,3,0,0,0,1,1,0,1,7,3,3,18,134.0,61.0,1,1,0,100.0
-Jesús Navas,DT,sevilla,real madrid,0,26,0,0,0.0,0.0,0,0,0,14,78.6,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,0,0,0,7,32.0,19.0,0,0,0,0.0
-Albert Sambi Lokonga,MC,sevilla,real madrid,1,85,0,0,0.0,0.0,1,0,1,52,98.1,1,0,0.0,0.0,0.0,0,3,0,0,0,0,0,0,0,0,0,0,36,248.0,164.0,3,1,0,100.0
-Manu Bueno,MC,sevilla,real madrid,0,5,0,0,0.0,0.0,0,0,0,6,83.3,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,1,1,0,6,39.0,11.0,0,0,1,0.0
-Lucien Agoume,MC,sevilla,real madrid,1,90,0,0,0.0,0.0,0,0,0,59,84.7,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,0,0,0,0,30,125.0,41.0,0,1,0,100.0
-Dodi Lukebakio,MC,sevilla,real madrid,1,90,1,0,0.2,0.1,1,0,1,36,83.3,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,7,3,3,28,127.0,74.0,3,0,1,0.0
-Kike Salas,DF,sevilla,real madrid,1,85,0,0,0.0,0.1,0,0,0,47,85.1,1,0,0.0,0.0,0.0,-2,2,5,0,4,1,1,0,3,2,1,1,20,89.0,22.0,0,1,0,100.0
-Gonzalo Montiel,DF,sevilla,real madrid,0,5,0,0,0.0,0.0,0,0,0,9,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,5,34.0,22.0,1,0,0,0.0
-Nemanja Gudelj,DF,sevilla,real madrid,1,90,0,0,0.0,0.0,1,1,0,53,83.0,0,0,0.0,0.0,0.0,3,0,0,0,0,1,1,0,6,0,0,0,24,93.0,54.0,0,1,1,50.0
-Loïc Bade,DF,sevilla,real madrid,1,90,0,0,0.0,0.0,0,0,0,44,77.3,0,0,0.0,0.0,0.0,-2,2,1,0,0,0,0,0,0,1,1,0,30,213.0,142.0,1,0,0,0.0
-Carmona,DF,sevilla,real madrid,1,90,0,0,0.0,0.0,0,0,0,47,85.1,0,0,0.0,0.0,0.0,2,3,2,0,1,2,2,0,3,2,2,0,27,180.0,86.0,0,0,0,0.0
-Álvaro Fernández,PT,sevilla,real madrid,1,90,0,0,0.0,0.0,0,0,0,31,71.0,0,0,4.0,42.9,1.8,-1,0,0,0,0,0,0,0,0,0,0,0,22,73.0,44.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Kylian Mbappé,DT,real madrid,sevilla,1,90,1,1,0.5,0.7,5,3,2,34,85.3,0,0,0.0,0.0,0.0,15,0,0,0,0,0,0,0,0,3,1,2,21,138.0,106.0,4,0,0,0.0,24_25,18,1
+Rodrygo,DT,real madrid,sevilla,1,70,1,1,0.4,0.1,4,2,2,42,78.6,0,0,0.0,0.0,0.0,14,2,2,0,2,0,0,0,0,3,0,2,31,193.0,120.0,4,0,0,0.0,24_25,18,1
+Luka Modrić,MC,real madrid,sevilla,0,20,0,0,0.0,0.0,0,0,0,21,85.7,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,0,0,0,16,70.0,37.0,0,0,0,0.0,24_25,18,1
+Brahim Díaz,DT,real madrid,sevilla,1,90,1,0,0.3,0.2,1,0,1,45,84.4,0,0,0.0,0.0,0.0,10,1,2,0,1,3,0,3,1,3,2,1,27,207.0,127.0,4,0,0,0.0,24_25,18,1
+Jude Bellingham,MC,real madrid,sevilla,1,76,0,0,0.1,0.2,1,1,0,45,86.7,0,0,0.0,0.0,0.0,3,1,1,0,1,0,0,0,1,1,0,1,32,152.0,67.0,1,0,0,0.0,24_25,18,1
+Raúl Asencio,DF,real madrid,sevilla,0,14,0,0,0.0,0.0,0,0,0,11,90.9,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,1,0,0,0,8,25.0,1.0,0,0,0,0.0,24_25,18,1
+Federico Valverde,MC,real madrid,sevilla,1,90,1,0,0.0,0.3,1,0,1,62,83.9,1,0,0.0,0.0,0.0,8,2,0,0,0,0,0,0,1,0,0,0,35,162.0,77.0,1,1,2,33.3,24_25,18,1
+Dani Ceballos,MC,real madrid,sevilla,1,70,0,0,0.2,0.0,1,1,0,61,95.1,0,0,0.0,0.0,0.0,4,5,5,0,3,0,0,0,0,2,0,0,40,180.0,65.0,0,0,0,0.0,24_25,18,1
+Arda Güler,MC,real madrid,sevilla,0,20,0,0,0.0,0.0,0,0,0,11,81.8,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,0,7,19.0,8.0,0,1,0,100.0,24_25,18,1
+Eduardo Camavinga,DF,real madrid,sevilla,1,90,0,1,0.0,0.0,0,0,0,80,90.0,0,0,0.0,0.0,0.0,9,7,5,0,1,2,1,1,1,0,0,0,42,203.0,127.0,2,0,1,0.0,24_25,18,1
+Antonio Rüdiger,DF,real madrid,sevilla,1,90,0,0,0.2,0.0,1,1,0,75,96.0,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,2,0,0,0,62,239.0,136.0,0,0,1,0.0,24_25,18,1
+Aurélien Tchouaméni,DF,real madrid,sevilla,1,90,0,0,0.0,0.0,0,0,0,86,93.0,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,3,0,0,0,54,328.0,202.0,1,2,1,66.7,24_25,18,1
+Lucas Vázquez,DF,real madrid,sevilla,1,90,0,1,0.3,0.5,2,1,1,57,91.2,0,0,0.0,0.0,0.0,12,5,5,0,3,0,0,0,3,4,4,0,35,201.0,138.0,6,0,2,0.0,24_25,18,1
+Thibaut Courtois,PT,real madrid,sevilla,1,90,0,0,0.0,0.0,0,0,0,39,84.6,0,0,2.0,50.0,1.3,4,0,0,0,0,0,0,0,2,0,0,0,26,127.0,55.0,0,0,0,0.0,24_25,18,1
+Isaac Romero,DT,sevilla,real madrid,1,73,1,0,1.0,0.0,5,3,2,14,92.9,0,0,0.0,0.0,0.0,8,1,1,0,1,1,0,1,0,0,0,0,13,52.0,13.0,1,0,0,0.0,24_25,18,0
+Álvaro Pascual,DT,sevilla,real madrid,0,17,0,0,0.0,0.0,0,0,0,1,100.0,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,1,1,0,1,6,26.0,0.0,0,1,0,100.0,24_25,18,0
+Juanlu Sánchez,DT,sevilla,real madrid,1,72,0,1,0.1,0.5,1,1,0,24,95.8,0,0,0.0,0.0,0.0,6,3,3,0,0,3,0,3,0,2,0,2,17,92.0,44.0,2,1,1,50.0,24_25,18,0
+Peque,MC,sevilla,real madrid,0,18,0,1,0.0,0.2,0,0,0,5,100.0,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,1,1,0,3,4.0,1.0,0,0,0,0.0,24_25,18,0
+Stanis Idumbo,MC,sevilla,real madrid,1,64,0,0,0.0,0.3,1,1,0,16,87.5,0,0,0.0,0.0,0.0,3,3,0,0,0,1,1,0,1,7,3,3,18,134.0,61.0,1,1,0,100.0,24_25,18,0
+Jesús Navas,DT,sevilla,real madrid,0,26,0,0,0.0,0.0,0,0,0,14,78.6,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,0,0,0,7,32.0,19.0,0,0,0,0.0,24_25,18,0
+Albert Sambi Lokonga,MC,sevilla,real madrid,1,85,0,0,0.0,0.0,1,0,1,52,98.1,1,0,0.0,0.0,0.0,0,3,0,0,0,0,0,0,0,0,0,0,36,248.0,164.0,3,1,0,100.0,24_25,18,0
+Manu Bueno,MC,sevilla,real madrid,0,5,0,0,0.0,0.0,0,0,0,6,83.3,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,1,1,0,6,39.0,11.0,0,0,1,0.0,24_25,18,0
+Lucien Agoume,MC,sevilla,real madrid,1,90,0,0,0.0,0.0,0,0,0,59,84.7,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,0,0,0,0,30,125.0,41.0,0,1,0,100.0,24_25,18,0
+Dodi Lukebakio,MC,sevilla,real madrid,1,90,1,0,0.2,0.1,1,0,1,36,83.3,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,7,3,3,28,127.0,74.0,3,0,1,0.0,24_25,18,0
+Kike Salas,DF,sevilla,real madrid,1,85,0,0,0.0,0.1,0,0,0,47,85.1,1,0,0.0,0.0,0.0,-2,2,5,0,4,1,1,0,3,2,1,1,20,89.0,22.0,0,1,0,100.0,24_25,18,0
+Gonzalo Montiel,DF,sevilla,real madrid,0,5,0,0,0.0,0.0,0,0,0,9,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,5,34.0,22.0,1,0,0,0.0,24_25,18,0
+Nemanja Gudelj,DF,sevilla,real madrid,1,90,0,0,0.0,0.0,1,1,0,53,83.0,0,0,0.0,0.0,0.0,3,0,0,0,0,1,1,0,6,0,0,0,24,93.0,54.0,0,1,1,50.0,24_25,18,0
+Loïc Bade,DF,sevilla,real madrid,1,90,0,0,0.0,0.0,0,0,0,44,77.3,0,0,0.0,0.0,0.0,-2,2,1,0,0,0,0,0,0,1,1,0,30,213.0,142.0,1,0,0,0.0,24_25,18,0
+Carmona,DF,sevilla,real madrid,1,90,0,0,0.0,0.0,0,0,0,47,85.1,0,0,0.0,0.0,0.0,2,3,2,0,1,2,2,0,3,2,2,0,27,180.0,86.0,0,0,0,0.0,24_25,18,0
+Álvaro Fernández,PT,sevilla,real madrid,1,90,0,0,0.0,0.0,0,0,0,31,71.0,0,0,4.0,42.9,1.8,-1,0,0,0,0,0,0,0,0,0,0,0,22,73.0,44.0,0,0,0,0.0,24_25,18,0

@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Robert Lewandowski,DT,barcelona,real sociedad,1,90,1,0,1.2,0.0,5,4,1,20,90.0,0,0,0.0,0.0,0.0,11,1,0,0,0,0,0,0,0,1,0,1,17,43.0,8.0,0,1,0,100.0
-Marcus Rashford,DT,barcelona,real sociedad,1,77,0,1,0.3,0.2,6,4,2,43,67.4,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,1,8,3,5,36,231.0,95.0,7,0,0,0.0
-Ferrán Torres,DT,barcelona,real sociedad,0,13,0,0,0.0,0.4,0,0,0,6,83.3,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,0,0,0,7,35.0,23.0,0,0,1,0.0
-Roony Bardghji,DT,barcelona,real sociedad,1,57,0,0,0.1,0.0,2,0,2,38,81.6,0,0,0.0,0.0,0.0,7,1,1,0,0,1,0,1,0,8,5,3,32,192.0,105.0,2,0,1,0.0
-Lamine Yamal,DT,barcelona,real sociedad,0,33,0,1,0.0,0.3,0,0,0,23,78.3,0,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,0,8,3,2,26,184.0,79.0,5,0,0,0.0
-Pedro Fernandez,MC,barcelona,real sociedad,1,45,0,0,0.0,0.1,0,0,0,25,92.0,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,0,4,4,0,16,32.0,10.0,0,1,0,100.0
-Dani Olmo,MC,barcelona,real sociedad,0,45,0,0,0.1,0.2,2,1,1,40,80.0,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,0,0,0,0,29,89.0,17.0,0,0,0,0.0
-Pedri,MC,barcelona,real sociedad,1,89,0,0,0.4,0.1,2,1,1,117,92.3,0,0,0.0,0.0,0.0,8,2,6,0,5,1,0,1,1,4,4,0,76,319.0,169.0,3,1,0,100.0
-Marc Casado,MC,barcelona,real sociedad,0,1,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0
-Frenkie de Jong,MC,barcelona,real sociedad,1,90,0,0,0.0,0.2,0,0,0,102,98.0,0,0,0.0,0.0,0.0,4,1,1,0,0,1,1,0,1,1,0,0,79,464.0,221.0,1,1,0,100.0
-Gerard Martín,DF,barcelona,real sociedad,1,77,0,0,0.0,0.0,1,1,0,74,87.8,0,0,0.0,0.0,0.0,3,3,1,0,0,0,0,0,0,2,1,1,56,173.0,83.0,2,1,0,100.0
-Eric García,DF,barcelona,real sociedad,0,13,0,0,0.0,0.0,1,1,0,8,87.5,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,4,6.0,1.0,0,1,0,100.0
-Andreas Christensen,DF,barcelona,real sociedad,1,90,0,0,0.0,0.0,1,1,0,98,98.0,0,0,0.0,0.0,0.0,6,0,0,0,0,2,1,1,6,0,0,0,76,396.0,271.0,3,4,0,100.0
-Ronald Araújo,DF,barcelona,real sociedad,1,90,0,0,0.0,0.0,1,0,1,75,96.0,0,0,0.0,0.0,0.0,6,0,0,0,0,1,0,1,5,0,0,0,61,341.0,235.0,5,3,1,75.0
-Jules Koundé,DF,barcelona,real sociedad,1,90,1,0,0.2,0.0,1,0,1,93,88.2,1,0,0.0,0.0,0.0,8,2,1,0,1,0,0,0,1,1,0,1,68,184.0,70.0,1,2,0,100.0
-Wojciech Szczęsny,PT,barcelona,real sociedad,1,90,0,0,0.0,0.0,0,0,0,35,85.7,0,0,1.0,50.0,1.0,4,0,0,0,0,0,0,0,0,0,0,0,25,62.0,29.0,0,0,0,0.0
-Mikel Oyarzabal,DT,real sociedad,barcelona,1,90,0,0,0.2,0.1,4,3,1,11,72.7,0,0,0.0,0.0,0.0,2,0,1,0,1,1,0,1,1,1,1,0,15,137.0,67.0,2,0,6,0.0
-Ander Barrenetxea,MC,real sociedad,barcelona,1,80,0,1,0.0,0.6,0,0,0,22,72.7,0,0,0.0,0.0,0.0,8,2,3,0,3,2,0,2,1,4,2,2,22,96.0,43.0,0,0,1,0.0
-Umar Sadiq,DT,real sociedad,barcelona,0,10,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,23.0,0.0,0,0,1,0.0
-Pablo Marín,MC,real sociedad,barcelona,1,66,0,0,0.0,0.0,0,0,0,10,90.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,1,0,9,22.0,11.0,0,0,0,0.0
-Brais Méndez,MC,real sociedad,barcelona,0,24,0,0,0.0,0.0,0,0,0,15,80.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,1,0,0,0,14,67.0,42.0,2,0,1,0.0
-Beñat Turrientes,MC,real sociedad,barcelona,1,65,0,0,0.0,0.0,0,0,0,8,75.0,0,0,0.0,0.0,0.0,2,2,1,0,1,0,0,0,2,3,2,1,10,73.0,30.0,0,0,0,0.0
-Carlos Soler,MC,real sociedad,barcelona,0,25,0,0,0.0,0.0,0,0,0,12,91.7,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,8,15.0,8.0,0,0,1,0.0
-Gonçalo Guedes,MC,real sociedad,barcelona,1,56,0,0,0.0,0.0,0,0,0,8,62.5,0,0,0.0,0.0,0.0,4,1,4,0,3,2,0,2,0,0,0,0,6,15.0,11.0,0,0,2,0.0
-Takefusa Kubo,MC,real sociedad,barcelona,0,34,0,0,0.1,0.1,1,1,0,16,81.3,0,0,0.0,0.0,0.0,2,1,3,0,2,1,0,1,0,2,1,1,17,68.0,20.0,0,0,0,0.0
-Jon Gorrotxategi,MC,real sociedad,barcelona,1,90,0,0,0.0,0.0,0,0,0,25,84.0,0,0,0.0,0.0,0.0,4,1,2,0,2,1,1,0,4,0,0,0,20,65.0,20.0,0,0,0,0.0
-Aihen Muñoz,DF,real sociedad,barcelona,1,90,0,0,0.1,0.1,1,1,0,32,59.4,0,0,0.0,0.0,0.0,2,6,11,0,7,1,0,1,6,0,0,0,20,105.0,65.0,3,1,0,100.0
-Duje ĆaletaCar,DF,real sociedad,barcelona,1,90,0,0,0.0,0.0,0,0,0,26,88.5,1,0,0.0,0.0,0.0,2,0,0,0,0,3,2,1,10,0,0,0,21,59.0,22.0,0,0,0,0.0
-Igor Zubeldia,DF,real sociedad,barcelona,1,90,0,0,0.0,0.0,0,0,0,21,90.5,1,0,0.0,0.0,0.0,2,3,2,0,0,2,1,1,10,0,0,0,17,54.0,23.0,0,1,2,33.3
-Álvaro Odriozola,DF,real sociedad,barcelona,1,56,1,0,0.6,0.0,1,0,1,14,85.7,0,0,0.0,0.0,0.0,10,3,2,0,0,2,2,0,2,0,0,0,7,35.0,12.0,2,1,1,50.0
-Sergio Gómez,DF,real sociedad,barcelona,0,34,0,0,0.0,0.0,0,0,0,20,75.0,0,0,0.0,0.0,0.0,2,4,3,0,1,0,0,0,0,0,0,0,13,30.0,15.0,0,0,0,0.0
-Álex Remiro,PT,real sociedad,barcelona,1,90,0,0,0.0,0.0,0,0,0,39,53.8,0,0,2.0,77.8,1.5,9,1,1,0,0,0,0,0,3,0,0,0,24,142.0,98.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Robert Lewandowski,DT,barcelona,real sociedad,1,90,1,0,1.2,0.0,5,4,1,20,90.0,0,0,0.0,0.0,0.0,11,1,0,0,0,0,0,0,0,1,0,1,17,43.0,8.0,0,1,0,100.0,25_26,7,1
+Marcus Rashford,DT,barcelona,real sociedad,1,77,0,1,0.3,0.2,6,4,2,43,67.4,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,1,8,3,5,36,231.0,95.0,7,0,0,0.0,25_26,7,1
+Ferrán Torres,DT,barcelona,real sociedad,0,13,0,0,0.0,0.4,0,0,0,6,83.3,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,0,0,0,7,35.0,23.0,0,0,1,0.0,25_26,7,1
+Roony Bardghji,DT,barcelona,real sociedad,1,57,0,0,0.1,0.0,2,0,2,38,81.6,0,0,0.0,0.0,0.0,7,1,1,0,0,1,0,1,0,8,5,3,32,192.0,105.0,2,0,1,0.0,25_26,7,1
+Lamine Yamal,DT,barcelona,real sociedad,0,33,0,1,0.0,0.3,0,0,0,23,78.3,0,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,0,8,3,2,26,184.0,79.0,5,0,0,0.0,25_26,7,1
+Pedro Fernandez,MC,barcelona,real sociedad,1,45,0,0,0.0,0.1,0,0,0,25,92.0,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,0,4,4,0,16,32.0,10.0,0,1,0,100.0,25_26,7,1
+Dani Olmo,MC,barcelona,real sociedad,0,45,0,0,0.1,0.2,2,1,1,40,80.0,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,0,0,0,0,29,89.0,17.0,0,0,0,0.0,25_26,7,1
+Pedri,MC,barcelona,real sociedad,1,89,0,0,0.4,0.1,2,1,1,117,92.3,0,0,0.0,0.0,0.0,8,2,6,0,5,1,0,1,1,4,4,0,76,319.0,169.0,3,1,0,100.0,25_26,7,1
+Marc Casado,MC,barcelona,real sociedad,0,1,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0,25_26,7,1
+Frenkie de Jong,MC,barcelona,real sociedad,1,90,0,0,0.0,0.2,0,0,0,102,98.0,0,0,0.0,0.0,0.0,4,1,1,0,0,1,1,0,1,1,0,0,79,464.0,221.0,1,1,0,100.0,25_26,7,1
+Gerard Martín,DF,barcelona,real sociedad,1,77,0,0,0.0,0.0,1,1,0,74,87.8,0,0,0.0,0.0,0.0,3,3,1,0,0,0,0,0,0,2,1,1,56,173.0,83.0,2,1,0,100.0,25_26,7,1
+Eric García,DF,barcelona,real sociedad,0,13,0,0,0.0,0.0,1,1,0,8,87.5,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,4,6.0,1.0,0,1,0,100.0,25_26,7,1
+Andreas Christensen,DF,barcelona,real sociedad,1,90,0,0,0.0,0.0,1,1,0,98,98.0,0,0,0.0,0.0,0.0,6,0,0,0,0,2,1,1,6,0,0,0,76,396.0,271.0,3,4,0,100.0,25_26,7,1
+Ronald Araújo,DF,barcelona,real sociedad,1,90,0,0,0.0,0.0,1,0,1,75,96.0,0,0,0.0,0.0,0.0,6,0,0,0,0,1,0,1,5,0,0,0,61,341.0,235.0,5,3,1,75.0,25_26,7,1
+Jules Koundé,DF,barcelona,real sociedad,1,90,1,0,0.2,0.0,1,0,1,93,88.2,1,0,0.0,0.0,0.0,8,2,1,0,1,0,0,0,1,1,0,1,68,184.0,70.0,1,2,0,100.0,25_26,7,1
+Wojciech Szczęsny,PT,barcelona,real sociedad,1,90,0,0,0.0,0.0,0,0,0,35,85.7,0,0,1.0,50.0,1.0,4,0,0,0,0,0,0,0,0,0,0,0,25,62.0,29.0,0,0,0,0.0,25_26,7,1
+Mikel Oyarzabal,DT,real sociedad,barcelona,1,90,0,0,0.2,0.1,4,3,1,11,72.7,0,0,0.0,0.0,0.0,2,0,1,0,1,1,0,1,1,1,1,0,15,137.0,67.0,2,0,6,0.0,25_26,7,0
+Ander Barrenetxea,MC,real sociedad,barcelona,1,80,0,1,0.0,0.6,0,0,0,22,72.7,0,0,0.0,0.0,0.0,8,2,3,0,3,2,0,2,1,4,2,2,22,96.0,43.0,0,0,1,0.0,25_26,7,0
+Umar Sadiq,DT,real sociedad,barcelona,0,10,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,23.0,0.0,0,0,1,0.0,25_26,7,0
+Pablo Marín,MC,real sociedad,barcelona,1,66,0,0,0.0,0.0,0,0,0,10,90.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,1,0,9,22.0,11.0,0,0,0,0.0,25_26,7,0
+Brais Méndez,MC,real sociedad,barcelona,0,24,0,0,0.0,0.0,0,0,0,15,80.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,1,0,0,0,14,67.0,42.0,2,0,1,0.0,25_26,7,0
+Beñat Turrientes,MC,real sociedad,barcelona,1,65,0,0,0.0,0.0,0,0,0,8,75.0,0,0,0.0,0.0,0.0,2,2,1,0,1,0,0,0,2,3,2,1,10,73.0,30.0,0,0,0,0.0,25_26,7,0
+Carlos Soler,MC,real sociedad,barcelona,0,25,0,0,0.0,0.0,0,0,0,12,91.7,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,8,15.0,8.0,0,0,1,0.0,25_26,7,0
+Gonçalo Guedes,MC,real sociedad,barcelona,1,56,0,0,0.0,0.0,0,0,0,8,62.5,0,0,0.0,0.0,0.0,4,1,4,0,3,2,0,2,0,0,0,0,6,15.0,11.0,0,0,2,0.0,25_26,7,0
+Takefusa Kubo,MC,real sociedad,barcelona,0,34,0,0,0.1,0.1,1,1,0,16,81.3,0,0,0.0,0.0,0.0,2,1,3,0,2,1,0,1,0,2,1,1,17,68.0,20.0,0,0,0,0.0,25_26,7,0
+Jon Gorrotxategi,MC,real sociedad,barcelona,1,90,0,0,0.0,0.0,0,0,0,25,84.0,0,0,0.0,0.0,0.0,4,1,2,0,2,1,1,0,4,0,0,0,20,65.0,20.0,0,0,0,0.0,25_26,7,0
+Aihen Muñoz,DF,real sociedad,barcelona,1,90,0,0,0.1,0.1,1,1,0,32,59.4,0,0,0.0,0.0,0.0,2,6,11,0,7,1,0,1,6,0,0,0,20,105.0,65.0,3,1,0,100.0,25_26,7,0
+Duje ĆaletaCar,DF,real sociedad,barcelona,1,90,0,0,0.0,0.0,0,0,0,26,88.5,1,0,0.0,0.0,0.0,2,0,0,0,0,3,2,1,10,0,0,0,21,59.0,22.0,0,0,0,0.0,25_26,7,0
+Igor Zubeldia,DF,real sociedad,barcelona,1,90,0,0,0.0,0.0,0,0,0,21,90.5,1,0,0.0,0.0,0.0,2,3,2,0,0,2,1,1,10,0,0,0,17,54.0,23.0,0,1,2,33.3,25_26,7,0
+Álvaro Odriozola,DF,real sociedad,barcelona,1,56,1,0,0.6,0.0,1,0,1,14,85.7,0,0,0.0,0.0,0.0,10,3,2,0,0,2,2,0,2,0,0,0,7,35.0,12.0,2,1,1,50.0,25_26,7,0
+Sergio Gómez,DF,real sociedad,barcelona,0,34,0,0,0.0,0.0,0,0,0,20,75.0,0,0,0.0,0.0,0.0,2,4,3,0,1,0,0,0,0,0,0,0,13,30.0,15.0,0,0,0,0.0,25_26,7,0
+Álex Remiro,PT,real sociedad,barcelona,1,90,0,0,0.0,0.0,0,0,0,39,53.8,0,0,2.0,77.8,1.5,9,1,1,0,0,0,0,0,3,0,0,0,24,142.0,98.0,0,0,0,0.0,25_26,7,0

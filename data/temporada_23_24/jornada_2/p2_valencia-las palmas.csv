@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
-Domingos André Ribeiro Almeida,DT,valencia,las palmas,1,55,0,0,0.0,0.0,0,0,0,12,41.7,0,0,0.0,0.0,0.0,1,2,5,0,3,2,0,2,1,3,1,2,15,80.0,15.0,0,0,1,0.0
-Javier Guerra,DT,valencia,las palmas,0,35,0,0,0.0,0.0,1,1,0,19,73.7,0,0,0.0,0.0,0.0,2,0,1,0,1,1,1,0,0,2,2,0,16,135.0,70.0,4,1,1,50.0
-Hugo Duro,DT,valencia,las palmas,1,81,0,0,0.1,0.4,1,0,1,8,87.5,0,0,0.0,0.0,0.0,5,0,3,0,3,0,0,0,0,0,0,0,6,6.0,3.0,0,1,3,25.0
-Hugo González,DT,valencia,las palmas,0,9,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,0,1,0,0,0,0,0,0,0,1,0,0,6,25.0,5.0,0,0,1,0.0
-Diego López,MC,valencia,las palmas,1,69,0,0,0.1,0.0,1,0,1,16,81.3,0,0,0.0,0.0,0.0,5,2,2,0,0,3,0,3,0,1,0,1,14,98.0,50.0,2,2,1,66.7
-Pablo Gozalbez,MC,valencia,las palmas,0,21,0,0,0.0,0.0,0,0,0,7,57.1,0,0,0.0,0.0,0.0,0,0,2,0,2,0,0,0,0,1,0,1,8,15.0,3.0,0,0,1,0.0
-José Luis García Vayá,MC,valencia,las palmas,1,90,1,0,0.8,0.1,0,0,0,54,79.6,0,0,0.0,0.0,0.0,14,4,4,0,2,0,0,0,0,1,1,0,33,202.0,97.0,1,1,0,100.0
-Mouctar Diakhaby,MC,valencia,las palmas,1,69,0,0,0.0,0.0,0,0,0,26,88.5,0,0,0.0,0.0,0.0,7,0,2,0,2,0,0,0,1,0,0,0,14,63.0,31.0,0,1,0,100.0
-Jesus Vazquez,MC,valencia,las palmas,0,21,0,0,0.0,0.0,0,0,0,5,40.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,4,15.0,3.0,0,1,3,25.0
-Francisco Perez,MC,valencia,las palmas,1,81,0,0,0.1,0.0,1,1,0,25,76.0,0,0,0.0,0.0,0.0,6,0,0,0,0,0,0,0,0,6,3,3,20,119.0,59.0,3,0,0,0.0
-Dimitri Foulquier,DF,valencia,las palmas,0,9,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,0,0.0,0.0,0,0,0,0.0
-José Luis Gayà,DF,valencia,las palmas,1,90,0,0,0.0,0.1,1,1,0,41,75.6,0,0,0.0,0.0,0.0,8,3,1,0,1,0,0,0,1,3,3,0,24,163.0,95.0,4,2,0,100.0
-Cenk Özkacar,DF,valencia,las palmas,1,90,0,0,0.0,0.0,1,1,0,49,89.8,0,0,0.0,0.0,0.0,8,2,1,0,0,3,1,2,1,0,0,0,35,210.0,135.0,1,0,0,0.0
-Gabriel Paulista,DF,valencia,las palmas,1,90,0,0,0.0,0.1,1,1,0,55,87.3,0,0,0.0,0.0,0.0,9,1,1,0,0,0,0,0,4,0,0,0,43,261.0,111.0,0,1,0,100.0
-Thierry Correia,DF,valencia,las palmas,1,90,0,0,0.4,0.0,1,0,1,61,75.4,0,0,0.0,0.0,0.0,5,0,1,0,1,0,0,0,0,1,1,0,31,219.0,102.0,1,0,0,0.0
-Giorgi Mamardashvili,PT,valencia,las palmas,1,90,0,0,0.0,0.0,0,0,0,24,45.8,0,0,0.0,100.0,0.1,7,1,1,0,0,0,0,0,0,0,0,0,15,119.0,27.0,0,0,0,0.0
-Jonathan Viera,DT,las palmas,valencia,1,90,0,0,0.3,0.1,1,1,0,77,89.6,0,0,0.0,0.0,0.0,5,1,0,0,0,0,0,0,0,3,2,1,65,319.0,132.0,4,0,1,0.0
-Sandro Ramírez,DT,las palmas,valencia,1,90,0,0,0.0,0.0,0,0,0,35,82.9,0,0,0.0,0.0,0.0,4,1,0,0,0,1,0,1,1,2,2,0,30,118.0,50.0,3,1,0,100.0
-Munir El Haddadi,DT,las palmas,valencia,1,63,0,0,0.1,0.0,1,1,0,12,75.0,0,0,0.0,0.0,0.0,3,1,2,0,2,0,0,0,1,3,0,3,17,39.0,7.0,0,0,1,0.0
-Pejiño,DT,las palmas,valencia,0,27,0,0,0.0,0.0,2,1,1,10,80.0,0,0,0.0,0.0,0.0,2,1,2,0,2,0,0,0,0,0,0,0,11,73.0,17.0,0,0,0,0.0
-Enzo Loiodice,MC,las palmas,valencia,1,90,0,0,0.0,0.0,0,0,0,49,69.4,0,0,0.0,0.0,0.0,2,4,4,0,2,1,0,1,1,5,2,2,35,133.0,59.0,1,1,1,50.0
-Kirian Rodríguez,MC,las palmas,valencia,1,81,0,0,0.0,0.0,0,0,0,75,90.7,0,0,0.0,0.0,0.0,6,1,0,0,0,0,0,0,0,2,2,0,58,162.0,66.0,0,1,0,100.0
-Marc Cardona,DT,las palmas,valencia,0,9,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,1,0,0,0,6,21.0,6.0,0,0,0,0.0
-Javier Muñoz,MC,las palmas,valencia,1,90,0,0,0.0,0.0,1,1,0,38,76.3,0,0,0.0,0.0,0.0,1,0,2,0,2,1,0,1,1,0,0,0,24,94.0,24.0,0,1,1,50.0
-Daley Sinkgraven,DF,las palmas,valencia,1,22,0,0,0.0,0.0,0,0,0,16,93.8,0,0,0.0,0.0,0.0,2,1,2,0,2,0,0,0,0,0,0,0,11,31.0,11.0,0,0,0,0.0
-Sergi Cardona,DF,las palmas,valencia,0,68,0,0,0.0,0.0,0,0,0,62,85.5,0,0,0.0,0.0,0.0,3,3,4,0,1,0,0,0,1,3,1,1,40,182.0,56.0,0,0,0,0.0
-Mika Mármol,DF,las palmas,valencia,1,81,0,0,0.0,0.0,0,0,0,85,89.4,0,0,0.0,0.0,0.0,5,2,0,0,0,0,0,0,1,5,5,0,71,337.0,192.0,0,0,2,0.0
-Benito Ramírez,DF,las palmas,valencia,0,9,0,0,0.0,0.0,1,1,0,16,81.3,0,0,0.0,0.0,0.0,0,0,0,0,0,1,1,0,0,0,0,0,7,12.0,5.0,0,0,0,0.0
-Álex Suárez,DF,las palmas,valencia,1,90,0,0,0.0,0.0,0,0,0,56,98.2,0,0,0.0,0.0,0.0,6,2,1,0,0,0,0,0,7,0,0,0,43,156.0,84.0,0,3,2,60.0
-Álvaro Lemos,DF,las palmas,valencia,1,45,0,0,0.0,0.0,0,0,0,26,80.8,0,0,0.0,0.0,0.0,2,1,0,0,0,2,1,1,0,1,0,1,19,83.0,24.0,0,0,1,0.0
-Julian Araujo,DF,las palmas,valencia,0,45,0,0,0.0,0.3,1,1,0,28,85.7,0,0,0.0,0.0,0.0,0,0,0,0,0,1,1,0,0,2,1,1,19,92.0,44.0,1,4,1,80.0
-Álvaro Vallés,PT,las palmas,valencia,1,90,0,0,0.0,0.0,0,0,0,51,82.4,0,0,1.0,100.0,1.8,4,1,1,0,0,0,0,0,1,0,0,0,37,142.0,95.0,0,0,0,0.0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
+Domingos André Ribeiro Almeida,DT,valencia,las palmas,1,55,0,0,0.0,0.0,0,0,0,12,41.7,0,0,0.0,0.0,0.0,1,2,5,0,3,2,0,2,1,3,1,2,15,80.0,15.0,0,0,1,0.0,23_24,2,1
+Javier Guerra,DT,valencia,las palmas,0,35,0,0,0.0,0.0,1,1,0,19,73.7,0,0,0.0,0.0,0.0,2,0,1,0,1,1,1,0,0,2,2,0,16,135.0,70.0,4,1,1,50.0,23_24,2,1
+Hugo Duro,DT,valencia,las palmas,1,81,0,0,0.1,0.4,1,0,1,8,87.5,0,0,0.0,0.0,0.0,5,0,3,0,3,0,0,0,0,0,0,0,6,6.0,3.0,0,1,3,25.0,23_24,2,1
+Hugo González,DT,valencia,las palmas,0,9,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,0,1,0,0,0,0,0,0,0,1,0,0,6,25.0,5.0,0,0,1,0.0,23_24,2,1
+Diego López,MC,valencia,las palmas,1,69,0,0,0.1,0.0,1,0,1,16,81.3,0,0,0.0,0.0,0.0,5,2,2,0,0,3,0,3,0,1,0,1,14,98.0,50.0,2,2,1,66.7,23_24,2,1
+Pablo Gozalbez,MC,valencia,las palmas,0,21,0,0,0.0,0.0,0,0,0,7,57.1,0,0,0.0,0.0,0.0,0,0,2,0,2,0,0,0,0,1,0,1,8,15.0,3.0,0,0,1,0.0,23_24,2,1
+José Luis García Vayá,MC,valencia,las palmas,1,90,1,0,0.8,0.1,0,0,0,54,79.6,0,0,0.0,0.0,0.0,14,4,4,0,2,0,0,0,0,1,1,0,33,202.0,97.0,1,1,0,100.0,23_24,2,1
+Mouctar Diakhaby,MC,valencia,las palmas,1,69,0,0,0.0,0.0,0,0,0,26,88.5,0,0,0.0,0.0,0.0,7,0,2,0,2,0,0,0,1,0,0,0,14,63.0,31.0,0,1,0,100.0,23_24,2,1
+Jesus Vazquez,MC,valencia,las palmas,0,21,0,0,0.0,0.0,0,0,0,5,40.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,4,15.0,3.0,0,1,3,25.0,23_24,2,1
+Francisco Perez,MC,valencia,las palmas,1,81,0,0,0.1,0.0,1,1,0,25,76.0,0,0,0.0,0.0,0.0,6,0,0,0,0,0,0,0,0,6,3,3,20,119.0,59.0,3,0,0,0.0,23_24,2,1
+Dimitri Foulquier,DF,valencia,las palmas,0,9,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,0,0.0,0.0,0,0,0,0.0,23_24,2,1
+José Luis Gayà,DF,valencia,las palmas,1,90,0,0,0.0,0.1,1,1,0,41,75.6,0,0,0.0,0.0,0.0,8,3,1,0,1,0,0,0,1,3,3,0,24,163.0,95.0,4,2,0,100.0,23_24,2,1
+Cenk Özkacar,DF,valencia,las palmas,1,90,0,0,0.0,0.0,1,1,0,49,89.8,0,0,0.0,0.0,0.0,8,2,1,0,0,3,1,2,1,0,0,0,35,210.0,135.0,1,0,0,0.0,23_24,2,1
+Gabriel Paulista,DF,valencia,las palmas,1,90,0,0,0.0,0.1,1,1,0,55,87.3,0,0,0.0,0.0,0.0,9,1,1,0,0,0,0,0,4,0,0,0,43,261.0,111.0,0,1,0,100.0,23_24,2,1
+Thierry Correia,DF,valencia,las palmas,1,90,0,0,0.4,0.0,1,0,1,61,75.4,0,0,0.0,0.0,0.0,5,0,1,0,1,0,0,0,0,1,1,0,31,219.0,102.0,1,0,0,0.0,23_24,2,1
+Giorgi Mamardashvili,PT,valencia,las palmas,1,90,0,0,0.0,0.0,0,0,0,24,45.8,0,0,0.0,100.0,0.1,7,1,1,0,0,0,0,0,0,0,0,0,15,119.0,27.0,0,0,0,0.0,23_24,2,1
+Jonathan Viera,DT,las palmas,valencia,1,90,0,0,0.3,0.1,1,1,0,77,89.6,0,0,0.0,0.0,0.0,5,1,0,0,0,0,0,0,0,3,2,1,65,319.0,132.0,4,0,1,0.0,23_24,2,0
+Sandro Ramírez,DT,las palmas,valencia,1,90,0,0,0.0,0.0,0,0,0,35,82.9,0,0,0.0,0.0,0.0,4,1,0,0,0,1,0,1,1,2,2,0,30,118.0,50.0,3,1,0,100.0,23_24,2,0
+Munir El Haddadi,DT,las palmas,valencia,1,63,0,0,0.1,0.0,1,1,0,12,75.0,0,0,0.0,0.0,0.0,3,1,2,0,2,0,0,0,1,3,0,3,17,39.0,7.0,0,0,1,0.0,23_24,2,0
+Pejiño,DT,las palmas,valencia,0,27,0,0,0.0,0.0,2,1,1,10,80.0,0,0,0.0,0.0,0.0,2,1,2,0,2,0,0,0,0,0,0,0,11,73.0,17.0,0,0,0,0.0,23_24,2,0
+Enzo Loiodice,MC,las palmas,valencia,1,90,0,0,0.0,0.0,0,0,0,49,69.4,0,0,0.0,0.0,0.0,2,4,4,0,2,1,0,1,1,5,2,2,35,133.0,59.0,1,1,1,50.0,23_24,2,0
+Kirian Rodríguez,MC,las palmas,valencia,1,81,0,0,0.0,0.0,0,0,0,75,90.7,0,0,0.0,0.0,0.0,6,1,0,0,0,0,0,0,0,2,2,0,58,162.0,66.0,0,1,0,100.0,23_24,2,0
+Marc Cardona,DT,las palmas,valencia,0,9,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,1,0,0,0,6,21.0,6.0,0,0,0,0.0,23_24,2,0
+Javier Muñoz,MC,las palmas,valencia,1,90,0,0,0.0,0.0,1,1,0,38,76.3,0,0,0.0,0.0,0.0,1,0,2,0,2,1,0,1,1,0,0,0,24,94.0,24.0,0,1,1,50.0,23_24,2,0
+Daley Sinkgraven,DF,las palmas,valencia,1,22,0,0,0.0,0.0,0,0,0,16,93.8,0,0,0.0,0.0,0.0,2,1,2,0,2,0,0,0,0,0,0,0,11,31.0,11.0,0,0,0,0.0,23_24,2,0
+Sergi Cardona,DF,las palmas,valencia,0,68,0,0,0.0,0.0,0,0,0,62,85.5,0,0,0.0,0.0,0.0,3,3,4,0,1,0,0,0,1,3,1,1,40,182.0,56.0,0,0,0,0.0,23_24,2,0
+Mika Mármol,DF,las palmas,valencia,1,81,0,0,0.0,0.0,0,0,0,85,89.4,0,0,0.0,0.0,0.0,5,2,0,0,0,0,0,0,1,5,5,0,71,337.0,192.0,0,0,2,0.0,23_24,2,0
+Benito Ramírez,DF,las palmas,valencia,0,9,0,0,0.0,0.0,1,1,0,16,81.3,0,0,0.0,0.0,0.0,0,0,0,0,0,1,1,0,0,0,0,0,7,12.0,5.0,0,0,0,0.0,23_24,2,0
+Álex Suárez,DF,las palmas,valencia,1,90,0,0,0.0,0.0,0,0,0,56,98.2,0,0,0.0,0.0,0.0,6,2,1,0,0,0,0,0,7,0,0,0,43,156.0,84.0,0,3,2,60.0,23_24,2,0
+Álvaro Lemos,DF,las palmas,valencia,1,45,0,0,0.0,0.0,0,0,0,26,80.8,0,0,0.0,0.0,0.0,2,1,0,0,0,2,1,1,0,1,0,1,19,83.0,24.0,0,0,1,0.0,23_24,2,0
+Julian Araujo,DF,las palmas,valencia,0,45,0,0,0.0,0.3,1,1,0,28,85.7,0,0,0.0,0.0,0.0,0,0,0,0,0,1,1,0,0,2,1,1,19,92.0,44.0,1,4,1,80.0,23_24,2,0
+Álvaro Vallés,PT,las palmas,valencia,1,90,0,0,0.0,0.0,0,0,0,51,82.4,0,0,1.0,100.0,1.8,4,1,1,0,0,0,0,0,1,0,0,0,37,142.0,95.0,0,0,0,0.0,23_24,2,0
