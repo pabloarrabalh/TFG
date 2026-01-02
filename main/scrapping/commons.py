@@ -10,6 +10,7 @@ Módulo de utilidades genéricas:
 - Lógica genérica de colapso de registros de Fantasy y postprocesado de DataFrames.
 """
 
+
 import re
 import unicodedata
 from collections import defaultdict
@@ -57,7 +58,6 @@ def normalizar_texto(texto):
 def normalizar_equipo(nombre_equipo: str) -> str:
     """
     Normaliza un nombre de equipo y aplica ALIAS_EQUIPOS.
-
     Devuelve un identificador canónico de equipo (ej: "atletico madrid").
     """
     nombre_norm = normalizar_texto(nombre_equipo)
@@ -316,19 +316,13 @@ def obtener_match_nombre(nombre_html_norm, nombres_norm_equipo, equipo_norm=None
     """
     Resuelve el mejor match fuzzy entre un nombre de HTML (FBRef) y una lista
     de nombres normalizados de Fantasy/CSV.
-
-    Lógica:
-      1. Si son dos palabras y el segundo es apellido crítico, intenta matchear
-         solo por el nombre.
-      2. Si es una palabra y no es apellido crítico, se trata como apodo
-         (inicio/fin de nombre).
-      3. Fuzzy matching con WRatio (RapidFuzz) con score_cutoff.
     """
     if not nombres_norm_equipo:
         return None, 0
 
     partes = nombre_html_norm.split()
 
+    # Caso 1: dos palabras y apellido crítico -> intentar solo por nombre
     if len(partes) == 2:
         nombre = partes[0]
         apellido = partes[1]
@@ -343,6 +337,7 @@ def obtener_match_nombre(nombre_html_norm, nombres_norm_equipo, equipo_norm=None
                 unico = candidatos_nombre[0]
                 return unico, 100
 
+    # Caso 2: una palabra no crítica -> apodo
     if len(partes) == 1:
         palabra = partes[0]
 
@@ -358,6 +353,7 @@ def obtener_match_nombre(nombre_html_norm, nombres_norm_equipo, equipo_norm=None
             if len(candidatos) == 1:
                 return candidatos[0], 95
 
+    # Caso 3: fuzzy normal
     mejor, score, _ = process.extractOne(
         nombre_html_norm,
         nombres_norm_equipo,
@@ -384,8 +380,6 @@ def coincide_inicial_apellido(nombre1, nombre2):
     Comprueba si dos nombres coinciden en:
       - apellido exacto
       - y la inicial del nombre de pila (permitiendo abreviaturas tipo 'J.')
-
-    Se usa como heurística cuando no hay match directo entre Fantasy y FBRef.
     """
     partes1 = nombre1.split()
     partes2 = nombre2.split()
@@ -458,11 +452,7 @@ def normalizar_equipo_temporada(nombre: str) -> str:
 
 def aplicar_alias_jugador_temporada(nombre: str, equipo_norm: str, temporada: str) -> str:
     """
-    Aplica alias de jugadores específicos de una temporada y un equipo:
-
-        nombre_largo_norm -> alias_corto_norm
-
-    Si no hay alias definido, devuelve el nombre original.
+    Aplica alias de jugadores específicos de una temporada y un equipo.
     """
     alias_jug = get_alias_jugadores(temporada)
 
@@ -485,15 +475,7 @@ def aplicar_alias_jugador_temporada(nombre: str, equipo_norm: str, temporada: st
 def construir_fantasy_por_norm(fantasy_partido: dict):
     """
     A partir de un diccionario de Fantasy de partido:
-
         { clave_ff: info }
-
-    donde info contiene:
-        - nombre_norm
-        - equipo_norm
-        - posicion
-        - minutos (opcional)
-        - puntos
 
     construye:
         - jugadores_por_apellido_equipo:
@@ -501,15 +483,6 @@ def construir_fantasy_por_norm(fantasy_partido: dict):
 
         - fantasy_por_norm:
             clave_norm -> lista de entradas Fantasy
-
-      clave_norm:
-        - (nombre_norm, equipo_norm) si apellido NO crítico
-        - (nombre_norm, equipo_norm) si apellido crítico pero único
-        - (nombre_norm, equipo_norm, pos_clave) si apellido crítico y duplicado
-
-    Además colapsa duplicados por (nombre_norm, equipo_norm) quedándose con:
-      - Si alguno tiene minutos > 0, el de más minutos.
-      - Si todos tienen minutos = 0, el de más puntos.
     """
     agrupado = defaultdict(list)
     for clave_ff, info in fantasy_partido.items():
@@ -597,19 +570,24 @@ def postprocesar_df_partido(df):
     if "Equipo_rival" in df.columns:
         df["Equipo_rival"] = df["Equipo_rival"].apply(normalizar_equipo_temporada)
 
-    mask_no_portero = df["posicion"] != "PT"
-    df.loc[mask_no_portero, "Goles_en_contra"] = 0.0
-    df.loc[mask_no_portero, "Porcentaje_paradas"] = 0.0
+    # Porteros vs no porteros
+    if "posicion" in df.columns:
+        mask_no_portero = df["posicion"] != "PT"
+        if "Goles_en_contra" in df.columns:
+            df.loc[mask_no_portero, "Goles_en_contra"] = 0.0
+        if "Porcentaje_paradas" in df.columns:
+            df.loc[mask_no_portero, "Porcentaje_paradas"] = 0.0
 
+    # Tarjetas
     if "Amarillas" not in df.columns:
         df["Amarillas"] = 0
-
     if "Rojas" not in df.columns:
         df["Rojas"] = 0
 
     df["Amarillas"] = df["Amarillas"].fillna(0).astype(int)
     df["Rojas"] = df["Rojas"].fillna(0).astype(int)
 
+    # Rellenar NaN genérico
     df = df.fillna(0)
 
     return df
@@ -620,8 +598,6 @@ def contar_tarjetas_banquillo(df):
     Devuelve un DataFrame con los jugadores que:
       - Tienen al menos una amarilla o roja.
       - Tienen 0 minutos jugados.
-
-    Se usa para detectar expulsiones/sanciones desde el banquillo.
     """
     if df is None or df.empty:
         return pd.DataFrame()

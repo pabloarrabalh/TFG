@@ -8,8 +8,30 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import cloudscraper
 
-from commons import *
-from alias import*
+from commons import (
+    normalizar_texto,
+    normalizar_equipo_temporada,
+    aplicar_alias_jugador_temporada,
+    limpiar_minuto,
+    extraer_nombre_jugador,
+    to_int,
+    to_float,
+    mapear_posicion,
+    normalizar_pos_clave,
+    obtener_match_nombre,
+    nombre_a_mayus,
+    coincide_inicial_apellido,
+    construir_fantasy_por_norm,
+    postprocesar_df_partido,
+    contar_tarjetas_banquillo,
+)
+from alias import (
+    APELLIDOS_CRITICOS,
+    MAPEO_STATS,
+    COLUMNAS_MODELO,
+    UMBRAL_MATCH,
+)
+
 
 # ========== LOGGING ==========
 logging.basicConfig(
@@ -17,6 +39,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 logger = logging.getLogger(__name__)
+
 
 def log_jugadores_sin_entrada():
     logger.info(
@@ -27,18 +50,10 @@ def log_jugadores_sin_entrada():
     )
 
 
-# =====================================================
-# CONFIG GLOBAL DEPENDIENTE DE TEMPORADA
-# =====================================================
-
 TEMPORADA_ACTUAL = "25_26"  # valor por defecto
 
 
 def _build_rutas_temporada(temporada: str):
-    """
-    Construye (y crea si no existen) las carpetas de HTML y CSV
-    asociadas a una temporada concreta.
-    """
     carpeta_html = os.path.join("main", "html", f"temporada_{temporada}")
     carpeta_csv = os.path.join("data", f"temporada_{temporada}")
     os.makedirs(carpeta_html, exist_ok=True)
@@ -57,22 +72,7 @@ scraper = cloudscraper.create_scraper(
 )
 
 
-# =====================================================
-# LÓGICA FBREF + FANTASY (HTML + flujo)
-# =====================================================
-
-
 def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo=None):
-    """
-    Parsea una tabla de FBRef (summary, passing, defense, misc, keepers, etc.)
-    y devuelve un diccionario:
-
-        { nombre_norm: fila_pandas }
-
-    Añadiendo columnas auxiliares:
-        - "__nombre_norm"
-        - "__equipo_norm"
-    """
     caption = tabla_html.find("caption")
     if caption:
         texto_caption = caption.get_text(strip=True)
@@ -135,7 +135,6 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo=None):
             nombre, equipo_norm, TEMPORADA_ACTUAL
         )
         nombre_norm = normalizar_texto(nombre_con_alias)
-
         nombre_base_norm = normalizar_texto(nombre)
 
         fila = fila.copy()
@@ -152,14 +151,6 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo=None):
 
 
 def rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val):
-    """
-    Rellena en fila_salida las estadísticas del jugador a partir
-    de las tablas de FBRef en tablas_por_tipo usando MAPEO_STATS.
-
-    Además:
-      - Calcula TiroFallado_partido y TiroPuerta_partido.
-      - Solo para porteros, rellena Goles_en_contra, Porcentaje_paradas y PSxG.
-    """
     for tipo, cfg in MAPEO_STATS.items():
         mapa_tipo = tablas_por_tipo.get(tipo, {})
         fila_tipo = mapa_tipo.get(clave_fbref)
@@ -246,7 +237,6 @@ def obtener_calendario():
     if os.path.exists(ruta_local):
         with open(ruta_local, "r", encoding="utf-8") as f:
             html = f.read()
-    
 
     soup = BeautifulSoup(html, "lxml")
     calendario = {}
@@ -291,14 +281,6 @@ def obtener_calendario():
 
 
 def obtener_fantasy_jornada(jornada):
-    """
-    Parsea el archivo puntos.html de LaLiga Fantasy para una jornada:
-
-        main/html/temporada_<TEMPORADA_ACTUAL>/j<jornada>/puntos.html
-
-    Devuelve:
-        { "equipoA-equipoB": { clave_ff: info_jugador, ... }, ... }
-    """
     ruta_puntos = os.path.join(CARPETA_HTML, f"j{jornada}", "puntos.html")
 
     if not os.path.exists(ruta_puntos):
@@ -429,7 +411,6 @@ def obtener_nombres_partido(html_partido):
     A partir del HTML de un partido de FBRef, intenta extraer:
         - equipo_local
         - equipo_visitante
-
     Usando la etiqueta <title> y el patrón "Local vs. Visitante Match".
     """
     soup = BeautifulSoup(html_partido, "lxml")
@@ -450,13 +431,9 @@ def obtener_nombres_partido(html_partido):
     return equipo_local, equipo_visitante
 
 
-def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
+def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido, jornada):
     """
-    Core de integración FBRef + Fantasy para un partido:
-      - Parsea HTML de FBRef (stats por tipo).
-      - Parsea Fantasy (ya pasado como mapa_fantasy_partido).
-      - Hace fuzzy matching de nombres por equipo/apellido/posición.
-      - Construye un DataFrame con todas las columnas de COLUMNAS_MODELO.
+    Core de integración FBRef + Fantasy para un partido.
     """
     soup = BeautifulSoup(html_partido, "lxml")
     tag_title = soup.find("title")
@@ -754,14 +731,25 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
         if clave_registro not in bd_partido:
             fila_nueva = {col: np.nan for col in COLUMNAS_MODELO}
 
+            # Contexto
+            fila_nueva["temporada"] = TEMPORADA_ACTUAL
+            fila_nueva["jornada"] = jornada
+
+            # Entidad
             fila_nueva["player"] = nombre_fb
+            fila_nueva["posicion"] = pos_val
             fila_nueva["Equipo_propio"] = equipo_fb_norm
             fila_nueva["Equipo_rival"] = equipo_rival_norm
+
+            # Flags
+            fila_nueva["local"] = 1 if equipo_fb_norm == local_norm else 0
             fila_nueva["Titular"] = 1 if nombre_fb in titulares else 0
+            fila_nueva["Min_partido"] = minutos
+
+            # Stats portero inicializadas
             fila_nueva["Goles_en_contra"] = np.nan
             fila_nueva["Porcentaje_paradas"] = np.nan
             fila_nueva["PSxG"] = np.nan
-            fila_nueva["posicion"] = pos_val
 
             bd_partido[clave_registro] = fila_nueva
 
@@ -799,7 +787,7 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
 
             logger.debug(
                 "[DEBUG 6767] player_fb=%s | nombre_fb_norm=%s | equipo_fb=%s | "
-                "pos_fb=%s | minutos_fb=%s | clave_fbref=%s | "
+                "pos_fb=%s | min: %s | clave_fbref=%s | "
                 "mejor_norm=%s | score=%.2f | clave_norm=%s | "
                 "clave_ff_asignada=%s | candidatos_fantasy=%s",
                 nombre_fb,
@@ -894,10 +882,13 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
 
         fila = {col: 0 for col in COLUMNAS_MODELO}
 
+        fila["temporada"] = TEMPORADA_ACTUAL
+        fila["jornada"] = jornada
         fila["player"] = nombre_a_mayus(nombre_canonico_ff)
         fila["posicion"] = pos_val
         fila["Equipo_propio"] = equipo_norm
         fila["Equipo_rival"] = equipo_rival_norm
+        fila["local"] = 1 if equipo_norm == local_norm else 0
         fila["Titular"] = 0
         fila["Min_partido"] = 0
         fila["puntosFantasy"] = puntos
@@ -923,11 +914,7 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido):
 
 def procesar_jornada(jornada: int):
     """
-    Procesa los 10 partidos de una jornada:
-      - Carga puntos Fantasy.
-      - Lee HTMLs p1.html..p10.html si existen.
-      - Genera un CSV por partido.
-      - Muestra jugadores con tarjetas desde el banquillo.
+    Procesa los 10 partidos de una jornada.
     """
     sj = str(jornada)
     print(f"\n=== JORNADA {sj} (temp {TEMPORADA_ACTUAL}) ===")
@@ -956,6 +943,7 @@ def procesar_jornada(jornada: int):
             html_partido,
             fantasy_partido,
             idx_partido,
+            jornada,
         )
         if df_partido is not None and not df_partido.empty:
             eq_loc_norm = normalizar_texto(eq_loc_csv)
@@ -1005,10 +993,7 @@ def analizar_temporada(codigo_temporada: str, j_ini: int = 1, j_fin: int = 38):
 
 def procesar_un_partido(jornada: int, idx_partido: int):
     """
-    Procesa un único partido (útil para debug):
-      - Lee p<idx_partido>.html.
-      - Hace matching FBRef + Fantasy.
-      - Genera un CSV de salida.
+    Procesa un único partido (útil para debug).
     """
     sj = str(jornada)
 
@@ -1039,6 +1024,7 @@ def procesar_un_partido(jornada: int, idx_partido: int):
         html_partido,
         fantasy_partido,
         idx_partido,
+        jornada,
     )
 
     if df_partido is None or df_partido.empty:

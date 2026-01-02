@@ -280,8 +280,14 @@ def _comparar_campos_stats(
     get_keepers,
     get_defense,
     get_possession,
+    codigo_temporada,
+    num_jornada,
 ):
     campos_a_comprobar = [
+        # contexto
+        ("temporada", lambda: (fila_csv.get("temporada", ""), codigo_temporada)),
+        ("jornada",   lambda: (fila_csv.get("jornada", ""), num_jornada)),
+        # minutos y goles
         ("Min_partido", lambda: (fila_csv.get("Min_partido", ""), get_summary("Min"))),
         ("Gol_partido", lambda: (fila_csv.get("Gol_partido", ""), get_summary("Gls"))),
         ("Asist_partido", lambda: (fila_csv.get("Asist_partido", ""), get_summary("Ast"))),
@@ -395,7 +401,7 @@ def _comparar_campos_stats(
     return campos_mal, discrepancias
 
 
-def analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador):
+def analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador, codigo_temporada, num_jornada):
     info = comparar_partido_stats_precalculado(jugadores_html, df_csv, nombre_jugador)
     if info is None:
         return {
@@ -414,7 +420,8 @@ def analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador
 
     campos_mal, discrepancias = _comparar_campos_stats(
         fila_csv, es_portero, get_summary, get_passing,
-        get_misc, get_keepers, get_defense, get_possession
+        get_misc, get_keepers, get_defense, get_possession,
+        codigo_temporada, num_jornada,
     )
 
     return {
@@ -526,7 +533,9 @@ def analizar_jugador(codigo_temporada: str, num_jornada: int, num_partido: int, 
     df_csv = pd.read_csv(path_csv)
     df_csv = añadir_equipo_y_player_norm(df_csv)
 
-    resultado = analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador)
+    resultado = analizar_jugador_interno_precalculado(
+        jugadores_html, df_csv, nombre_jugador, codigo_temporada, num_jornada
+    )
     mostrar_analisis_jugador(resultado)
 
 
@@ -561,7 +570,9 @@ def analizar_partido_completo(codigo_temporada: str, num_jornada: int, num_parti
 
     for _, fila in df_csv.iterrows():
         nombre_jugador = fila["player"]
-        resultado = analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador)
+        resultado = analizar_jugador_interno_precalculado(
+            jugadores_html, df_csv, nombre_jugador, codigo_temporada, num_jornada
+        )
 
         if not resultado["ok"]:
             print(f"\n[ERROR] {nombre_jugador}")
@@ -774,7 +785,8 @@ def comparar_jugador_completo(codigo_temporada: str, num_jornada: int,
 
     campos_mal, discrepancias = _comparar_campos_stats(
         fila_csv, es_portero, get_summary, get_passing,
-        get_misc, get_keepers, get_defense, get_possession
+        get_misc, get_keepers, get_defense, get_possession,
+        codigo_temporada, num_jornada,
     )
 
     print(f"{'Campo':35s} | {'CSV':>10s} | {'HTML':>10s} | {'OK?':>3s}")
@@ -783,6 +795,7 @@ def comparar_jugador_completo(codigo_temporada: str, num_jornada: int,
     discrep_map = {d["campo"]: d for d in discrepancias}
 
     for campo, _ in [
+        ("temporada", None), ("jornada", None),
         ("Min_partido", None), ("Gol_partido", None), ("Asist_partido", None),
         ("xG_partido", None), ("Tiros", None), ("TiroFallado_partido", None),
         ("TiroPuerta_partido", None), ("Pases_Totales", None),
@@ -810,4 +823,4 @@ def comparar_jugador_completo(codigo_temporada: str, num_jornada: int,
 
 
 if __name__ == "__main__":
-    analizar_rango_jornadas("23_24", 1, 38)
+    analizar_rango_jornadas("24_25", 1, 5)
