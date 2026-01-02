@@ -53,7 +53,7 @@ ALIAS_JUGADORES_POR_TEMPORADA = {
     },
     "23_24":{
         "athletic": {  "nico williams": "n williams", "inaki williams": "i williams", },
-        "villarreal": {"alexander sorloth": "sorloth"}, 
+        "villarreal": {"alexander sorloth": "sorloth","alberto moreno": "a moreno",}, 
         "valencia": {"jose luis garcia vaya": "pepelu","cristian":"rivero","ruben lendinez":"iranzo"},
         "almeria":{"marko milovanovic": "marezi",},
         "rayo": {"isaac palazon camacho": "isi"},
@@ -65,8 +65,7 @@ ALIAS_JUGADORES_POR_TEMPORADA = {
         "granada":{"adri bosch":"miki bosch"},
         "betis": {"ezequiel avila": "chimy"},
         "girona": {"viktor tsyhankov": "tsygankov","savio":"savinho" },
-
-
+        "las palmas": {"sergi cardona": "s cardona",}
     }
 }
 

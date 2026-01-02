@@ -19,7 +19,7 @@ from alias import get_alias_jugadores_reverse  # usamos alias invertidos
 # CONFIG DEBUG / LOG
 # =====================================================
 
-DEBUG_DETALLE = False  # ponlo a True solo cuando quieras ver trazas detalladas
+DEBUG_DETALLE = True  # ponlo a True solo cuando quieras ver trazas detalladas
 
 
 # =====================================================
@@ -690,6 +690,6 @@ def comparar_partido(
 
 if __name__ == "__main__":
     # ejemplo: rango completo
-    comprobar_rango_jornadas("23_24", 1, 38)
+    comprobar_rango_jornadas("23_24", 1, 2)
     # o solo un partido:
     # comparar_partido("24_25", 15, 2)

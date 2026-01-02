@@ -1182,7 +1182,7 @@ def procesar_un_partido(jornada: int, idx_partido: int):
 
 
 if __name__ == "__main__":
-    analizar_temporada("23_24", 30,38)
+    analizar_temporada("23_24", 1,5)
     '''
     TEMPORADA_ACTUAL = "24_25"
     CARPETA_HTML, CARPETA_CSV = _build_rutas_temporada(TEMPORADA_ACTUAL)
