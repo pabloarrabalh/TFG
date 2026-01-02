@@ -50,34 +50,16 @@ ALIAS_JUGADORES_POR_TEMPORADA = {
         "sevilla": {"joaquin martinez gauna": "oso"},
     },
     "24_25": {
-        "atletico madrid": {"alexander sorloth": "sorloth"},
+        "atletico madrid": {"alexander sorloth": "sorloth"}, #TOCADO
         "las palmas":{"fabio": "fabio gonzalez","jose carlos gonzalez": "josito", },
         "athletic": {  "nico williams": "n williams", "inaki williams": "i williams", },
         "rayo": {"isaac palazon camacho": "isi"},
         "valencia": {"jose luis garcia vaya": "pepelu"},
         "betis": {"ezequiel avila": "chimy", },
         "espanyol": {"antoniu": "roca"},
-        "mallorca": {"antonio sanchez": "antonio"},
-        "girona": {
-        # FBRef: Arnau Martinez  -> Fantasy: Arnau
-        "arnau martinez": "arnau",
-        "arnaut danjuma": "danjuma",
-        "viktor tsyhankov": "tsygankov",
-
-        # FBRef: Yangel Herrera   -> Fantasy: Herrera (esto ya lo tenías)
-        "yangel herrera": "herrera",
-        },
-        "getafe": {
-        # FBRef: Bertuğ Yıldırım  -> Fantasy: Yildirim
-        "bertug yıldırım": "yildirim",
-        # FBRef: John Joe         -> Fantasy: Patrick Finn
-        "john joe": "patrick finn",
-        }, 
-        "sevilla": {
-            # NUEVO: FBRef Álvaro Pascual -> Fantasy García Pascual
-            "alvaro pascual": "garcia pascual",
-            "diego iturralde": "hormigo",
-        },
+        "girona": {"arnaut danjuma": "danjuma","viktor tsyhankov": "tsygankov", },
+        "getafe": { "bertug yıldırım": "yildirim", "john joe": "patrick finn",}, 
+        "sevilla": { "alvaro pascual": "garcia pascual","diego iturralde": "hormigo"},
         "valladolid":{"adrian baquerin": "arnu",},
         "leganes":{"adria altimira": "altimira",}
     },

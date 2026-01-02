@@ -810,4 +810,4 @@ def comparar_jugador_completo(codigo_temporada: str, num_jornada: int,
 
 
 if __name__ == "__main__":
-    analizar_rango_jornadas("24_25", 10, 20)
+    analizar_rango_jornadas("24_25", 1, 38)
