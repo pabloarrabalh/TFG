@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Jørgen Strand Larsen,DT,celta,villarreal,1,90,1,0,1.9,0.0,6,3,3,22,90.9,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,1,0,1,18,63.0,6.0,0,1,1,50.0
+Williot Swedberg,DT,celta,villarreal,1,64,0,0,0.1,0.0,3,3,0,12,66.7,1,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,0,2,0,2,12,90.0,67.0,2,1,0,100.0
+Franco Cervi,DT,celta,villarreal,0,26,0,0,0.2,0.6,2,2,0,23,95.7,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,0,0,0,17,97.0,35.0,1,0,0,0.0
+Iago Aspas,DT,celta,villarreal,1,90,1,1,1.2,0.6,1,1,0,62,93.5,0,0,0.0,0.0,0.0,17,0,0,0,0,0,0,0,0,0,0,0,51,340.0,185.0,4,0,1,0.0
+Hugo Álvarez,MC,celta,villarreal,1,79,0,0,0.1,0.0,1,0,1,40,92.5,0,0,0.0,0.0,0.0,0,2,4,0,3,0,0,0,0,2,1,1,26,138.0,90.0,3,0,0,0.0
+Anastasios Douvikas,DT,celta,villarreal,0,11,1,0,0.1,0.3,1,0,1,4,100.0,1,0,0.0,0.0,0.0,8,2,2,0,0,0,0,0,0,0,0,0,3,23.0,14.0,1,0,1,0.0
+Fran Beltrán,MC,celta,villarreal,1,79,0,0,0.1,0.1,2,2,0,59,98.3,0,0,0.0,0.0,0.0,2,3,3,0,3,1,1,0,1,0,0,0,50,208.0,97.0,0,0,0,0.0
+Carles Pérez,MC,celta,villarreal,0,11,0,0,0.0,0.0,1,0,1,6,100.0,0,0,0.0,0.0,0.0,2,0,1,0,1,1,1,0,0,0,0,0,7,27.0,5.0,0,0,0,0.0
+Damián Rodríguez,MC,celta,villarreal,1,45,0,1,0.0,0.5,1,1,0,48,93.8,1,0,0.0,0.0,0.0,0,0,0,0,0,1,1,0,0,0,0,0,35,96.0,47.0,1,0,0,0.0
+Mihailo Ristić,DF,celta,villarreal,0,45,0,0,0.0,0.0,1,1,0,42,85.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,1,1,0,36,223.0,140.0,2,0,0,0.0
+Óscar Mingueza,MC,celta,villarreal,1,90,0,0,0.0,0.8,1,1,0,89,91.0,0,0,0.0,0.0,0.0,3,3,1,0,0,0,0,0,2,0,0,0,65,230.0,151.0,6,0,0,0.0
+Jailson Siqueira,DF,celta,villarreal,1,90,0,0,0.0,0.0,0,0,0,72,91.7,0,0,0.0,0.0,0.0,4,2,5,0,4,0,0,0,1,0,0,0,53,290.0,210.0,0,2,3,40.0
+Carl Starfelt,DF,celta,villarreal,1,90,0,0,0.0,0.0,0,0,0,50,98.0,0,0,0.0,0.0,0.0,4,2,1,0,0,2,1,1,3,0,0,0,31,85.0,26.0,0,2,0,100.0
+Javier Manquillo,DF,celta,villarreal,1,45,0,0,0.0,0.0,0,0,0,38,94.7,1,0,0.0,0.0,0.0,0,1,0,0,0,0,0,0,0,0,0,0,25,71.0,47.0,0,0,0,0.0
+Luca de la Torre,MC,celta,villarreal,0,45,0,0,0.1,0.0,2,2,0,37,89.2,0,0,0.0,0.0,0.0,1,1,1,0,1,0,0,0,0,0,0,0,26,174.0,109.0,2,0,0,0.0
+Vicente Guaita,PT,celta,villarreal,1,90,0,0,0.0,0.0,0,0,0,27,81.5,0,0,2.0,33.3,0.7,1,0,0,0,0,0,0,0,0,0,0,0,16,71.0,51.0,0,0,0,0.0
+Alexander Sørloth,DT,villarreal,celta,1,90,0,1,0.1,0.2,2,2,0,30,90.0,0,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,0,3,3,0,20,191.0,51.0,4,2,2,50.0
+Gonçalo Guedes,DT,villarreal,celta,1,73,1,0,0.1,0.0,2,1,1,26,76.9,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,2,1,1,20,149.0,43.0,1,0,1,0.0
+José Luis Morales,DT,villarreal,celta,0,17,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,3,5.0,0.0,0,0,1,0.0
+Alex Baena,MC,villarreal,celta,1,90,0,0,0.3,0.1,5,4,1,52,82.7,0,0,0.0,0.0,0.0,-1,1,1,0,0,0,0,0,0,2,1,1,37,222.0,122.0,4,0,0,0.0
+Daniel Parejo,MC,villarreal,celta,1,78,0,1,0.0,0.1,0,0,0,59,91.5,0,0,0.0,0.0,0.0,7,0,0,0,0,2,1,1,1,1,1,0,30,88.0,39.0,0,0,1,0.0
+Étienne Capoue,MC,villarreal,celta,0,12,0,0,0.0,0.0,0,0,0,7,85.7,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,2,7.0,2.0,0,0,0,0.0
+Santi Comesaña,MC,villarreal,celta,1,16,0,0,0.0,0.0,0,0,0,12,83.3,0,1,0.0,0.0,0.0,-2,1,1,0,1,0,0,0,0,0,0,0,8,22.0,8.0,0,0,0,0.0
+Ilias Akhomach,MC,villarreal,celta,1,55,0,0,0.0,0.0,1,1,0,21,81.0,0,0,0.0,0.0,0.0,4,1,1,0,1,0,0,0,0,8,5,2,27,212.0,133.0,4,0,0,0.0
+Francis Coquelin,MC,villarreal,celta,0,35,0,0,0.0,0.0,0,0,0,23,91.3,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,8,8.0,4.0,0,0,0,0.0
+Alberto Moreno,DF,villarreal,celta,1,55,1,0,0.0,0.1,1,0,1,29,96.6,0,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,2,0,0,0,14,41.0,29.0,1,0,0,0.0
+Alfonso Pedraza,DF,villarreal,celta,0,35,0,0,0.0,0.1,0,0,0,17,76.5,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,3,1,2,12,94.0,64.0,1,1,0,100.0
+Yerson Mosquera,DF,villarreal,celta,1,45,0,0,0.0,0.0,0,0,0,36,86.1,0,0,0.0,0.0,0.0,1,0,0,0,0,1,1,0,3,0,0,0,24,67.0,45.0,0,0,0,0.0
+Jorge Cuenca,DF,villarreal,celta,0,45,0,0,0.0,0.0,0,0,0,38,89.5,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,24,122.0,98.0,0,2,0,100.0
+Raúl Albiol,DF,villarreal,celta,1,90,0,0,0.0,0.0,0,0,0,73,91.8,0,0,0.0,0.0,0.0,0,1,1,0,0,2,2,0,1,0,0,0,51,232.0,79.0,0,1,1,50.0
+Kiko Femenía,DF,villarreal,celta,1,90,0,0,0.0,0.0,0,0,0,77,83.1,0,0,0.0,0.0,0.0,0,5,2,0,0,0,0,0,1,0,0,0,50,217.0,91.0,1,0,0,0.0
+Filip Jørgensen,PT,villarreal,celta,1,90,0,0,0.0,0.0,0,0,0,45,82.2,0,0,3.0,71.4,2.5,3,0,0,0,0,0,0,0,0,0,0,0,28,115.0,54.0,0,0,0,0.0

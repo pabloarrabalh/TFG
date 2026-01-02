@@ -51,6 +51,23 @@ ALIAS_JUGADORES_POR_TEMPORADA = {
         "valladolid":{"adrian baquerin": "arnu",},
         "leganes":{"adria altimira": "altimira",}
     },
+    "23_24":{
+        "athletic": {  "nico williams": "n williams", "inaki williams": "i williams", },
+        "villarreal": {"alexander sorloth": "sorloth"}, 
+        "valencia": {"jose luis garcia vaya": "pepelu","cristian":"rivero","ruben lendinez":"iranzo"},
+        "almeria":{"marko milovanovic": "marezi",},
+        "rayo": {"isaac palazon camacho": "isi"},
+        "sevilla": {"yassine bounou": "bono","jesus corona": "tecatito","diego iturralde": "hormigo"},
+        "mallorca": {"samu costa": "samu","jaume costa": "costa",},
+        "alaves": {"xeber": "alkain",},
+        "osasuna": {"ezequiel avila": "chimy"},
+        "cadiz":{"mamadou mbaye":"momo"},
+        "granada":{"adri bosch":"miki bosch"},
+        "betis": {"ezequiel avila": "chimy"},
+        "girona": {"viktor tsyhankov": "tsygankov","savio":"savinho" },
+
+
+    }
 }
 
 

@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Anthony Lozano,DT,almeria,barcelona,1,58,0,0,0.4,0.3,2,1,1,10,80.0,0,0,0.0,0.0,0.0,3,0,0,0,0,1,0,1,1,1,0,1,6,24.0,4.0,0,1,2,33.3
+Luis Javier Suárez,DT,almeria,barcelona,0,32,0,0,0.0,0.0,0,0,0,9,77.8,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,1,2,1,0,5,48.0,5.0,0,0,1,0.0
+Adri Embarba,DT,almeria,barcelona,1,79,0,0,0.1,0.1,3,3,0,25,64.0,0,0,0.0,0.0,0.0,2,2,4,0,2,0,0,0,2,2,1,1,19,151.0,95.0,5,0,3,0.0
+Álex Centelles,DF,almeria,barcelona,0,11,0,0,0.0,0.0,0,0,0,4,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,7.0,4.0,0,0,0,0.0
+Léo Baptistão,DT,almeria,barcelona,1,58,0,0,0.3,0.0,1,1,0,14,85.7,0,0,0.0,0.0,0.0,2,1,2,0,1,1,0,1,0,1,1,0,14,142.0,111.0,1,0,0,0.0
+Luka Romero,DT,almeria,barcelona,0,32,0,0,0.0,0.0,0,0,0,10,90.0,0,0,0.0,0.0,0.0,1,1,1,0,0,1,0,1,0,0,0,0,8,51.0,22.0,1,0,1,0.0
+Jonathan Viera,MC,almeria,barcelona,1,67,0,0,0.0,0.1,0,0,0,28,100.0,0,0,0.0,0.0,0.0,2,2,2,0,1,0,0,0,0,3,0,3,17,76.0,30.0,0,0,1,0.0
+Gonzalo Melero,MC,almeria,barcelona,0,23,0,0,0.0,0.0,0,0,0,11,81.8,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,7,40.0,17.0,0,0,0,0.0
+Lucas Robertone,MC,almeria,barcelona,1,90,0,0,0.0,0.0,1,1,0,45,88.9,0,0,0.0,0.0,0.0,4,4,3,0,1,1,1,0,1,1,1,0,22,129.0,60.0,0,1,1,50.0
+Marcos Peña,MC,almeria,barcelona,1,90,0,0,0.0,0.0,1,1,0,42,83.3,0,0,0.0,0.0,0.0,0,3,3,0,2,2,0,2,2,1,0,1,19,92.0,9.0,0,0,0,0.0
+Bruno Langa,DF,almeria,barcelona,1,90,0,0,0.0,0.0,2,1,1,36,75.0,0,0,0.0,0.0,0.0,0,1,1,0,1,1,0,1,1,2,1,0,14,77.0,57.0,3,0,2,0.0
+Chumi,DF,almeria,barcelona,1,90,0,0,0.0,0.0,0,0,0,47,85.1,0,0,0.0,0.0,0.0,0,0,2,0,2,2,0,2,3,0,0,0,32,127.0,69.0,0,0,0,0.0
+César Montes,DF,almeria,barcelona,1,90,0,0,0.1,0.0,2,1,1,44,93.2,0,0,0.0,0.0,0.0,2,2,1,0,1,1,1,0,3,1,1,0,20,88.0,38.0,0,2,0,100.0
+Marc Pubill,DF,almeria,barcelona,1,80,0,0,0.0,0.0,0,0,0,29,75.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,6,4,1,1,20,167.0,85.0,4,1,0,100.0
+Alejandro Pozo Pozo,DF,almeria,barcelona,0,10,0,0,0.0,0.0,0,0,0,13,92.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,12,30.0,3.0,0,0,0,0.0
+Luís Maximiano,PT,almeria,barcelona,1,90,0,0,0.0,0.0,0,0,0,36,63.9,0,0,2.0,71.4,1.9,4,0,0,0,0,0,0,0,2,0,0,0,21,95.0,76.0,0,0,0,0.0
+Robert Lewandowski,DT,barcelona,almeria,1,68,0,0,0.1,0.0,3,2,1,16,81.3,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,1,2,1,1,17,58.0,21.0,1,0,1,0.0
+João Félix,DT,barcelona,almeria,0,22,0,0,0.3,0.0,1,1,0,20,70.0,0,0,0.0,0.0,0.0,1,0,0,0,0,1,0,1,1,2,1,1,17,63.0,12.0,0,0,0,0.0
+Ferrán Torres,DT,barcelona,almeria,1,72,0,0,0.1,0.1,1,1,0,20,80.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,0,0,0,21,93.0,57.0,1,1,0,100.0
+Vitor Roque,DT,barcelona,almeria,0,18,0,0,0.0,0.0,1,0,1,2,100.0,1,0,0.0,0.0,0.0,0,0,1,0,1,0,0,0,0,0,0,0,4,20.0,13.0,1,0,0,0.0
+Lamine Yamal,DT,barcelona,almeria,1,90,0,0,0.1,0.1,2,2,0,57,80.7,0,0,0.0,0.0,0.0,11,4,3,0,0,0,0,0,0,5,3,2,51,256.0,141.0,5,0,0,0.0
+Pedri,MC,barcelona,almeria,1,82,0,0,0.0,0.1,0,0,0,107,90.7,0,0,0.0,0.0,0.0,7,3,2,0,1,2,1,1,0,4,1,3,92,424.0,226.0,2,1,0,100.0
+Oriol Romeu,MC,barcelona,almeria,0,8,0,0,0.0,0.0,0,0,0,6,83.3,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,5,8.0,4.0,0,0,1,0.0
+Sergi Roberto,MC,barcelona,almeria,1,68,0,1,0.0,0.2,1,1,0,64,89.1,0,0,0.0,0.0,0.0,12,0,0,0,0,0,0,0,1,2,1,0,58,263.0,124.0,3,2,0,100.0
+Andreas Christensen,MC,barcelona,almeria,0,22,0,0,0.0,0.0,0,0,0,16,93.8,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,12,54.0,33.0,1,0,0,0.0
+Fermin López,MC,barcelona,almeria,1,90,2,0,0.8,0.2,4,0,4,43,88.4,0,0,0.0,0.0,0.0,20,2,2,0,1,2,1,1,0,2,2,0,44,234.0,149.0,4,0,1,0.0
+Héctor Fort,DF,barcelona,almeria,1,72,0,1,0.0,0.5,1,1,0,58,87.9,0,0,0.0,0.0,0.0,12,1,2,0,1,0,0,0,0,0,0,0,49,185.0,75.0,1,0,0,0.0
+João Cancelo,DF,barcelona,almeria,0,18,0,0,0.0,0.0,0,0,0,15,86.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,12,34.0,4.0,0,1,0,100.0
+Iñigo Martínez,DF,barcelona,almeria,1,90,0,0,0.1,0.0,2,1,1,87,88.5,0,0,0.0,0.0,0.0,7,0,1,0,1,0,0,0,2,0,0,0,72,457.0,331.0,3,4,0,100.0
+Pau Cubarsí,DF,barcelona,almeria,1,90,0,0,0.0,0.0,0,0,0,92,95.7,0,0,0.0,0.0,0.0,7,1,2,0,1,2,0,2,2,0,0,0,77,303.0,152.0,0,0,2,0.0
+Jules Koundé,DF,barcelona,almeria,1,90,0,0,0.0,0.1,0,0,0,90,92.2,0,0,0.0,0.0,0.0,8,1,1,0,1,1,0,1,1,3,2,1,72,302.0,164.0,2,2,0,100.0
+MarcAndré ter Stegen,PT,barcelona,almeria,1,90,0,0,0.0,0.0,0,0,0,37,91.9,0,0,0.0,100.0,0.6,11,0,0,0,0,0,0,0,0,0,0,0,28,134.0,91.0,0,0,0,0.0

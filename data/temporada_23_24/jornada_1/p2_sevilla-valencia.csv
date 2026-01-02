@@ -1,0 +1,31 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Youssef EnNesyri,DT,sevilla,valencia,1,81,1,0,0.6,0.0,4,2,2,6,50.0,0,0,0.0,0.0,0.0,8,0,1,0,1,1,0,1,0,3,0,3,8,37.0,12.0,1,3,3,50.0
+Federico Gattoni,DF,sevilla,valencia,0,9,0,0,0.0,0.0,0,0,0,6,83.3,0,0,0.0,0.0,0.0,1,1,1,0,0,0,0,0,1,0,0,0,2,13.0,12.0,0,1,1,50.0
+Érik Lamela,DT,sevilla,valencia,1,55,0,0,0.0,0.0,0,0,0,7,85.7,0,0,0.0,0.0,0.0,2,6,2,0,0,3,0,3,0,1,0,1,9,22.0,5.0,0,0,1,0.0
+Óliver Torres,MC,sevilla,valencia,0,35,0,0,0.0,0.0,0,0,0,18,72.2,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,0,1,0,1,13,44.0,14.0,1,2,3,40.0
+Lucas Ocampos,DT,sevilla,valencia,1,90,0,0,0.0,0.0,1,1,0,26,57.7,0,0,0.0,0.0,0.0,2,2,3,0,3,1,0,1,1,4,0,3,28,170.0,80.0,4,1,1,50.0
+Suso,MC,sevilla,valencia,1,90,0,1,0.0,0.5,1,0,1,39,59.0,0,0,0.0,0.0,0.0,8,1,1,0,1,1,0,1,0,3,1,1,32,156.0,81.0,3,2,1,66.7
+Ivan Rakitić,MC,sevilla,valencia,1,90,0,0,0.0,0.0,1,1,0,69,66.7,1,0,0.0,0.0,0.0,3,3,2,0,1,0,0,0,0,5,2,2,40,167.0,53.0,3,2,0,100.0
+Fernando,MC,sevilla,valencia,1,68,0,0,0.0,0.0,0,0,0,30,83.3,0,0,0.0,0.0,0.0,4,2,3,0,3,2,0,2,0,3,1,1,24,121.0,47.0,0,1,1,50.0
+Djibril Sow,MC,sevilla,valencia,0,22,0,0,0.0,0.0,0,0,0,10,80.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,7,22.0,12.0,0,1,1,50.0
+Marcos Acuña,DF,sevilla,valencia,1,90,0,0,0.1,0.1,2,2,0,68,72.1,1,0,0.0,0.0,0.0,1,2,2,0,1,2,0,2,0,3,1,0,36,161.0,95.0,2,0,2,0.0
+Nemanja Gudelj,DF,sevilla,valencia,1,90,0,0,0.0,0.0,0,0,0,63,68.3,1,0,0.0,0.0,0.0,1,2,0,0,0,1,1,0,3,0,0,0,44,220.0,108.0,0,1,1,50.0
+Loïc Bade,DF,sevilla,valencia,1,80,0,0,0.0,0.0,0,0,0,46,87.0,0,1,0.0,0.0,0.0,-1,0,2,0,2,0,0,0,1,0,0,0,28,116.0,55.0,0,3,3,50.0
+Jesús Navas,DF,sevilla,valencia,1,68,0,0,0.0,0.0,0,0,0,42,76.2,0,0,0.0,0.0,0.0,3,3,2,0,0,0,0,0,1,1,0,1,25,117.0,47.0,0,0,0,0.0
+Juanlu Sánchez,DF,sevilla,valencia,0,22,0,0,0.0,0.0,0,0,0,13,84.6,0,0,0.0,0.0,0.0,0,0,0,0,0,1,0,1,0,2,2,0,8,43.0,22.0,1,0,1,0.0
+Yassine Bounou,PT,sevilla,valencia,1,90,0,0,0.0,0.0,0,0,0,31,64.5,0,0,2.0,33.3,1.1,2,0,0,0,0,0,0,0,0,0,0,0,16,77.0,64.0,0,0,0,0.0
+Hugo Duro,DT,valencia,sevilla,1,90,0,1,0.3,0.3,3,2,1,18,72.2,0,0,0.0,0.0,0.0,8,2,4,0,2,0,0,0,2,3,2,0,17,44.0,14.0,0,4,5,44.4
+Domingos André Ribeiro Almeida,DT,valencia,sevilla,1,61,0,1,0.0,0.3,0,0,0,22,81.8,0,0,0.0,0.0,0.0,10,2,1,0,0,1,0,1,1,2,1,1,18,104.0,72.0,2,0,1,0.0
+Javier Guerra,DT,valencia,sevilla,0,29,1,0,0.3,0.0,1,0,1,9,55.6,0,0,0.0,0.0,0.0,8,0,1,0,1,0,0,0,0,3,1,2,7,20.0,2.0,0,0,2,0.0
+Diego López,MC,valencia,sevilla,1,64,0,0,0.1,0.2,2,2,0,21,71.4,0,0,0.0,0.0,0.0,8,1,1,0,1,0,0,0,0,3,1,1,18,149.0,83.0,4,1,1,50.0
+Pablo Gozalbez,MC,valencia,sevilla,0,26,0,0,0.0,0.0,0,0,0,9,44.4,0,0,0.0,0.0,0.0,0,0,2,0,2,0,0,0,0,1,0,1,5,12.0,2.0,0,1,0,100.0
+José Luis García Vayá,MC,valencia,sevilla,1,90,0,0,0.0,0.0,2,2,0,58,67.2,0,0,0.0,0.0,0.0,4,1,0,0,0,1,0,1,6,2,1,0,29,140.0,58.0,0,1,3,25.0
+Mouctar Diakhaby,MC,valencia,sevilla,1,90,1,0,0.3,0.0,1,0,1,45,91.1,1,0,0.0,0.0,0.0,14,2,1,0,0,1,0,1,4,2,2,0,24,83.0,50.0,2,8,1,88.9
+Francisco Perez,MC,valencia,sevilla,1,60,0,0,0.0,0.1,0,0,0,13,84.6,0,0,0.0,0.0,0.0,5,0,0,0,0,1,0,1,0,2,1,1,13,124.0,38.0,3,0,0,0.0
+Dimitri Foulquier,DF,valencia,sevilla,0,30,0,0,0.0,0.0,0,0,0,19,73.7,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,1,1,1,0,9,24.0,13.0,0,1,0,100.0
+José Luis Gayà,DF,valencia,sevilla,1,86,0,0,0.1,0.1,1,1,0,30,63.3,0,0,0.0,0.0,0.0,6,6,5,0,1,2,0,2,4,2,2,0,14,87.0,65.0,2,0,0,0.0
+Jesus Vazquez,DF,valencia,sevilla,0,4,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,0,0,0,0,0,0.0,0.0,0,0,1,0.0
+Cenk Özkacar,DF,valencia,sevilla,1,90,0,0,0.0,0.1,0,0,0,29,69.0,1,0,0.0,0.0,0.0,4,1,1,0,0,1,1,0,6,1,0,1,22,66.0,30.0,0,1,1,50.0
+Gabriel Paulista,DF,valencia,sevilla,1,90,0,0,0.0,0.0,0,0,0,39,76.9,0,0,0.0,0.0,0.0,7,2,1,0,0,0,0,0,11,0,0,0,23,93.0,45.0,0,2,2,50.0
+Thierry Correia,DF,valencia,sevilla,1,90,0,0,0.0,0.0,0,0,0,51,68.6,0,0,0.0,0.0,0.0,3,5,3,0,0,4,0,4,1,0,0,0,25,73.0,35.0,0,0,0,0.0
+Giorgi Mamardashvili,PT,valencia,sevilla,1,90,0,0,0.0,0.0,0,0,0,20,50.0,0,0,1.0,66.7,1.0,6,0,0,0,0,0,0,0,0,0,0,0,8,61.0,31.0,0,0,0,0.0

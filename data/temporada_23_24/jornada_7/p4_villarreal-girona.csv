@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Alex Baena,DT,villarreal,girona,1,90,0,0,0.1,0.5,3,2,1,55,69.1,1,0,0.0,0.0,0.0,4,1,0,0,0,1,0,1,0,0,0,0,39,250.0,134.0,7,0,0,0.0
+Alexander Sørloth,DT,villarreal,girona,1,90,0,0,0.2,0.0,1,1,0,15,73.3,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,0,4,1,3,17,125.0,56.0,2,1,1,50.0
+Yeremi Pino,MC,villarreal,girona,1,58,0,0,0.4,0.0,4,3,1,16,81.3,1,0,0.0,0.0,0.0,3,3,2,0,1,1,0,1,0,3,2,1,14,45.0,14.0,0,2,1,66.7
+Ilias Akhomach,MC,villarreal,girona,0,32,0,0,0.0,0.0,0,0,0,12,83.3,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,1,0,1,14,61.0,22.0,1,0,0,0.0
+Étienne Capoue,MC,villarreal,girona,1,58,0,0,0.0,0.0,1,1,0,45,97.8,0,0,0.0,0.0,0.0,5,1,2,0,1,0,0,0,0,1,1,0,31,172.0,82.0,2,1,2,33.3
+Ramón Terrats,MC,villarreal,girona,0,32,0,0,0.0,0.0,1,1,0,25,96.0,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,1,1,0,12,83.0,66.0,0,0,1,0.0
+Daniel Parejo,MC,villarreal,girona,1,87,1,0,0.8,0.0,0,0,0,65,96.9,0,0,0.0,0.0,0.0,8,1,0,0,0,0,0,0,0,0,0,0,27,102.0,66.0,1,1,0,100.0
+Manu Trigueros,MC,villarreal,girona,0,3,0,0,0.0,0.0,0,0,0,11,90.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,7,24.0,13.0,1,0,0,0.0
+José Luis Morales,MC,villarreal,girona,1,77,0,0,0.3,0.0,2,2,0,16,81.3,0,0,0.0,0.0,0.0,2,1,2,0,1,1,0,1,0,3,2,1,15,109.0,66.0,2,0,2,0.0
+Ben Brereton,MC,villarreal,girona,0,13,0,0,0.1,0.0,1,1,0,4,50.0,1,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,0,0,0,0,8,51.0,32.0,2,0,0,0.0
+Alfonso Pedraza,DF,villarreal,girona,1,90,0,0,0.0,0.0,0,0,0,56,73.2,0,0,0.0,0.0,0.0,3,2,0,0,0,2,1,1,3,3,1,2,33,282.0,154.0,6,0,0,0.0
+Aïssa Mandi,DF,villarreal,girona,1,90,0,0,0.0,0.1,0,0,0,63,93.7,0,0,0.0,0.0,0.0,3,0,0,0,0,1,1,0,2,0,0,0,31,138.0,74.0,0,1,0,100.0
+Raúl Albiol,DF,villarreal,girona,1,77,0,0,0.0,0.0,0,0,0,30,90.0,0,0,0.0,0.0,0.0,3,3,1,0,0,1,1,0,2,0,0,0,18,127.0,98.0,1,1,1,50.0
+Matteo Gabbia,DF,villarreal,girona,0,13,0,0,0.0,0.0,0,0,0,11,81.8,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,1,0,0,0,8,35.0,15.0,0,1,0,100.0
+Juan Foyth,DF,villarreal,girona,1,90,0,0,0.0,0.0,0,0,0,46,78.3,0,0,0.0,0.0,0.0,0,1,3,0,2,2,0,2,1,0,0,0,21,145.0,93.0,2,1,1,50.0
+Filip Jørgensen,PT,villarreal,girona,1,90,0,0,0.0,0.0,0,0,0,38,89.5,0,0,2.0,60.0,1.3,5,0,1,0,1,0,0,0,1,0,0,0,22,88.0,29.0,0,0,0,0.0
+Artem Dovbyk,DT,girona,villarreal,1,68,1,0,1.0,0.0,6,3,3,7,71.4,0,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,0,0,0,0,9,19.0,5.0,0,2,0,100.0
+Cristhian Stuani,DT,girona,villarreal,0,22,0,0,0.2,0.0,2,2,0,5,80.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,1,1,0,6,23.0,9.0,0,1,2,33.3
+Sávio,MC,girona,villarreal,1,90,0,1,0.0,0.5,0,0,0,27,74.1,0,0,0.0,0.0,0.0,11,1,0,0,0,2,0,2,1,4,3,1,25,275.0,125.0,4,0,0,0.0
+Iván Martín,MC,girona,villarreal,1,52,0,0,0.0,0.1,0,0,0,20,90.0,0,0,0.0,0.0,0.0,0,1,1,0,1,2,0,2,0,2,0,2,20,137.0,49.0,1,0,0,0.0
+Portu,DT,girona,villarreal,0,38,0,0,0.1,0.0,1,0,1,9,77.8,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,0,0,0,0,6,43.0,26.0,1,0,1,0.0
+Yangel Herrera,MC,girona,villarreal,1,90,0,0,0.0,0.3,1,1,0,38,89.5,1,0,0.0,0.0,0.0,4,2,3,0,3,0,0,0,0,1,1,0,28,189.0,109.0,3,1,1,50.0
+Viktor Tsyhankov,MC,girona,villarreal,1,87,0,0,0.2,0.4,2,2,0,30,86.7,0,0,0.0,0.0,0.0,7,0,1,0,1,1,0,1,2,2,2,0,29,212.0,133.0,6,1,2,33.3
+Jhon Solis,MC,girona,villarreal,0,3,0,0,0.0,0.0,0,0,0,4,25.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,25.0,0.0,0,0,0,0.0
+Aleix García,MC,girona,villarreal,1,90,0,1,0.0,0.6,0,0,0,64,92.2,0,0,0.0,0.0,0.0,11,4,2,0,0,3,0,3,3,0,0,0,38,160.0,62.0,0,0,0,0.0
+Miguel Gutiérrez,DF,girona,villarreal,1,90,0,0,0.0,0.0,2,2,0,42,95.2,1,0,0.0,0.0,0.0,4,1,2,0,1,1,1,0,4,0,0,0,32,277.0,127.0,3,3,0,100.0
+David López,DF,girona,villarreal,1,90,0,0,0.0,0.0,0,0,0,60,86.7,0,0,0.0,0.0,0.0,5,1,1,0,0,3,2,1,4,0,0,0,42,235.0,122.0,0,1,1,50.0
+Eric García,DF,girona,villarreal,1,87,1,0,0.5,0.0,2,1,1,59,83.1,0,0,0.0,0.0,0.0,9,0,0,0,0,2,1,1,2,0,0,0,47,253.0,152.0,0,0,2,0.0
+Daley Blind,DF,girona,villarreal,0,3,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,3,17.0,0.0,0,0,0,0.0
+Arnau Martinez,DF,girona,villarreal,1,51,0,0,0.0,0.0,0,0,0,25,96.0,0,0,0.0,0.0,0.0,3,1,2,0,1,0,0,0,4,1,0,1,12,42.0,7.0,0,0,0,0.0
+Yan Couto,DF,girona,villarreal,0,39,0,0,0.0,0.1,1,1,0,18,66.7,0,0,0.0,0.0,0.0,2,3,3,0,1,0,0,0,2,1,0,1,10,70.0,42.0,2,0,0,0.0
+Paulo Gazzaniga,PT,girona,villarreal,1,90,0,0,0.0,0.0,0,0,0,29,82.8,0,0,1.0,100.0,1.2,6,0,0,0,0,0,0,0,0,0,0,0,15,95.0,65.0,0,0,0,0.0

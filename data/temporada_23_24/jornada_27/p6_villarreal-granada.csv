@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Alexander Sørloth,DT,villarreal,granada,1,90,3,0,1.2,0.0,3,0,3,18,77.8,0,0,0.0,0.0,0.0,18,0,0,0,0,1,0,1,0,4,1,3,17,110.0,20.0,1,1,1,50.0
+Gerard Moreno,DT,villarreal,granada,1,45,0,0,0.2,0.0,1,1,0,16,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,0,2,17,80.0,38.0,1,0,0,0.0
+Gonçalo Guedes,DT,villarreal,granada,0,45,1,0,0.3,0.0,2,0,2,16,75.0,0,0,0.0,0.0,0.0,9,1,0,0,0,0,0,0,0,0,0,0,10,68.0,49.0,2,0,0,0.0
+Alex Baena,MC,villarreal,granada,1,61,0,1,0.1,0.3,1,1,0,25,64.0,0,0,0.0,0.0,0.0,10,2,3,0,2,0,0,0,1,2,1,1,16,112.0,57.0,1,0,0,0.0
+Manu Trigueros,MC,villarreal,granada,0,29,0,0,0.0,0.0,1,0,1,12,91.7,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,1,0,0,0,8,57.0,11.0,1,0,0,0.0
+Daniel Parejo,MC,villarreal,granada,1,90,0,3,0.1,1.0,2,1,1,66,89.4,0,0,0.0,0.0,0.0,19,2,1,0,1,1,0,1,2,0,0,0,17,41.0,16.0,0,1,1,50.0
+Étienne Capoue,MC,villarreal,granada,1,90,1,0,0.2,0.0,1,0,1,44,86.4,1,0,0.0,0.0,0.0,10,2,1,0,0,1,0,1,1,5,4,1,31,199.0,124.0,3,2,1,66.7
+Bertrand Traoré,MC,villarreal,granada,1,74,0,0,0.1,0.3,3,1,2,20,90.0,0,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,0,1,0,1,14,126.0,99.0,4,0,1,0.0
+José Luis Morales,MC,villarreal,granada,0,16,0,0,0.0,0.0,0,0,0,5,20.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,5,117.0,100.0,3,0,0,0.0
+Alberto Moreno,DF,villarreal,granada,1,90,0,0,0.0,0.1,2,2,0,45,82.2,0,0,0.0,0.0,0.0,6,3,1,0,1,0,0,0,6,0,0,0,21,133.0,57.0,2,0,0,0.0
+Yerson Mosquera,DF,villarreal,granada,1,90,0,0,0.0,0.0,0,0,0,55,85.5,0,0,0.0,0.0,0.0,5,2,1,0,0,0,0,0,8,0,0,0,26,109.0,47.0,0,2,1,66.7
+Eric Bailly,DF,villarreal,granada,1,45,0,0,0.0,0.0,0,0,0,22,86.4,0,0,0.0,0.0,0.0,3,1,0,0,0,1,1,0,2,0,0,0,12,88.0,52.0,0,0,1,0.0
+Aïssa Mandi,DF,villarreal,granada,0,16,0,0,0.0,0.0,0,0,0,8,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,4.0,0.0,0,0,0,0.0
+Stefan Lekovic,DF,villarreal,granada,0,29,0,0,0.0,0.0,0,0,0,14,85.7,0,0,0.0,0.0,0.0,0,0,0,0,0,1,1,0,1,0,0,0,4,6.0,1.0,0,0,0,0.0
+Kiko Femenía,DF,villarreal,granada,1,90,0,0,0.0,0.0,0,0,0,66,86.4,0,0,0.0,0.0,0.0,5,2,3,0,1,2,0,2,2,1,0,1,36,284.0,187.0,4,0,0,0.0
+Pepe Reina,PT,villarreal,granada,1,90,0,0,0.0,0.0,0,0,0,36,77.8,0,0,1.0,66.7,0.8,6,0,0,0,0,0,0,0,0,0,0,0,28,166.0,84.0,0,0,0,0.0
+Lucas Boyé,DT,granada,villarreal,1,81,0,0,0.1,0.0,2,1,1,15,86.7,0,0,0.0,0.0,0.0,0,3,2,0,1,0,0,0,1,2,1,1,15,52.0,26.0,2,1,3,25.0
+Antonio Puertas,DT,granada,villarreal,0,9,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,7.0,5.0,0,0,0,0.0
+Myrto Uzuni,DT,granada,villarreal,1,90,0,0,0.0,0.1,1,1,0,12,91.7,0,0,0.0,0.0,0.0,0,1,0,0,0,1,0,1,0,0,0,0,11,36.0,2.0,0,0,0,0.0
+Facundo Pellistri,DT,granada,villarreal,1,81,0,0,0.0,0.0,0,0,0,27,70.4,0,0,0.0,0.0,0.0,0,1,0,0,0,2,0,2,1,3,1,2,25,178.0,100.0,3,1,0,100.0
+Kamil Jóźwiak,MC,granada,villarreal,0,9,0,0,0.0,0.0,1,1,0,4,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,3.0,0.0,0,0,0,0.0
+Carlos Neva,MC,granada,villarreal,1,90,0,0,0.0,0.0,0,0,0,59,83.1,0,0,0.0,0.0,0.0,-2,0,0,0,0,1,0,1,2,0,0,0,39,117.0,66.0,1,0,1,0.0
+Gonzalo Villar,MC,granada,villarreal,1,81,0,0,0.0,0.0,0,0,0,39,84.6,0,0,0.0,0.0,0.0,1,5,4,0,2,2,2,0,1,2,1,1,27,182.0,94.0,1,2,0,100.0
+Óscar Melendo,MC,granada,villarreal,0,9,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,5,15.0,2.0,0,0,1,0.0
+Sergio Ruiz,MC,granada,villarreal,1,90,0,1,0.0,0.3,1,1,0,57,80.7,0,0,0.0,0.0,0.0,6,2,1,0,0,0,0,0,1,1,1,0,38,266.0,163.0,2,1,0,100.0
+Ricard Sánchez,MC,granada,villarreal,1,90,0,0,0.0,0.0,0,0,0,58,72.4,1,0,0.0,0.0,0.0,-5,0,0,0,0,0,0,0,0,1,1,0,34,189.0,129.0,2,0,0,0.0
+Ignasi Miquel,DF,granada,villarreal,1,90,0,0,0.0,0.0,1,1,0,69,97.1,0,0,0.0,0.0,0.0,0,2,3,0,1,3,0,3,3,1,0,1,53,301.0,176.0,1,0,0,0.0
+Martin Hongla,DF,granada,villarreal,1,62,0,0,0.0,0.0,0,0,0,53,94.3,0,0,0.0,0.0,0.0,2,1,0,0,0,1,1,0,2,1,0,1,41,242.0,124.0,0,0,1,0.0
+Theo Corbeanu,MC,granada,villarreal,0,28,1,0,0.3,0.0,3,1,2,14,71.4,0,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,0,0,0,0,14,96.0,62.0,2,0,0,0.0
+Kamil Piątkowski,DF,granada,villarreal,1,61,0,0,0.0,0.0,0,0,0,44,86.4,1,0,0.0,0.0,0.0,-3,4,4,0,1,0,0,0,2,0,0,0,35,150.0,115.0,2,0,0,0.0
+Bruno Méndez,DF,granada,villarreal,0,29,0,0,0.0,0.0,0,0,0,23,78.3,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,15,56.0,36.0,0,0,0,0.0
+Augusto Batalla,PT,granada,villarreal,1,90,0,0,0.0,0.0,0,0,0,20,60.0,0,0,5.0,50.0,2.8,-1,0,1,0,1,0,0,0,0,0,0,0,8,52.0,22.0,0,1,0,100.0

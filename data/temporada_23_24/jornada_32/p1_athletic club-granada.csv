@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Gorka Guruzeta,DT,athletic,granada,1,82,1,0,0.7,0.0,4,2,2,21,81.0,0,0,0.0,0.0,0.0,9,1,0,0,0,2,0,2,0,1,0,1,20,74.0,22.0,1,0,2,0.0
+Raúl García,DT,athletic,granada,0,8,0,0,0.0,0.0,0,0,0,8,62.5,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,0,0,0,0,5,17.0,7.0,0,4,1,80.0
+Nico Williams,DT,athletic,granada,1,90,0,0,0.0,0.1,1,0,1,44,61.4,0,0,0.0,0.0,0.0,8,1,0,0,0,1,0,1,0,9,6,3,37,405.0,196.0,8,1,0,100.0
+Iñaki Williams,DT,athletic,granada,1,90,0,0,0.2,0.0,4,3,1,49,75.5,0,0,0.0,0.0,0.0,1,2,2,0,2,1,0,1,2,8,2,6,51,243.0,151.0,4,1,2,33.3
+Oihan Sancet,MC,athletic,granada,1,62,0,0,0.2,0.5,1,1,0,25,68.0,1,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,1,0,0,28,180.0,97.0,3,0,0,0.0
+Álex Berenguer,MC,athletic,granada,0,28,0,0,0.0,0.0,0,0,0,18,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,1,1,11,66.0,5.0,0,0,2,0.0
+Unai Gómez,MC,athletic,granada,1,62,0,0,0.0,0.2,1,1,0,28,85.7,0,0,0.0,0.0,0.0,7,1,1,0,1,1,0,1,0,1,0,1,18,127.0,79.0,2,1,0,100.0
+Ander Herrera,MC,athletic,granada,0,28,0,0,0.1,0.0,2,2,0,30,86.7,1,0,0.0,0.0,0.0,1,1,0,0,0,1,1,0,0,0,0,0,23,45.0,16.0,0,0,2,0.0
+Iñigo Ruiz de Galarreta,MC,athletic,granada,1,90,0,0,0.0,0.0,1,0,1,61,85.2,0,0,0.0,0.0,0.0,4,3,2,0,1,1,1,0,0,1,1,0,45,220.0,117.0,2,1,2,33.3
+Yuri Berchiche,DF,athletic,granada,1,69,0,0,0.2,0.0,2,2,0,59,86.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,1,0,46,191.0,107.0,1,0,0,0.0
+Iñigo Lekue,DF,athletic,granada,0,21,0,0,0.0,0.0,0,0,0,17,82.4,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,2,0,0,0,13,32.0,20.0,0,0,0,0.0
+Aitor Paredes,DF,athletic,granada,1,45,0,0,0.0,0.0,0,0,0,43,95.3,1,0,0.0,0.0,0.0,1,1,0,0,0,1,0,1,2,0,0,0,33,114.0,49.0,0,2,2,50.0
+Yeray Álvarez,DF,athletic,granada,0,45,0,0,0.0,0.0,1,1,0,36,97.2,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,2,0,0,0,31,249.0,157.0,1,3,0,100.0
+Daniel Vivian,DF,athletic,granada,1,90,0,0,0.0,0.0,0,0,0,97,83.5,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,1,1,0,76,444.0,278.0,1,4,1,80.0
+Óscar de Marcos,DF,athletic,granada,1,90,0,0,0.0,0.0,0,0,0,92,80.4,1,0,0.0,0.0,0.0,1,1,1,0,0,2,0,2,1,1,0,1,59,210.0,97.0,2,1,2,33.3
+Unai Simón,PT,athletic,granada,1,90,0,0,0.0,0.0,0,0,0,42,83.3,0,0,1.0,0.0,0.0,5,0,0,0,0,0,0,0,0,0,0,0,29,179.0,107.0,0,1,0,100.0
+Lucas Boyé,DT,granada,athletic,1,79,0,0,0.0,0.0,1,1,0,19,73.7,0,0,0.0,0.0,0.0,3,2,0,0,0,0,0,0,0,1,1,0,13,77.0,30.0,0,2,5,28.6
+Matias Arezo,DT,granada,athletic,0,11,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,1,2,33.3
+Gonzalo Villar,DT,granada,athletic,1,45,0,0,0.0,0.0,0,0,0,4,50.0,0,0,0.0,0.0,0.0,2,2,1,0,0,2,0,2,0,3,0,0,9,57.0,47.0,1,0,1,0.0
+Ricard Sánchez,MC,granada,athletic,0,45,0,0,0.0,0.0,0,0,0,12,58.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,0,0,0,7,39.0,22.0,1,0,1,0.0
+Kamil Jóźwiak,MC,granada,athletic,1,80,0,0,0.0,0.0,0,0,0,30,53.3,0,0,0.0,0.0,0.0,5,4,4,0,1,0,0,0,2,4,2,0,24,244.0,151.0,6,5,1,83.3
+Faitout Maouassa,MC,granada,athletic,0,10,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,3,9.0,1.0,0,1,1,50.0
+Gerard Gumbau,MC,granada,athletic,1,90,0,0,0.0,0.0,1,1,0,48,66.7,0,0,0.0,0.0,0.0,4,3,2,0,1,2,1,1,1,0,0,0,15,69.0,19.0,0,1,1,50.0
+Sergio Ruiz,MC,granada,athletic,1,90,0,0,0.0,0.0,1,1,0,36,83.3,0,0,0.0,0.0,0.0,4,5,4,0,2,1,0,1,0,1,0,0,16,68.0,33.0,0,0,0,0.0
+Antonio Puertas,MC,granada,athletic,1,64,0,0,0.0,0.0,1,1,0,11,72.7,1,0,0.0,0.0,0.0,1,2,2,0,1,1,0,1,0,1,0,1,11,12.0,1.0,0,0,1,0.0
+Myrto Uzuni,DT,granada,athletic,0,26,0,0,0.0,0.0,1,1,0,3,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,2,4.0,0.0,0,0,1,0.0
+Carlos Neva,DF,granada,athletic,1,89,0,0,0.0,0.0,0,0,0,35,68.6,0,0,0.0,0.0,0.0,3,1,1,0,0,1,1,0,5,2,1,1,18,58.0,26.0,0,2,1,66.7
+Theo Corbeanu,DF,granada,athletic,0,1,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,0,1,1,2.0,0.0,0,0,0,0.0
+Ignasi Miquel,DF,granada,athletic,1,90,0,0,0.0,0.0,0,0,0,30,63.3,0,0,0.0,0.0,0.0,4,5,5,0,2,2,2,0,5,0,0,0,14,63.0,19.0,0,0,2,0.0
+Miguel Ángel Rubio,DF,granada,athletic,1,90,0,0,0.0,0.0,0,0,0,23,69.6,0,0,0.0,0.0,0.0,5,0,2,0,2,4,3,1,9,0,0,0,11,51.0,28.0,0,3,1,75.0
+Bruno Méndez,DF,granada,athletic,1,90,0,0,0.0,0.0,0,0,0,27,74.1,1,0,0.0,0.0,0.0,3,1,4,0,3,3,0,3,8,0,0,0,5,18.0,5.0,0,1,1,50.0
+Augusto Batalla,PT,granada,athletic,1,90,0,0,0.0,0.0,0,0,0,39,66.7,0,0,1.0,80.0,1.0,7,0,0,0,0,0,0,0,1,0,0,0,18,84.0,64.0,0,0,0,0.0

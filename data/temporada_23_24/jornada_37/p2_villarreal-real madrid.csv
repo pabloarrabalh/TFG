@@ -1,0 +1,32 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Alexander Sørloth,DT,villarreal,real madrid,1,90,4,0,1.2,0.0,9,5,4,22,81.8,0,0,0.0,0.0,0.0,22,1,0,0,0,0,0,0,1,2,1,1,26,119.0,47.0,2,5,3,62.5
+Gerard Moreno,DT,villarreal,real madrid,1,72,0,2,0.0,0.4,0,0,0,46,82.6,0,0,0.0,0.0,0.0,13,0,1,0,1,0,0,0,0,3,2,1,35,209.0,98.0,3,0,0,0.0
+Étienne Capoue,MC,villarreal,real madrid,0,18,0,0,0.1,0.0,1,1,0,25,84.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,1,1,15,78.0,43.0,1,0,0,0.0
+Gonçalo Guedes,MC,villarreal,real madrid,1,90,0,0,0.1,0.2,3,3,0,39,76.9,0,0,0.0,0.0,0.0,6,3,3,0,2,1,0,1,1,3,3,0,30,215.0,96.0,3,0,0,0.0
+Daniel Parejo,MC,villarreal,real madrid,1,45,0,0,0.0,0.1,0,0,0,35,91.4,0,0,0.0,0.0,0.0,1,1,2,0,1,0,0,0,0,0,0,0,19,88.0,42.0,0,0,0,0.0
+Francis Coquelin,MC,villarreal,real madrid,0,45,0,0,0.0,0.0,0,0,0,28,92.9,0,0,0.0,0.0,0.0,2,3,2,0,1,0,0,0,0,0,0,0,18,96.0,23.0,0,0,0,0.0
+Santi Comesaña,MC,villarreal,real madrid,1,90,0,0,0.1,0.0,2,1,1,59,91.5,0,0,0.0,0.0,0.0,2,4,4,0,1,0,0,0,1,2,2,0,43,222.0,120.0,0,1,1,50.0
+Ilias Akhomach,MC,villarreal,real madrid,1,45,0,0,0.1,0.0,2,2,0,23,82.6,0,0,0.0,0.0,0.0,1,1,1,0,1,0,0,0,0,3,2,1,15,163.0,31.0,2,0,0,0.0
+Bertrand Traoré,MC,villarreal,real madrid,0,45,0,0,0.1,0.0,2,1,1,17,82.4,1,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,0,5,2,3,16,72.0,36.0,1,1,0,100.0
+Alberto Moreno,DF,villarreal,real madrid,1,79,0,0,0.0,0.1,1,1,0,46,84.8,1,0,0.0,0.0,0.0,-3,2,3,0,2,2,0,2,0,0,0,0,29,122.0,78.0,1,0,0,0.0
+Ramón Terrats,DF,villarreal,real madrid,0,11,0,0,0.0,0.0,0,0,0,18,72.2,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,1,1,0,1,8,51.0,25.0,1,0,0,0.0
+Jorge Cuenca,DF,villarreal,real madrid,1,45,0,0,0.0,0.0,0,0,0,31,83.9,0,0,0.0,0.0,0.0,-3,2,3,0,1,1,1,0,1,0,0,0,21,106.0,72.0,0,0,0,0.0
+Raúl Albiol,DF,villarreal,real madrid,0,45,0,0,0.0,0.0,0,0,0,30,90.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,17,91.0,49.0,0,0,0,0.0
+Eric Bailly,DF,villarreal,real madrid,1,90,0,0,0.0,0.0,0,0,0,47,97.9,0,0,0.0,0.0,0.0,-1,0,0,0,0,0,0,0,1,0,0,0,30,181.0,83.0,0,2,0,100.0
+Yerson Mosquera,DF,villarreal,real madrid,1,90,0,1,0.1,0.1,1,0,1,48,89.6,0,0,0.0,0.0,0.0,5,5,3,0,0,3,0,3,2,3,0,3,26,80.0,30.0,0,1,0,100.0
+Filip Jørgensen,PT,villarreal,real madrid,1,90,0,0,0.0,0.0,0,0,0,31,96.8,0,0,4.0,33.3,1.9,-1,0,0,0,0,0,0,0,0,0,0,0,18,72.0,40.0,0,0,0,0.0
+Joselu,DT,real madrid,villarreal,1,90,1,0,0.3,0.0,1,0,1,18,66.7,0,0,0.0,0.0,0.0,5,0,1,0,1,1,1,0,1,0,0,0,9,21.0,9.0,0,0,1,0.0
+Brahim Díaz,DT,real madrid,villarreal,1,67,0,2,0.1,0.3,1,0,1,32,96.9,0,0,0.0,0.0,0.0,11,2,0,0,0,0,0,0,0,5,2,3,27,83.0,28.0,1,0,1,0.0
+Rodrygo,DT,real madrid,villarreal,0,23,0,0,0.1,0.0,1,1,0,8,87.5,0,0,0.0,0.0,0.0,3,2,2,0,0,0,0,0,0,3,2,1,14,108.0,51.0,3,0,0,0.0
+Arda Güler,DT,real madrid,villarreal,1,90,2,0,0.4,0.0,4,2,2,57,91.2,0,0,0.0,0.0,0.0,19,1,1,0,1,0,0,0,1,8,4,3,44,371.0,221.0,6,0,0,0.0
+Luka Modrić,MC,real madrid,villarreal,1,81,0,0,0.0,0.1,1,1,0,95,92.6,0,0,0.0,0.0,0.0,2,1,1,0,1,0,0,0,0,2,0,2,62,305.0,143.0,2,0,0,0.0
+Mario Martín,MC,real madrid,villarreal,0,9,0,0,0.0,0.0,0,0,0,8,87.5,0,0,0.0,0.0,0.0,0,4,2,0,0,1,0,1,0,0,0,0,8,48.0,16.0,0,0,0,0.0
+Dani Ceballos,MC,real madrid,villarreal,1,90,0,0,0.0,0.0,1,1,0,88,96.6,1,0,0.0,0.0,0.0,0,2,3,0,2,2,1,1,1,2,0,2,73,369.0,195.0,2,0,0,0.0
+Federico Valverde,MC,real madrid,villarreal,1,59,0,0,0.0,0.0,1,0,1,52,94.2,0,0,0.0,0.0,0.0,1,1,1,0,0,1,0,1,2,0,0,0,40,154.0,87.0,0,0,0,0.0
+Eduardo Camavinga,MC,real madrid,villarreal,0,31,0,0,0.0,0.1,0,0,0,32,90.6,1,0,0.0,0.0,0.0,1,1,2,0,1,0,0,0,2,0,0,0,22,159.0,63.0,0,0,0,0.0
+Fran Garcia,DF,real madrid,villarreal,1,90,0,0,0.0,0.0,0,0,0,78,82.1,0,0,0.0,0.0,0.0,-3,3,4,0,3,1,1,0,1,0,0,0,50,167.0,86.0,1,1,2,33.3
+Antonio Rüdiger,DF,real madrid,villarreal,1,90,0,0,0.0,0.0,1,1,0,62,93.5,0,0,0.0,0.0,0.0,-2,2,1,0,0,1,1,0,1,0,0,0,44,178.0,90.0,0,1,2,33.3
+Éder Militão,DF,real madrid,villarreal,1,60,0,0,0.0,0.0,0,0,0,46,87.0,0,0,0.0,0.0,0.0,-1,3,3,0,1,1,1,0,3,0,0,0,36,187.0,78.0,2,2,4,33.3
+Nacho,DF,real madrid,villarreal,0,30,0,0,0.0,0.0,0,0,0,25,100.0,0,0,0.0,0.0,0.0,2,1,1,0,1,1,1,0,0,0,0,0,14,75.0,16.0,0,0,0,0.0
+Lucas Vázquez,DF,real madrid,villarreal,1,90,1,2,0.2,0.4,1,0,1,77,88.3,0,0,0.0,0.0,0.0,19,1,2,0,2,2,1,1,5,3,2,1,43,159.0,69.0,2,0,0,0.0
+Andriy Lunin,PT,real madrid,villarreal,1,90,0,0,0.0,0.0,0,0,0,43,90.7,0,0,4.0,42.9,3.1,-1,0,0,0,0,0,0,0,2,0,0,0,29,111.0,57.0,0,0,0,0.0

@@ -1,0 +1,31 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Borja Mayoral,DT,getafe,valencia,1,90,1,0,0.1,0.0,2,0,2,33,87.9,0,0,0.0,0.0,0.0,12,0,0,0,0,1,0,1,0,1,0,1,21,54.0,17.0,0,3,2,60.0
+Juanmi Latasa,DT,getafe,valencia,1,73,0,0,0.1,0.0,1,0,1,20,35.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,1,0,1,12,35.0,0.0,0,12,8,60.0
+Jaime Mata,DT,getafe,valencia,0,17,0,0,0.1,0.0,1,0,1,5,60.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,5.0,0.0,0,1,1,50.0
+Jordi,MC,getafe,valencia,1,82,0,0,0.3,0.0,1,0,1,47,59.6,0,0,0.0,0.0,0.0,0,3,1,0,1,2,0,2,0,4,1,3,27,140.0,44.0,2,1,2,33.3
+Stefan Mitrović,DF,getafe,valencia,0,8,0,0,0.0,0.0,0,0,0,8,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,4,34.0,29.0,1,0,1,0.0
+Luis Milla,MC,getafe,valencia,1,69,0,0,0.0,0.1,1,0,1,67,73.1,1,0,0.0,0.0,0.0,6,1,0,0,0,0,0,0,1,3,2,1,31,159.0,76.0,2,2,1,66.7
+Óscar Rodríguez Arnaiz,MC,getafe,valencia,0,21,0,0,0.0,0.0,1,1,0,27,88.9,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,1,0,0,14,56.0,29.0,0,1,0,100.0
+Nemanja Maksimović,MC,getafe,valencia,1,90,0,0,0.0,0.0,0,0,0,52,92.3,0,0,0.0,0.0,0.0,9,3,0,0,0,1,0,1,0,0,0,0,24,118.0,45.0,1,1,1,50.0
+Mason Greenwood,MC,getafe,valencia,1,90,0,0,0.1,0.0,1,1,0,56,75.0,0,0,0.0,0.0,0.0,6,1,0,0,0,0,0,0,0,5,2,3,41,320.0,134.0,5,1,0,100.0
+Gastón Álvarez,DF,getafe,valencia,1,90,0,0,0.0,0.0,0,0,0,68,75.0,0,0,0.0,0.0,0.0,7,1,1,0,0,1,0,1,1,1,1,0,19,60.0,24.0,1,2,2,50.0
+Domingos Duarte,DF,getafe,valencia,1,89,0,0,0.0,0.1,0,0,0,76,78.9,0,1,0.0,0.0,0.0,4,0,0,0,0,0,0,0,2,1,1,0,35,239.0,171.0,3,2,1,66.7
+Djené,DF,getafe,valencia,1,69,0,0,0.0,0.0,0,0,0,58,86.2,1,0,0.0,0.0,0.0,5,1,0,0,0,0,0,0,1,0,0,0,28,155.0,98.0,1,3,0,100.0
+Carles Aleñá,MC,getafe,valencia,0,21,0,0,0.0,0.0,0,0,0,27,85.2,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,0,1,0,1,11,71.0,43.0,2,0,2,0.0
+Iglesias,DF,getafe,valencia,1,90,0,1,0.0,0.1,0,0,0,80,65.0,0,0,0.0,0.0,0.0,12,3,0,0,0,0,0,0,5,0,0,0,24,90.0,49.0,2,1,0,100.0
+David Soria,PT,getafe,valencia,1,90,0,0,0.0,0.0,0,0,0,28,75.0,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,0,0,0,12,31.0,18.0,0,0,0,0.0
+Hugo Duro,DT,valencia,getafe,1,90,0,0,0.0,0.0,0,0,0,15,66.7,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,2,0,0,0,14,85.0,3.0,0,3,6,33.3
+Diego López,DT,valencia,getafe,1,81,0,0,0.0,0.0,0,0,0,17,47.1,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,1,0,1,13,46.0,17.0,0,0,4,0.0
+Jesus Vazquez,MC,valencia,getafe,0,9,0,0,0.0,0.0,0,0,0,3,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,9.0,2.0,0,0,0,0.0
+Francisco Perez,MC,valencia,getafe,1,53,0,0,0.0,0.0,0,0,0,11,72.7,0,0,0.0,0.0,0.0,2,1,1,0,0,1,0,1,0,0,0,0,15,98.0,34.0,1,0,0,0.0
+Mouctar Diakhaby,DF,valencia,getafe,0,37,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,4,2,2,0,0,2,1,1,8,0,0,0,0,0.0,0.0,0,2,0,100.0
+José Luis García Vayá,MC,valencia,getafe,1,90,0,0,0.1,0.1,2,2,0,45,66.7,0,0,0.0,0.0,0.0,6,1,2,0,1,2,0,2,4,0,0,0,27,68.0,18.0,0,1,2,33.3
+Javier Guerra,MC,valencia,getafe,1,87,0,0,0.0,0.0,0,0,0,27,66.7,0,1,0.0,0.0,0.0,1,2,1,0,0,1,0,1,5,0,0,0,12,47.0,31.0,0,2,2,50.0
+Dimitri Foulquier,MC,valencia,getafe,1,90,0,0,0.0,0.0,0,0,0,19,47.4,1,0,0.0,0.0,0.0,0,0,2,0,2,0,0,0,2,2,0,0,17,51.0,21.0,1,0,5,0.0
+Yarek Gasiorowski,DF,valencia,getafe,1,89,0,0,0.0,0.0,0,0,0,26,57.7,0,0,0.0,0.0,0.0,0,6,4,0,1,0,0,0,5,0,0,0,16,38.0,20.0,1,3,1,75.0
+Roman Yaremchuk,MC,valencia,getafe,0,1,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,0.0,0.0,0,1,0,100.0
+Gabriel Paulista,DF,valencia,getafe,1,49,0,0,0.0,0.0,0,0,0,29,65.5,2,1,0.0,0.0,0.0,4,0,0,0,0,0,0,0,9,0,0,0,11,51.0,29.0,0,3,4,42.9
+Cristhian Mosquera,DF,valencia,getafe,1,90,0,0,0.1,0.0,1,1,0,34,70.6,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,7,0,0,0,16,71.0,10.0,0,4,4,50.0
+Thierry Correia,DF,valencia,getafe,1,89,0,0,0.0,0.0,0,0,0,50,50.0,1,0,0.0,0.0,0.0,3,4,3,0,1,0,0,0,7,1,1,0,26,153.0,46.0,0,2,2,50.0
+Sergi Canós,DT,valencia,getafe,0,1,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0
+Giorgi Mamardashvili,PT,valencia,getafe,1,90,0,0,0.0,0.0,0,0,0,32,21.9,0,0,1.0,83.3,1.1,5,0,0,0,0,0,0,0,2,0,0,0,16,104.0,48.0,0,0,0,0.0

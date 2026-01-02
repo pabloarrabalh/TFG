@@ -1,0 +1,32 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+Anthony Lozano,DT,almeria,villarreal,1,68,1,0,0.8,0.1,5,3,2,7,85.7,0,0,0.0,0.0,0.0,9,0,0,0,0,1,1,0,2,1,0,0,9,48.0,20.0,0,2,5,28.6
+Largie Ramazani,DT,almeria,villarreal,0,18,0,0,0.0,0.0,1,1,0,2,50.0,2,1,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,2,2,0,3,60.0,59.0,2,0,0,0.0
+Adri Embarba,DT,almeria,villarreal,1,84,0,0,0.0,0.2,1,1,0,30,80.0,0,0,0.0,0.0,0.0,5,1,1,0,0,1,0,1,0,2,1,1,22,143.0,69.0,2,1,1,50.0
+Luka Romero,DT,almeria,villarreal,0,6,0,0,0.0,0.0,0,0,0,7,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,5,25.0,22.0,1,0,0,0.0
+Léo Baptistão,DT,almeria,villarreal,1,90,0,0,0.2,0.0,3,3,0,40,67.5,0,0,0.0,0.0,0.0,1,0,0,0,0,2,0,2,2,2,1,1,27,142.0,91.0,4,4,0,100.0
+Jonathan Viera,MC,almeria,villarreal,1,75,0,0,0.4,0.6,4,3,1,52,88.5,1,0,0.0,0.0,0.0,7,1,3,0,2,1,0,1,0,2,2,0,44,281.0,191.0,4,0,1,0.0
+Sergio Arribas,MC,almeria,villarreal,0,15,0,0,0.0,0.0,0,0,0,8,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,8,41.0,2.0,0,0,0,0.0
+Dion Lopy,MC,almeria,villarreal,1,67,0,0,0.1,0.0,3,2,1,37,97.3,0,0,0.0,0.0,0.0,4,0,1,0,1,0,0,0,0,2,1,1,29,138.0,57.0,0,0,1,0.0
+Marcos Peña,MC,almeria,villarreal,0,23,0,0,0.0,0.0,1,1,0,8,100.0,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,1,0,0,0,5,15.0,8.0,0,0,0,0.0
+Lucas Robertone,MC,almeria,villarreal,1,90,0,0,0.0,0.0,0,0,0,64,89.1,0,0,0.0,0.0,0.0,4,1,0,0,0,2,0,2,1,0,0,0,42,218.0,90.0,0,0,0,0.0
+Bruno Langa,DF,almeria,villarreal,1,90,0,0,0.0,0.1,1,1,0,49,83.7,0,0,0.0,0.0,0.0,1,1,2,0,2,0,0,0,1,5,3,0,32,200.0,97.0,3,0,0,0.0
+Chumi,DF,almeria,villarreal,1,90,0,0,0.0,0.0,0,0,0,64,90.6,0,0,0.0,0.0,0.0,1,4,1,0,0,0,0,0,0,0,0,0,47,201.0,83.0,0,0,1,0.0
+César Montes,DF,almeria,villarreal,1,90,0,0,0.0,0.1,1,1,0,77,85.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,3,0,0,0,56,247.0,137.0,0,2,0,100.0
+Marc Pubill,DF,almeria,villarreal,1,90,0,0,0.1,0.2,4,3,1,56,87.5,0,0,0.0,0.0,0.0,2,1,1,0,1,1,0,1,3,2,1,1,36,156.0,100.0,5,0,2,0.0
+Luís Maximiano,PT,almeria,villarreal,1,90,0,0,0.0,0.0,0,0,0,50,86.0,0,0,2.0,33.3,1.4,2,0,0,0,0,0,0,0,0,0,0,0,34,119.0,64.0,0,0,0,0.0
+Alexander Sørloth,DT,villarreal,almeria,1,90,1,0,0.8,0.2,4,3,1,14,78.6,0,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,0,3,2,0,17,116.0,64.0,4,1,1,50.0
+Gerard Moreno,DT,villarreal,almeria,1,71,0,0,0.0,0.0,0,0,0,17,70.6,0,0,0.0,0.0,0.0,3,1,1,0,0,0,0,0,0,1,0,1,11,47.0,9.0,1,1,2,33.3
+Bertrand Traoré,MC,villarreal,almeria,0,19,0,0,0.1,0.0,1,1,0,9,66.7,0,0,0.0,0.0,0.0,2,0,1,0,1,1,0,1,0,0,0,0,11,42.0,26.0,1,0,1,0.0
+Alex Baena,MC,villarreal,almeria,1,90,0,0,0.0,0.2,2,2,0,35,77.1,0,0,0.0,0.0,0.0,4,2,6,0,4,1,0,1,1,1,1,0,25,148.0,102.0,2,1,0,100.0
+Francis Coquelin,MC,villarreal,almeria,1,90,0,0,0.0,0.0,1,1,0,32,84.4,1,0,0.0,0.0,0.0,3,3,1,0,0,2,0,2,1,1,0,1,16,77.0,48.0,1,1,1,50.0
+Daniel Parejo,MC,villarreal,almeria,1,59,0,0,0.0,0.0,0,0,0,21,76.2,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,1,0,0,0,14,30.0,16.0,1,0,0,0.0
+Gonçalo Guedes,MC,villarreal,almeria,0,31,0,0,0.0,0.0,0,0,0,15,86.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,9,79.0,62.0,2,0,0,0.0
+Ilias Akhomach,MC,villarreal,almeria,1,78,1,0,0.7,0.0,3,1,2,12,83.3,1,0,0.0,0.0,0.0,8,1,2,0,2,0,0,0,2,3,1,1,16,101.0,83.0,4,0,0,0.0
+José Luis Morales,DT,villarreal,almeria,0,12,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,3,11.0,5.0,0,0,0,0.0
+Alfonso Pedraza,DF,villarreal,almeria,1,60,0,1,0.0,0.7,0,0,0,32,68.8,0,0,0.0,0.0,0.0,11,0,0,0,0,3,2,1,1,1,1,0,25,119.0,85.0,5,0,1,0.0
+Alberto Moreno,DF,villarreal,almeria,0,30,0,1,0.0,0.5,0,0,0,18,77.8,0,0,0.0,0.0,0.0,8,1,1,0,1,0,0,0,0,0,0,0,13,82.0,59.0,3,1,0,100.0
+Yerson Mosquera,DF,villarreal,almeria,1,90,0,0,0.0,0.0,0,0,0,67,89.6,0,0,0.0,0.0,0.0,4,1,1,0,1,1,1,0,3,1,1,0,43,280.0,210.0,1,3,0,100.0
+Aïssa Mandi,DF,villarreal,almeria,1,71,0,0,0.0,0.0,0,0,0,36,86.1,0,0,0.0,0.0,0.0,2,0,1,0,1,2,2,0,2,0,0,0,21,98.0,72.0,0,1,1,50.0
+Jorge Cuenca,DF,villarreal,almeria,0,19,0,0,0.0,0.0,0,0,0,15,93.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,11,44.0,20.0,0,0,1,0.0
+Kiko Femenía,DF,villarreal,almeria,1,90,0,0,0.0,0.0,0,0,0,46,91.3,1,0,0.0,0.0,0.0,4,1,2,0,2,2,1,1,6,0,0,0,29,139.0,61.0,2,2,1,66.7
+Filip Jørgensen,PT,villarreal,almeria,1,90,0,0,0.0,0.0,0,0,0,45,88.9,1,0,1.0,80.0,1.2,7,0,0,0,0,0,0,0,1,0,0,0,24,90.0,45.0,0,0,0,0.0

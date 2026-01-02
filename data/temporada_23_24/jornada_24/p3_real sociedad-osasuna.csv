@@ -1,0 +1,33 @@
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct
+André Silva,DT,real sociedad,osasuna,1,61,0,0,0.0,0.1,1,1,0,13,92.3,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,0,2,1,1,10,34.0,6.0,0,3,0,100.0
+Umar Sadiq,DT,real sociedad,osasuna,0,29,0,0,0.0,0.1,0,0,0,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,3,5.0,0.0,0,1,1,50.0
+Arsen Zakharyan,DT,real sociedad,osasuna,1,61,0,0,0.2,0.0,3,2,1,35,74.3,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,5,3,2,32,183.0,117.0,3,0,0,0.0
+Ander Barrenetxea,DT,real sociedad,osasuna,0,29,0,0,0.1,0.0,1,1,0,23,56.5,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,2,1,1,21,154.0,80.0,1,1,1,50.0
+Takefusa Kubo,DT,real sociedad,osasuna,1,90,0,0,0.6,0.5,6,4,2,47,76.6,0,0,0.0,0.0,0.0,8,0,0,0,0,1,0,1,1,4,1,1,39,366.0,167.0,5,1,0,100.0
+Mikel Merino,MC,real sociedad,osasuna,1,61,0,0,0.1,0.0,1,1,0,38,76.3,0,0,0.0,0.0,0.0,5,1,0,0,0,2,1,1,0,2,2,0,16,119.0,56.0,1,3,3,50.0
+Brais Méndez,MC,real sociedad,osasuna,0,29,0,0,0.2,0.1,3,3,0,12,91.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,11,50.0,5.0,0,0,1,0.0
+Martín Zubimendi,MC,real sociedad,osasuna,1,90,0,0,0.0,0.0,1,1,0,62,87.1,0,0,0.0,0.0,0.0,7,1,2,0,1,0,0,0,4,3,3,0,41,313.0,136.0,1,1,2,33.3
+Beñat Turrientes,MC,real sociedad,osasuna,1,71,0,0,0.0,0.0,0,0,0,25,80.0,0,0,0.0,0.0,0.0,4,1,1,0,1,2,1,1,1,4,2,1,14,95.0,60.0,2,1,4,20.0
+Olasagasti,MC,real sociedad,osasuna,0,19,0,0,0.0,0.0,0,0,0,20,85.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,1,1,1,0,9,50.0,21.0,1,1,2,33.3
+Javi Galán,DF,real sociedad,osasuna,1,90,0,0,0.1,0.3,1,1,0,85,81.2,0,0,0.0,0.0,0.0,10,1,1,0,1,4,1,3,1,4,2,1,64,440.0,327.0,8,1,0,100.0
+Jon Pacheco,DF,real sociedad,osasuna,1,90,0,0,0.0,0.0,0,0,0,68,91.2,0,0,0.0,0.0,0.0,3,1,1,0,0,1,1,0,1,0,0,0,36,249.0,155.0,0,5,3,62.5
+Igor Zubeldia,DF,real sociedad,osasuna,1,90,0,0,0.1,0.0,1,1,0,100,90.0,0,0,0.0,0.0,0.0,5,1,1,0,0,0,0,0,3,0,0,0,67,544.0,339.0,2,7,5,58.3
+Jon Aramburu,DF,real sociedad,osasuna,1,71,0,0,0.1,0.0,1,1,0,56,87.5,0,0,0.0,0.0,0.0,0,2,4,0,2,3,3,0,3,1,1,0,32,147.0,70.0,1,0,1,0.0
+Hamari Traoré,DF,real sociedad,osasuna,0,19,0,0,0.1,0.0,2,2,0,19,63.2,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,12,84.0,52.0,1,0,1,0.0
+Álex Remiro,PT,real sociedad,osasuna,1,90,0,0,0.0,0.0,0,0,0,25,100.0,0,0,1.0,50.0,0.2,4,0,0,0,0,0,0,0,0,0,0,0,12,101.0,37.0,0,1,0,100.0
+Ante Budimir,DT,osasuna,real sociedad,1,73,1,0,0.1,0.0,1,0,1,9,55.6,0,0,0.0,0.0,0.0,9,0,1,0,1,1,1,0,1,0,0,0,7,58.0,28.0,0,6,9,40.0
+Raúl,DT,osasuna,real sociedad,0,17,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,1,4.0,2.0,0,2,0,100.0
+Rubén Peña,DT,osasuna,real sociedad,1,64,0,0,0.1,0.0,2,2,0,9,66.7,0,0,0.0,0.0,0.0,6,0,0,0,0,0,0,0,0,2,1,1,5,41.0,23.0,0,1,4,20.0
+Rubén García,DT,osasuna,real sociedad,0,26,0,0,0.1,0.0,1,1,0,5,60.0,0,0,0.0,0.0,0.0,1,0,1,0,1,2,1,1,1,0,0,0,3,4.0,0.0,0,1,1,50.0
+Aimar Oroz,MC,osasuna,real sociedad,1,90,0,0,0.1,0.0,2,2,0,34,79.4,0,0,0.0,0.0,0.0,7,3,5,0,4,0,0,0,2,3,2,0,29,205.0,132.0,2,1,1,50.0
+Lucas Torró,MC,osasuna,real sociedad,1,90,0,0,0.0,0.0,1,0,1,31,54.8,0,0,0.0,0.0,0.0,6,1,3,0,2,0,0,0,4,0,0,0,13,32.0,4.0,0,5,3,62.5
+Jon Moncayola,MC,osasuna,real sociedad,1,72,0,1,0.0,0.1,0,0,0,32,81.3,0,0,0.0,0.0,0.0,13,1,5,0,4,0,0,0,2,0,0,0,11,26.0,4.0,0,1,0,100.0
+Pablo Ibáñez,MC,osasuna,real sociedad,0,18,0,0,0.0,0.0,0,0,0,5,40.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,1,1,0,3,19.0,1.0,0,1,1,50.0
+Johan Mojica,DF,osasuna,real sociedad,1,72,0,0,0.0,0.0,1,1,0,25,56.0,0,0,0.0,0.0,0.0,7,0,2,0,2,2,2,0,5,3,1,2,19,124.0,53.0,3,2,0,100.0
+Juan Cruz Armada,DF,osasuna,real sociedad,0,18,0,0,0.0,0.0,0,0,0,5,60.0,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,1,1,0,1,2,4.0,3.0,0,0,1,0.0
+Jorge Herrando,DF,osasuna,real sociedad,1,90,0,0,0.1,0.0,1,1,0,15,66.7,0,0,0.0,0.0,0.0,8,2,0,0,0,3,3,0,5,0,0,0,12,43.0,13.0,0,1,2,33.3
+David García,DF,osasuna,real sociedad,1,90,0,0,0.0,0.1,0,0,0,28,89.3,0,0,0.0,0.0,0.0,10,2,2,0,0,4,2,2,7,0,0,0,12,50.0,25.0,0,2,2,50.0
+Unai García,DF,osasuna,real sociedad,1,79,0,0,0.0,0.0,0,0,0,26,73.1,0,0,0.0,0.0,0.0,8,3,2,0,0,0,0,0,2,0,0,0,18,23.0,10.0,0,1,0,100.0
+Catena,DF,osasuna,real sociedad,0,11,0,0,0.0,0.0,0,0,0,1,100.0,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,0,0,0,0,0.0,0.0,0,0,1,0.0
+Jesús Areso,DF,osasuna,real sociedad,1,90,0,0,0.0,0.0,0,0,0,23,60.9,0,0,0.0,0.0,0.0,5,2,3,0,2,4,1,3,3,0,0,0,8,18.0,7.0,0,0,1,0.0
+Sergio Herrera,PT,osasuna,real sociedad,1,90,0,0,0.0,0.0,0,0,0,45,46.7,0,0,0.0,100.0,0.6,12,0,0,0,0,0,0,0,1,0,0,0,31,200.0,122.0,0,0,0,0.0
