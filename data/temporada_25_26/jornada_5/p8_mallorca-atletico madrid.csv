@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
-Vedat Muriqi,DT,mallorca,atletico madrid,1,90,1,0,0.4,0.0,1,0,1,26,53.8,0,0,0.0,0.0,0.0,8,0,1,0,1,0,0,0,2,2,1,1,21,70.0,21.0,0,7,3,70.0,25_26,5,1
-Takuma Asano,DT,mallorca,atletico madrid,1,67,0,0,0.1,0.0,1,1,0,7,71.4,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,1,0,1,9,52.0,16.0,1,1,2,33.3,25_26,5,1
-Marc Domenech,MC,mallorca,atletico madrid,0,23,0,0,0.0,0.0,1,1,0,11,45.5,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,10,15.0,6.0,0,1,1,50.0,25_26,5,1
-Sergi Darder,MC,mallorca,atletico madrid,1,90,0,0,0.0,0.0,1,1,0,49,83.7,0,0,0.0,0.0,0.0,7,0,0,0,0,1,0,1,1,2,2,0,40,183.0,98.0,2,0,0,0.0,25_26,5,1
-Manu Morlanes,MC,mallorca,atletico madrid,1,81,0,0,0.0,0.0,0,0,0,33,87.9,0,0,0.0,0.0,0.0,6,3,3,0,2,0,0,0,2,0,0,0,21,86.0,60.0,1,2,1,66.7,25_26,5,1
-Abdón Prats,DT,mallorca,atletico madrid,0,9,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,2.0,0.0,0,0,0,0.0,25_26,5,1
-Samu Costa,MC,mallorca,atletico madrid,1,66,0,0,0.0,0.0,0,0,0,21,76.2,0,0,0.0,0.0,0.0,5,1,3,0,2,2,0,2,3,0,0,0,18,53.0,22.0,0,3,2,60.0,25_26,5,1
-Antonio Sánchez,DF,mallorca,atletico madrid,0,24,0,0,0.0,0.0,0,0,0,24,83.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,17,130.0,57.0,2,0,0,0.0,25_26,5,1
-Johan Mojica,DF,mallorca,atletico madrid,1,90,0,0,0.0,0.1,0,0,0,48,75.0,0,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,2,0,0,0,35,124.0,49.0,1,0,0,0.0,25_26,5,1
-Marash Kumbulla,DF,mallorca,atletico madrid,1,35,0,0,0.0,0.0,0,0,0,20,80.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,1,0,0,0,16,58.0,19.0,0,0,0,0.0,25_26,5,1
-Pablo Torre,DT,mallorca,atletico madrid,0,55,0,0,0.1,0.0,2,1,1,37,86.5,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,0,0,0,24,91.0,50.0,0,0,0,0.0,25_26,5,1
-Antonio Raillo,DF,mallorca,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,57,86.0,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,3,0,0,0,43,158.0,110.0,1,2,2,50.0,25_26,5,1
-Martin Valjent,DF,mallorca,atletico madrid,1,90,0,0,0.0,0.0,1,0,1,42,92.9,0,0,0.0,0.0,0.0,7,3,2,0,0,1,0,1,11,1,1,0,33,163.0,88.0,1,3,0,100.0,25_26,5,1
-Mateu Morey,DF,mallorca,atletico madrid,1,81,0,0,0.0,0.0,0,0,0,14,85.7,0,0,0.0,0.0,0.0,4,3,3,0,1,1,0,1,4,1,1,0,15,68.0,34.0,1,0,1,0.0,25_26,5,1
-Jan Virgili,MC,mallorca,atletico madrid,0,9,0,1,0.0,0.4,1,1,0,12,83.3,0,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,0,5,3,2,12,102.0,59.0,2,1,0,100.0,25_26,5,1
-Leo Román,PT,mallorca,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,37,78.4,0,0,1.0,85.7,3.0,15,0,0,0,0,0,0,0,3,0,0,0,19,65.0,38.0,0,0,0,0.0,25_26,5,1
-Giacomo Raspadori,DT,atletico madrid,mallorca,1,61,0,0,0.0,0.0,0,0,0,30,76.7,0,0,0.0,0.0,0.0,6,0,1,0,1,0,0,0,0,1,0,1,22,96.0,42.0,2,0,2,0.0,25_26,5,0
-Nahuel Molina,DF,atletico madrid,mallorca,0,29,0,0,0.0,0.0,0,0,0,11,72.7,0,0,0.0,0.0,0.0,1,2,3,0,3,1,0,1,1,0,0,0,5,16.0,7.0,0,0,2,0.0,25_26,5,0
-Julián Álvarez,DT,atletico madrid,mallorca,1,61,0,0,1.1,0.0,1,0,1,25,80.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,1,0,1,17,64.0,13.0,0,0,0,0.0,25_26,5,0
-Alexander Sørloth,DT,atletico madrid,mallorca,0,10,0,0,0.0,0.0,1,1,0,2,50.0,0,1,0.0,0.0,0.0,-2,0,0,0,0,0,0,0,0,0,0,0,1,2.0,0.0,0,1,0,100.0,25_26,5,0
-Nicolás González,MC,atletico madrid,mallorca,1,76,0,0,0.1,0.3,2,1,1,49,81.6,0,0,0.0,0.0,0.0,8,0,2,0,2,1,0,1,1,4,2,2,41,208.0,127.0,4,3,1,75.0,25_26,5,0
-Matteo Ruggeri,DF,atletico madrid,mallorca,0,14,0,0,0.0,0.0,0,0,0,5,60.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,6,0,0,0,1,0.0,0.0,0,0,0,0.0,25_26,5,0
-Pablo Barrios,MC,atletico madrid,mallorca,1,67,0,0,0.0,0.0,1,0,1,63,87.3,0,0,0.0,0.0,0.0,7,1,0,0,0,1,0,1,0,3,2,1,55,246.0,124.0,1,1,2,33.3,25_26,5,0
-Conor Gallagher,MC,atletico madrid,mallorca,0,23,1,0,0.4,0.2,1,0,1,3,100.0,0,0,0.0,0.0,0.0,8,1,2,0,1,1,0,1,0,0,0,0,2,3.0,3.0,1,0,0,0.0,25_26,5,0
-Koke,MC,atletico madrid,mallorca,1,90,0,0,0.0,0.2,0,0,0,94,94.7,0,0,0.0,0.0,0.0,5,1,1,0,0,1,0,1,1,0,0,0,80,242.0,137.0,0,1,2,33.3,25_26,5,0
-Giuliano Simeone,MC,atletico madrid,mallorca,1,61,0,0,0.3,0.3,1,1,0,34,82.4,0,0,0.0,0.0,0.0,6,1,0,0,0,1,0,1,0,3,2,1,24,154.0,105.0,5,0,0,0.0,25_26,5,0
-Antoine Griezmann,MC,atletico madrid,mallorca,0,29,0,0,0.2,0.0,1,0,1,8,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,0,0,0,4,30.0,22.0,1,0,1,0.0,25_26,5,0
-Dávid Hancko,DF,atletico madrid,mallorca,1,90,0,0,0.1,0.0,2,2,0,57,82.5,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,3,1,0,1,34,89.0,58.0,2,0,3,0.0,25_26,5,0
-Clément Lenglet,DF,atletico madrid,mallorca,1,90,0,0,0.0,0.0,0,0,0,66,87.9,0,0,0.0,0.0,0.0,5,1,1,0,0,0,0,0,3,0,0,0,55,249.0,191.0,0,2,1,66.7,25_26,5,0
-Robin Le Normand,DF,atletico madrid,mallorca,1,90,0,0,0.0,0.0,0,0,0,56,96.4,0,0,0.0,0.0,0.0,7,2,2,0,1,4,1,3,6,0,0,0,42,205.0,159.0,0,3,3,50.0,25_26,5,0
-Marcos Llorente,DF,atletico madrid,mallorca,1,90,0,0,0.2,0.0,1,0,1,73,84.9,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,1,2,1,1,54,290.0,147.0,5,1,3,25.0,25_26,5,0
-Jan Oblak,PT,atletico madrid,mallorca,1,90,0,0,0.0,0.0,0,0,0,23,52.2,0,0,1.0,66.7,1.0,4,0,0,0,0,0,0,0,0,0,0,0,11,57.0,42.0,0,0,0,0.0,25_26,5,0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,fecha_partido,local,roles
+Vedat Muriqi,DT,mallorca,atletico madrid,1,90,1,0,0.4,0.0,1,0,1,26,53.8,0,0,0.0,0.0,0.0,8,0,1,0,1,0,0,0,2,2,1,1,21,70.0,21.0,0,7,3,70.0,25_26,5,21/09/2025,1,"[{'goles': [3, 9.0]}, {'goles_90': [6, 0.64]}, {'penaltis_marcados': [6, 2.0]}, {'tiros_puerta': [4, 21.0]}, {'rojas': [2, 1.0]}]"
+Takuma Asano,DT,mallorca,atletico madrid,1,67,0,0,0.1,0.0,1,1,0,7,71.4,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,1,0,1,9,52.0,16.0,1,1,2,33.3,25_26,5,21/09/2025,1,[]
+Marc Domenech,MC,mallorca,atletico madrid,0,23,0,0,0.0,0.0,1,1,0,11,45.5,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,10,15.0,6.0,0,1,1,50.0,25_26,5,21/09/2025,1,[]
+Sergi Darder,MC,mallorca,atletico madrid,1,90,0,0,0.0,0.0,1,1,0,49,83.7,0,0,0.0,0.0,0.0,7,0,0,0,0,1,0,1,1,2,2,0,40,183.0,98.0,2,0,0,0.0,25_26,5,21/09/2025,1,"[{'corners': [9, 32.0]}]"
+Manu Morlanes,MC,mallorca,atletico madrid,1,81,0,0,0.0,0.0,0,0,0,33,87.9,0,0,0.0,0.0,0.0,6,3,3,0,2,0,0,0,2,0,0,0,21,86.0,60.0,1,2,1,66.7,25_26,5,21/09/2025,1,"[{'rojas': [2, 1.0]}]"
+Abdón Prats,DT,mallorca,atletico madrid,0,9,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,2.0,0.0,0,0,0,0.0,25_26,5,21/09/2025,1,"[{'apariciones_suplente': [5, 23.0]}]"
+Samu Costa,MC,mallorca,atletico madrid,1,66,0,0,0.0,0.0,0,0,0,21,76.2,0,0,0.0,0.0,0.0,5,1,3,0,2,2,0,2,3,0,0,0,18,53.0,22.0,0,3,2,60.0,25_26,5,21/09/2025,1,"[{'amarillas': [4, 6.0]}]"
+Antonio Sánchez,DF,mallorca,atletico madrid,0,24,0,0,0.0,0.0,0,0,0,24,83.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,17,130.0,57.0,2,0,0,0.0,25_26,5,21/09/2025,1,"[{'rojas': [2, 1.0]}]"
+Johan Mojica,DF,mallorca,atletico madrid,1,90,0,0,0.0,0.1,0,0,0,48,75.0,0,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,2,0,0,0,35,124.0,49.0,1,0,0,0.0,25_26,5,21/09/2025,1,"[{'centros_area': [1, 14.0]}]"
+Marash Kumbulla,DF,mallorca,atletico madrid,1,35,0,0,0.0,0.0,0,0,0,20,80.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,1,0,0,0,16,58.0,19.0,0,0,0,0.0,25_26,5,21/09/2025,1,"[{'despejes': [2, 224.0]}]"
+Pablo Torre,DT,mallorca,atletico madrid,0,55,0,0,0.1,0.0,2,1,1,37,86.5,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,0,0,0,24,91.0,50.0,0,0,0,0.0,25_26,5,21/09/2025,1,"[{'apariciones_suplente': [6, 22.0]}]"
+Antonio Raillo,DF,mallorca,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,57,86.0,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,3,0,0,0,43,158.0,110.0,1,2,2,50.0,25_26,5,21/09/2025,1,"[{'minutos': [5, 1530.0]}]"
+Martin Valjent,DF,mallorca,atletico madrid,1,90,0,0,0.0,0.0,1,0,1,42,92.9,0,0,0.0,0.0,0.0,7,3,2,0,0,1,0,1,11,1,1,0,33,163.0,88.0,1,3,0,100.0,25_26,5,21/09/2025,1,"[{'despejes': [7, 94.0]}, {'minutos': [5, 1530.0]}]"
+Mateu Morey,DF,mallorca,atletico madrid,1,81,0,0,0.0,0.0,0,0,0,14,85.7,0,0,0.0,0.0,0.0,4,3,3,0,1,1,0,1,4,1,1,0,15,68.0,34.0,1,0,1,0.0,25_26,5,21/09/2025,1,[]
+Jan Virgili,MC,mallorca,atletico madrid,0,9,0,1,0.0,0.4,1,1,0,12,83.3,0,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,0,5,3,2,12,102.0,59.0,2,1,0,100.0,25_26,5,21/09/2025,1,"[{'asistencias': [8, 4.0]}, {'asistencias_90': [3, 0.48]}]"
+Leo Román,PT,mallorca,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,37,78.4,0,0,1.0,85.7,3.0,15,0,0,0,0,0,0,0,3,0,0,0,19,65.0,38.0,0,0,0,0.0,25_26,5,21/09/2025,1,[]
+Giacomo Raspadori,DT,atletico madrid,mallorca,1,61,0,0,0.0,0.0,0,0,0,30,76.7,0,0,0.0,0.0,0.0,6,0,1,0,1,0,0,0,0,1,0,1,22,96.0,42.0,2,0,2,0.0,25_26,5,21/09/2025,0,"[{'apariciones_suplente': [9, 10.0]}]"
+Nahuel Molina,DF,atletico madrid,mallorca,0,29,0,0,0.0,0.0,0,0,0,11,72.7,0,0,0.0,0.0,0.0,1,2,3,0,3,1,0,1,1,0,0,0,5,16.0,7.0,0,0,2,0.0,25_26,5,21/09/2025,0,"[{'rojas': [10, 1.0]}]"
+Julián Álvarez,DT,atletico madrid,mallorca,1,61,0,0,1.1,0.0,1,0,1,25,80.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,1,0,1,17,64.0,13.0,0,0,0,0.0,25_26,5,21/09/2025,0,"[{'goles': [5, 7.0]}, {'penaltis_marcados': [6, 2.0]}, {'tiros_puerta': [9, 16.0]}, {'pases_clave': [4, 36.0]}, {'corners': [6, 51.0]}]"
+Alexander Sørloth,DT,atletico madrid,mallorca,0,10,0,0,0.0,0.0,1,1,0,2,50.0,0,1,0.0,0.0,0.0,-2,0,0,0,0,0,0,0,0,0,0,0,1,2.0,0.0,0,1,0,100.0,25_26,5,21/09/2025,0,"[{'rojas': [2, 1.0]}]"
+Nicolás González,MC,atletico madrid,mallorca,1,76,0,0,0.1,0.3,2,1,1,49,81.6,0,0,0.0,0.0,0.0,8,0,2,0,2,1,0,1,1,4,2,2,41,208.0,127.0,4,3,1,75.0,25_26,5,21/09/2025,0,[]
+Matteo Ruggeri,DF,atletico madrid,mallorca,0,14,0,0,0.0,0.0,0,0,0,5,60.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,6,0,0,0,1,0.0,0.0,0,0,0,0.0,25_26,5,21/09/2025,0,"[{'centros_area': [4, 10.0]}]"
+Pablo Barrios,MC,atletico madrid,mallorca,1,67,0,0,0.0,0.0,1,0,1,63,87.3,0,0,0.0,0.0,0.0,7,1,0,0,0,1,0,1,0,3,2,1,55,246.0,124.0,1,1,2,33.3,25_26,5,21/09/2025,0,"[{'regates_exitosos': [10, 29.0]}]"
+Conor Gallagher,MC,atletico madrid,mallorca,0,23,1,0,0.4,0.2,1,0,1,3,100.0,0,0,0.0,0.0,0.0,8,1,2,0,1,1,0,1,0,0,0,0,2,3.0,3.0,1,0,0,0.0,25_26,5,21/09/2025,0,"[{'apariciones_suplente': [1, 14.0]}]"
+Koke,MC,atletico madrid,mallorca,1,90,0,0,0.0,0.2,0,0,0,94,94.7,0,0,0.0,0.0,0.0,5,1,1,0,0,1,0,1,1,0,0,0,80,242.0,137.0,0,1,2,33.3,25_26,5,21/09/2025,0,"[{'pases_completados_pct': [10, 91.5]}]"
+Giuliano Simeone,MC,atletico madrid,mallorca,1,61,0,0,0.3,0.3,1,1,0,34,82.4,0,0,0.0,0.0,0.0,6,1,0,0,0,1,0,1,0,3,2,1,24,154.0,105.0,5,0,0,0.0,25_26,5,21/09/2025,0,"[{'asistencias': [8, 4.0]}]"
+Antoine Griezmann,MC,atletico madrid,mallorca,0,29,0,0,0.2,0.0,1,0,1,8,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,0,0,0,4,30.0,22.0,1,0,1,0.0,25_26,5,21/09/2025,0,"[{'goles': [9, 6.0]}, {'goles_90': [5, 0.8]}, {'apariciones_suplente': [3, 13.0]}]"
+Dávid Hancko,DF,atletico madrid,mallorca,1,90,0,0,0.1,0.0,2,2,0,57,82.5,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,3,1,0,1,34,89.0,58.0,2,0,3,0.0,25_26,5,21/09/2025,0,[]
+Clément Lenglet,DF,atletico madrid,mallorca,1,90,0,0,0.0,0.0,0,0,0,66,87.9,0,0,0.0,0.0,0.0,5,1,1,0,0,0,0,0,3,0,0,0,55,249.0,191.0,0,2,1,66.7,25_26,5,21/09/2025,0,"[{'rojas': [2, 1.0]}]"
+Robin Le Normand,DF,atletico madrid,mallorca,1,90,0,0,0.0,0.0,0,0,0,56,96.4,0,0,0.0,0.0,0.0,7,2,2,0,1,4,1,3,6,0,0,0,42,205.0,159.0,0,3,3,50.0,25_26,5,21/09/2025,0,"[{'amarillas': [4, 13.0]}]"
+Marcos Llorente,DF,atletico madrid,mallorca,1,90,0,0,0.2,0.0,1,0,1,73,84.9,0,0,0.0,0.0,0.0,3,1,0,0,0,0,0,0,1,2,1,1,54,290.0,147.0,5,1,3,25.0,25_26,5,21/09/2025,0,"[{'rojas': [8, 1.0]}]"
+Jan Oblak,PT,atletico madrid,mallorca,1,90,0,0,0.0,0.0,0,0,0,23,52.2,0,0,1.0,66.7,1.0,4,0,0,0,0,0,0,0,0,0,0,0,11,57.0,42.0,0,0,0,0.0,25_26,5,21/09/2025,0,"[{'minutos': [5, 1530.0]}, {'porterias_cero': [4, 6.0]}]"

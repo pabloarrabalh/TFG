@@ -1,32 +1,32 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
-Hugo Duro,DT,valencia,real sociedad,1,90,0,0,0.0,0.0,0,0,0,8,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,2,1,1,11,72.0,43.0,0,1,11,8.3,23_24,7,1
-Diego López,DT,valencia,real sociedad,1,73,0,0,0.0,0.0,1,1,0,24,62.5,0,0,0.0,0.0,0.0,3,2,2,0,2,1,0,1,0,0,0,0,15,77.0,23.0,0,1,1,50.0,23_24,7,1
-Roman Yaremchuk,DT,valencia,real sociedad,0,17,0,0,0.1,0.0,1,1,0,5,60.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,1,0,1,8,36.0,5.0,0,1,2,33.3,23_24,7,1
-Francisco Perez,DT,valencia,real sociedad,1,54,0,0,0.0,0.0,0,0,0,14,71.4,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,0,1,14,88.0,38.0,0,0,1,0.0,23_24,7,1
-Domingos André Ribeiro Almeida,DT,valencia,real sociedad,0,36,0,0,0.0,0.0,0,0,0,10,60.0,0,0,0.0,0.0,0.0,2,2,2,0,0,0,0,0,0,1,1,0,9,106.0,23.0,1,0,1,0.0,23_24,7,1
-Selim Amallah,MC,valencia,real sociedad,1,44,0,0,0.0,0.0,1,0,1,9,77.8,2,1,0.0,0.0,0.0,-1,0,2,0,2,0,0,0,0,1,0,1,10,36.0,17.0,1,0,2,0.0,23_24,7,1
-Javier Guerra,MC,valencia,real sociedad,1,90,0,0,0.1,0.0,3,2,1,30,73.3,1,0,0.0,0.0,0.0,4,2,2,0,1,6,0,6,1,5,4,1,24,143.0,49.0,1,0,5,0.0,23_24,7,1
-José Luis García Vayá,MC,valencia,real sociedad,1,90,0,0,0.1,0.1,2,2,0,47,85.1,0,0,0.0,0.0,0.0,5,2,1,0,1,3,0,3,2,1,1,0,30,119.0,47.0,0,1,1,50.0,23_24,7,1
-José Luis Gayà,DF,valencia,real sociedad,1,54,0,0,0.0,0.0,0,0,0,29,72.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,17,107.0,62.0,2,1,1,50.0,23_24,7,1
-Gabriel Paulista,DF,valencia,real sociedad,0,36,0,0,0.0,0.0,0,0,0,16,56.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,6,19.0,2.0,0,1,0,100.0,23_24,7,1
-Cenk Özkacar,DF,valencia,real sociedad,1,90,0,0,0.0,0.0,0,0,0,49,79.6,0,0,0.0,0.0,0.0,3,2,2,0,0,1,0,1,5,1,0,1,29,116.0,52.0,0,2,1,66.7,23_24,7,1
-Mouctar Diakhaby,DF,valencia,real sociedad,1,90,0,0,0.0,0.0,1,1,0,52,78.8,0,0,0.0,0.0,0.0,5,2,2,0,0,1,0,1,2,0,0,0,35,163.0,74.0,0,2,0,100.0,23_24,7,1
-Thierry Correia,DF,valencia,real sociedad,1,45,0,0,0.0,0.0,0,0,0,39,76.9,0,0,0.0,0.0,0.0,1,1,3,0,2,0,0,0,0,1,1,0,23,92.0,35.0,0,0,0,0.0,23_24,7,1
-Cristhian Mosquera,DF,valencia,real sociedad,0,45,0,0,0.0,0.0,0,0,0,28,67.9,1,0,0.0,0.0,0.0,2,4,0,0,0,0,0,0,4,0,0,0,13,68.0,15.0,1,5,1,83.3,23_24,7,1
-Giorgi Mamardashvili,PT,valencia,real sociedad,1,90,0,0,0.0,0.0,0,0,0,33,42.4,0,0,1.0,0.0,0.0,3,0,0,0,0,0,0,0,1,0,0,0,19,91.0,33.0,0,0,0,0.0,23_24,7,1
-Carlos Fernández,DT,real sociedad,valencia,1,90,1,0,0.2,0.0,1,0,1,18,61.1,1,0,0.0,0.0,0.0,9,0,0,0,0,1,0,1,1,2,2,0,14,102.0,15.0,1,3,4,42.9,23_24,7,0
-Mohamed Ali Cho,DT,real sociedad,valencia,1,90,0,0,0.0,0.0,0,0,0,21,52.4,0,0,0.0,0.0,0.0,6,2,2,0,1,2,0,2,0,6,2,3,22,194.0,101.0,5,0,2,0.0,23_24,7,0
-Mikel Oyarzabal,DT,real sociedad,valencia,1,90,0,0,0.0,0.0,0,0,0,35,82.9,0,0,0.0,0.0,0.0,4,1,2,0,1,2,0,2,1,2,0,2,28,107.0,34.0,0,1,1,50.0,23_24,7,0
-Beñat Turrientes,MC,real sociedad,valencia,1,60,0,0,0.0,0.0,0,0,0,29,86.2,0,0,0.0,0.0,0.0,6,2,1,0,0,1,0,1,0,1,1,0,18,53.0,28.0,0,0,1,0.0,23_24,7,0
-Brais Méndez,MC,real sociedad,valencia,0,30,0,0,0.0,0.0,0,0,0,13,84.6,1,0,0.0,0.0,0.0,0,1,3,0,3,0,0,0,0,0,0,0,4,18.0,3.0,0,0,0,0.0,23_24,7,0
-Urko González,MC,real sociedad,valencia,1,45,0,0,0.0,0.0,0,0,0,26,80.8,1,0,0.0,0.0,0.0,0,1,1,0,0,0,0,0,0,0,0,0,11,54.0,17.0,0,1,0,100.0,23_24,7,0
-Martín Zubimendi,MC,real sociedad,valencia,0,45,0,0,0.0,0.0,0,0,0,45,82.2,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,1,0,0,0,30,155.0,96.0,2,2,0,100.0,23_24,7,0
-Mikel Merino,MC,real sociedad,valencia,1,90,0,0,0.0,0.0,1,1,0,54,77.8,1,0,0.0,0.0,0.0,3,2,2,0,2,0,0,0,1,3,1,1,39,160.0,57.0,1,6,4,60.0,23_24,7,0
-Kieran Tierney,DF,real sociedad,valencia,1,71,0,1,0.0,0.2,0,0,0,56,71.4,0,0,0.0,0.0,0.0,11,3,3,0,1,4,1,3,4,0,0,0,26,82.0,26.0,0,1,0,100.0,23_24,7,0
-Aihen Muñoz,DF,real sociedad,valencia,0,19,0,0,0.0,0.0,0,0,0,26,61.5,0,0,0.0,0.0,0.0,1,3,0,0,0,0,0,0,1,0,0,0,9,61.0,36.0,1,1,1,50.0,23_24,7,0
-Jon Pacheco,DF,real sociedad,valencia,1,60,0,0,0.0,0.0,0,0,0,84,92.9,1,0,0.0,0.0,0.0,5,0,0,0,0,2,1,1,1,0,0,0,54,255.0,134.0,0,3,0,100.0,23_24,7,0
-Igor Zubeldia,DF,real sociedad,valencia,0,30,0,0,0.0,0.0,0,0,0,31,80.6,1,0,0.0,0.0,0.0,1,1,1,0,0,0,0,0,0,0,0,0,22,101.0,43.0,0,1,0,100.0,23_24,7,0
-Aritz Elustondo,DF,real sociedad,valencia,1,90,0,0,0.0,0.0,0,0,0,85,96.5,0,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,4,0,0,0,60,286.0,123.0,0,6,1,85.7,23_24,7,0
-Hamari Traoré,DF,real sociedad,valencia,1,45,0,0,0.0,0.0,0,0,0,43,86.0,1,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,2,0,20,50.0,22.0,0,1,1,50.0,23_24,7,0
-Álvaro Odriozola,DF,real sociedad,valencia,0,45,0,0,0.0,0.0,0,0,0,28,89.3,0,0,0.0,0.0,0.0,2,0,0,0,0,1,1,0,0,2,0,2,18,155.0,81.0,4,0,0,0.0,23_24,7,0
-Álex Remiro,PT,real sociedad,valencia,1,90,0,0,0.0,0.0,0,0,0,52,86.5,0,0,0.0,100.0,0.4,11,0,0,0,0,0,0,0,1,0,0,0,35,132.0,47.0,0,1,0,100.0,23_24,7,0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,fecha_partido,local,roles
+Hugo Duro,DT,valencia,real sociedad,1,90,0,0,0.0,0.0,0,0,0,8,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,2,1,1,11,72.0,43.0,0,1,11,8.3,23_24,7,27/09/2023,1,"[{'faltas_recibidas': [1, 95.0]}]"
+Diego López,DT,valencia,real sociedad,1,73,0,0,0.0,0.0,1,1,0,24,62.5,0,0,0.0,0.0,0.0,3,2,2,0,2,1,0,1,0,0,0,0,15,77.0,23.0,0,1,1,50.0,23_24,7,27/09/2023,1,[]
+Roman Yaremchuk,DT,valencia,real sociedad,0,17,0,0,0.1,0.0,1,1,0,5,60.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,1,0,1,8,36.0,5.0,0,1,2,33.3,23_24,7,27/09/2023,1,[]
+Francisco Perez,DT,valencia,real sociedad,1,54,0,0,0.0,0.0,0,0,0,14,71.4,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,1,0,1,14,88.0,38.0,0,0,1,0.0,23_24,7,27/09/2023,1,"[{'apariciones_suplente': [5, 22.0]}]"
+Domingos André Ribeiro Almeida,DT,valencia,real sociedad,0,36,0,0,0.0,0.0,0,0,0,10,60.0,0,0,0.0,0.0,0.0,2,2,2,0,0,0,0,0,0,1,1,0,9,106.0,23.0,1,0,1,0.0,23_24,7,27/09/2023,1,[]
+Selim Amallah,MC,valencia,real sociedad,1,44,0,0,0.0,0.0,1,0,1,9,77.8,2,1,0.0,0.0,0.0,-1,0,2,0,2,0,0,0,0,1,0,1,10,36.0,17.0,1,0,2,0.0,23_24,7,27/09/2023,1,"[{'rojas': [10, 1.0]}]"
+Javier Guerra,MC,valencia,real sociedad,1,90,0,0,0.1,0.0,3,2,1,30,73.3,1,0,0.0,0.0,0.0,4,2,2,0,1,6,0,6,1,5,4,1,24,143.0,49.0,1,0,5,0.0,23_24,7,27/09/2023,1,"[{'rojas': [10, 1.0]}]"
+José Luis García Vayá,MC,valencia,real sociedad,1,90,0,0,0.1,0.1,2,2,0,47,85.1,0,0,0.0,0.0,0.0,5,2,1,0,1,3,0,3,2,1,1,0,30,119.0,47.0,0,1,1,50.0,23_24,7,27/09/2023,1,"[{'penaltis_marcados': [1, 7.0]}, {'pases_clave': [8, 55.0]}, {'pases_ultimo_tercio': [8, 216.0]}, {'corners': [4, 108.0]}, {'entradas': [6, 78.0]}, {'intercepciones': [3, 49.0]}, {'minutos': [6, 3302.0]}]"
+José Luis Gayà,DF,valencia,real sociedad,1,54,0,0,0.0,0.0,0,0,0,29,72.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,17,107.0,62.0,2,1,1,50.0,23_24,7,27/09/2023,1,"[{'entradas': [10, 71.0]}]"
+Gabriel Paulista,DF,valencia,real sociedad,0,36,0,0,0.0,0.0,0,0,0,16,56.3,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,6,19.0,2.0,0,1,0,100.0,23_24,7,27/09/2023,1,"[{'rojas': [10, 1.0]}]"
+Cenk Özkacar,DF,valencia,real sociedad,1,90,0,0,0.0,0.0,0,0,0,49,79.6,0,0,0.0,0.0,0.0,3,2,2,0,0,1,0,1,5,1,0,1,29,116.0,52.0,0,2,1,66.7,23_24,7,27/09/2023,1,[]
+Mouctar Diakhaby,DF,valencia,real sociedad,1,90,0,0,0.0,0.0,1,1,0,52,78.8,0,0,0.0,0.0,0.0,5,2,2,0,0,1,0,1,2,0,0,0,35,163.0,74.0,0,2,0,100.0,23_24,7,27/09/2023,1,[]
+Thierry Correia,DF,valencia,real sociedad,1,45,0,0,0.0,0.0,0,0,0,39,76.9,0,0,0.0,0.0,0.0,1,1,3,0,2,0,0,0,0,1,1,0,23,92.0,35.0,0,0,0,0.0,23_24,7,27/09/2023,1,"[{'rojas': [10, 1.0]}]"
+Cristhian Mosquera,DF,valencia,real sociedad,0,45,0,0,0.0,0.0,0,0,0,28,67.9,1,0,0.0,0.0,0.0,2,4,0,0,0,0,0,0,4,0,0,0,13,68.0,15.0,1,5,1,83.3,23_24,7,27/09/2023,1,"[{'despejes': [7, 137.0]}]"
+Giorgi Mamardashvili,PT,valencia,real sociedad,1,90,0,0,0.0,0.0,0,0,0,33,42.4,0,0,1.0,0.0,0.0,3,0,0,0,0,0,0,0,1,0,0,0,19,91.0,33.0,0,0,0,0.0,23_24,7,27/09/2023,1,"[{'minutos': [7, 3284.0]}, {'rojas': [10, 1.0]}, {'porterias_cero': [4, 13.0]}, {'paradas': [8, 103.0]}, {'save_pct': [10, 73.8]}]"
+Carlos Fernández,DT,real sociedad,valencia,1,90,1,0,0.2,0.0,1,0,1,18,61.1,1,0,0.0,0.0,0.0,9,0,0,0,0,1,0,1,1,2,2,0,14,102.0,15.0,1,3,4,42.9,23_24,7,27/09/2023,0,[]
+Mohamed Ali Cho,DT,real sociedad,valencia,1,90,0,0,0.0,0.0,0,0,0,21,52.4,0,0,0.0,0.0,0.0,6,2,2,0,1,2,0,2,0,6,2,3,22,194.0,101.0,5,0,2,0.0,23_24,7,27/09/2023,0,[]
+Mikel Oyarzabal,DT,real sociedad,valencia,1,90,0,0,0.0,0.0,0,0,0,35,82.9,0,0,0.0,0.0,0.0,4,1,2,0,1,2,0,2,1,2,0,2,28,107.0,34.0,0,1,1,50.0,23_24,7,27/09/2023,0,"[{'penaltis_marcados': [6, 4.0]}, {'rojas': [8, 1.0]}]"
+Beñat Turrientes,MC,real sociedad,valencia,1,60,0,0,0.0,0.0,0,0,0,29,86.2,0,0,0.0,0.0,0.0,6,2,1,0,0,1,0,1,0,1,1,0,18,53.0,28.0,0,0,1,0.0,23_24,7,27/09/2023,0,[]
+Brais Méndez,MC,real sociedad,valencia,0,30,0,0,0.0,0.0,0,0,0,13,84.6,1,0,0.0,0.0,0.0,0,1,3,0,3,0,0,0,0,0,0,0,4,18.0,3.0,0,0,0,0.0,23_24,7,27/09/2023,0,[]
+Urko González,MC,real sociedad,valencia,1,45,0,0,0.0,0.0,0,0,0,26,80.8,1,0,0.0,0.0,0.0,0,1,1,0,0,0,0,0,0,0,0,0,11,54.0,17.0,0,1,0,100.0,23_24,7,27/09/2023,0,[]
+Martín Zubimendi,MC,real sociedad,valencia,0,45,0,0,0.0,0.0,0,0,0,45,82.2,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,1,0,0,0,30,155.0,96.0,2,2,0,100.0,23_24,7,27/09/2023,0,[]
+Mikel Merino,MC,real sociedad,valencia,1,90,0,0,0.0,0.0,1,1,0,54,77.8,1,0,0.0,0.0,0.0,3,2,2,0,2,0,0,0,1,3,1,1,39,160.0,57.0,1,6,4,60.0,23_24,7,27/09/2023,0,"[{'entradas': [7, 77.0]}, {'faltas_cometidas': [4, 70.0]}]"
+Kieran Tierney,DF,real sociedad,valencia,1,71,0,1,0.0,0.2,0,0,0,56,71.4,0,0,0.0,0.0,0.0,11,3,3,0,1,4,1,3,4,0,0,0,26,82.0,26.0,0,1,0,100.0,23_24,7,27/09/2023,0,[]
+Aihen Muñoz,DF,real sociedad,valencia,0,19,0,0,0.0,0.0,0,0,0,26,61.5,0,0,0.0,0.0,0.0,1,3,0,0,0,0,0,0,1,0,0,0,9,61.0,36.0,1,1,1,50.0,23_24,7,27/09/2023,0,[]
+Jon Pacheco,DF,real sociedad,valencia,1,60,0,0,0.0,0.0,0,0,0,84,92.9,1,0,0.0,0.0,0.0,5,0,0,0,0,2,1,1,1,0,0,0,54,255.0,134.0,0,3,0,100.0,23_24,7,27/09/2023,0,[]
+Igor Zubeldia,DF,real sociedad,valencia,0,30,0,0,0.0,0.0,0,0,0,31,80.6,1,0,0.0,0.0,0.0,1,1,1,0,0,0,0,0,0,0,0,0,22,101.0,43.0,0,1,0,100.0,23_24,7,27/09/2023,0,"[{'amarillas': [7, 11.0]}, {'rojas': [10, 1.0]}]"
+Aritz Elustondo,DF,real sociedad,valencia,1,90,0,0,0.0,0.0,0,0,0,85,96.5,0,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,4,0,0,0,60,286.0,123.0,0,6,1,85.7,23_24,7,27/09/2023,0,"[{'rojas': [8, 1.0]}]"
+Hamari Traoré,DF,real sociedad,valencia,1,45,0,0,0.0,0.0,0,0,0,43,86.0,1,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,2,0,20,50.0,22.0,0,1,1,50.0,23_24,7,27/09/2023,0,[]
+Álvaro Odriozola,DF,real sociedad,valencia,0,45,0,0,0.0,0.0,0,0,0,28,89.3,0,0,0.0,0.0,0.0,2,0,0,0,0,1,1,0,0,2,0,2,18,155.0,81.0,4,0,0,0.0,23_24,7,27/09/2023,0,[]
+Álex Remiro,PT,real sociedad,valencia,1,90,0,0,0.0,0.0,0,0,0,52,86.5,0,0,0.0,100.0,0.4,11,0,0,0,0,0,0,0,1,0,0,0,35,132.0,47.0,0,1,0,100.0,23_24,7,27/09/2023,0,"[{'minutos': [8, 3275.0]}, {'rojas': [10, 1.0]}, {'porterias_cero': [2, 15.0]}, {'save_pct': [3, 76.2]}]"

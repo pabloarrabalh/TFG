@@ -34,6 +34,7 @@ from alias import (
 )
 from roles import ROLES_DESTACADOS  # <--- NUEVO
 
+
 # ========== LOGGING ==========
 logging.basicConfig(
     level=logging.DEBUG,
@@ -931,16 +932,30 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido, jornada):
     if "roles" not in df_partido.columns:
         df_partido["roles"] = df_partido.index.to_series().apply(lambda _: [])
 
-    # Rellenar roles desde el dict por temporada (sincronizado por nombre canónico)
-    mapa_roles_temp = ROLES_DESTACADOS.get(TEMPORADA_ACTUAL, {})
-
+    # Rellenar roles desde el dict por temporada (y fallback a otras temporadas)
     def _asignar_roles_fila(fila):
+        temporada_fila = fila["temporada"]
         nombre_canonico = normalizar_texto(
             aplicar_alias_jugador_temporada(
-                fila["player"], fila["Equipo_propio"], TEMPORADA_ACTUAL
+                fila["player"], fila["Equipo_propio"], temporada_fila
             )
         )
-        return [r for r in mapa_roles_temp.get(nombre_canonico, [])]
+
+        # 1) probar en su temporada
+        roles_temp = ROLES_DESTACADOS.get(temporada_fila, {})
+        roles = roles_temp.get(nombre_canonico)
+        if roles:
+            return [r for r in roles]
+
+        # 2) fallback: buscar en cualquier otra temporada
+        for temp, mapa in ROLES_DESTACADOS.items():
+            if temp == temporada_fila:
+                continue
+            if nombre_canonico in mapa:
+                return [r for r in mapa[nombre_canonico]]
+
+        # 3) si no tiene rol en ninguna temporada
+        return []
 
     df_partido["roles"] = df_partido.apply(_asignar_roles_fila, axis=1)
 

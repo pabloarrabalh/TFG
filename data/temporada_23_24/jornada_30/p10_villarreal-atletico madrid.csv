@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
-Alexander Sørloth,DT,villarreal,atletico madrid,1,90,1,0,0.1,0.1,2,1,1,14,85.7,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,1,0,1,12,75.0,3.0,0,3,1,75.0,23_24,30,1
-Gonçalo Guedes,DT,villarreal,atletico madrid,1,70,0,0,0.0,0.0,0,0,0,17,82.4,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,0,1,1,0,11,63.0,14.0,0,0,1,0.0,23_24,30,1
-José Luis Morales,DT,villarreal,atletico madrid,0,20,0,0,0.0,0.1,0,0,0,4,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,3,18.0,4.0,1,0,0,0.0,23_24,30,1
-Gerard Moreno,DT,villarreal,atletico madrid,1,80,0,1,0.2,0.0,3,3,0,43,79.1,0,0,0.0,0.0,0.0,7,1,1,0,1,0,0,0,1,3,0,2,33,220.0,54.0,1,0,0,0.0,23_24,30,1
-Bertrand Traoré,DT,villarreal,atletico madrid,0,10,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,3,1,2,6,42.0,2.0,0,0,0,0.0,23_24,30,1
-Francis Coquelin,MC,villarreal,atletico madrid,1,64,0,0,0.1,0.0,1,1,0,35,80.0,0,0,0.0,0.0,0.0,5,0,0,0,0,1,0,1,0,0,0,0,11,60.0,18.0,0,0,1,0.0,23_24,30,1
-Alex Baena,MC,villarreal,atletico madrid,0,26,0,0,0.0,0.2,0,0,0,19,84.2,0,0,0.0,0.0,0.0,5,1,0,0,0,0,0,0,0,2,2,0,8,78.0,51.0,1,0,0,0.0,23_24,30,1
-Daniel Parejo,MC,villarreal,atletico madrid,1,90,0,0,0.1,0.3,1,1,0,69,87.0,1,0,0.0,0.0,0.0,6,3,3,0,1,2,1,1,0,2,2,0,28,167.0,80.0,0,0,0,0.0,23_24,30,1
-Étienne Capoue,MC,villarreal,atletico madrid,1,64,0,0,0.0,0.0,0,0,0,34,82.4,1,0,0.0,0.0,0.0,3,2,0,0,0,0,0,0,0,6,2,4,21,99.0,46.0,2,0,1,0.0,23_24,30,1
-Santi Comesaña,MC,villarreal,atletico madrid,0,26,0,0,0.0,0.0,0,0,0,13,84.6,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,2,2,0,3,26.0,23.0,1,1,2,33.3,23_24,30,1
-Jorge Cuenca,DF,villarreal,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,71,78.9,0,0,0.0,0.0,0.0,0,4,0,0,0,1,0,1,1,0,0,0,29,129.0,59.0,0,2,0,100.0,23_24,30,1
-Aïssa Mandi,DF,villarreal,atletico madrid,1,90,0,0,0.1,0.0,2,2,0,81,92.6,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,0,0,0,0,42,312.0,158.0,2,0,1,0.0,23_24,30,1
-Raúl Albiol,DF,villarreal,atletico madrid,1,80,0,0,0.0,0.0,0,0,0,60,90.0,0,0,0.0,0.0,0.0,4,2,1,0,0,1,0,1,2,0,0,0,40,213.0,111.0,1,0,1,0.0,23_24,30,1
-Alfonso Pedraza,DF,villarreal,atletico madrid,0,10,0,0,0.0,0.0,0,0,0,4,50.0,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,1,0,0,0,3,5.0,3.0,0,0,0,0.0,23_24,30,1
-Yerson Mosquera,DF,villarreal,atletico madrid,1,90,0,0,0.2,0.0,2,1,1,62,80.6,1,0,0.0,0.0,0.0,2,3,1,0,0,4,0,4,3,2,0,0,28,154.0,83.0,4,2,0,100.0,23_24,30,1
-Filip Jørgensen,PT,villarreal,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,30,86.7,0,0,2.0,75.0,1.9,6,0,0,0,0,0,0,0,0,0,0,0,16,106.0,64.0,0,0,0,0.0,23_24,30,1
-Memphis,DT,atletico madrid,villarreal,1,65,0,0,0.1,0.1,2,1,1,15,73.3,0,0,0.0,0.0,0.0,3,0,1,0,1,1,0,1,0,1,0,1,17,78.0,26.0,1,0,0,0.0,23_24,30,0
-Álvaro Morata,DT,atletico madrid,villarreal,0,25,0,0,0.3,0.0,2,0,2,14,78.6,0,0,0.0,0.0,0.0,4,1,1,0,0,0,0,0,0,0,0,0,10,54.0,41.0,2,1,0,100.0,23_24,30,0
-Antoine Griezmann,DT,atletico madrid,villarreal,1,65,0,0,0.0,0.3,0,0,0,31,77.4,1,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,1,0,1,16,57.0,22.0,0,0,0,0.0,23_24,30,0
-Ángel Correa,MC,atletico madrid,villarreal,0,25,0,0,0.0,0.2,1,1,0,11,90.9,0,0,0.0,0.0,0.0,3,0,0,0,0,1,0,1,1,1,0,1,10,50.0,30.0,3,0,0,0.0,23_24,30,0
-Samuel Lino,DF,atletico madrid,villarreal,1,90,0,0,0.3,0.3,1,0,1,51,84.3,0,0,0.0,0.0,0.0,7,1,2,0,2,4,0,4,0,3,2,0,33,317.0,201.0,5,0,0,0.0,23_24,30,0
-Koke,MC,atletico madrid,villarreal,1,90,0,0,0.0,0.0,1,0,1,86,86.0,0,0,0.0,0.0,0.0,6,2,3,0,2,2,0,2,2,1,1,0,38,175.0,95.0,1,0,0,0.0,23_24,30,0
-Pablo Barrios,MC,atletico madrid,villarreal,1,83,0,0,0.2,0.0,2,2,0,32,84.4,1,0,0.0,0.0,0.0,2,1,1,0,1,0,0,0,1,1,0,0,25,122.0,36.0,0,1,3,25.0,23_24,30,0
-Saúl Ñíguez,MC,atletico madrid,villarreal,0,7,1,0,0.1,0.0,1,0,1,11,63.6,1,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,0,0,0,5,13.0,1.0,0,2,1,66.7,23_24,30,0
-Rodrigo Riquelme,DF,atletico madrid,villarreal,1,45,0,1,0.0,0.1,2,2,0,26,73.1,0,0,0.0,0.0,0.0,6,2,2,0,0,1,0,1,2,1,0,1,22,134.0,83.0,2,0,1,0.0,23_24,30,0
-Stefan Savić,DF,atletico madrid,villarreal,0,45,0,0,0.0,0.0,0,0,0,28,71.4,0,0,0.0,0.0,0.0,2,1,1,0,1,0,0,0,1,0,0,0,12,82.0,63.0,0,2,0,100.0,23_24,30,0
-Reinildo Mandava,DF,atletico madrid,villarreal,1,90,0,0,0.0,0.0,0,0,0,39,84.6,0,0,0.0,0.0,0.0,5,6,6,0,2,0,0,0,3,0,0,0,10,45.0,16.0,0,0,1,0.0,23_24,30,0
-José María Giménez,DF,atletico madrid,villarreal,1,90,0,0,0.0,0.0,0,0,0,27,88.9,0,0,0.0,0.0,0.0,4,1,2,0,1,0,0,0,5,0,0,0,9,40.0,6.0,0,1,2,33.3,23_24,30,0
-Axel Witsel,DF,atletico madrid,villarreal,1,65,1,0,0.1,0.0,1,0,1,35,88.6,0,0,0.0,0.0,0.0,12,2,0,0,0,1,0,1,2,0,0,0,18,71.0,26.0,0,1,0,100.0,23_24,30,0
-César Azpilicueta,MC,atletico madrid,villarreal,0,25,0,1,0.0,0.2,0,0,0,17,94.1,0,0,0.0,0.0,0.0,7,1,0,0,0,1,0,1,0,0,0,0,6,24.0,13.0,1,0,0,0.0,23_24,30,0
-Marcos Llorente,DF,atletico madrid,villarreal,1,90,0,0,0.1,0.0,1,0,1,53,92.5,0,0,0.0,0.0,0.0,4,3,0,0,0,0,0,0,0,1,1,0,35,166.0,99.0,3,0,0,0.0,23_24,30,0
-Jan Oblak,PT,atletico madrid,villarreal,1,90,0,0,0.0,0.0,0,0,0,33,78.8,0,0,1.0,50.0,0.8,5,0,0,0,0,0,0,0,0,0,0,0,14,108.0,83.0,0,0,0,0.0,23_24,30,0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,fecha_partido,local,roles
+Alexander Sørloth,DT,villarreal,atletico madrid,1,90,1,0,0.1,0.1,2,1,1,14,85.7,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,1,0,1,12,75.0,3.0,0,3,1,75.0,23_24,30,01/04/2024,1,"[{'goles': [2, 23.0]}, {'goles_90': [1, 0.83]}, {'tiros_puerta': [4, 36.0]}, {'goles_por_tiro': [2, 0.29]}]"
+Gonçalo Guedes,DT,villarreal,atletico madrid,1,70,0,0,0.0,0.0,0,0,0,17,82.4,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,0,1,1,0,11,63.0,14.0,0,0,1,0.0,23_24,30,01/04/2024,1,[]
+José Luis Morales,DT,villarreal,atletico madrid,0,20,0,0,0.0,0.1,0,0,0,4,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,3,18.0,4.0,1,0,0,0.0,23_24,30,01/04/2024,1,"[{'goles_por_tiro': [5, 0.27]}, {'apariciones_suplente': [10, 21.0]}]"
+Gerard Moreno,DT,villarreal,atletico madrid,1,80,0,1,0.2,0.0,3,3,0,43,79.1,0,0,0.0,0.0,0.0,7,1,1,0,1,0,0,0,1,3,0,2,33,220.0,54.0,1,0,0,0.0,23_24,30,01/04/2024,1,"[{'pases_clave': [10, 53.0]}]"
+Bertrand Traoré,DT,villarreal,atletico madrid,0,10,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,3,1,2,6,42.0,2.0,0,0,0,0.0,23_24,30,01/04/2024,1,[]
+Francis Coquelin,MC,villarreal,atletico madrid,1,64,0,0,0.1,0.0,1,1,0,35,80.0,0,0,0.0,0.0,0.0,5,0,0,0,0,1,0,1,0,0,0,0,11,60.0,18.0,0,0,1,0.0,23_24,30,01/04/2024,1,[]
+Alex Baena,MC,villarreal,atletico madrid,0,26,0,0,0.0,0.2,0,0,0,19,84.2,0,0,0.0,0.0,0.0,5,1,0,0,0,0,0,0,0,2,2,0,8,78.0,51.0,1,0,0,0.0,23_24,30,01/04/2024,1,"[{'asistencias': [1, 14.0]}, {'asistencias_90': [2, 0.49]}, {'pases_clave': [3, 83.0]}, {'corners': [5, 95.0]}, {'amarillas': [7, 11.0]}, {'rojas': [10, 1.0]}]"
+Daniel Parejo,MC,villarreal,atletico madrid,1,90,0,0,0.1,0.3,1,1,0,69,87.0,1,0,0.0,0.0,0.0,6,3,3,0,1,2,1,1,0,2,2,0,28,167.0,80.0,0,0,0,0.0,23_24,30,01/04/2024,1,"[{'penaltis_marcados': [7, 3.0]}]"
+Étienne Capoue,MC,villarreal,atletico madrid,1,64,0,0,0.0,0.0,0,0,0,34,82.4,1,0,0.0,0.0,0.0,3,2,0,0,0,0,0,0,0,6,2,4,21,99.0,46.0,2,0,1,0.0,23_24,30,01/04/2024,1,[]
+Santi Comesaña,MC,villarreal,atletico madrid,0,26,0,0,0.0,0.0,0,0,0,13,84.6,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,2,2,0,3,26.0,23.0,1,1,2,33.3,23_24,30,01/04/2024,1,"[{'rojas': [2, 2.0]}]"
+Jorge Cuenca,DF,villarreal,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,71,78.9,0,0,0.0,0.0,0.0,0,4,0,0,0,1,0,1,1,0,0,0,29,129.0,59.0,0,2,0,100.0,23_24,30,01/04/2024,1,[]
+Aïssa Mandi,DF,villarreal,atletico madrid,1,90,0,0,0.1,0.0,2,2,0,81,92.6,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,0,0,0,0,42,312.0,158.0,2,0,1,0.0,23_24,30,01/04/2024,1,[]
+Raúl Albiol,DF,villarreal,atletico madrid,1,80,0,0,0.0,0.0,0,0,0,60,90.0,0,0,0.0,0.0,0.0,4,2,1,0,0,1,0,1,2,0,0,0,40,213.0,111.0,1,0,1,0.0,23_24,30,01/04/2024,1,[]
+Alfonso Pedraza,DF,villarreal,atletico madrid,0,10,0,0,0.0,0.0,0,0,0,4,50.0,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,1,0,0,0,3,5.0,3.0,0,0,0,0.0,23_24,30,01/04/2024,1,"[{'rojas': [10, 1.0]}]"
+Yerson Mosquera,DF,villarreal,atletico madrid,1,90,0,0,0.2,0.0,2,1,1,62,80.6,1,0,0.0,0.0,0.0,2,3,1,0,0,4,0,4,3,2,0,0,28,154.0,83.0,4,2,0,100.0,23_24,30,01/04/2024,1,[]
+Filip Jørgensen,PT,villarreal,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,30,86.7,0,0,2.0,75.0,1.9,6,0,0,0,0,0,0,0,0,0,0,0,16,106.0,64.0,0,0,0,0.0,23_24,30,01/04/2024,1,"[{'paradas': [1, 143.0]}]"
+Memphis,DT,atletico madrid,villarreal,1,65,0,0,0.1,0.1,2,1,1,15,73.3,0,0,0.0,0.0,0.0,3,0,1,0,1,1,0,1,0,1,0,1,17,78.0,26.0,1,0,0,0.0,23_24,30,01/04/2024,0,[]
+Álvaro Morata,DT,atletico madrid,villarreal,0,25,0,0,0.3,0.0,2,0,2,14,78.6,0,0,0.0,0.0,0.0,4,1,1,0,0,0,0,0,0,0,0,0,10,54.0,41.0,2,1,0,100.0,23_24,30,01/04/2024,0,"[{'goles': [8, 15.0]}, {'goles_90': [5, 0.71]}, {'tiros_puerta': [9, 33.0]}, {'goles_por_tiro': [10, 0.23]}, {'rojas': [10, 1.0]}]"
+Antoine Griezmann,DT,atletico madrid,villarreal,1,65,0,0,0.0,0.3,0,0,0,31,77.4,1,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,1,0,1,16,57.0,22.0,0,0,0,0.0,23_24,30,01/04/2024,0,"[{'goles': [6, 16.0]}, {'penaltis_marcados': [3, 4.0]}, {'corners': [6, 94.0]}]"
+Ángel Correa,MC,atletico madrid,villarreal,0,25,0,0,0.0,0.2,1,1,0,11,90.9,0,0,0.0,0.0,0.0,3,0,0,0,0,1,0,1,1,1,0,1,10,50.0,30.0,3,0,0,0.0,23_24,30,01/04/2024,0,"[{'apariciones_suplente': [1, 28.0]}, {'rojas': [8, 1.0]}]"
+Samuel Lino,DF,atletico madrid,villarreal,1,90,0,0,0.3,0.3,1,0,1,51,84.3,0,0,0.0,0.0,0.0,7,1,2,0,2,4,0,4,0,3,2,0,33,317.0,201.0,5,0,0,0.0,23_24,30,01/04/2024,0,[]
+Koke,MC,atletico madrid,villarreal,1,90,0,0,0.0,0.0,1,0,1,86,86.0,0,0,0.0,0.0,0.0,6,2,3,0,2,2,0,2,2,1,1,0,38,175.0,95.0,1,0,0,0.0,23_24,30,01/04/2024,0,"[{'pases_ultimo_tercio': [9, 196.0]}]"
+Pablo Barrios,MC,atletico madrid,villarreal,1,83,0,0,0.2,0.0,2,2,0,32,84.4,1,0,0.0,0.0,0.0,2,1,1,0,1,0,0,0,1,1,0,0,25,122.0,36.0,0,1,3,25.0,23_24,30,01/04/2024,0,"[{'rojas': [8, 1.0]}]"
+Saúl Ñíguez,MC,atletico madrid,villarreal,0,7,1,0,0.1,0.0,1,0,1,11,63.6,1,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,0,0,0,5,13.0,1.0,0,2,1,66.7,23_24,30,01/04/2024,0,"[{'rojas': [10, 1.0]}]"
+Rodrigo Riquelme,DF,atletico madrid,villarreal,1,45,0,1,0.0,0.1,2,2,0,26,73.1,0,0,0.0,0.0,0.0,6,2,2,0,0,1,0,1,2,1,0,1,22,134.0,83.0,2,0,1,0.0,23_24,30,01/04/2024,0,[]
+Stefan Savić,DF,atletico madrid,villarreal,0,45,0,0,0.0,0.0,0,0,0,28,71.4,0,0,0.0,0.0,0.0,2,1,1,0,1,0,0,0,1,0,0,0,12,82.0,63.0,0,2,0,100.0,23_24,30,01/04/2024,0,"[{'rojas': [10, 1.0]}]"
+Reinildo Mandava,DF,atletico madrid,villarreal,1,90,0,0,0.0,0.0,0,0,0,39,84.6,0,0,0.0,0.0,0.0,5,6,6,0,2,0,0,0,3,0,0,0,10,45.0,16.0,0,0,1,0.0,23_24,30,01/04/2024,0,[]
+José María Giménez,DF,atletico madrid,villarreal,1,90,0,0,0.0,0.0,0,0,0,27,88.9,0,0,0.0,0.0,0.0,4,1,2,0,1,0,0,0,5,0,0,0,9,40.0,6.0,0,1,2,33.3,23_24,30,01/04/2024,0,"[{'pases_completados_pct': [9, 91.8]}]"
+Axel Witsel,DF,atletico madrid,villarreal,1,65,1,0,0.1,0.0,1,0,1,35,88.6,0,0,0.0,0.0,0.0,12,2,0,0,0,1,0,1,2,0,0,0,18,71.0,26.0,0,1,0,100.0,23_24,30,01/04/2024,0,"[{'pases_completados_pct': [6, 91.9]}]"
+César Azpilicueta,MC,atletico madrid,villarreal,0,25,0,1,0.0,0.2,0,0,0,17,94.1,0,0,0.0,0.0,0.0,7,1,0,0,0,1,0,1,0,0,0,0,6,24.0,13.0,1,0,0,0.0,23_24,30,01/04/2024,0,[]
+Marcos Llorente,DF,atletico madrid,villarreal,1,90,0,0,0.1,0.0,1,0,1,53,92.5,0,0,0.0,0.0,0.0,4,3,0,0,0,0,0,0,0,1,1,0,35,166.0,99.0,3,0,0,0.0,23_24,30,01/04/2024,0,"[{'rojas': [8, 1.0]}]"
+Jan Oblak,PT,atletico madrid,villarreal,1,90,0,0,0.0,0.0,0,0,0,33,78.8,0,0,1.0,50.0,0.8,5,0,0,0,0,0,0,0,0,0,0,0,14,108.0,83.0,0,0,0,0.0,23_24,30,01/04/2024,0,"[{'minutos': [1, 3420.0]}, {'porterias_cero': [4, 13.0]}, {'paradas': [9, 101.0]}]"

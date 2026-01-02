@@ -1,31 +1,31 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
-Adrián Liso,DT,getafe,real madrid,1,89,0,0,0.1,0.0,2,2,0,13,46.2,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,0,3,1,2,7,53.0,22.0,0,4,4,50.0,25_26,9,1
-Coba da Costa,MC,getafe,real madrid,0,1,0,0,0.0,0.0,0,0,0,1,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,54.0,0.0,0,0,0,0.0,25_26,9,1
-Álex Sancris,DT,getafe,real madrid,1,83,0,0,0.0,0.1,1,1,0,16,43.8,2,1,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,0,0,0,11,56.0,25.0,1,0,7,0.0,25_26,9,1
-Mauro Arambarri,MC,getafe,real madrid,1,90,0,0,0.1,0.0,1,1,0,7,42.9,0,0,0.0,0.0,0.0,2,0,1,0,1,3,1,2,2,1,0,1,3,13.0,0.0,0,2,4,33.3,25_26,9,1
-Luis Milla,MC,getafe,real madrid,1,90,0,0,0.0,0.0,1,1,0,29,55.2,0,0,0.0,0.0,0.0,3,3,0,0,0,0,0,0,0,1,0,1,13,100.0,19.0,1,1,2,33.3,25_26,9,1
-Mario Martín,MC,getafe,real madrid,1,86,0,0,0.0,0.1,0,0,0,12,66.7,0,0,0.0,0.0,0.0,2,0,3,0,3,1,0,1,0,3,0,3,8,42.0,18.0,1,2,2,50.0,25_26,9,1
-Abu Kamara,MC,getafe,real madrid,0,4,0,0,0.3,0.0,1,0,1,0,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,1.0,1.0,0,0,0,0.0,25_26,9,1
-Diego Rico,DF,getafe,real madrid,1,90,0,0,0.0,0.3,0,0,0,23,52.2,0,0,0.0,0.0,0.0,3,4,4,0,3,0,0,0,0,1,0,1,11,36.0,12.0,0,1,0,100.0,25_26,9,1
-Djené,DF,getafe,real madrid,1,90,0,0,0.0,0.0,1,1,0,18,72.2,0,0,0.0,0.0,0.0,6,3,3,0,0,1,1,0,7,0,0,0,8,32.0,11.0,0,2,0,100.0,25_26,9,1
-Domingos Duarte,DF,getafe,real madrid,1,90,0,0,0.0,0.0,0,0,0,18,72.2,1,0,0.0,0.0,0.0,4,1,1,0,1,1,1,0,7,0,0,0,9,51.0,3.0,0,0,3,0.0,25_26,9,1
-Iglesias,DF,getafe,real madrid,1,90,0,0,0.0,0.0,0,0,0,24,33.3,0,0,0.0,0.0,0.0,2,4,4,0,0,0,0,0,2,3,1,2,14,70.0,6.0,0,0,0,0.0,25_26,9,1
-Kiko Femenía,DF,getafe,real madrid,1,75,0,0,0.0,0.0,0,0,0,24,83.3,1,0,0.0,0.0,0.0,10,3,5,0,2,0,0,0,6,0,0,0,8,59.0,32.0,1,0,0,0.0,25_26,9,1
-Allan Nyom,DF,getafe,real madrid,0,1,0,0,0.0,0.0,0,0,0,0,0.0,0,1,0.0,0.0,0.0,-2,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0,25_26,9,1
-David Soria,PT,getafe,real madrid,1,90,0,0,0.0,0.0,0,0,0,34,29.4,0,0,1.0,90.0,2.3,10,0,0,0,0,0,0,0,0,0,0,0,14,99.0,69.0,0,0,0,0.0,25_26,9,1
-Kylian Mbappé,DT,real madrid,getafe,1,90,1,0,1.4,0.1,7,3,4,34,82.4,0,0,0.0,0.0,0.0,13,0,0,0,0,0,0,0,0,3,1,2,25,195.0,92.0,3,0,0,0.0,25_26,9,0
-Rodrygo,DT,real madrid,getafe,1,85,0,0,0.0,0.3,1,0,1,54,77.8,0,0,0.0,0.0,0.0,8,4,4,0,1,2,0,2,0,4,3,1,40,290.0,175.0,5,0,1,0.0,25_26,9,0
-Brahim Díaz,DT,real madrid,getafe,0,5,0,0,0.1,0.2,1,1,0,8,87.5,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,1,0,1,7,38.0,21.0,2,0,0,0.0,25_26,9,0
-Franco Mastantuono,DT,real madrid,getafe,1,54,0,0,0.0,0.0,2,1,1,15,80.0,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,0,4,1,3,14,82.0,8.0,0,0,1,0.0,25_26,9,0
-Vinicius Júnior,DT,real madrid,getafe,0,36,0,0,0.2,0.1,2,2,0,12,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,4,0,3,16,128.0,66.0,2,0,0,0.0,25_26,9,0
-Jude Bellingham,MC,real madrid,getafe,1,85,0,0,0.2,0.2,2,0,2,44,88.6,0,0,0.0,0.0,0.0,9,1,1,0,0,0,0,0,1,5,2,1,25,157.0,83.0,2,2,3,40.0,25_26,9,0
-Gonzalo García,MC,real madrid,getafe,0,5,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0,25_26,9,0
-Eduardo Camavinga,MC,real madrid,getafe,1,64,0,0,0.0,0.0,0,0,0,48,85.4,0,0,0.0,0.0,0.0,8,4,3,0,0,1,0,1,0,2,2,0,19,116.0,83.0,1,2,2,50.0,25_26,9,0
-Arda Güler,MC,real madrid,getafe,0,26,0,1,0.1,0.5,2,2,0,34,85.3,0,0,0.0,0.0,0.0,9,0,0,0,0,1,0,1,0,0,0,0,18,60.0,16.0,0,0,0,0.0,25_26,9,0
-Aurélien Tchouaméni,MC,real madrid,getafe,1,90,0,0,0.0,0.0,1,1,0,81,91.4,1,0,0.0,0.0,0.0,7,2,1,0,0,0,0,0,5,0,0,0,38,167.0,83.0,1,8,1,88.9,25_26,9,0
-Álvaro Carreras,DF,real madrid,getafe,1,90,0,0,0.0,0.0,1,1,0,95,88.4,0,0,0.0,0.0,0.0,7,0,1,0,1,2,0,2,2,1,1,0,41,205.0,123.0,2,2,0,100.0,25_26,9,0
-David Alaba,DF,real madrid,getafe,1,45,0,0,0.0,0.0,1,0,1,32,100.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,3,0,0,0,14,85.0,51.0,0,1,2,33.3,25_26,9,0
-Raúl Asencio,DF,real madrid,getafe,0,45,0,0,0.1,0.0,1,1,0,32,90.6,0,0,0.0,0.0,0.0,3,1,1,0,0,1,1,0,2,0,0,0,16,71.0,14.0,0,2,1,66.7,25_26,9,0
-Éder Militão,DF,real madrid,getafe,1,90,0,0,0.0,0.0,1,0,1,79,86.1,0,0,0.0,0.0,0.0,8,1,0,0,0,0,0,0,5,0,0,0,32,196.0,93.0,0,5,0,100.0,25_26,9,0
-Federico Valverde,DF,real madrid,getafe,1,90,0,0,0.0,0.5,1,1,0,68,85.3,0,0,0.0,0.0,0.0,7,2,0,0,0,0,0,0,1,1,1,0,30,267.0,186.0,3,0,1,0.0,25_26,9,0
-Thibaut Courtois,PT,real madrid,getafe,1,90,0,0,0.0,0.0,0,0,0,40,67.5,0,0,0.0,100.0,0.3,8,0,0,0,0,0,0,0,0,0,0,0,19,100.0,38.0,0,0,0,0.0,25_26,9,0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,fecha_partido,local,roles
+Adrián Liso,DT,getafe,real madrid,1,89,0,0,0.1,0.0,2,2,0,13,46.2,0,0,0.0,0.0,0.0,2,1,0,0,0,1,0,1,0,3,1,2,7,53.0,22.0,0,4,4,50.0,25_26,9,19/10/2025,1,[]
+Coba da Costa,MC,getafe,real madrid,0,1,0,0,0.0,0.0,0,0,0,1,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,54.0,0.0,0,0,0,0.0,25_26,9,19/10/2025,1,"[{'apariciones_suplente': [9, 10.0]}]"
+Álex Sancris,DT,getafe,real madrid,1,83,0,0,0.0,0.1,1,1,0,16,43.8,2,1,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,0,0,0,11,56.0,25.0,1,0,7,0.0,25_26,9,19/10/2025,1,"[{'rojas': [2, 1.0]}]"
+Mauro Arambarri,MC,getafe,real madrid,1,90,0,0,0.1,0.0,1,1,0,7,42.9,0,0,0.0,0.0,0.0,2,0,1,0,1,3,1,2,2,1,0,1,3,13.0,0.0,0,2,4,33.3,25_26,9,19/10/2025,1,"[{'faltas_recibidas': [3, 35.0]}]"
+Luis Milla,MC,getafe,real madrid,1,90,0,0,0.0,0.0,1,1,0,29,55.2,0,0,0.0,0.0,0.0,3,3,0,0,0,0,0,0,0,1,0,1,13,100.0,19.0,1,1,2,33.3,25_26,9,19/10/2025,1,"[{'asistencias': [2, 6.0]}, {'pases_clave': [8, 32.0]}, {'corners': [3, 59.0]}, {'rojas': [2, 1.0]}]"
+Mario Martín,MC,getafe,real madrid,1,86,0,0,0.0,0.1,0,0,0,12,66.7,0,0,0.0,0.0,0.0,2,0,3,0,3,1,0,1,0,3,0,3,8,42.0,18.0,1,2,2,50.0,25_26,9,19/10/2025,1,"[{'amarillas': [4, 6.0]}, {'faltas_cometidas': [2, 34.0]}]"
+Abu Kamara,MC,getafe,real madrid,0,4,0,0,0.3,0.0,1,0,1,0,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,1.0,1.0,0,0,0,0.0,25_26,9,19/10/2025,1,[]
+Diego Rico,DF,getafe,real madrid,1,90,0,0,0.0,0.3,0,0,0,23,52.2,0,0,0.0,0.0,0.0,3,4,4,0,3,0,0,0,0,1,0,1,11,36.0,12.0,0,1,0,100.0,25_26,9,19/10/2025,1,"[{'intercepciones': [6, 23.0]}]"
+Djené,DF,getafe,real madrid,1,90,0,0,0.0,0.0,1,1,0,18,72.2,0,0,0.0,0.0,0.0,6,3,3,0,0,1,1,0,7,0,0,0,8,32.0,11.0,0,2,0,100.0,25_26,9,19/10/2025,1,"[{'amarillas': [2, 14.0]}, {'rojas': [10, 1.0]}]"
+Domingos Duarte,DF,getafe,real madrid,1,90,0,0,0.0,0.0,0,0,0,18,72.2,1,0,0.0,0.0,0.0,4,1,1,0,1,1,1,0,7,0,0,0,9,51.0,3.0,0,0,3,0.0,25_26,9,19/10/2025,1,"[{'despejes': [2, 107.0]}]"
+Iglesias,DF,getafe,real madrid,1,90,0,0,0.0,0.0,0,0,0,24,33.3,0,0,0.0,0.0,0.0,2,4,4,0,0,0,0,0,2,3,1,2,14,70.0,6.0,0,0,0,0.0,25_26,9,19/10/2025,1,"[{'entradas': [4, 45.0]}, {'faltas_cometidas': [7, 27.0]}, {'faltas_recibidas': [8, 33.0]}]"
+Kiko Femenía,DF,getafe,real madrid,1,75,0,0,0.0,0.0,0,0,0,24,83.3,1,0,0.0,0.0,0.0,10,3,5,0,2,0,0,0,6,0,0,0,8,59.0,32.0,1,0,0,0.0,25_26,9,19/10/2025,1,"[{'rojas': [10, 1.0]}]"
+Allan Nyom,DF,getafe,real madrid,0,1,0,0,0.0,0.0,0,0,0,0,0.0,0,1,0.0,0.0,0.0,-2,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0,25_26,9,19/10/2025,1,"[{'rojas': [2, 1.0]}]"
+David Soria,PT,getafe,real madrid,1,90,0,0,0.0,0.0,0,0,0,34,29.4,0,0,1.0,90.0,2.3,10,0,0,0,0,0,0,0,0,0,0,0,14,99.0,69.0,0,0,0,0.0,25_26,9,19/10/2025,1,"[{'minutos': [5, 1530.0]}, {'porterias_cero': [10, 4.0]}, {'paradas': [4, 56.0]}]"
+Kylian Mbappé,DT,real madrid,getafe,1,90,1,0,1.4,0.1,7,3,4,34,82.4,0,0,0.0,0.0,0.0,13,0,0,0,0,0,0,0,0,3,1,2,25,195.0,92.0,3,0,0,0.0,25_26,9,19/10/2025,0,"[{'goles': [1, 18.0]}, {'goles_90': [2, 1.03]}, {'asistencias': [8, 4.0]}, {'penaltis_marcados': [1, 5.0]}, {'tiros_puerta': [1, 33.0]}, {'pases_clave': [1, 49.0]}, {'regates_exitosos': [2, 51.0]}, {'minutos': [3, 1570.0]}]"
+Rodrygo,DT,real madrid,getafe,1,85,0,0,0.0,0.3,1,0,1,54,77.8,0,0,0.0,0.0,0.0,8,4,4,0,1,2,0,2,0,4,3,1,40,290.0,175.0,5,0,1,0.0,25_26,9,19/10/2025,0,"[{'apariciones_suplente': [5, 11.0]}]"
+Brahim Díaz,DT,real madrid,getafe,0,5,0,0,0.1,0.2,1,1,0,8,87.5,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,1,0,1,7,38.0,21.0,2,0,0,0.0,25_26,9,19/10/2025,0,"[{'asistencias_90': [5, 0.35]}]"
+Franco Mastantuono,DT,real madrid,getafe,1,54,0,0,0.0,0.0,2,1,1,15,80.0,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,0,4,1,3,14,82.0,8.0,0,0,1,0.0,25_26,9,19/10/2025,0,[]
+Vinicius Júnior,DT,real madrid,getafe,0,36,0,0,0.2,0.1,2,2,0,12,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,4,0,3,16,128.0,66.0,2,0,0,0.0,25_26,9,19/10/2025,0,"[{'asistencias': [4, 5.0]}, {'penaltis_marcados': [9, 1.0]}, {'tiros_puerta': [5, 20.0]}, {'pases_clave': [7, 33.0]}, {'regates_exitosos': [3, 43.0]}, {'faltas_recibidas': [6, 34.0]}]"
+Jude Bellingham,MC,real madrid,getafe,1,85,0,0,0.2,0.2,2,0,2,44,88.6,0,0,0.0,0.0,0.0,9,1,1,0,0,0,0,0,1,5,2,1,25,157.0,83.0,2,2,3,40.0,25_26,9,19/10/2025,0,"[{'tiros_puerta': [7, 17.0]}]"
+Gonzalo García,MC,real madrid,getafe,0,5,0,0,0.0,0.0,0,0,0,0,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0,25_26,9,19/10/2025,0,"[{'apariciones_suplente': [4, 12.0]}]"
+Eduardo Camavinga,MC,real madrid,getafe,1,64,0,0,0.0,0.0,0,0,0,48,85.4,0,0,0.0,0.0,0.0,8,4,3,0,0,1,0,1,0,2,2,0,19,116.0,83.0,1,2,2,50.0,25_26,9,19/10/2025,0,"[{'pases_completados_pct': [10, 90.7]}, {'entradas': [8, 76.0]}, {'faltas_recibidas': [8, 68.0]}]"
+Arda Güler,MC,real madrid,getafe,0,26,0,1,0.1,0.5,2,2,0,34,85.3,0,0,0.0,0.0,0.0,9,0,0,0,0,1,0,1,0,0,0,0,18,60.0,16.0,0,0,0,0.0,25_26,9,19/10/2025,0,"[{'asistencias': [4, 5.0]}, {'asistencias_90': [8, 0.4]}, {'pases_clave': [2, 40.0]}, {'corners': [7, 48.0]}]"
+Aurélien Tchouaméni,MC,real madrid,getafe,1,90,0,0,0.0,0.0,1,1,0,81,91.4,1,0,0.0,0.0,0.0,7,2,1,0,0,0,0,0,5,0,0,0,38,167.0,83.0,1,8,1,88.9,25_26,9,19/10/2025,0,"[{'pases_ultimo_tercio': [5, 106.0]}]"
+Álvaro Carreras,DF,real madrid,getafe,1,90,0,0,0.0,0.0,1,1,0,95,88.4,0,0,0.0,0.0,0.0,7,0,1,0,1,2,0,2,2,1,1,0,41,205.0,123.0,2,2,0,100.0,25_26,9,19/10/2025,0,"[{'pases_ultimo_tercio': [3, 112.0]}, {'intercepciones': [6, 23.0]}, {'rojas': [2, 1.0]}]"
+David Alaba,DF,real madrid,getafe,1,45,0,0,0.0,0.0,1,0,1,32,100.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,3,0,0,0,14,85.0,51.0,0,1,2,33.3,25_26,9,19/10/2025,0,[]
+Raúl Asencio,DF,real madrid,getafe,0,45,0,0,0.1,0.0,1,1,0,32,90.6,0,0,0.0,0.0,0.0,3,1,1,0,0,1,1,0,2,0,0,0,16,71.0,14.0,0,2,1,66.7,25_26,9,19/10/2025,0,"[{'pases_completados_pct': [4, 93.4]}]"
+Éder Militão,DF,real madrid,getafe,1,90,0,0,0.0,0.0,1,0,1,79,86.1,0,0,0.0,0.0,0.0,8,1,0,0,0,0,0,0,5,0,0,0,32,196.0,93.0,0,5,0,100.0,25_26,9,19/10/2025,0,[]
+Federico Valverde,DF,real madrid,getafe,1,90,0,0,0.0,0.5,1,1,0,68,85.3,0,0,0.0,0.0,0.0,7,2,0,0,0,0,0,0,1,1,1,0,30,267.0,186.0,3,0,1,0.0,25_26,9,19/10/2025,0,"[{'asistencias': [8, 4.0]}, {'pases_ultimo_tercio': [7, 101.0]}]"
+Thibaut Courtois,PT,real madrid,getafe,1,90,0,0,0.0,0.0,0,0,0,40,67.5,0,0,0.0,100.0,0.3,8,0,0,0,0,0,0,0,0,0,0,0,19,100.0,38.0,0,0,0,0.0,25_26,9,19/10/2025,0,"[{'minutos': [1, 1620.0]}, {'porterias_cero': [1, 8.0]}, {'save_pct': [10, 75.4]}]"

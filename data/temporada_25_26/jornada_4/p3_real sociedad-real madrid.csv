@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
-Mikel Oyarzabal,DT,real sociedad,real madrid,1,90,1,0,1.1,0.4,3,1,2,25,80.0,0,0,0.0,0.0,0.0,10,0,0,0,0,1,1,0,0,1,1,0,21,106.0,25.0,1,0,2,0.0,25_26,4,1
-Ander Barrenetxea,DT,real sociedad,real madrid,1,90,0,0,0.1,0.2,3,3,0,47,76.6,1,0,0.0,0.0,0.0,5,2,0,0,0,0,0,0,2,8,5,2,40,294.0,150.0,5,0,0,0.0,25_26,4,1
-Gonçalo Guedes,DT,real sociedad,real madrid,1,65,0,0,0.0,0.0,0,0,0,27,70.4,0,0,0.0,0.0,0.0,3,1,3,0,3,2,0,2,1,1,0,0,18,93.0,59.0,1,1,1,50.0,25_26,4,1
-Takefusa Kubo,DT,real sociedad,real madrid,0,25,0,0,0.1,0.0,1,1,0,17,58.8,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,17,80.0,66.0,2,0,0,0.0,25_26,4,1
-Mikel Goti,MC,real sociedad,real madrid,1,56,0,0,0.1,0.0,2,2,0,23,47.8,0,0,0.0,0.0,0.0,0,0,0,0,0,2,0,2,0,3,2,1,16,68.0,9.0,1,2,3,40.0,25_26,4,1
-Carlos Soler,MC,real sociedad,real madrid,0,34,0,0,0.2,0.3,1,1,0,35,94.3,0,0,0.0,0.0,0.0,6,0,0,0,0,0,0,0,0,0,0,0,28,109.0,58.0,2,0,0,0.0,25_26,4,1
-Pablo Marín,MC,real sociedad,real madrid,1,65,0,0,0.2,0.0,2,2,0,15,73.3,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,16,83.0,53.0,1,0,0,0.0,25_26,4,1
-Arsen Zakharyan,MC,real sociedad,real madrid,0,25,0,0,0.0,0.0,1,1,0,16,93.8,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,9,30.0,9.0,0,0,3,0.0,25_26,4,1
-Jon Gorrotxategi,MC,real sociedad,real madrid,1,77,0,0,0.0,0.0,1,1,0,61,88.5,0,0,0.0,0.0,0.0,2,3,5,0,3,3,1,2,1,0,0,0,45,292.0,202.0,3,2,2,50.0,25_26,4,1
-Jon Karrikaburu,MC,real sociedad,real madrid,0,13,0,0,0.1,0.0,2,2,0,2,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,4,5.0,1.0,0,1,2,33.3,25_26,4,1
-Sergio Gómez,DF,real sociedad,real madrid,1,90,0,0,0.0,0.2,1,1,0,94,81.9,0,0,0.0,0.0,0.0,7,3,1,0,0,0,0,0,0,0,0,0,52,259.0,161.0,3,0,0,0.0,25_26,4,1
-Duje ĆaletaCar,DF,real sociedad,real madrid,1,90,0,0,0.2,0.1,3,2,1,69,91.3,0,0,0.0,0.0,0.0,1,0,1,0,1,1,1,0,2,0,0,0,54,438.0,380.0,6,4,3,57.1,25_26,4,1
-Igor Zubeldia,DF,real sociedad,real madrid,1,90,0,0,0.1,0.0,1,1,0,56,91.1,1,0,0.0,0.0,0.0,-1,1,2,0,2,0,0,0,2,0,0,0,35,172.0,98.0,0,1,2,33.3,25_26,4,1
-Aritz Elustondo,DF,real sociedad,real madrid,1,56,0,0,0.0,0.0,0,0,0,31,80.6,0,0,0.0,0.0,0.0,-2,3,6,0,3,1,0,1,4,0,0,0,12,67.0,53.0,2,1,1,50.0,25_26,4,1
-Jon Aramburu,DF,real sociedad,real madrid,0,34,0,0,0.0,0.0,1,1,0,35,80.0,0,0,0.0,0.0,0.0,2,0,2,0,2,0,0,0,1,0,0,0,18,77.0,21.0,1,1,1,50.0,25_26,4,1
-Álex Remiro,PT,real sociedad,real madrid,1,90,0,0,0.0,0.0,0,0,0,29,86.2,0,0,2.0,66.7,2.4,5,0,0,0,0,0,0,0,0,0,0,0,18,58.0,32.0,0,0,0,0.0,25_26,4,1
-Kylian Mbappé,DT,real madrid,real sociedad,1,90,1,1,1.1,0.7,6,4,2,19,84.2,1,0,0.0,0.0,0.0,17,0,1,0,1,0,0,0,0,10,9,1,25,145.0,82.0,3,2,1,66.7,25_26,4,0
-Vinicius Júnior,MC,real madrid,real sociedad,1,67,0,0,0.0,0.3,1,1,0,19,73.7,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,8,3,4,24,249.0,96.0,3,0,0,0.0,25_26,4,0
-Fran Garcia,MC,real madrid,real sociedad,0,23,0,0,0.0,0.0,0,0,0,5,60.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,2,32.0,10.0,1,1,2,33.3,25_26,4,0
-Brahim Díaz,DT,real madrid,real sociedad,1,45,0,0,0.0,0.2,1,1,0,9,100.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,1,1,0,1,8,32.0,3.0,0,0,0,0.0,25_26,4,0
-Federico Valverde,MC,real madrid,real sociedad,0,45,0,0,0.0,0.0,0,0,0,12,58.3,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,4,0,0,0,5,25.0,1.0,0,1,2,33.3,25_26,4,0
-Arda Güler,MC,real madrid,real sociedad,1,87,1,0,0.8,0.3,2,1,1,36,77.8,0,0,0.0,0.0,0.0,15,2,0,0,0,1,0,1,0,1,1,0,16,63.0,32.0,0,0,2,0.0,25_26,4,0
-David Alaba,DF,real madrid,real sociedad,0,3,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,2,2,0,1,0,0,0,0,0.0,0.0,0,0,0,0.0,25_26,4,0
-Dani Ceballos,MC,real madrid,real sociedad,1,67,0,0,0.0,0.0,0,0,0,26,96.2,0,0,0.0,0.0,0.0,6,1,2,0,1,5,3,2,3,0,0,0,21,78.0,37.0,0,1,1,50.0,25_26,4,0
-Raúl Asencio,DF,real madrid,real sociedad,0,23,0,0,0.1,0.0,1,0,1,3,66.7,0,0,0.0,0.0,0.0,3,0,0,0,0,1,1,0,3,0,0,0,2,15.0,1.0,0,1,1,50.0,25_26,4,0
-Aurélien Tchouaméni,DF,real madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,35,82.9,0,0,0.0,0.0,0.0,7,1,0,0,0,2,2,0,6,0,0,0,24,93.0,48.0,1,5,0,100.0,25_26,4,0
-Álvaro Carreras,DF,real madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,41,80.5,0,0,0.0,0.0,0.0,5,1,2,0,2,4,0,4,6,1,1,0,20,105.0,62.0,1,1,2,33.3,25_26,4,0
-Dean Huijsen,DF,real madrid,real sociedad,1,31,0,0,0.1,0.2,1,1,0,26,76.9,0,1,0.0,0.0,0.0,-1,0,0,0,0,0,0,0,2,0,0,0,22,152.0,91.0,0,3,0,100.0,25_26,4,0
-Éder Militão,DF,real madrid,real sociedad,1,90,0,0,0.4,0.0,3,1,2,23,78.3,0,0,0.0,0.0,0.0,6,1,2,0,1,4,3,1,5,1,0,0,18,40.0,16.0,0,3,2,60.0,25_26,4,0
-Dani Carvajal,DF,real madrid,real sociedad,1,81,0,0,0.0,0.5,1,1,0,33,78.8,0,0,0.0,0.0,0.0,4,1,3,0,3,2,0,2,6,0,0,0,14,40.0,16.0,1,1,0,100.0,25_26,4,0
-Trent AlexanderArnold,DF,real madrid,real sociedad,0,9,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,2,1,2,0,1,0,0,0,0,0,0,0,1,14.0,14.0,0,1,0,100.0,25_26,4,0
-Thibaut Courtois,PT,real madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,43,46.5,0,0,1.0,100.0,1.0,4,0,0,0,0,0,0,0,0,0,0,0,19,118.0,67.0,0,0,0,0.0,25_26,4,0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,fecha_partido,local,roles
+Mikel Oyarzabal,DT,real sociedad,real madrid,1,90,1,0,1.1,0.4,3,1,2,25,80.0,0,0,0.0,0.0,0.0,10,0,0,0,0,1,1,0,0,1,1,0,21,106.0,25.0,1,0,2,0.0,25_26,4,13/09/2025,1,"[{'penaltis_marcados': [2, 3.0]}]"
+Ander Barrenetxea,DT,real sociedad,real madrid,1,90,0,0,0.1,0.2,3,3,0,47,76.6,1,0,0.0,0.0,0.0,5,2,0,0,0,0,0,0,2,8,5,2,40,294.0,150.0,5,0,0,0.0,25_26,4,13/09/2025,1,"[{'regates_exitosos': [7, 32.0]}]"
+Gonçalo Guedes,DT,real sociedad,real madrid,1,65,0,0,0.0,0.0,0,0,0,27,70.4,0,0,0.0,0.0,0.0,3,1,3,0,3,2,0,2,1,1,0,0,18,93.0,59.0,1,1,1,50.0,25_26,4,13/09/2025,1,[]
+Takefusa Kubo,DT,real sociedad,real madrid,0,25,0,0,0.1,0.0,1,1,0,17,58.8,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,17,80.0,66.0,2,0,0,0.0,25_26,4,13/09/2025,1,"[{'pases_clave': [6, 58.0]}]"
+Mikel Goti,MC,real sociedad,real madrid,1,56,0,0,0.1,0.0,2,2,0,23,47.8,0,0,0.0,0.0,0.0,0,0,0,0,0,2,0,2,0,3,2,1,16,68.0,9.0,1,2,3,40.0,25_26,4,13/09/2025,1,[]
+Carlos Soler,MC,real sociedad,real madrid,0,34,0,0,0.2,0.3,1,1,0,35,94.3,0,0,0.0,0.0,0.0,6,0,0,0,0,0,0,0,0,0,0,0,28,109.0,58.0,2,0,0,0.0,25_26,4,13/09/2025,1,[]
+Pablo Marín,MC,real sociedad,real madrid,1,65,0,0,0.2,0.0,2,2,0,15,73.3,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,16,83.0,53.0,1,0,0,0.0,25_26,4,13/09/2025,1,[]
+Arsen Zakharyan,MC,real sociedad,real madrid,0,25,0,0,0.0,0.0,1,1,0,16,93.8,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,9,30.0,9.0,0,0,3,0.0,25_26,4,13/09/2025,1,"[{'apariciones_suplente': [9, 10.0]}]"
+Jon Gorrotxategi,MC,real sociedad,real madrid,1,77,0,0,0.0,0.0,1,1,0,61,88.5,0,0,0.0,0.0,0.0,2,3,5,0,3,3,1,2,1,0,0,0,45,292.0,202.0,3,2,2,50.0,25_26,4,13/09/2025,1,"[{'intercepciones': [3, 25.0]}, {'amarillas': [4, 6.0]}]"
+Jon Karrikaburu,MC,real sociedad,real madrid,0,13,0,0,0.1,0.0,2,2,0,2,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,0,0,0,4,5.0,1.0,0,1,2,33.3,25_26,4,13/09/2025,1,[]
+Sergio Gómez,DF,real sociedad,real madrid,1,90,0,0,0.0,0.2,1,1,0,94,81.9,0,0,0.0,0.0,0.0,7,3,1,0,0,0,0,0,0,0,0,0,52,259.0,161.0,3,0,0,0.0,25_26,4,13/09/2025,1,"[{'entradas': [1, 53.0]}]"
+Duje ĆaletaCar,DF,real sociedad,real madrid,1,90,0,0,0.2,0.1,3,2,1,69,91.3,0,0,0.0,0.0,0.0,1,0,1,0,1,1,1,0,2,0,0,0,54,438.0,380.0,6,4,3,57.1,25_26,4,13/09/2025,1,[]
+Igor Zubeldia,DF,real sociedad,real madrid,1,90,0,0,0.1,0.0,1,1,0,56,91.1,1,0,0.0,0.0,0.0,-1,1,2,0,2,0,0,0,2,0,0,0,35,172.0,98.0,0,1,2,33.3,25_26,4,13/09/2025,1,"[{'despejes': [4, 105.0]}]"
+Aritz Elustondo,DF,real sociedad,real madrid,1,56,0,0,0.0,0.0,0,0,0,31,80.6,0,0,0.0,0.0,0.0,-2,3,6,0,3,1,0,1,4,0,0,0,12,67.0,53.0,2,1,1,50.0,25_26,4,13/09/2025,1,"[{'rojas': [8, 1.0]}]"
+Jon Aramburu,DF,real sociedad,real madrid,0,34,0,0,0.0,0.0,1,1,0,35,80.0,0,0,0.0,0.0,0.0,2,0,2,0,2,0,0,0,1,0,0,0,18,77.0,21.0,1,1,1,50.0,25_26,4,13/09/2025,1,"[{'entradas': [2, 51.0]}, {'faltas_cometidas': [3, 33.0]}]"
+Álex Remiro,PT,real sociedad,real madrid,1,90,0,0,0.0,0.0,0,0,0,29,86.2,0,0,2.0,66.7,2.4,5,0,0,0,0,0,0,0,0,0,0,0,18,58.0,32.0,0,0,0,0.0,25_26,4,13/09/2025,1,"[{'minutos': [5, 1530.0]}]"
+Kylian Mbappé,DT,real madrid,real sociedad,1,90,1,1,1.1,0.7,6,4,2,19,84.2,1,0,0.0,0.0,0.0,17,0,1,0,1,0,0,0,0,10,9,1,25,145.0,82.0,3,2,1,66.7,25_26,4,13/09/2025,0,"[{'goles': [1, 18.0]}, {'goles_90': [2, 1.03]}, {'asistencias': [8, 4.0]}, {'penaltis_marcados': [1, 5.0]}, {'tiros_puerta': [1, 33.0]}, {'pases_clave': [1, 49.0]}, {'regates_exitosos': [2, 51.0]}, {'minutos': [3, 1570.0]}]"
+Vinicius Júnior,MC,real madrid,real sociedad,1,67,0,0,0.0,0.3,1,1,0,19,73.7,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,8,3,4,24,249.0,96.0,3,0,0,0.0,25_26,4,13/09/2025,0,"[{'asistencias': [4, 5.0]}, {'penaltis_marcados': [9, 1.0]}, {'tiros_puerta': [5, 20.0]}, {'pases_clave': [7, 33.0]}, {'regates_exitosos': [3, 43.0]}, {'faltas_recibidas': [6, 34.0]}]"
+Fran Garcia,MC,real madrid,real sociedad,0,23,0,0,0.0,0.0,0,0,0,5,60.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,2,32.0,10.0,1,1,2,33.3,25_26,4,13/09/2025,0,"[{'rojas': [2, 1.0]}]"
+Brahim Díaz,DT,real madrid,real sociedad,1,45,0,0,0.0,0.2,1,1,0,9,100.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,1,1,0,1,8,32.0,3.0,0,0,0,0.0,25_26,4,13/09/2025,0,"[{'asistencias_90': [5, 0.35]}]"
+Federico Valverde,MC,real madrid,real sociedad,0,45,0,0,0.0,0.0,0,0,0,12,58.3,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,4,0,0,0,5,25.0,1.0,0,1,2,33.3,25_26,4,13/09/2025,0,"[{'asistencias': [8, 4.0]}, {'pases_ultimo_tercio': [7, 101.0]}]"
+Arda Güler,MC,real madrid,real sociedad,1,87,1,0,0.8,0.3,2,1,1,36,77.8,0,0,0.0,0.0,0.0,15,2,0,0,0,1,0,1,0,1,1,0,16,63.0,32.0,0,0,2,0.0,25_26,4,13/09/2025,0,"[{'asistencias': [4, 5.0]}, {'asistencias_90': [8, 0.4]}, {'pases_clave': [2, 40.0]}, {'corners': [7, 48.0]}]"
+David Alaba,DF,real madrid,real sociedad,0,3,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,2,2,0,1,0,0,0,0,0.0,0.0,0,0,0,0.0,25_26,4,13/09/2025,0,[]
+Dani Ceballos,MC,real madrid,real sociedad,1,67,0,0,0.0,0.0,0,0,0,26,96.2,0,0,0.0,0.0,0.0,6,1,2,0,1,5,3,2,3,0,0,0,21,78.0,37.0,0,1,1,50.0,25_26,4,13/09/2025,0,"[{'pases_completados_pct': [2, 94.3]}]"
+Raúl Asencio,DF,real madrid,real sociedad,0,23,0,0,0.1,0.0,1,0,1,3,66.7,0,0,0.0,0.0,0.0,3,0,0,0,0,1,1,0,3,0,0,0,2,15.0,1.0,0,1,1,50.0,25_26,4,13/09/2025,0,"[{'pases_completados_pct': [4, 93.4]}]"
+Aurélien Tchouaméni,DF,real madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,35,82.9,0,0,0.0,0.0,0.0,7,1,0,0,0,2,2,0,6,0,0,0,24,93.0,48.0,1,5,0,100.0,25_26,4,13/09/2025,0,"[{'pases_ultimo_tercio': [5, 106.0]}]"
+Álvaro Carreras,DF,real madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,41,80.5,0,0,0.0,0.0,0.0,5,1,2,0,2,4,0,4,6,1,1,0,20,105.0,62.0,1,1,2,33.3,25_26,4,13/09/2025,0,"[{'pases_ultimo_tercio': [3, 112.0]}, {'intercepciones': [6, 23.0]}, {'rojas': [2, 1.0]}]"
+Dean Huijsen,DF,real madrid,real sociedad,1,31,0,0,0.1,0.2,1,1,0,26,76.9,0,1,0.0,0.0,0.0,-1,0,0,0,0,0,0,0,2,0,0,0,22,152.0,91.0,0,3,0,100.0,25_26,4,13/09/2025,0,"[{'pases_ultimo_tercio': [10, 97.0]}, {'rojas': [2, 1.0]}]"
+Éder Militão,DF,real madrid,real sociedad,1,90,0,0,0.4,0.0,3,1,2,23,78.3,0,0,0.0,0.0,0.0,6,1,2,0,1,4,3,1,5,1,0,0,18,40.0,16.0,0,3,2,60.0,25_26,4,13/09/2025,0,[]
+Dani Carvajal,DF,real madrid,real sociedad,1,81,0,0,0.0,0.5,1,1,0,33,78.8,0,0,0.0,0.0,0.0,4,1,3,0,3,2,0,2,6,0,0,0,14,40.0,16.0,1,1,0,100.0,25_26,4,13/09/2025,0,"[{'rojas': [10, 1.0]}]"
+Trent AlexanderArnold,DF,real madrid,real sociedad,0,9,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,2,1,2,0,1,0,0,0,0,0,0,0,1,14.0,14.0,0,1,0,100.0,25_26,4,13/09/2025,0,[]
+Thibaut Courtois,PT,real madrid,real sociedad,1,90,0,0,0.0,0.0,0,0,0,43,46.5,0,0,1.0,100.0,1.0,4,0,0,0,0,0,0,0,0,0,0,0,19,118.0,67.0,0,0,0,0.0,25_26,4,13/09/2025,0,"[{'minutos': [1, 1620.0]}, {'porterias_cero': [1, 8.0]}, {'save_pct': [10, 75.4]}]"

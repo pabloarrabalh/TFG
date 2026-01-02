@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
-André Silva,DT,real sociedad,las palmas,1,70,0,0,0.1,0.1,1,1,0,17,76.5,0,0,0.0,0.0,0.0,4,0,1,0,1,0,0,0,0,1,0,1,9,45.0,5.0,0,0,2,0.0,23_24,34,1
-Ander Barrenetxea,MC,real sociedad,las palmas,0,20,0,0,0.2,0.0,2,1,1,12,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,0,11,51.0,6.0,0,0,0,0.0,23_24,34,1
-Mikel Oyarzabal,MC,real sociedad,las palmas,1,90,0,0,0.1,0.0,1,0,1,14,85.7,0,0,0.0,0.0,0.0,4,1,1,0,0,2,0,2,0,0,0,0,11,69.0,8.0,1,0,1,0.0,23_24,34,1
-Mikel Merino,MC,real sociedad,las palmas,1,90,0,0,0.0,0.0,0,0,0,53,86.8,0,0,0.0,0.0,0.0,7,6,1,0,0,2,1,1,2,1,1,0,32,181.0,67.0,0,3,0,100.0,23_24,34,1
-Brais Méndez,MC,real sociedad,las palmas,1,70,0,1,0.1,0.1,2,2,0,31,74.2,0,0,0.0,0.0,0.0,11,0,0,0,0,0,0,0,1,2,1,1,12,42.0,25.0,0,1,0,100.0,23_24,34,1
-Arsen Zakharyan,MC,real sociedad,las palmas,0,20,0,0,0.0,0.0,0,0,0,9,77.8,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,9,25.0,12.0,0,0,0,0.0,23_24,34,1
-Sheraldo Becker,MC,real sociedad,las palmas,1,88,1,0,0.2,0.0,3,1,2,29,58.6,0,0,0.0,0.0,0.0,12,0,1,0,1,0,0,0,0,0,0,0,23,143.0,92.0,3,0,1,0.0,23_24,34,1
-Takefusa Kubo,MC,real sociedad,las palmas,0,2,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,1,5.0,5.0,0,0,0,0.0,23_24,34,1
-Beñat Turrientes,MC,real sociedad,las palmas,1,90,0,0,0.0,0.0,0,0,0,53,86.8,0,0,0.0,0.0,0.0,6,1,2,0,1,2,1,1,1,1,0,0,25,122.0,59.0,0,1,0,100.0,23_24,34,1
-Javi Galán,DF,real sociedad,las palmas,1,78,0,0,0.0,0.0,0,0,0,44,88.6,1,0,0.0,0.0,0.0,5,1,0,0,0,1,0,1,0,2,1,1,22,134.0,71.0,3,0,0,0.0,23_24,34,1
-Jon Aramburu,DF,real sociedad,las palmas,0,12,0,0,0.0,0.0,0,0,0,9,77.8,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,0,1,2,3.0,0.0,0,1,0,100.0,23_24,34,1
-Jon Pacheco,DF,real sociedad,las palmas,1,90,0,0,0.0,0.0,0,0,0,74,93.2,0,0,0.0,0.0,0.0,10,0,0,0,0,2,1,1,3,0,0,0,38,240.0,160.0,3,2,1,66.7,23_24,34,1
-Robin Le Normand,DF,real sociedad,las palmas,1,90,0,0,0.0,0.0,0,0,0,60,86.7,1,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,5,0,0,0,32,146.0,103.0,0,2,0,100.0,23_24,34,1
-Álvaro Odriozola,DF,real sociedad,las palmas,1,78,0,0,0.0,0.1,0,0,0,53,90.6,0,0,0.0,0.0,0.0,7,1,1,0,0,0,0,0,1,2,0,2,30,154.0,87.0,1,1,2,33.3,23_24,34,1
-Aritz Elustondo,DF,real sociedad,las palmas,0,12,0,0,0.0,0.0,0,0,0,8,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,0,0,0,5,23.0,9.0,0,0,0,0.0,23_24,34,1
-Álex Remiro,PT,real sociedad,las palmas,1,90,0,0,0.0,0.0,0,0,0,46,82.6,0,0,0.0,100.0,0.1,8,0,0,0,0,0,0,0,2,0,0,0,24,110.0,43.0,0,0,0,0.0,23_24,34,1
-Munir El Haddadi,DT,las palmas,real sociedad,1,57,0,0,0.0,0.0,1,1,0,15,80.0,0,0,0.0,0.0,0.0,0,0,0,0,0,1,0,1,0,1,0,1,14,36.0,16.0,0,0,2,0.0,23_24,34,0
-Sandro Ramírez,DT,las palmas,real sociedad,0,33,0,0,0.0,0.0,1,1,0,10,90.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,13,54.0,10.0,0,1,1,50.0,23_24,34,0
-Alberto Moleiro,DT,las palmas,real sociedad,1,90,0,0,0.0,0.3,0,0,0,27,88.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,0,2,29,219.0,76.0,3,0,2,0.0,23_24,34,0
-Benito Ramírez,MC,las palmas,real sociedad,1,74,0,0,0.0,0.0,1,1,0,20,85.0,0,0,0.0,0.0,0.0,1,1,2,0,1,1,0,1,0,0,0,0,16,121.0,58.0,3,2,2,50.0,23_24,34,0
-Fabio González,MC,las palmas,real sociedad,0,16,0,0,0.0,0.0,0,0,0,29,93.1,0,0,0.0,0.0,0.0,3,0,0,0,0,1,0,1,0,1,1,0,24,67.0,14.0,0,0,0,0.0,23_24,34,0
-Kirian Rodríguez,MC,las palmas,real sociedad,1,90,0,0,0.1,0.0,1,1,0,58,87.9,0,0,0.0,0.0,0.0,1,2,1,0,0,0,0,0,0,2,1,1,51,229.0,65.0,0,0,0,0.0,23_24,34,0
-Máximo Perrone,MC,las palmas,real sociedad,1,57,0,0,0.0,0.0,1,0,1,27,81.5,0,0,0.0,0.0,0.0,0,0,1,0,1,2,1,1,0,0,0,0,21,68.0,31.0,0,0,0,0.0,23_24,34,0
-Javier Muñoz,MC,las palmas,real sociedad,0,33,0,0,0.0,0.0,1,1,0,21,90.5,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,18,84.0,38.0,0,0,0,0.0,23_24,34,0
-Marvin,MC,las palmas,real sociedad,1,90,0,0,0.3,0.0,1,1,0,25,68.0,0,0,0.0,0.0,0.0,0,3,1,0,0,2,0,2,0,0,0,0,19,127.0,74.0,4,0,1,0.0,23_24,34,0
-Daley Sinkgraven,DF,las palmas,real sociedad,1,57,0,0,0.0,0.0,0,0,0,30,83.3,0,0,0.0,0.0,0.0,0,1,0,0,0,2,1,1,1,0,0,0,20,76.0,8.0,0,1,0,100.0,23_24,34,0
-Sergi Cardona,DF,las palmas,real sociedad,0,33,0,0,0.0,0.0,0,0,0,21,95.2,1,0,0.0,0.0,0.0,1,1,0,0,0,1,0,1,1,0,0,0,12,50.0,23.0,1,0,0,0.0,23_24,34,0
-Mika Mármol,DF,las palmas,real sociedad,1,70,0,0,0.0,0.0,0,0,0,44,81.8,0,0,0.0,0.0,0.0,1,2,2,0,0,1,0,1,3,0,0,0,36,163.0,91.0,0,0,1,0.0,23_24,34,0
-Julian Araujo,DF,las palmas,real sociedad,0,20,0,0,0.0,0.0,0,0,0,19,84.2,0,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,0,0,0,0,12,29.0,8.0,0,0,0,0.0,23_24,34,0
-Saúl Coco,DF,las palmas,real sociedad,1,90,0,0,0.0,0.0,0,0,0,39,84.6,0,0,0.0,0.0,0.0,2,3,0,0,0,0,0,0,3,0,0,0,33,126.0,48.0,0,2,1,66.7,23_24,34,0
-Álex Suárez,DF,las palmas,real sociedad,1,90,0,0,0.0,0.0,0,0,0,47,76.6,0,0,0.0,0.0,0.0,-3,1,1,0,1,1,0,1,0,1,1,0,33,117.0,65.0,0,1,1,50.0,23_24,34,0
-Álvaro Vallés,PT,las palmas,real sociedad,1,90,0,0,0.0,0.0,0,0,0,45,73.3,0,0,2.0,50.0,0.4,3,0,0,0,0,0,0,0,1,0,0,0,37,174.0,98.0,0,0,0,0.0,23_24,34,0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,fecha_partido,local,roles
+André Silva,DT,real sociedad,las palmas,1,70,0,0,0.1,0.1,1,1,0,17,76.5,0,0,0.0,0.0,0.0,4,0,1,0,1,0,0,0,0,1,0,1,9,45.0,5.0,0,0,2,0.0,23_24,34,04/05/2024,1,[]
+Ander Barrenetxea,MC,real sociedad,las palmas,0,20,0,0,0.2,0.0,2,1,1,12,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,0,11,51.0,6.0,0,0,0,0.0,23_24,34,04/05/2024,1,"[{'regates_exitosos': [7, 32.0]}]"
+Mikel Oyarzabal,MC,real sociedad,las palmas,1,90,0,0,0.1,0.0,1,0,1,14,85.7,0,0,0.0,0.0,0.0,4,1,1,0,0,2,0,2,0,0,0,0,11,69.0,8.0,1,0,1,0.0,23_24,34,04/05/2024,1,"[{'penaltis_marcados': [6, 4.0]}, {'rojas': [8, 1.0]}]"
+Mikel Merino,MC,real sociedad,las palmas,1,90,0,0,0.0,0.0,0,0,0,53,86.8,0,0,0.0,0.0,0.0,7,6,1,0,0,2,1,1,2,1,1,0,32,181.0,67.0,0,3,0,100.0,23_24,34,04/05/2024,1,"[{'entradas': [7, 77.0]}, {'faltas_cometidas': [4, 70.0]}]"
+Brais Méndez,MC,real sociedad,las palmas,1,70,0,1,0.1,0.1,2,2,0,31,74.2,0,0,0.0,0.0,0.0,11,0,0,0,0,0,0,0,1,2,1,1,12,42.0,25.0,0,1,0,100.0,23_24,34,04/05/2024,1,[]
+Arsen Zakharyan,MC,real sociedad,las palmas,0,20,0,0,0.0,0.0,0,0,0,9,77.8,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,9,25.0,12.0,0,0,0,0.0,23_24,34,04/05/2024,1,"[{'apariciones_suplente': [9, 10.0]}]"
+Sheraldo Becker,MC,real sociedad,las palmas,1,88,1,0,0.2,0.0,3,1,2,29,58.6,0,0,0.0,0.0,0.0,12,0,1,0,1,0,0,0,0,0,0,0,23,143.0,92.0,3,0,1,0.0,23_24,34,04/05/2024,1,"[{'rojas': [8, 1.0]}]"
+Takefusa Kubo,MC,real sociedad,las palmas,0,2,0,0,0.0,0.0,0,0,0,2,50.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,0,0,0,1,5.0,5.0,0,0,0,0.0,23_24,34,04/05/2024,1,"[{'pases_clave': [6, 58.0]}]"
+Beñat Turrientes,MC,real sociedad,las palmas,1,90,0,0,0.0,0.0,0,0,0,53,86.8,0,0,0.0,0.0,0.0,6,1,2,0,1,2,1,1,1,1,0,0,25,122.0,59.0,0,1,0,100.0,23_24,34,04/05/2024,1,[]
+Javi Galán,DF,real sociedad,las palmas,1,78,0,0,0.0,0.0,0,0,0,44,88.6,1,0,0.0,0.0,0.0,5,1,0,0,0,1,0,1,0,2,1,1,22,134.0,71.0,3,0,0,0.0,23_24,34,04/05/2024,1,[]
+Jon Aramburu,DF,real sociedad,las palmas,0,12,0,0,0.0,0.0,0,0,0,9,77.8,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,1,0,1,2,3.0,0.0,0,1,0,100.0,23_24,34,04/05/2024,1,"[{'entradas': [2, 102.0]}]"
+Jon Pacheco,DF,real sociedad,las palmas,1,90,0,0,0.0,0.0,0,0,0,74,93.2,0,0,0.0,0.0,0.0,10,0,0,0,0,2,1,1,3,0,0,0,38,240.0,160.0,3,2,1,66.7,23_24,34,04/05/2024,1,[]
+Robin Le Normand,DF,real sociedad,las palmas,1,90,0,0,0.0,0.0,0,0,0,60,86.7,1,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,5,0,0,0,32,146.0,103.0,0,2,0,100.0,23_24,34,04/05/2024,1,"[{'amarillas': [4, 13.0]}]"
+Álvaro Odriozola,DF,real sociedad,las palmas,1,78,0,0,0.0,0.1,0,0,0,53,90.6,0,0,0.0,0.0,0.0,7,1,1,0,0,0,0,0,1,2,0,2,30,154.0,87.0,1,1,2,33.3,23_24,34,04/05/2024,1,[]
+Aritz Elustondo,DF,real sociedad,las palmas,0,12,0,0,0.0,0.0,0,0,0,8,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,0,0,0,5,23.0,9.0,0,0,0,0.0,23_24,34,04/05/2024,1,"[{'rojas': [8, 1.0]}]"
+Álex Remiro,PT,real sociedad,las palmas,1,90,0,0,0.0,0.0,0,0,0,46,82.6,0,0,0.0,100.0,0.1,8,0,0,0,0,0,0,0,2,0,0,0,24,110.0,43.0,0,0,0,0.0,23_24,34,04/05/2024,1,"[{'minutos': [8, 3275.0]}, {'rojas': [10, 1.0]}, {'porterias_cero': [2, 15.0]}, {'save_pct': [3, 76.2]}]"
+Munir El Haddadi,DT,las palmas,real sociedad,1,57,0,0,0.0,0.0,1,1,0,15,80.0,0,0,0.0,0.0,0.0,0,0,0,0,0,1,0,1,0,1,0,1,14,36.0,16.0,0,0,2,0.0,23_24,34,04/05/2024,0,"[{'faltas_recibidas': [4, 73.0]}]"
+Sandro Ramírez,DT,las palmas,real sociedad,0,33,0,0,0.0,0.0,1,1,0,10,90.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,13,54.0,10.0,0,1,1,50.0,23_24,34,04/05/2024,0,[]
+Alberto Moleiro,DT,las palmas,real sociedad,1,90,0,0,0.0,0.3,0,0,0,27,88.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,0,2,29,219.0,76.0,3,0,2,0.0,23_24,34,04/05/2024,0,"[{'regates_exitosos': [9, 57.0]}]"
+Benito Ramírez,MC,las palmas,real sociedad,1,74,0,0,0.0,0.0,1,1,0,20,85.0,0,0,0.0,0.0,0.0,1,1,2,0,1,1,0,1,0,0,0,0,16,121.0,58.0,3,2,2,50.0,23_24,34,04/05/2024,0,"[{'rojas': [8, 1.0]}]"
+Fabio González,MC,las palmas,real sociedad,0,16,0,0,0.0,0.0,0,0,0,29,93.1,0,0,0.0,0.0,0.0,3,0,0,0,0,1,0,1,0,1,1,0,24,67.0,14.0,0,0,0,0.0,23_24,34,04/05/2024,0,[]
+Kirian Rodríguez,MC,las palmas,real sociedad,1,90,0,0,0.1,0.0,1,1,0,58,87.9,0,0,0.0,0.0,0.0,1,2,1,0,0,0,0,0,0,2,1,1,51,229.0,65.0,0,0,0,0.0,23_24,34,04/05/2024,0,"[{'pases_ultimo_tercio': [3, 278.0]}]"
+Máximo Perrone,MC,las palmas,real sociedad,1,57,0,0,0.0,0.0,1,0,1,27,81.5,0,0,0.0,0.0,0.0,0,0,1,0,1,2,1,1,0,0,0,0,21,68.0,31.0,0,0,0,0.0,23_24,34,04/05/2024,0,[]
+Javier Muñoz,MC,las palmas,real sociedad,0,33,0,0,0.0,0.0,1,1,0,21,90.5,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,18,84.0,38.0,0,0,0,0.0,23_24,34,04/05/2024,0,[]
+Marvin,MC,las palmas,real sociedad,1,90,0,0,0.3,0.0,1,1,0,25,68.0,0,0,0.0,0.0,0.0,0,3,1,0,0,2,0,2,0,0,0,0,19,127.0,74.0,4,0,1,0.0,23_24,34,04/05/2024,0,[]
+Daley Sinkgraven,DF,las palmas,real sociedad,1,57,0,0,0.0,0.0,0,0,0,30,83.3,0,0,0.0,0.0,0.0,0,1,0,0,0,2,1,1,1,0,0,0,20,76.0,8.0,0,1,0,100.0,23_24,34,04/05/2024,0,"[{'rojas': [10, 1.0]}]"
+Sergi Cardona,DF,las palmas,real sociedad,0,33,0,0,0.0,0.0,0,0,0,21,95.2,1,0,0.0,0.0,0.0,1,1,0,0,0,1,0,1,1,0,0,0,12,50.0,23.0,1,0,0,0.0,23_24,34,04/05/2024,0,"[{'entradas': [4, 90.0]}, {'intercepciones': [4, 46.0]}, {'amarillas': [7, 11.0]}]"
+Mika Mármol,DF,las palmas,real sociedad,1,70,0,0,0.0,0.0,0,0,0,44,81.8,0,0,0.0,0.0,0.0,1,2,2,0,0,1,0,1,3,0,0,0,36,163.0,91.0,0,0,1,0.0,23_24,34,04/05/2024,0,"[{'intercepciones': [7, 44.0]}, {'despejes': [6, 147.0]}, {'rojas': [10, 1.0]}]"
+Julian Araujo,DF,las palmas,real sociedad,0,20,0,0,0.0,0.0,0,0,0,19,84.2,0,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,0,0,0,0,12,29.0,8.0,0,0,0,0.0,23_24,34,04/05/2024,0,[]
+Saúl Coco,DF,las palmas,real sociedad,1,90,0,0,0.0,0.0,0,0,0,39,84.6,0,0,0.0,0.0,0.0,2,3,0,0,0,0,0,0,3,0,0,0,33,126.0,48.0,0,2,1,66.7,23_24,34,04/05/2024,0,"[{'rojas': [10, 1.0]}]"
+Álex Suárez,DF,las palmas,real sociedad,1,90,0,0,0.0,0.0,0,0,0,47,76.6,0,0,0.0,0.0,0.0,-3,1,1,0,1,1,0,1,0,1,1,0,33,117.0,65.0,0,1,1,50.0,23_24,34,04/05/2024,0,"[{'amarillas': [3, 12.0]}]"
+Álvaro Vallés,PT,las palmas,real sociedad,1,90,0,0,0.0,0.0,0,0,0,45,73.3,0,0,2.0,50.0,0.4,3,0,0,0,0,0,0,0,1,0,0,0,37,174.0,98.0,0,0,0,0.0,23_24,34,04/05/2024,0,"[{'minutos': [10, 3263.0]}, {'rojas': [10, 1.0]}, {'paradas': [5, 108.0]}, {'save_pct': [9, 74.3]}]"

@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
-Julián Álvarez,DT,atletico madrid,elche,1,90,0,0,0.0,0.1,0,0,0,31,71.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,4,0,4,21,97.0,33.0,1,0,2,0.0,25_26,2,1
-Alexander Sørloth,DT,atletico madrid,elche,1,67,1,0,0.7,0.1,3,1,2,19,63.2,0,0,0.0,0.0,0.0,11,0,0,0,0,0,0,0,0,4,3,1,10,65.0,31.0,4,4,1,80.0,25_26,2,1
-Giacomo Raspadori,DT,atletico madrid,elche,0,23,0,0,0.1,0.0,2,1,1,12,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,8,18.0,1.0,0,0,0,0.0,25_26,2,1
-Thiago Almada,MC,atletico madrid,elche,1,67,0,0,0.0,0.5,0,0,0,47,74.5,0,0,0.0,0.0,0.0,5,0,1,0,1,0,0,0,0,2,1,1,34,220.0,106.0,2,0,2,0.0,25_26,2,1
-Conor Gallagher,MC,atletico madrid,elche,0,23,0,0,0.0,0.0,1,1,0,19,73.7,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,0,1,0,1,15,54.0,20.0,2,0,0,0.0,25_26,2,1
-Pablo Barrios,MC,atletico madrid,elche,1,90,0,0,0.1,0.0,2,2,0,76,82.9,0,0,0.0,0.0,0.0,5,3,1,0,0,1,0,1,0,3,0,2,55,332.0,167.0,6,3,1,75.0,25_26,2,1
-Johnny Cardoso,MC,atletico madrid,elche,1,67,0,0,0.0,0.0,0,0,0,40,85.0,0,0,0.0,0.0,0.0,6,3,4,0,1,0,0,0,3,1,1,0,30,186.0,103.0,2,0,1,0.0,25_26,2,1
-Antoine Griezmann,MC,atletico madrid,elche,0,23,0,0,0.1,0.0,2,0,2,17,88.2,0,0,0.0,0.0,0.0,4,0,0,0,0,2,0,2,0,0,0,0,10,64.0,43.0,1,0,0,0.0,25_26,2,1
-Giuliano Simeone,MC,atletico madrid,elche,1,74,0,0,0.1,0.1,1,1,0,31,80.6,0,0,0.0,0.0,0.0,4,1,1,0,1,1,0,1,0,1,0,1,28,206.0,90.0,5,0,0,0.0,25_26,2,1
-Nahuel Molina,DF,atletico madrid,elche,0,16,0,0,0.0,0.1,0,0,0,24,83.3,0,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,0,2,0,2,10,54.0,29.0,1,0,0,0.0,25_26,2,1
-Matteo Ruggeri,DF,atletico madrid,elche,1,74,0,0,0.0,0.0,0,0,0,50,80.0,0,0,0.0,0.0,0.0,4,3,5,0,3,0,0,0,2,0,0,0,20,103.0,44.0,0,1,1,50.0,25_26,2,1
-Javi Galán,DF,atletico madrid,elche,0,16,0,0,0.0,0.0,0,0,0,14,71.4,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,0,2,0,1,8,53.0,17.0,1,2,0,100.0,25_26,2,1
-Dávid Hancko,DF,atletico madrid,elche,1,90,0,1,0.1,0.2,1,0,1,59,86.4,0,0,0.0,0.0,0.0,10,2,0,0,0,1,1,0,1,0,0,0,34,361.0,274.0,6,1,2,33.3,25_26,2,1
-Robin Le Normand,DF,atletico madrid,elche,1,90,0,0,0.0,0.0,0,0,0,75,90.7,0,0,0.0,0.0,0.0,6,1,1,0,0,0,0,0,4,0,0,0,38,212.0,98.0,0,2,3,40.0,25_26,2,1
-Marcos Llorente,DF,atletico madrid,elche,1,90,0,0,0.6,0.0,1,1,0,65,87.7,0,0,0.0,0.0,0.0,4,4,4,0,1,1,0,1,1,1,1,0,38,251.0,168.0,8,0,0,0.0,25_26,2,1
-Jan Oblak,PT,atletico madrid,elche,1,90,0,0,0.0,0.0,0,0,0,29,72.4,0,0,1.0,50.0,0.4,3,0,0,0,0,0,0,0,0,0,0,0,15,72.0,54.0,0,0,0,0.0,25_26,2,1
-Rafa Mir,DT,elche,atletico madrid,1,66,1,0,0.3,0.0,2,1,1,16,62.5,0,0,0.0,0.0,0.0,8,0,0,0,0,1,0,1,1,0,0,0,16,67.0,49.0,2,1,1,50.0,25_26,2,0
-André Silva,DT,elche,atletico madrid,0,24,0,0,0.0,0.0,0,0,0,7,71.4,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,4,10.0,0.0,0,1,0,100.0,25_26,2,0
-Álvaro Rodríguez,DT,elche,atletico madrid,1,90,0,1,0.0,0.3,1,1,0,21,61.9,0,0,0.0,0.0,0.0,7,1,2,0,1,1,0,1,1,9,2,7,20,119.0,62.0,2,4,3,57.1,25_26,2,0
-Rodrigo Mendoza,MC,elche,atletico madrid,1,67,0,0,0.0,0.0,1,1,0,25,80.0,1,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,3,2,1,19,93.0,46.0,1,0,1,0.0,25_26,2,0
-Martim Neto,MC,elche,atletico madrid,0,23,0,0,0.0,0.0,0,0,0,11,90.9,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,1,1,1,0,6,28.0,21.0,1,0,0,0.0,25_26,2,0
-Aleix Febas,MC,elche,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,37,83.8,1,0,0.0,0.0,0.0,1,0,1,0,1,1,0,1,2,1,0,1,27,133.0,96.0,2,0,0,0.0,25_26,2,0
-Marc Aguado,MC,elche,atletico madrid,1,84,0,0,0.0,0.0,0,0,0,41,95.1,0,0,0.0,0.0,0.0,4,3,3,0,1,0,0,0,2,0,0,0,24,73.0,37.0,0,1,0,100.0,25_26,2,0
-Federico Redondo,MC,elche,atletico madrid,0,6,0,0,0.0,0.0,0,0,0,6,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,3,7.0,4.0,0,0,0,0.0,25_26,2,0
-Germán Valera,MC,elche,atletico madrid,1,90,0,0,0.0,0.2,0,0,0,47,76.6,0,0,0.0,0.0,0.0,5,3,3,0,0,1,1,0,0,2,0,2,36,209.0,138.0,2,0,0,0.0,25_26,2,0
-Álvaro Núñez,MC,elche,atletico madrid,1,90,0,0,0.0,0.1,0,0,0,35,85.7,0,0,0.0,0.0,0.0,5,1,0,0,0,0,0,0,2,4,3,1,26,107.0,64.0,0,1,4,20.0,25_26,2,0
-Pedro Bigas,DF,elche,atletico madrid,1,81,0,0,0.0,0.0,1,0,1,40,90.0,0,0,0.0,0.0,0.0,5,6,4,0,1,2,1,1,3,0,0,0,30,92.0,32.0,0,1,3,25.0,25_26,2,0
-Léo Pétrot,DF,elche,atletico madrid,0,9,0,0,0.0,0.0,0,0,0,3,33.3,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,1,0,0,0,2,3.0,0.0,0,0,0,0.0,25_26,2,0
-David Affengruber,DF,elche,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,45,97.8,0,0,0.0,0.0,0.0,7,2,3,0,1,2,1,1,7,0,0,0,30,95.0,65.0,0,2,0,100.0,25_26,2,0
-John Donald,DF,elche,atletico madrid,1,45,0,0,0.0,0.0,0,0,0,17,64.7,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,8,39.0,22.0,1,1,1,50.0,25_26,2,0
-Víctor Chust,DF,elche,atletico madrid,0,45,0,0,0.2,0.0,1,1,0,22,86.4,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,3,0,0,0,13,40.0,5.0,0,1,0,100.0,25_26,2,0
-Matías Dituro,PT,elche,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,64,64.1,1,0,1.0,83.3,0.9,8,0,0,0,0,0,0,0,5,0,0,0,43,169.0,117.0,0,0,0,0.0,25_26,2,0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,fecha_partido,local,roles
+Julián Álvarez,DT,atletico madrid,elche,1,90,0,0,0.0,0.1,0,0,0,31,71.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,4,0,4,21,97.0,33.0,1,0,2,0.0,25_26,2,23/08/2025,1,"[{'goles': [5, 7.0]}, {'penaltis_marcados': [6, 2.0]}, {'tiros_puerta': [9, 16.0]}, {'pases_clave': [4, 36.0]}, {'corners': [6, 51.0]}]"
+Alexander Sørloth,DT,atletico madrid,elche,1,67,1,0,0.7,0.1,3,1,2,19,63.2,0,0,0.0,0.0,0.0,11,0,0,0,0,0,0,0,0,4,3,1,10,65.0,31.0,4,4,1,80.0,25_26,2,23/08/2025,1,"[{'rojas': [2, 1.0]}]"
+Giacomo Raspadori,DT,atletico madrid,elche,0,23,0,0,0.1,0.0,2,1,1,12,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,8,18.0,1.0,0,0,0,0.0,25_26,2,23/08/2025,1,"[{'apariciones_suplente': [9, 10.0]}]"
+Thiago Almada,MC,atletico madrid,elche,1,67,0,0,0.0,0.5,0,0,0,47,74.5,0,0,0.0,0.0,0.0,5,0,1,0,1,0,0,0,0,2,1,1,34,220.0,106.0,2,0,2,0.0,25_26,2,23/08/2025,1,[]
+Conor Gallagher,MC,atletico madrid,elche,0,23,0,0,0.0,0.0,1,1,0,19,73.7,0,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,0,1,0,1,15,54.0,20.0,2,0,0,0.0,25_26,2,23/08/2025,1,"[{'apariciones_suplente': [1, 14.0]}]"
+Pablo Barrios,MC,atletico madrid,elche,1,90,0,0,0.1,0.0,2,2,0,76,82.9,0,0,0.0,0.0,0.0,5,3,1,0,0,1,0,1,0,3,0,2,55,332.0,167.0,6,3,1,75.0,25_26,2,23/08/2025,1,"[{'regates_exitosos': [10, 29.0]}]"
+Johnny Cardoso,MC,atletico madrid,elche,1,67,0,0,0.0,0.0,0,0,0,40,85.0,0,0,0.0,0.0,0.0,6,3,4,0,1,0,0,0,3,1,1,0,30,186.0,103.0,2,0,1,0.0,25_26,2,23/08/2025,1,"[{'intercepciones': [6, 48.0]}]"
+Antoine Griezmann,MC,atletico madrid,elche,0,23,0,0,0.1,0.0,2,0,2,17,88.2,0,0,0.0,0.0,0.0,4,0,0,0,0,2,0,2,0,0,0,0,10,64.0,43.0,1,0,0,0.0,25_26,2,23/08/2025,1,"[{'goles': [9, 6.0]}, {'goles_90': [5, 0.8]}, {'apariciones_suplente': [3, 13.0]}]"
+Giuliano Simeone,MC,atletico madrid,elche,1,74,0,0,0.1,0.1,1,1,0,31,80.6,0,0,0.0,0.0,0.0,4,1,1,0,1,1,0,1,0,1,0,1,28,206.0,90.0,5,0,0,0.0,25_26,2,23/08/2025,1,"[{'asistencias': [8, 4.0]}]"
+Nahuel Molina,DF,atletico madrid,elche,0,16,0,0,0.0,0.1,0,0,0,24,83.3,0,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,0,2,0,2,10,54.0,29.0,1,0,0,0.0,25_26,2,23/08/2025,1,"[{'rojas': [10, 1.0]}]"
+Matteo Ruggeri,DF,atletico madrid,elche,1,74,0,0,0.0,0.0,0,0,0,50,80.0,0,0,0.0,0.0,0.0,4,3,5,0,3,0,0,0,2,0,0,0,20,103.0,44.0,0,1,1,50.0,25_26,2,23/08/2025,1,"[{'centros_area': [4, 10.0]}]"
+Javi Galán,DF,atletico madrid,elche,0,16,0,0,0.0,0.0,0,0,0,14,71.4,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,0,2,0,1,8,53.0,17.0,1,2,0,100.0,25_26,2,23/08/2025,1,[]
+Dávid Hancko,DF,atletico madrid,elche,1,90,0,1,0.1,0.2,1,0,1,59,86.4,0,0,0.0,0.0,0.0,10,2,0,0,0,1,1,0,1,0,0,0,34,361.0,274.0,6,1,2,33.3,25_26,2,23/08/2025,1,[]
+Robin Le Normand,DF,atletico madrid,elche,1,90,0,0,0.0,0.0,0,0,0,75,90.7,0,0,0.0,0.0,0.0,6,1,1,0,0,0,0,0,4,0,0,0,38,212.0,98.0,0,2,3,40.0,25_26,2,23/08/2025,1,"[{'amarillas': [4, 13.0]}]"
+Marcos Llorente,DF,atletico madrid,elche,1,90,0,0,0.6,0.0,1,1,0,65,87.7,0,0,0.0,0.0,0.0,4,4,4,0,1,1,0,1,1,1,1,0,38,251.0,168.0,8,0,0,0.0,25_26,2,23/08/2025,1,"[{'rojas': [8, 1.0]}]"
+Jan Oblak,PT,atletico madrid,elche,1,90,0,0,0.0,0.0,0,0,0,29,72.4,0,0,1.0,50.0,0.4,3,0,0,0,0,0,0,0,0,0,0,0,15,72.0,54.0,0,0,0,0.0,25_26,2,23/08/2025,1,"[{'minutos': [5, 1530.0]}, {'porterias_cero': [4, 6.0]}]"
+Rafa Mir,DT,elche,atletico madrid,1,66,1,0,0.3,0.0,2,1,1,16,62.5,0,0,0.0,0.0,0.0,8,0,0,0,0,1,0,1,1,0,0,0,16,67.0,49.0,2,1,1,50.0,25_26,2,23/08/2025,0,"[{'goles': [9, 6.0]}, {'tiros_puerta': [2, 22.0]}, {'faltas_cometidas': [4, 30.0]}]"
+André Silva,DT,elche,atletico madrid,0,24,0,0,0.0,0.0,0,0,0,7,71.4,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,0,0,0,0,4,10.0,0.0,0,1,0,100.0,25_26,2,23/08/2025,0,[]
+Álvaro Rodríguez,DT,elche,atletico madrid,1,90,0,1,0.0,0.3,1,1,0,21,61.9,0,0,0.0,0.0,0.0,7,1,2,0,1,1,0,1,1,9,2,7,20,119.0,62.0,2,4,3,57.1,25_26,2,23/08/2025,0,"[{'asistencias': [8, 4.0]}, {'asistencias_90': [3, 0.48]}]"
+Rodrigo Mendoza,MC,elche,atletico madrid,1,67,0,0,0.0,0.0,1,1,0,25,80.0,1,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,0,3,2,1,19,93.0,46.0,1,0,1,0.0,25_26,2,23/08/2025,0,[]
+Martim Neto,MC,elche,atletico madrid,0,23,0,0,0.0,0.0,0,0,0,11,90.9,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,1,1,1,0,6,28.0,21.0,1,0,0,0.0,25_26,2,23/08/2025,0,[]
+Aleix Febas,MC,elche,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,37,83.8,1,0,0.0,0.0,0.0,1,0,1,0,1,1,0,1,2,1,0,1,27,133.0,96.0,2,0,0,0.0,25_26,2,23/08/2025,0,"[{'pases_ultimo_tercio': [6, 105.0]}, {'minutos': [5, 1530.0]}, {'faltas_recibidas': [1, 55.0]}]"
+Marc Aguado,MC,elche,atletico madrid,1,84,0,0,0.0,0.0,0,0,0,41,95.1,0,0,0.0,0.0,0.0,4,3,3,0,1,0,0,0,2,0,0,0,24,73.0,37.0,0,1,0,100.0,25_26,2,23/08/2025,0,"[{'intercepciones': [6, 23.0]}]"
+Federico Redondo,MC,elche,atletico madrid,0,6,0,0,0.0,0.0,0,0,0,6,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,1,0,0,0,3,7.0,4.0,0,0,0,0.0,25_26,2,23/08/2025,0,"[{'rojas': [2, 1.0]}]"
+Germán Valera,MC,elche,atletico madrid,1,90,0,0,0.0,0.2,0,0,0,47,76.6,0,0,0.0,0.0,0.0,5,3,3,0,0,1,1,0,0,2,0,2,36,209.0,138.0,2,0,0,0.0,25_26,2,23/08/2025,0,"[{'goles_por_tiro': [9, 0.25]}, {'faltas_recibidas': [2, 36.0]}]"
+Álvaro Núñez,MC,elche,atletico madrid,1,90,0,0,0.0,0.1,0,0,0,35,85.7,0,0,0.0,0.0,0.0,5,1,0,0,0,0,0,0,2,4,3,1,26,107.0,64.0,0,1,4,20.0,25_26,2,23/08/2025,0,"[{'centros_area': [2, 12.0]}]"
+Pedro Bigas,DF,elche,atletico madrid,1,81,0,0,0.0,0.0,1,0,1,40,90.0,0,0,0.0,0.0,0.0,5,6,4,0,1,2,1,1,3,0,0,0,30,92.0,32.0,0,1,3,25.0,25_26,2,23/08/2025,0,[]
+Léo Pétrot,DF,elche,atletico madrid,0,9,0,0,0.0,0.0,0,0,0,3,33.3,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,1,0,0,0,2,3.0,0.0,0,0,0,0.0,25_26,2,23/08/2025,0,"[{'apariciones_suplente': [9, 10.0]}]"
+David Affengruber,DF,elche,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,45,97.8,0,0,0.0,0.0,0.0,7,2,3,0,1,2,1,1,7,0,0,0,30,95.0,65.0,0,2,0,100.0,25_26,2,23/08/2025,0,"[{'intercepciones': [6, 23.0]}, {'despejes': [9, 91.0]}, {'rojas': [2, 1.0]}]"
+John Donald,DF,elche,atletico madrid,1,45,0,0,0.0,0.0,0,0,0,17,64.7,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,8,39.0,22.0,1,1,1,50.0,25_26,2,23/08/2025,0,[]
+Víctor Chust,DF,elche,atletico madrid,0,45,0,0,0.2,0.0,1,1,0,22,86.4,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,3,0,0,0,13,40.0,5.0,0,1,0,100.0,25_26,2,23/08/2025,0,"[{'rojas': [2, 1.0]}]"
+Matías Dituro,PT,elche,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,64,64.1,1,0,1.0,83.3,0.9,8,0,0,0,0,0,0,0,5,0,0,0,43,169.0,117.0,0,0,0,0.0,25_26,2,23/08/2025,0,"[{'save_pct': [8, 76.2]}]"

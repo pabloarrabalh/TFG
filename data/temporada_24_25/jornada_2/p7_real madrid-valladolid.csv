@@ -1,32 +1,32 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
-Kylian Mbappé,DT,real madrid,valladolid,1,85,0,0,1.0,0.0,4,1,3,28,85.7,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,5,4,1,31,135.0,39.0,2,1,0,100.0,24_25,2,1
-Endrick,DT,real madrid,valladolid,0,5,1,0,0.0,0.0,1,0,1,1,100.0,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,0,0,0,1,9.0,5.0,0,0,0,0.0,24_25,2,1
-Vinicius Júnior,DT,real madrid,valladolid,1,84,0,0,0.0,1.0,1,1,0,38,84.2,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,9,5,4,37,345.0,207.0,6,0,1,0.0,24_25,2,1
-Dani Ceballos,MC,real madrid,valladolid,0,6,0,0,0.0,0.0,0,0,0,10,100.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,3,2,1,6,70.0,21.0,0,0,0,0.0,24_25,2,1
-Rodrygo,DT,real madrid,valladolid,1,68,0,1,0.0,0.0,0,0,0,47,80.9,0,0,0.0,0.0,0.0,7,0,1,0,1,2,0,2,0,3,0,2,44,284.0,163.0,4,0,1,0.0,24_25,2,1
-Luka Modrić,MC,real madrid,valladolid,0,22,0,0,0.0,0.0,0,0,0,24,75.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,1,1,1,0,18,81.0,26.0,0,0,2,0.0,24_25,2,1
-Arda Güler,MC,real madrid,valladolid,1,68,0,0,0.5,0.2,5,2,3,48,79.2,1,0,0.0,0.0,0.0,5,3,0,0,0,1,0,1,0,4,1,3,44,260.0,127.0,2,0,1,0.0,24_25,2,1
-Brahim Díaz,DT,real madrid,valladolid,0,22,1,1,0.3,0.0,1,0,1,15,100.0,0,0,0.0,0.0,0.0,13,1,1,0,1,0,0,0,0,1,1,0,14,127.0,97.0,4,0,1,0.0,24_25,2,1
-Aurélien Tchouaméni,MC,real madrid,valladolid,1,90,0,0,0.0,0.0,1,1,0,90,95.6,0,0,0.0,0.0,0.0,7,1,2,0,1,1,1,0,3,1,1,0,65,346.0,172.0,3,1,2,33.3,24_25,2,1
-Federico Valverde,MC,real madrid,valladolid,1,90,1,0,0.0,0.3,2,1,1,61,90.2,0,0,0.0,0.0,0.0,15,3,3,0,2,2,0,2,2,1,1,0,54,301.0,150.0,2,0,1,0.0,24_25,2,1
-Fran Garcia,DF,real madrid,valladolid,1,90,0,0,0.0,0.2,0,0,0,67,94.0,0,0,0.0,0.0,0.0,11,3,1,0,0,0,0,0,1,0,0,0,51,188.0,73.0,0,1,1,50.0,24_25,2,1
-Antonio Rüdiger,DF,real madrid,valladolid,1,90,0,0,0.2,0.0,2,2,0,86,93.0,0,0,0.0,0.0,0.0,9,0,0,0,0,1,0,1,2,0,0,0,62,287.0,165.0,0,3,1,75.0,24_25,2,1
-Éder Militão,DF,real madrid,valladolid,1,90,0,1,0.0,0.3,0,0,0,81,91.4,0,0,0.0,0.0,0.0,16,1,1,0,1,1,1,0,2,3,3,0,61,365.0,253.0,1,2,2,50.0,24_25,2,1
-Dani Carvajal,DF,real madrid,valladolid,1,90,0,0,0.0,0.0,0,0,0,63,87.3,0,0,0.0,0.0,0.0,8,4,5,0,1,2,1,1,3,0,0,0,35,198.0,55.0,0,0,0,0.0,24_25,2,1
-Thibaut Courtois,PT,real madrid,valladolid,1,90,0,0,0.0,0.0,0,0,0,30,93.3,0,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,0,0,0,0,17,114.0,76.0,0,0,0,0.0,24_25,2,1
-Marcos André,DT,valladolid,real madrid,1,70,0,0,0.0,0.0,0,0,0,10,60.0,1,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,3,2,1,14,80.0,3.0,0,5,2,71.4,24_25,2,0
-Mamadou Sylla,DT,valladolid,real madrid,0,20,0,0,0.1,0.0,1,1,0,3,66.7,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,2,12.0,7.0,1,0,0,0.0,24_25,2,0
-Darwin Machís,MC,valladolid,real madrid,1,57,0,0,0.0,0.0,1,1,0,11,45.5,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,10,55.0,28.0,0,0,0,0.0,24_25,2,0
-Raúl Moro,MC,valladolid,real madrid,0,33,0,0,0.1,0.1,2,2,0,19,78.9,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,3,1,2,15,143.0,116.0,4,0,0,0.0,24_25,2,0
-Víctor Meseguer,MC,valladolid,real madrid,1,58,0,0,0.0,0.0,1,1,0,21,66.7,0,0,0.0,0.0,0.0,1,2,3,0,3,2,0,2,0,1,0,1,13,25.0,14.0,0,0,1,0.0,24_25,2,0
-Selim Amallah,MC,valladolid,real madrid,0,32,0,0,0.1,0.0,1,1,0,11,72.7,0,0,0.0,0.0,0.0,0,1,1,0,1,0,0,0,0,0,0,0,8,71.0,41.0,2,0,0,0.0,24_25,2,0
-Kike Pérez,MC,valladolid,real madrid,1,84,0,0,0.0,0.1,0,0,0,35,82.9,0,0,0.0,0.0,0.0,2,4,5,0,4,1,0,1,0,2,0,1,24,147.0,96.0,1,1,1,50.0,24_25,2,0
-Amath,MC,valladolid,real madrid,0,6,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,0,0,1,0,1,0,0,0,0,0,0,0,3,6.0,3.0,0,0,0,0.0,24_25,2,0
-Iván Sánchez,MC,valladolid,real madrid,1,90,0,0,0.0,0.0,0,0,0,31,83.9,0,0,0.0,0.0,0.0,1,1,5,0,4,0,0,0,1,3,2,1,20,159.0,90.0,3,0,0,0.0,24_25,2,0
-Stanko Jurić,MC,valladolid,real madrid,1,70,0,0,0.0,0.1,0,0,0,29,89.7,0,0,0.0,0.0,0.0,3,4,4,0,1,2,1,1,2,0,0,0,19,106.0,68.0,1,0,0,0.0,24_25,2,0
-Mario Martín,MC,valladolid,real madrid,0,20,0,0,0.0,0.0,1,1,0,13,92.3,0,0,0.0,0.0,0.0,0,1,3,0,2,0,0,0,0,1,0,1,10,44.0,23.0,0,2,0,100.0,24_25,2,0
-Lucas Oliveira Rosa,DF,valladolid,real madrid,1,90,0,0,0.0,0.1,0,0,0,34,79.4,0,0,0.0,0.0,0.0,0,3,4,0,1,1,0,1,2,1,1,0,17,126.0,60.0,1,0,1,0.0,24_25,2,0
-Enzo Boyomo,DF,valladolid,real madrid,1,90,0,0,0.0,0.0,1,1,0,55,87.3,0,0,0.0,0.0,0.0,1,1,1,0,0,2,2,0,4,1,1,0,31,137.0,53.0,0,2,2,50.0,24_25,2,0
-Eray Cömert,DF,valladolid,real madrid,1,90,0,0,0.0,0.0,0,0,0,41,95.1,0,0,0.0,0.0,0.0,1,1,1,0,0,2,2,0,5,0,0,0,28,142.0,67.0,0,2,1,66.7,24_25,2,0
-Luis Pérez,DF,valladolid,real madrid,1,90,0,0,0.0,0.0,0,0,0,37,83.8,0,0,0.0,0.0,0.0,3,1,1,0,1,2,0,2,3,0,0,0,25,165.0,84.0,2,1,0,100.0,24_25,2,0
-Karl Jakob Hein,PT,valladolid,real madrid,1,90,0,0,0.0,0.0,0,0,0,44,70.5,0,0,3.0,66.7,1.9,6,0,0,0,0,0,0,0,0,0,0,0,29,123.0,58.0,0,0,0,0.0,24_25,2,0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,fecha_partido,local,roles
+Kylian Mbappé,DT,real madrid,valladolid,1,85,0,0,1.0,0.0,4,1,3,28,85.7,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,5,4,1,31,135.0,39.0,2,1,0,100.0,24_25,2,25/08/2024,1,"[{'goles': [1, 31.0]}, {'goles_90': [2, 0.96]}, {'penaltis_marcados': [2, 7.0]}, {'tiros_puerta': [1, 75.0]}, {'regates_exitosos': [3, 83.0]}, {'rojas': [8, 1.0]}]"
+Endrick,DT,real madrid,valladolid,0,5,1,0,0.0,0.0,1,0,1,1,100.0,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,0,0,0,1,9.0,5.0,0,0,0,0.0,24_25,2,25/08/2024,1,[]
+Vinicius Júnior,DT,real madrid,valladolid,1,84,0,0,0.0,1.0,1,1,0,38,84.2,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,9,5,4,37,345.0,207.0,6,0,1,0.0,24_25,2,25/08/2024,1,"[{'asistencias': [4, 8.0]}, {'asistencias_90': [8, 0.32]}, {'pases_clave': [9, 58.0]}, {'regates_exitosos': [4, 82.0]}, {'rojas': [8, 1.0]}, {'faltas_recibidas': [2, 70.0]}]"
+Dani Ceballos,MC,real madrid,valladolid,0,6,0,0,0.0,0.0,0,0,0,10,100.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,3,2,1,6,70.0,21.0,0,0,0,0.0,24_25,2,25/08/2024,1,"[{'pases_completados_pct': [2, 94.3]}]"
+Rodrygo,DT,real madrid,valladolid,1,68,0,1,0.0,0.0,0,0,0,47,80.9,0,0,0.0,0.0,0.0,7,0,1,0,1,2,0,2,0,3,0,2,44,284.0,163.0,4,0,1,0.0,24_25,2,25/08/2024,1,"[{'tiros_puerta': [6, 35.0]}, {'regates_exitosos': [8, 60.0]}]"
+Luka Modrić,MC,real madrid,valladolid,0,22,0,0,0.0,0.0,0,0,0,24,75.0,0,0,0.0,0.0,0.0,2,1,0,0,0,0,0,0,1,1,1,0,18,81.0,26.0,0,0,2,0.0,24_25,2,25/08/2024,1,"[{'asistencias_90': [10, 0.3]}, {'pases_clave': [5, 66.0]}, {'pases_ultimo_tercio': [6, 225.0]}, {'corners': [6, 98.0]}]"
+Arda Güler,MC,real madrid,valladolid,1,68,0,0,0.5,0.2,5,2,3,48,79.2,1,0,0.0,0.0,0.0,5,3,0,0,0,1,0,1,0,4,1,3,44,260.0,127.0,2,0,1,0.0,24_25,2,25/08/2024,1,"[{'asistencias': [4, 5.0]}, {'asistencias_90': [8, 0.4]}, {'pases_clave': [2, 40.0]}, {'corners': [7, 48.0]}]"
+Brahim Díaz,DT,real madrid,valladolid,0,22,1,1,0.3,0.0,1,0,1,15,100.0,0,0,0.0,0.0,0.0,13,1,1,0,1,0,0,0,0,1,1,0,14,127.0,97.0,4,0,1,0.0,24_25,2,25/08/2024,1,"[{'asistencias_90': [5, 0.35]}]"
+Aurélien Tchouaméni,MC,real madrid,valladolid,1,90,0,0,0.0,0.0,1,1,0,90,95.6,0,0,0.0,0.0,0.0,7,1,2,0,1,1,1,0,3,1,1,0,65,346.0,172.0,3,1,2,33.3,24_25,2,25/08/2024,1,"[{'pases_completados_pct': [6, 92.3]}, {'pases_ultimo_tercio': [9, 176.0]}, {'intercepciones': [9, 46.0]}]"
+Federico Valverde,MC,real madrid,valladolid,1,90,1,0,0.0,0.3,2,1,1,61,90.2,0,0,0.0,0.0,0.0,15,3,3,0,2,2,0,2,2,1,1,0,54,301.0,150.0,2,0,1,0.0,24_25,2,25/08/2024,1,"[{'pases_ultimo_tercio': [4, 232.0]}, {'intercepciones': [2, 55.0]}]"
+Fran Garcia,DF,real madrid,valladolid,1,90,0,0,0.0,0.2,0,0,0,67,94.0,0,0,0.0,0.0,0.0,11,3,1,0,0,0,0,0,1,0,0,0,51,188.0,73.0,0,1,1,50.0,24_25,2,25/08/2024,1,"[{'asistencias_90': [9, 0.32]}]"
+Antonio Rüdiger,DF,real madrid,valladolid,1,90,0,0,0.2,0.0,2,2,0,86,93.0,0,0,0.0,0.0,0.0,9,0,0,0,0,1,0,1,2,0,0,0,62,287.0,165.0,0,3,1,75.0,24_25,2,25/08/2024,1,"[{'pases_completados_pct': [9, 91.8]}]"
+Éder Militão,DF,real madrid,valladolid,1,90,0,1,0.0,0.3,0,0,0,81,91.4,0,0,0.0,0.0,0.0,16,1,1,0,1,1,1,0,2,3,3,0,61,365.0,253.0,1,2,2,50.0,24_25,2,25/08/2024,1,[]
+Dani Carvajal,DF,real madrid,valladolid,1,90,0,0,0.0,0.0,0,0,0,63,87.3,0,0,0.0,0.0,0.0,8,4,5,0,1,2,1,1,3,0,0,0,35,198.0,55.0,0,0,0,0.0,24_25,2,25/08/2024,1,"[{'rojas': [10, 1.0]}]"
+Thibaut Courtois,PT,real madrid,valladolid,1,90,0,0,0.0,0.0,0,0,0,30,93.3,0,0,0.0,0.0,0.0,10,0,0,0,0,0,0,0,0,0,0,0,17,114.0,76.0,0,0,0,0.0,24_25,2,25/08/2024,1,"[{'porterias_cero': [3, 11.0]}, {'save_pct': [9, 75.0]}]"
+Marcos André,DT,valladolid,real madrid,1,70,0,0,0.0,0.0,0,0,0,10,60.0,1,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,3,2,1,14,80.0,3.0,0,5,2,71.4,24_25,2,25/08/2024,0,[]
+Mamadou Sylla,DT,valladolid,real madrid,0,20,0,0,0.1,0.0,1,1,0,3,66.7,0,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,2,12.0,7.0,1,0,0,0.0,24_25,2,25/08/2024,0,"[{'penaltis_marcados': [6, 4.0]}]"
+Darwin Machís,MC,valladolid,real madrid,1,57,0,0,0.0,0.0,1,1,0,11,45.5,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,10,55.0,28.0,0,0,0,0.0,24_25,2,25/08/2024,0,"[{'rojas': [10, 1.0]}]"
+Raúl Moro,MC,valladolid,real madrid,0,33,0,0,0.1,0.1,2,2,0,19,78.9,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,3,1,2,15,143.0,116.0,4,0,0,0.0,24_25,2,25/08/2024,0,"[{'regates_exitosos': [9, 57.0]}]"
+Víctor Meseguer,MC,valladolid,real madrid,1,58,0,0,0.0,0.0,1,1,0,21,66.7,0,0,0.0,0.0,0.0,1,2,3,0,3,2,0,2,0,1,0,1,13,25.0,14.0,0,0,1,0.0,24_25,2,25/08/2024,0,[]
+Selim Amallah,MC,valladolid,real madrid,0,32,0,0,0.1,0.0,1,1,0,11,72.7,0,0,0.0,0.0,0.0,0,1,1,0,1,0,0,0,0,0,0,0,8,71.0,41.0,2,0,0,0.0,24_25,2,25/08/2024,0,"[{'rojas': [10, 1.0]}]"
+Kike Pérez,MC,valladolid,real madrid,1,84,0,0,0.0,0.1,0,0,0,35,82.9,0,0,0.0,0.0,0.0,2,4,5,0,4,1,0,1,0,2,0,1,24,147.0,96.0,1,1,1,50.0,24_25,2,25/08/2024,0,[]
+Amath,MC,valladolid,real madrid,0,6,0,0,0.0,0.0,0,0,0,3,66.7,0,0,0.0,0.0,0.0,0,0,1,0,1,0,0,0,0,0,0,0,3,6.0,3.0,0,0,0,0.0,24_25,2,25/08/2024,0,[]
+Iván Sánchez,MC,valladolid,real madrid,1,90,0,0,0.0,0.0,0,0,0,31,83.9,0,0,0.0,0.0,0.0,1,1,5,0,4,0,0,0,1,3,2,1,20,159.0,90.0,3,0,0,0.0,24_25,2,25/08/2024,0,"[{'apariciones_suplente': [6, 21.0]}]"
+Stanko Jurić,MC,valladolid,real madrid,1,70,0,0,0.0,0.1,0,0,0,29,89.7,0,0,0.0,0.0,0.0,3,4,4,0,1,2,1,1,2,0,0,0,19,106.0,68.0,1,0,0,0.0,24_25,2,25/08/2024,0,"[{'rojas': [8, 1.0]}]"
+Mario Martín,MC,valladolid,real madrid,0,20,0,0,0.0,0.0,1,1,0,13,92.3,0,0,0.0,0.0,0.0,0,1,3,0,2,0,0,0,0,1,0,1,10,44.0,23.0,0,2,0,100.0,24_25,2,25/08/2024,0,"[{'rojas': [1, 3.0]}]"
+Lucas Oliveira Rosa,DF,valladolid,real madrid,1,90,0,0,0.0,0.1,0,0,0,34,79.4,0,0,0.0,0.0,0.0,0,3,4,0,1,1,0,1,2,1,1,0,17,126.0,60.0,1,0,1,0.0,24_25,2,25/08/2024,0,[]
+Enzo Boyomo,DF,valladolid,real madrid,1,90,0,0,0.0,0.0,1,1,0,55,87.3,0,0,0.0,0.0,0.0,1,1,1,0,0,2,2,0,4,1,1,0,31,137.0,53.0,0,2,2,50.0,24_25,2,25/08/2024,0,"[{'minutos': [6, 3257.0]}]"
+Eray Cömert,DF,valladolid,real madrid,1,90,0,0,0.0,0.0,0,0,0,41,95.1,0,0,0.0,0.0,0.0,1,1,1,0,0,2,2,0,5,0,0,0,28,142.0,67.0,0,2,1,66.7,24_25,2,25/08/2024,0,[]
+Luis Pérez,DF,valladolid,real madrid,1,90,0,0,0.0,0.0,0,0,0,37,83.8,0,0,0.0,0.0,0.0,3,1,1,0,1,2,0,2,3,0,0,0,25,165.0,84.0,2,1,0,100.0,24_25,2,25/08/2024,0,"[{'centros_area': [3, 29.0]}]"
+Karl Jakob Hein,PT,valladolid,real madrid,1,90,0,0,0.0,0.0,0,0,0,44,70.5,0,0,3.0,66.7,1.9,6,0,0,0,0,0,0,0,0,0,0,0,29,123.0,58.0,0,0,0,0.0,24_25,2,25/08/2024,0,"[{'paradas': [4, 96.0]}]"

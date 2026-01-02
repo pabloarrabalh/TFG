@@ -1,34 +1,34 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
-Julián Álvarez,DT,atletico madrid,osasuna,1,81,0,0,0.3,0.7,3,0,3,21,85.7,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,1,0,1,20,102.0,50.0,2,0,0,0.0,25_26,9,1
-Giacomo Raspadori,MC,atletico madrid,osasuna,0,9,0,0,0.0,0.0,0,0,0,1,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,5.0,0.0,0,0,0,0.0,25_26,9,1
-Antoine Griezmann,DT,atletico madrid,osasuna,1,54,0,0,0.7,0.0,3,1,2,25,80.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,1,1,0,9,48.0,15.0,0,0,1,0.0,25_26,9,1
-Alexander Sørloth,DT,atletico madrid,osasuna,0,36,0,0,0.2,0.0,2,2,0,12,41.7,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,2,0,1,7,46.0,14.0,2,5,3,62.5,25_26,9,1
-Alex Baena,MC,atletico madrid,osasuna,1,62,0,0,0.0,0.6,1,0,1,38,78.9,0,0,0.0,0.0,0.0,6,1,0,0,0,0,0,0,0,3,0,3,26,152.0,24.0,0,2,0,100.0,25_26,9,1
-Thiago Almada,MC,atletico madrid,osasuna,0,28,1,0,0.6,0.0,1,0,1,14,64.3,0,0,0.0,0.0,0.0,10,1,0,0,0,0,0,0,2,1,1,0,12,98.0,76.0,4,0,0,0.0,25_26,9,1
-Koke,MC,atletico madrid,osasuna,1,53,0,0,0.0,0.1,1,1,0,49,89.8,1,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,1,0,0,0,37,195.0,100.0,0,2,1,66.7,25_26,9,1
-Conor Gallagher,MC,atletico madrid,osasuna,0,37,0,0,0.0,0.0,0,0,0,22,86.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,15,38.0,6.0,0,0,0,0.0,25_26,9,1
-Pablo Barrios,MC,atletico madrid,osasuna,1,90,0,0,0.1,0.1,2,1,1,67,91.0,0,0,0.0,0.0,0.0,8,1,3,0,2,0,0,0,2,1,1,0,44,206.0,72.0,1,0,0,0.0,25_26,9,1
-Nicolás González,DF,atletico madrid,osasuna,1,42,0,0,0.0,0.0,0,0,0,23,65.2,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,1,1,0,0,13,97.0,43.0,1,2,2,50.0,25_26,9,1
-Giuliano Simeone,DF,atletico madrid,osasuna,0,48,0,1,0.0,0.6,0,0,0,35,71.4,0,0,0.0,0.0,0.0,8,2,4,0,2,0,0,0,2,4,1,3,23,163.0,103.0,5,3,1,75.0,25_26,9,1
-Dávid Hancko,DF,atletico madrid,osasuna,1,90,0,0,0.1,0.0,2,2,0,56,83.9,0,0,0.0,0.0,0.0,7,0,1,0,1,4,2,2,1,0,0,0,35,150.0,91.0,2,0,2,0.0,25_26,9,1
-José María Giménez,DF,atletico madrid,osasuna,1,90,0,0,0.6,0.0,2,2,0,59,94.9,0,0,0.0,0.0,0.0,11,2,2,0,0,0,0,0,6,0,0,0,37,141.0,87.0,0,4,4,50.0,25_26,9,1
-Robin Le Normand,DF,atletico madrid,osasuna,1,90,0,0,0.0,0.0,0,0,0,48,91.7,0,0,0.0,0.0,0.0,11,2,3,0,2,0,0,0,7,1,0,1,34,177.0,129.0,1,2,2,50.0,25_26,9,1
-Marcos Llorente,DF,atletico madrid,osasuna,1,90,0,0,0.0,0.1,1,0,1,68,92.6,0,0,0.0,0.0,0.0,12,4,2,0,0,1,0,1,1,1,1,0,42,342.0,213.0,5,0,0,0.0,25_26,9,1
-Jan Oblak,PT,atletico madrid,osasuna,1,90,0,0,0.0,0.0,0,0,0,33,84.8,0,0,0.0,100.0,0.7,13,0,0,0,0,0,0,0,1,0,0,0,13,74.0,34.0,0,0,0,0.0,25_26,9,1
-Ante Budimir,DT,osasuna,atletico madrid,1,90,0,0,0.8,0.0,3,2,1,13,61.5,0,0,0.0,0.0,0.0,4,1,0,0,0,0,0,0,3,0,0,0,8,23.0,2.0,0,4,5,44.4,25_26,9,0
-Víctor Muñoz,DT,osasuna,atletico madrid,1,84,0,0,0.2,0.2,2,2,0,22,63.6,0,0,0.0,0.0,0.0,1,1,2,0,2,1,0,1,0,5,1,3,24,198.0,64.0,2,1,2,33.3,25_26,9,0
-Sheraldo Becker,MC,osasuna,atletico madrid,0,6,0,0,0.0,0.0,0,0,0,7,42.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,4,12.0,6.0,0,0,0,0.0,25_26,9,0
-Rubén García,DT,osasuna,atletico madrid,1,62,0,0,0.1,0.1,1,1,0,22,59.1,0,0,0.0,0.0,0.0,5,2,1,0,0,0,0,0,1,3,1,1,15,52.0,8.0,0,0,1,0.0,25_26,9,0
-Moi Gómez,MC,osasuna,atletico madrid,0,28,0,0,0.0,0.5,0,0,0,32,84.4,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,0,2,1,1,26,143.0,48.0,1,0,0,0.0,25_26,9,0
-Abel Bretones,MC,osasuna,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,30,70.0,0,0,0.0,0.0,0.0,5,3,4,0,1,1,0,1,3,3,1,2,22,117.0,71.0,1,0,1,0.0,25_26,9,0
-Jon Moncayola,MC,osasuna,atletico madrid,1,84,0,0,0.0,0.1,1,1,0,46,82.6,0,0,0.0,0.0,0.0,3,2,3,0,1,1,0,1,0,0,0,0,40,93.0,48.0,0,0,1,0.0,25_26,9,0
-Iker Muñoz,MC,osasuna,atletico madrid,0,6,0,0,0.0,0.0,0,0,0,2,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,6.0,1.0,0,0,0,0.0,25_26,9,0
-Lucas Torró,MC,osasuna,atletico madrid,1,73,0,0,0.1,0.0,1,0,1,30,66.7,0,0,0.0,0.0,0.0,3,3,1,0,0,1,0,1,1,1,1,0,16,86.0,22.0,1,4,2,66.7,25_26,9,0
-Kike Barja,MC,osasuna,atletico madrid,0,17,0,0,0.0,0.0,0,0,0,13,69.2,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,2,1,1,11,44.0,15.0,1,0,0,0.0,25_26,9,0
-Valentin Rosier,MC,osasuna,atletico madrid,1,40,0,0,0.0,0.0,0,0,0,11,81.8,0,0,0.0,0.0,0.0,4,2,0,0,0,2,0,2,5,0,0,0,6,4.0,1.0,0,0,2,0.0,25_26,9,0
-Iker Benito,MC,osasuna,atletico madrid,0,50,0,0,0.0,0.1,1,1,0,32,84.4,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,3,2,1,1,21,93.0,58.0,3,1,0,100.0,25_26,9,0
-Jorge Herrando,DF,osasuna,atletico madrid,1,73,0,0,0.0,0.0,0,0,0,20,90.0,0,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,4,0,0,0,16,66.0,24.0,0,1,0,100.0,25_26,9,0
-Raúl,DT,osasuna,atletico madrid,0,17,0,0,0.0,0.0,0,0,0,7,100.0,1,0,0.0,0.0,0.0,0,0,0,0,0,1,0,1,0,0,0,0,6,10.0,4.0,0,1,0,100.0,25_26,9,0
-Catena,DF,osasuna,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,37,91.9,1,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,8,0,0,0,24,103.0,74.0,1,3,5,37.5,25_26,9,0
-Enzo Boyomo,DF,osasuna,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,37,86.5,1,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,5,1,1,0,34,141.0,90.0,1,1,1,50.0,25_26,9,0
-Sergio Herrera,PT,osasuna,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,47,78.7,0,0,1.0,88.9,2.7,10,0,0,0,0,0,0,0,0,0,0,0,22,113.0,78.0,0,0,0,0.0,25_26,9,0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,fecha_partido,local,roles
+Julián Álvarez,DT,atletico madrid,osasuna,1,81,0,0,0.3,0.7,3,0,3,21,85.7,0,0,0.0,0.0,0.0,9,0,0,0,0,0,0,0,0,1,0,1,20,102.0,50.0,2,0,0,0.0,25_26,9,18/10/2025,1,"[{'goles': [5, 7.0]}, {'penaltis_marcados': [6, 2.0]}, {'tiros_puerta': [9, 16.0]}, {'pases_clave': [4, 36.0]}, {'corners': [6, 51.0]}]"
+Giacomo Raspadori,MC,atletico madrid,osasuna,0,9,0,0,0.0,0.0,0,0,0,1,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,1,5.0,0.0,0,0,0,0.0,25_26,9,18/10/2025,1,"[{'apariciones_suplente': [9, 10.0]}]"
+Antoine Griezmann,DT,atletico madrid,osasuna,1,54,0,0,0.7,0.0,3,1,2,25,80.0,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,0,1,1,0,9,48.0,15.0,0,0,1,0.0,25_26,9,18/10/2025,1,"[{'goles': [9, 6.0]}, {'goles_90': [5, 0.8]}, {'apariciones_suplente': [3, 13.0]}]"
+Alexander Sørloth,DT,atletico madrid,osasuna,0,36,0,0,0.2,0.0,2,2,0,12,41.7,0,0,0.0,0.0,0.0,1,0,1,0,1,0,0,0,0,2,0,1,7,46.0,14.0,2,5,3,62.5,25_26,9,18/10/2025,1,"[{'rojas': [2, 1.0]}]"
+Alex Baena,MC,atletico madrid,osasuna,1,62,0,0,0.0,0.6,1,0,1,38,78.9,0,0,0.0,0.0,0.0,6,1,0,0,0,0,0,0,0,3,0,3,26,152.0,24.0,0,2,0,100.0,25_26,9,18/10/2025,1,"[{'asistencias': [1, 14.0]}, {'asistencias_90': [2, 0.49]}, {'pases_clave': [3, 83.0]}, {'corners': [5, 95.0]}, {'amarillas': [7, 11.0]}, {'rojas': [10, 1.0]}]"
+Thiago Almada,MC,atletico madrid,osasuna,0,28,1,0,0.6,0.0,1,0,1,14,64.3,0,0,0.0,0.0,0.0,10,1,0,0,0,0,0,0,2,1,1,0,12,98.0,76.0,4,0,0,0.0,25_26,9,18/10/2025,1,[]
+Koke,MC,atletico madrid,osasuna,1,53,0,0,0.0,0.1,1,1,0,49,89.8,1,0,0.0,0.0,0.0,2,2,1,0,0,0,0,0,1,0,0,0,37,195.0,100.0,0,2,1,66.7,25_26,9,18/10/2025,1,"[{'pases_completados_pct': [10, 91.5]}]"
+Conor Gallagher,MC,atletico madrid,osasuna,0,37,0,0,0.0,0.0,0,0,0,22,86.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,15,38.0,6.0,0,0,0,0.0,25_26,9,18/10/2025,1,"[{'apariciones_suplente': [1, 14.0]}]"
+Pablo Barrios,MC,atletico madrid,osasuna,1,90,0,0,0.1,0.1,2,1,1,67,91.0,0,0,0.0,0.0,0.0,8,1,3,0,2,0,0,0,2,1,1,0,44,206.0,72.0,1,0,0,0.0,25_26,9,18/10/2025,1,"[{'regates_exitosos': [10, 29.0]}]"
+Nicolás González,DF,atletico madrid,osasuna,1,42,0,0,0.0,0.0,0,0,0,23,65.2,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,1,1,0,0,13,97.0,43.0,1,2,2,50.0,25_26,9,18/10/2025,1,[]
+Giuliano Simeone,DF,atletico madrid,osasuna,0,48,0,1,0.0,0.6,0,0,0,35,71.4,0,0,0.0,0.0,0.0,8,2,4,0,2,0,0,0,2,4,1,3,23,163.0,103.0,5,3,1,75.0,25_26,9,18/10/2025,1,"[{'asistencias': [8, 4.0]}]"
+Dávid Hancko,DF,atletico madrid,osasuna,1,90,0,0,0.1,0.0,2,2,0,56,83.9,0,0,0.0,0.0,0.0,7,0,1,0,1,4,2,2,1,0,0,0,35,150.0,91.0,2,0,2,0.0,25_26,9,18/10/2025,1,[]
+José María Giménez,DF,atletico madrid,osasuna,1,90,0,0,0.6,0.0,2,2,0,59,94.9,0,0,0.0,0.0,0.0,11,2,2,0,0,0,0,0,6,0,0,0,37,141.0,87.0,0,4,4,50.0,25_26,9,18/10/2025,1,"[{'pases_completados_pct': [9, 91.8]}]"
+Robin Le Normand,DF,atletico madrid,osasuna,1,90,0,0,0.0,0.0,0,0,0,48,91.7,0,0,0.0,0.0,0.0,11,2,3,0,2,0,0,0,7,1,0,1,34,177.0,129.0,1,2,2,50.0,25_26,9,18/10/2025,1,"[{'amarillas': [4, 13.0]}]"
+Marcos Llorente,DF,atletico madrid,osasuna,1,90,0,0,0.0,0.1,1,0,1,68,92.6,0,0,0.0,0.0,0.0,12,4,2,0,0,1,0,1,1,1,1,0,42,342.0,213.0,5,0,0,0.0,25_26,9,18/10/2025,1,"[{'rojas': [8, 1.0]}]"
+Jan Oblak,PT,atletico madrid,osasuna,1,90,0,0,0.0,0.0,0,0,0,33,84.8,0,0,0.0,100.0,0.7,13,0,0,0,0,0,0,0,1,0,0,0,13,74.0,34.0,0,0,0,0.0,25_26,9,18/10/2025,1,"[{'minutos': [5, 1530.0]}, {'porterias_cero': [4, 6.0]}]"
+Ante Budimir,DT,osasuna,atletico madrid,1,90,0,0,0.8,0.0,3,2,1,13,61.5,0,0,0.0,0.0,0.0,4,1,0,0,0,0,0,0,3,0,0,0,8,23.0,2.0,0,4,5,44.4,25_26,9,18/10/2025,0,"[{'goles': [9, 6.0]}, {'penaltis_marcados': [2, 3.0]}]"
+Víctor Muñoz,DT,osasuna,atletico madrid,1,84,0,0,0.2,0.2,2,2,0,22,63.6,0,0,0.0,0.0,0.0,1,1,2,0,2,1,0,1,0,5,1,3,24,198.0,64.0,2,1,2,33.3,25_26,9,18/10/2025,0,"[{'regates_exitosos': [5, 33.0]}]"
+Sheraldo Becker,MC,osasuna,atletico madrid,0,6,0,0,0.0,0.0,0,0,0,7,42.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,4,12.0,6.0,0,0,0,0.0,25_26,9,18/10/2025,0,"[{'rojas': [8, 1.0]}]"
+Rubén García,DT,osasuna,atletico madrid,1,62,0,0,0.1,0.1,1,1,0,22,59.1,0,0,0.0,0.0,0.0,5,2,1,0,0,0,0,0,1,3,1,1,15,52.0,8.0,0,0,1,0.0,25_26,9,18/10/2025,0,"[{'asistencias': [8, 4.0]}, {'asistencias_90': [5, 0.45]}, {'corners': [9, 32.0]}]"
+Moi Gómez,MC,osasuna,atletico madrid,0,28,0,0,0.0,0.5,0,0,0,32,84.4,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,0,2,1,1,26,143.0,48.0,1,0,0,0.0,25_26,9,18/10/2025,0,"[{'apariciones_suplente': [10, 20.0]}]"
+Abel Bretones,MC,osasuna,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,30,70.0,0,0,0.0,0.0,0.0,5,3,4,0,1,1,0,1,3,3,1,2,22,117.0,71.0,1,0,1,0.0,25_26,9,18/10/2025,0,"[{'rojas': [2, 1.0]}]"
+Jon Moncayola,MC,osasuna,atletico madrid,1,84,0,0,0.0,0.1,1,1,0,46,82.6,0,0,0.0,0.0,0.0,3,2,3,0,1,1,0,1,0,0,0,0,40,93.0,48.0,0,0,1,0.0,25_26,9,18/10/2025,0,"[{'rojas': [10, 1.0]}]"
+Iker Muñoz,MC,osasuna,atletico madrid,0,6,0,0,0.0,0.0,0,0,0,2,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,6.0,1.0,0,0,0,0.0,25_26,9,18/10/2025,0,[]
+Lucas Torró,MC,osasuna,atletico madrid,1,73,0,0,0.1,0.0,1,0,1,30,66.7,0,0,0.0,0.0,0.0,3,3,1,0,0,1,0,1,1,1,1,0,16,86.0,22.0,1,4,2,66.7,25_26,9,18/10/2025,0,"[{'faltas_cometidas': [1, 75.0]}]"
+Kike Barja,MC,osasuna,atletico madrid,0,17,0,0,0.0,0.0,0,0,0,13,69.2,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,0,2,1,1,11,44.0,15.0,1,0,0,0.0,25_26,9,18/10/2025,0,"[{'apariciones_suplente': [5, 11.0]}]"
+Valentin Rosier,MC,osasuna,atletico madrid,1,40,0,0,0.0,0.0,0,0,0,11,81.8,0,0,0.0,0.0,0.0,4,2,0,0,0,2,0,2,5,0,0,0,6,4.0,1.0,0,0,2,0.0,25_26,9,18/10/2025,0,"[{'rojas': [2, 1.0]}]"
+Iker Benito,MC,osasuna,atletico madrid,0,50,0,0,0.0,0.1,1,1,0,32,84.4,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,3,2,1,1,21,93.0,58.0,3,1,0,100.0,25_26,9,18/10/2025,0,[]
+Jorge Herrando,DF,osasuna,atletico madrid,1,73,0,0,0.0,0.0,0,0,0,20,90.0,0,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,4,0,0,0,16,66.0,24.0,0,1,0,100.0,25_26,9,18/10/2025,0,[]
+Raúl,DT,osasuna,atletico madrid,0,17,0,0,0.0,0.0,0,0,0,7,100.0,1,0,0.0,0.0,0.0,0,0,0,0,0,1,0,1,0,0,0,0,6,10.0,4.0,0,1,0,100.0,25_26,9,18/10/2025,0,"[{'apariciones_suplente': [5, 11.0]}]"
+Catena,DF,osasuna,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,37,91.9,1,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,8,0,0,0,24,103.0,74.0,1,3,5,37.5,25_26,9,18/10/2025,0,"[{'despejes': [2, 107.0]}, {'amarillas': [4, 6.0]}]"
+Enzo Boyomo,DF,osasuna,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,37,86.5,1,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,5,1,1,0,34,141.0,90.0,1,1,1,50.0,25_26,9,18/10/2025,0,"[{'entradas': [10, 40.0]}]"
+Sergio Herrera,PT,osasuna,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,47,78.7,0,0,1.0,88.9,2.7,10,0,0,0,0,0,0,0,0,0,0,0,22,113.0,78.0,0,0,0,0.0,25_26,9,18/10/2025,0,"[{'minutos': [5, 1530.0]}, {'porterias_cero': [7, 5.0]}, {'paradas': [2, 63.0]}, {'save_pct': [3, 79.5]}]"

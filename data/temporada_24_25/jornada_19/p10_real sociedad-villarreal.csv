@@ -1,30 +1,30 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
-Mikel Oyarzabal,DT,real sociedad,villarreal,1,82,0,1,0.0,0.4,0,0,0,12,58.3,0,0,0.0,0.0,0.0,10,3,2,0,0,1,0,1,0,0,0,0,7,30.0,21.0,1,1,2,33.3,24_25,19,1
-Pablo Marín,MC,real sociedad,villarreal,0,8,0,0,0.0,0.2,0,0,0,2,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,1,0,0,0,4,21.0,0.0,0,0,0,0.0,24_25,19,1
-Sergio Gómez,MC,real sociedad,villarreal,1,62,0,0,0.0,0.0,0,0,0,33,81.8,0,0,0.0,0.0,0.0,4,1,1,0,1,1,0,1,0,2,1,1,33,114.0,29.0,2,0,2,0.0,24_25,19,1
-Ander Barrenetxea,MC,real sociedad,villarreal,0,28,0,0,0.0,0.0,0,0,0,14,85.7,1,0,0.0,0.0,0.0,1,1,1,0,1,1,0,1,1,2,0,2,14,28.0,11.0,0,0,0,0.0,24_25,19,1
-Luka Sučić,MC,real sociedad,villarreal,1,90,0,0,0.0,0.0,2,1,1,43,74.4,0,0,0.0,0.0,0.0,7,1,1,0,0,1,0,1,4,6,1,5,42,235.0,70.0,1,3,2,60.0,24_25,19,1
-Brais Méndez,MC,real sociedad,villarreal,1,72,0,0,0.1,0.0,1,1,0,22,63.6,0,0,0.0,0.0,0.0,3,1,3,0,3,0,0,0,2,0,0,0,18,71.0,36.0,3,1,2,33.3,24_25,19,1
-Olasagasti,MC,real sociedad,villarreal,0,18,0,0,0.0,0.0,0,0,0,16,75.0,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,1,0,0,0,9,51.0,21.0,0,2,1,66.7,24_25,19,1
-Takefusa Kubo,MC,real sociedad,villarreal,1,82,1,0,0.4,0.0,1,0,1,40,80.0,0,0,0.0,0.0,0.0,14,0,0,0,0,1,0,1,0,7,5,2,40,236.0,173.0,7,1,1,50.0,24_25,19,1
-Orri Steinn Óskarsson,DT,real sociedad,villarreal,0,8,0,0,0.2,0.0,1,0,1,0,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,2,28.0,18.0,1,0,0,0.0,24_25,19,1
-Martín Zubimendi,MC,real sociedad,villarreal,1,90,0,0,0.0,0.0,0,0,0,54,94.4,1,0,0.0,0.0,0.0,7,2,2,0,0,2,2,0,6,0,0,0,45,247.0,84.0,0,1,0,100.0,24_25,19,1
-Aihen Muñoz,DF,real sociedad,villarreal,1,90,0,0,0.0,0.0,1,1,0,67,76.1,1,0,0.0,0.0,0.0,6,0,2,0,2,1,1,0,7,2,1,1,40,167.0,74.0,2,3,1,75.0,24_25,19,1
-Nayef Aguerd,DF,real sociedad,villarreal,1,90,0,0,0.0,0.0,0,0,0,70,91.4,0,0,0.0,0.0,0.0,8,1,0,0,0,2,2,0,4,0,0,0,63,283.0,139.0,0,2,4,33.3,24_25,19,1
-Aritz Elustondo,DF,real sociedad,villarreal,1,72,0,0,0.0,0.0,0,0,0,51,90.2,0,0,0.0,0.0,0.0,8,2,2,0,0,0,0,0,4,0,0,0,46,209.0,94.0,1,0,1,0.0,24_25,19,1
-Jon Pacheco,DF,real sociedad,villarreal,0,18,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,0,0,0,4,9.0,0.0,0,0,1,0.0,24_25,19,1
-Jon Aramburu,DF,real sociedad,villarreal,1,90,0,0,0.0,0.0,0,0,0,45,75.6,1,0,0.0,0.0,0.0,5,0,0,0,0,2,1,1,6,3,0,3,39,121.0,23.0,0,3,1,75.0,24_25,19,1
-Álex Remiro,PT,real sociedad,villarreal,1,90,0,0,0.0,0.0,0,0,0,33,78.8,0,0,0.0,100.0,0.8,13,0,0,0,0,0,0,0,1,0,0,0,21,76.0,44.0,0,1,0,100.0,24_25,19,1
-Thierno Barry,DT,villarreal,real sociedad,1,90,0,0,0.4,0.2,3,2,1,19,73.7,0,0,0.0,0.0,0.0,5,1,0,0,0,1,0,1,0,2,0,2,18,108.0,41.0,2,7,3,70.0,24_25,19,0
-Pape Gueye,DT,villarreal,real sociedad,1,90,0,0,0.0,0.3,1,1,0,37,75.7,0,0,0.0,0.0,0.0,6,1,1,0,0,0,0,0,0,2,2,0,27,187.0,116.0,2,1,3,25.0,24_25,19,0
-Alex Baena,MC,villarreal,real sociedad,1,90,0,0,0.1,0.0,2,2,0,55,60.0,1,0,0.0,0.0,0.0,1,2,3,0,1,1,0,1,2,0,0,0,29,144.0,49.0,1,0,1,0.0,24_25,19,0
-Daniel Parejo,MC,villarreal,real sociedad,1,90,0,0,0.0,0.0,1,1,0,50,74.0,0,0,0.0,0.0,0.0,4,4,4,0,1,1,0,1,3,1,0,1,19,95.0,71.0,1,1,1,50.0,24_25,19,0
-Santi Comesaña,MC,villarreal,real sociedad,1,60,0,0,0.0,0.0,0,0,0,17,88.2,0,0,0.0,0.0,0.0,3,2,1,0,0,1,1,0,0,1,0,1,14,46.0,33.0,2,0,2,0.0,24_25,19,0
-Pau Cabanes,MC,villarreal,real sociedad,0,30,0,0,0.0,0.0,1,1,0,6,83.3,0,0,0.0,0.0,0.0,2,0,1,0,1,1,0,1,0,1,1,0,6,62.0,51.0,1,0,2,0.0,24_25,19,0
-Denis Suárez,MC,villarreal,real sociedad,1,60,0,0,0.1,0.0,1,1,0,16,81.3,0,0,0.0,0.0,0.0,4,1,1,0,1,0,0,0,0,3,2,1,8,70.0,47.0,2,0,1,0.0,24_25,19,0
-Gerard Moreno,DT,villarreal,real sociedad,0,30,0,0,0.2,0.1,2,1,1,11,72.7,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,1,3,2,1,12,97.0,61.0,2,1,0,100.0,24_25,19,0
-Sergi Cardona,DF,villarreal,real sociedad,1,90,0,0,0.0,0.1,1,0,1,53,66.0,0,0,0.0,0.0,0.0,4,4,6,0,2,0,0,0,3,0,0,0,19,68.0,52.0,1,1,1,50.0,24_25,19,0
-Willy Kambwala,DF,villarreal,real sociedad,1,90,0,0,0.2,0.0,2,1,1,25,72.0,0,0,0.0,0.0,0.0,5,2,1,0,0,1,0,1,6,0,0,0,10,50.0,21.0,0,2,4,33.3,24_25,19,0
-Juan Foyth,DF,villarreal,real sociedad,1,90,0,0,0.1,0.1,1,0,1,35,80.0,1,0,0.0,0.0,0.0,5,1,2,0,1,1,0,1,13,1,0,1,12,70.0,29.0,0,4,0,100.0,24_25,19,0
-Kiko Femenía,DF,villarreal,real sociedad,1,90,0,0,0.0,0.1,0,0,0,44,79.5,0,0,0.0,0.0,0.0,5,4,3,0,1,0,0,0,2,1,1,0,18,110.0,18.0,0,1,0,100.0,24_25,19,0
-Luiz Lúcio Reis Júnior,PT,villarreal,real sociedad,1,90,0,0,0.0,0.0,0,0,0,31,71.0,0,0,1.0,66.7,1.3,5,0,0,0,0,0,0,0,1,0,0,0,11,80.0,62.0,0,0,0,0.0,24_25,19,0
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,fecha_partido,local,roles
+Mikel Oyarzabal,DT,real sociedad,villarreal,1,82,0,1,0.0,0.4,0,0,0,12,58.3,0,0,0.0,0.0,0.0,10,3,2,0,0,1,0,1,0,0,0,0,7,30.0,21.0,1,1,2,33.3,24_25,19,13/01/2025,1,"[{'penaltis_marcados': [6, 4.0]}, {'rojas': [8, 1.0]}]"
+Pablo Marín,MC,real sociedad,villarreal,0,8,0,0,0.0,0.2,0,0,0,2,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,1,0,0,0,4,21.0,0.0,0,0,0,0.0,24_25,19,13/01/2025,1,[]
+Sergio Gómez,MC,real sociedad,villarreal,1,62,0,0,0.0,0.0,0,0,0,33,81.8,0,0,0.0,0.0,0.0,4,1,1,0,1,1,0,1,0,2,1,1,33,114.0,29.0,2,0,2,0.0,24_25,19,13/01/2025,1,"[{'pases_clave': [10, 56.0]}, {'corners': [2, 133.0]}]"
+Ander Barrenetxea,MC,real sociedad,villarreal,0,28,0,0,0.0,0.0,0,0,0,14,85.7,1,0,0.0,0.0,0.0,1,1,1,0,1,1,0,1,1,2,0,2,14,28.0,11.0,0,0,0,0.0,24_25,19,13/01/2025,1,"[{'regates_exitosos': [7, 32.0]}]"
+Luka Sučić,MC,real sociedad,villarreal,1,90,0,0,0.0,0.0,2,1,1,43,74.4,0,0,0.0,0.0,0.0,7,1,1,0,0,1,0,1,4,6,1,5,42,235.0,70.0,1,3,2,60.0,24_25,19,13/01/2025,1,[]
+Brais Méndez,MC,real sociedad,villarreal,1,72,0,0,0.1,0.0,1,1,0,22,63.6,0,0,0.0,0.0,0.0,3,1,3,0,3,0,0,0,2,0,0,0,18,71.0,36.0,3,1,2,33.3,24_25,19,13/01/2025,1,[]
+Olasagasti,MC,real sociedad,villarreal,0,18,0,0,0.0,0.0,0,0,0,16,75.0,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,1,0,0,0,9,51.0,21.0,0,2,1,66.7,24_25,19,13/01/2025,1,[]
+Takefusa Kubo,MC,real sociedad,villarreal,1,82,1,0,0.4,0.0,1,0,1,40,80.0,0,0,0.0,0.0,0.0,14,0,0,0,0,1,0,1,0,7,5,2,40,236.0,173.0,7,1,1,50.0,24_25,19,13/01/2025,1,"[{'regates_exitosos': [6, 75.0]}, {'faltas_recibidas': [1, 73.0]}]"
+Orri Steinn Óskarsson,DT,real sociedad,villarreal,0,8,0,0,0.2,0.0,1,0,1,0,0.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,2,28.0,18.0,1,0,0,0.0,24_25,19,13/01/2025,1,[]
+Martín Zubimendi,MC,real sociedad,villarreal,1,90,0,0,0.0,0.0,0,0,0,54,94.4,1,0,0.0,0.0,0.0,7,2,2,0,0,2,2,0,6,0,0,0,45,247.0,84.0,0,1,0,100.0,24_25,19,13/01/2025,1,[]
+Aihen Muñoz,DF,real sociedad,villarreal,1,90,0,0,0.0,0.0,1,1,0,67,76.1,1,0,0.0,0.0,0.0,6,0,2,0,2,1,1,0,7,2,1,1,40,167.0,74.0,2,3,1,75.0,24_25,19,13/01/2025,1,[]
+Nayef Aguerd,DF,real sociedad,villarreal,1,90,0,0,0.0,0.0,0,0,0,70,91.4,0,0,0.0,0.0,0.0,8,1,0,0,0,2,2,0,4,0,0,0,63,283.0,139.0,0,2,4,33.3,24_25,19,13/01/2025,1,[]
+Aritz Elustondo,DF,real sociedad,villarreal,1,72,0,0,0.0,0.0,0,0,0,51,90.2,0,0,0.0,0.0,0.0,8,2,2,0,0,0,0,0,4,0,0,0,46,209.0,94.0,1,0,1,0.0,24_25,19,13/01/2025,1,"[{'rojas': [8, 1.0]}]"
+Jon Pacheco,DF,real sociedad,villarreal,0,18,0,0,0.0,0.0,0,0,0,3,100.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,2,0,0,0,4,9.0,0.0,0,0,1,0.0,24_25,19,13/01/2025,1,[]
+Jon Aramburu,DF,real sociedad,villarreal,1,90,0,0,0.0,0.0,0,0,0,45,75.6,1,0,0.0,0.0,0.0,5,0,0,0,0,2,1,1,6,3,0,3,39,121.0,23.0,0,3,1,75.0,24_25,19,13/01/2025,1,"[{'entradas': [2, 102.0]}]"
+Álex Remiro,PT,real sociedad,villarreal,1,90,0,0,0.0,0.0,0,0,0,33,78.8,0,0,0.0,100.0,0.8,13,0,0,0,0,0,0,0,1,0,0,0,21,76.0,44.0,0,1,0,100.0,24_25,19,13/01/2025,1,"[{'minutos': [7, 3240.0]}, {'porterias_cero': [2, 13.0]}, {'paradas': [8, 86.0]}]"
+Thierno Barry,DT,villarreal,real sociedad,1,90,0,0,0.4,0.2,3,2,1,19,73.7,0,0,0.0,0.0,0.0,5,1,0,0,0,1,0,1,0,2,0,2,18,108.0,41.0,2,7,3,70.0,24_25,19,13/01/2025,0,[]
+Pape Gueye,DT,villarreal,real sociedad,1,90,0,0,0.0,0.3,1,1,0,37,75.7,0,0,0.0,0.0,0.0,6,1,1,0,0,0,0,0,0,2,2,0,27,187.0,116.0,2,1,3,25.0,24_25,19,13/01/2025,0,"[{'rojas': [2, 2.0]}, {'faltas_recibidas': [9, 62.0]}]"
+Alex Baena,MC,villarreal,real sociedad,1,90,0,0,0.1,0.0,2,2,0,55,60.0,1,0,0.0,0.0,0.0,1,2,3,0,1,1,0,1,2,0,0,0,29,144.0,49.0,1,0,1,0.0,24_25,19,13/01/2025,0,"[{'asistencias': [2, 9.0]}, {'asistencias_90': [9, 0.31]}, {'pases_clave': [1, 95.0]}, {'corners': [4, 107.0]}]"
+Daniel Parejo,MC,villarreal,real sociedad,1,90,0,0,0.0,0.0,1,1,0,50,74.0,0,0,0.0,0.0,0.0,4,4,4,0,1,1,0,1,3,1,0,1,19,95.0,71.0,1,1,1,50.0,24_25,19,13/01/2025,0,"[{'pases_ultimo_tercio': [9, 176.0]}]"
+Santi Comesaña,MC,villarreal,real sociedad,1,60,0,0,0.0,0.0,0,0,0,17,88.2,0,0,0.0,0.0,0.0,3,2,1,0,0,1,1,0,0,1,0,1,14,46.0,33.0,2,0,2,0.0,24_25,19,13/01/2025,0,"[{'entradas': [5, 85.0]}]"
+Pau Cabanes,MC,villarreal,real sociedad,0,30,0,0,0.0,0.0,1,1,0,6,83.3,0,0,0.0,0.0,0.0,2,0,1,0,1,1,0,1,0,1,1,0,6,62.0,51.0,1,0,2,0.0,24_25,19,13/01/2025,0,[]
+Denis Suárez,MC,villarreal,real sociedad,1,60,0,0,0.1,0.0,1,1,0,16,81.3,0,0,0.0,0.0,0.0,4,1,1,0,1,0,0,0,0,3,2,1,8,70.0,47.0,2,0,1,0.0,24_25,19,13/01/2025,0,[]
+Gerard Moreno,DT,villarreal,real sociedad,0,30,0,0,0.2,0.1,2,1,1,11,72.7,0,0,0.0,0.0,0.0,5,0,0,0,0,0,0,0,1,3,2,1,12,97.0,61.0,2,1,0,100.0,24_25,19,13/01/2025,0,"[{'penaltis_marcados': [10, 3.0]}]"
+Sergi Cardona,DF,villarreal,real sociedad,1,90,0,0,0.0,0.1,1,0,1,53,66.0,0,0,0.0,0.0,0.0,4,4,6,0,2,0,0,0,3,0,0,0,19,68.0,52.0,1,1,1,50.0,24_25,19,13/01/2025,0,"[{'asistencias': [8, 7.0]}, {'centros_area': [7, 26.0]}, {'amarillas': [6, 11.0]}]"
+Willy Kambwala,DF,villarreal,real sociedad,1,90,0,0,0.2,0.0,2,1,1,25,72.0,0,0,0.0,0.0,0.0,5,2,1,0,0,1,0,1,6,0,0,0,10,50.0,21.0,0,2,4,33.3,24_25,19,13/01/2025,0,"[{'rojas': [8, 1.0]}]"
+Juan Foyth,DF,villarreal,real sociedad,1,90,0,0,0.1,0.1,1,0,1,35,80.0,1,0,0.0,0.0,0.0,5,1,2,0,1,1,0,1,13,1,0,1,12,70.0,29.0,0,4,0,100.0,24_25,19,13/01/2025,0,[]
+Kiko Femenía,DF,villarreal,real sociedad,1,90,0,0,0.0,0.1,0,0,0,44,79.5,0,0,0.0,0.0,0.0,5,4,3,0,1,0,0,0,2,1,1,0,18,110.0,18.0,0,1,0,100.0,24_25,19,13/01/2025,0,"[{'rojas': [10, 1.0]}]"
+Luiz Lúcio Reis Júnior,PT,villarreal,real sociedad,1,90,0,0,0.0,0.0,0,0,0,31,71.0,0,0,1.0,66.7,1.3,5,0,0,0,0,0,0,0,1,0,0,0,11,80.0,62.0,0,0,0,0.0,24_25,19,13/01/2025,0,"[{'save_pct': [2, 78.8]}]"

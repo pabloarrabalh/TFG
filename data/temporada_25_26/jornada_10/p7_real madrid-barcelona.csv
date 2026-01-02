@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,local
-Kylian Mbappé,DT,real madrid,barcelona,1,89,1,0,1.5,0.4,4,2,2,12,83.3,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,0,0,0,11,80.0,67.0,4,0,0,0.0,25_26,10,1
-Gonzalo García,DT,real madrid,barcelona,0,1,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,8.0,3.0,0,1,0,100.0,25_26,10,1
-Vinicius Júnior,MC,real madrid,barcelona,1,71,0,0,0.2,0.1,3,2,1,18,55.6,1,0,0.0,0.0,0.0,4,1,1,0,1,1,0,1,0,6,5,1,20,213.0,119.0,5,0,0,0.0,25_26,10,1
-Rodrygo,MC,real madrid,barcelona,0,19,0,0,0.1,0.0,2,0,2,6,50.0,1,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,1,1,0,8,61.0,21.0,1,0,0,0.0,25_26,10,1
-Arda Güler,MC,real madrid,barcelona,1,65,0,0,0.0,0.1,1,1,0,30,70.0,0,0,0.0,0.0,0.0,4,3,2,0,2,1,0,1,0,1,1,0,10,47.0,9.0,0,0,0,0.0,25_26,10,1
-Brahim Díaz,MC,real madrid,barcelona,0,25,0,0,0.0,0.0,0,0,0,7,71.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,5,28.0,22.0,0,0,3,0.0,25_26,10,1
-Eduardo Camavinga,MC,real madrid,barcelona,1,90,0,0,0.0,0.1,0,0,0,27,85.2,0,0,0.0,0.0,0.0,4,3,5,0,2,4,1,3,1,3,3,0,17,126.0,33.0,1,0,0,0.0,25_26,10,1
-Jude Bellingham,MC,real madrid,barcelona,1,89,1,1,1.2,0.5,5,2,3,28,67.9,0,0,0.0,0.0,0.0,16,3,2,0,1,1,0,1,0,2,1,1,26,138.0,64.0,2,1,1,50.0,25_26,10,1
-Dani Ceballos,MC,real madrid,barcelona,0,1,0,0,0.0,0.1,0,0,0,2,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,1,3,0,3,3,6.0,1.0,0,0,0,0.0,25_26,10,1
-Aurélien Tchouaméni,MC,real madrid,barcelona,1,90,0,0,0.2,0.5,3,3,0,30,86.7,0,0,0.0,0.0,0.0,7,2,0,0,0,3,2,1,1,0,0,0,17,90.0,25.0,0,1,0,100.0,25_26,10,1
-Álvaro Carreras,DF,real madrid,barcelona,1,90,0,0,0.0,0.1,0,0,0,32,87.5,0,0,0.0,0.0,0.0,5,2,3,0,2,1,0,1,3,2,0,2,23,158.0,65.0,2,0,1,0.0,25_26,10,1
-Dean Huijsen,DF,real madrid,barcelona,1,90,0,0,0.3,0.0,1,0,1,28,85.7,1,0,0.0,0.0,0.0,1,2,2,0,0,2,1,1,2,0,0,0,19,69.0,41.0,0,0,0,0.0,25_26,10,1
-Éder Militão,DF,real madrid,barcelona,1,90,0,1,0.1,0.8,2,2,0,25,92.0,1,0,0.0,0.0,0.0,9,4,3,0,0,1,1,0,4,1,0,1,15,88.0,51.0,0,2,1,66.7,25_26,10,1
-Federico Valverde,DF,real madrid,barcelona,1,71,0,0,0.0,0.0,1,1,0,31,80.6,1,0,0.0,0.0,0.0,2,3,2,0,1,2,0,2,2,3,1,2,14,58.0,34.0,0,1,0,100.0,25_26,10,1
-Dani Carvajal,DF,real madrid,barcelona,0,19,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,1,0,0,0,3,8.0,0.0,0,0,0,0.0,25_26,10,1
-Thibaut Courtois,PT,real madrid,barcelona,1,90,0,0,0.0,0.0,0,0,0,33,78.8,0,0,1.0,80.0,1.1,10,0,0,0,0,0,0,0,1,0,0,0,19,96.0,58.0,0,1,0,100.0,25_26,10,1
-Ferrán Torres,DT,barcelona,real madrid,1,73,0,0,0.1,0.0,2,0,2,15,86.7,1,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,12,27.0,5.0,0,0,0,0.0,25_26,10,0
-Marc Casado,MC,barcelona,real madrid,0,17,0,0,0.1,0.0,1,1,0,28,92.9,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,0,0,0,24,113.0,43.0,0,0,0,0.0,25_26,10,0
-Marcus Rashford,DT,barcelona,real madrid,1,90,0,1,0.1,0.7,2,2,0,44,79.5,0,0,0.0,0.0,0.0,9,0,0,0,0,1,1,0,1,6,2,3,36,161.0,86.0,3,0,1,0.0,25_26,10,0
-Lamine Yamal,DT,barcelona,real madrid,1,90,0,0,0.0,0.1,2,2,0,58,79.3,0,0,0.0,0.0,0.0,7,1,0,0,0,0,0,0,0,8,4,4,47,254.0,183.0,4,0,0,0.0,25_26,10,0
-Fermin López,MC,barcelona,real madrid,1,90,1,0,0.7,0.0,4,1,3,33,78.8,1,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,1,1,0,1,28,105.0,57.0,1,1,0,100.0,25_26,10,0
-Pedri,MC,barcelona,real madrid,1,89,0,0,0.0,0.1,0,0,0,75,92.0,2,1,0.0,0.0,0.0,-1,7,8,0,6,4,0,4,1,2,1,1,59,426.0,183.0,4,1,0,100.0,25_26,10,0
-Frenkie de Jong,MC,barcelona,real madrid,1,90,0,0,0.0,0.0,0,0,0,99,94.9,0,0,0.0,0.0,0.0,3,6,7,0,2,0,0,0,1,1,0,1,80,555.0,294.0,5,0,0,0.0,25_26,10,0
-Alejandro Balde,DF,barcelona,real madrid,1,89,0,0,0.0,0.0,0,0,0,69,84.1,1,0,0.0,0.0,0.0,-1,2,1,0,0,1,1,0,1,1,0,1,41,161.0,79.0,1,2,1,66.7,25_26,10,0
-Gerard Martín,DF,barcelona,real madrid,0,1,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,1,0.0,25_26,10,0
-Eric García,DF,barcelona,real madrid,1,73,0,0,0.0,0.1,1,1,0,65,93.8,0,0,0.0,0.0,0.0,-1,1,0,0,0,2,1,1,1,0,0,0,55,245.0,101.0,1,0,1,0.0,25_26,10,0
-Ronald Araújo,DF,barcelona,real madrid,0,17,0,0,0.0,0.0,1,1,0,13,92.3,0,0,0.0,0.0,0.0,2,0,0,0,0,2,1,1,2,0,0,0,12,52.0,23.0,0,0,0,0.0,25_26,10,0
-Pau Cubarsí,DF,barcelona,real madrid,1,82,0,0,0.0,0.0,1,1,0,64,93.8,0,0,0.0,0.0,0.0,0,0,0,0,0,2,2,0,1,0,0,0,43,240.0,85.0,0,0,0,0.0,25_26,10,0
-Roony Bardghji,DT,barcelona,real madrid,0,8,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,5,12.0,10.0,0,0,0,0.0,25_26,10,0
-Jules Koundé,DF,barcelona,real madrid,1,90,0,0,0.1,0.0,1,1,0,68,91.2,0,0,0.0,0.0,0.0,-1,3,6,0,4,1,1,0,0,1,1,0,48,234.0,133.0,3,2,3,40.0,25_26,10,0
-Wojciech Szczęsny,PT,barcelona,real madrid,1,90,0,0,0.0,0.0,0,0,0,37,91.9,0,0,2.0,80.0,4.3,15,0,0,0,0,0,0,0,1,0,0,0,22,71.0,21.0,0,0,0,0.0,25_26,10,0
-Lunin,PT,real madrid,barcelona,0,0,0,0,0.0,0.0,0,0,0,0,0.0,0,1,0.0,0.0,0.0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0,25_26,10,1
+﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,fecha_partido,local,roles
+Kylian Mbappé,DT,real madrid,barcelona,1,89,1,0,1.5,0.4,4,2,2,12,83.3,0,0,0.0,0.0,0.0,7,0,0,0,0,0,0,0,0,0,0,0,11,80.0,67.0,4,0,0,0.0,25_26,10,26/10/2025,1,"[{'goles': [1, 18.0]}, {'goles_90': [2, 1.03]}, {'asistencias': [8, 4.0]}, {'penaltis_marcados': [1, 5.0]}, {'tiros_puerta': [1, 33.0]}, {'pases_clave': [1, 49.0]}, {'regates_exitosos': [2, 51.0]}, {'minutos': [3, 1570.0]}]"
+Gonzalo García,DT,real madrid,barcelona,0,1,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,1,8.0,3.0,0,1,0,100.0,25_26,10,26/10/2025,1,"[{'apariciones_suplente': [4, 12.0]}]"
+Vinicius Júnior,MC,real madrid,barcelona,1,71,0,0,0.2,0.1,3,2,1,18,55.6,1,0,0.0,0.0,0.0,4,1,1,0,1,1,0,1,0,6,5,1,20,213.0,119.0,5,0,0,0.0,25_26,10,26/10/2025,1,"[{'asistencias': [4, 5.0]}, {'penaltis_marcados': [9, 1.0]}, {'tiros_puerta': [5, 20.0]}, {'pases_clave': [7, 33.0]}, {'regates_exitosos': [3, 43.0]}, {'faltas_recibidas': [6, 34.0]}]"
+Rodrygo,MC,real madrid,barcelona,0,19,0,0,0.1,0.0,2,0,2,6,50.0,1,0,0.0,0.0,0.0,2,0,0,0,0,1,0,1,0,1,1,0,8,61.0,21.0,1,0,0,0.0,25_26,10,26/10/2025,1,"[{'apariciones_suplente': [5, 11.0]}]"
+Arda Güler,MC,real madrid,barcelona,1,65,0,0,0.0,0.1,1,1,0,30,70.0,0,0,0.0,0.0,0.0,4,3,2,0,2,1,0,1,0,1,1,0,10,47.0,9.0,0,0,0,0.0,25_26,10,26/10/2025,1,"[{'asistencias': [4, 5.0]}, {'asistencias_90': [8, 0.4]}, {'pases_clave': [2, 40.0]}, {'corners': [7, 48.0]}]"
+Brahim Díaz,MC,real madrid,barcelona,0,25,0,0,0.0,0.0,0,0,0,7,71.4,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,5,28.0,22.0,0,0,3,0.0,25_26,10,26/10/2025,1,"[{'asistencias_90': [5, 0.35]}]"
+Eduardo Camavinga,MC,real madrid,barcelona,1,90,0,0,0.0,0.1,0,0,0,27,85.2,0,0,0.0,0.0,0.0,4,3,5,0,2,4,1,3,1,3,3,0,17,126.0,33.0,1,0,0,0.0,25_26,10,26/10/2025,1,"[{'pases_completados_pct': [10, 90.7]}, {'entradas': [8, 76.0]}, {'faltas_recibidas': [8, 68.0]}]"
+Jude Bellingham,MC,real madrid,barcelona,1,89,1,1,1.2,0.5,5,2,3,28,67.9,0,0,0.0,0.0,0.0,16,3,2,0,1,1,0,1,0,2,1,1,26,138.0,64.0,2,1,1,50.0,25_26,10,26/10/2025,1,"[{'tiros_puerta': [7, 17.0]}]"
+Dani Ceballos,MC,real madrid,barcelona,0,1,0,0,0.0,0.1,0,0,0,2,100.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,1,3,0,3,3,6.0,1.0,0,0,0,0.0,25_26,10,26/10/2025,1,"[{'pases_completados_pct': [2, 94.3]}]"
+Aurélien Tchouaméni,MC,real madrid,barcelona,1,90,0,0,0.2,0.5,3,3,0,30,86.7,0,0,0.0,0.0,0.0,7,2,0,0,0,3,2,1,1,0,0,0,17,90.0,25.0,0,1,0,100.0,25_26,10,26/10/2025,1,"[{'pases_ultimo_tercio': [5, 106.0]}]"
+Álvaro Carreras,DF,real madrid,barcelona,1,90,0,0,0.0,0.1,0,0,0,32,87.5,0,0,0.0,0.0,0.0,5,2,3,0,2,1,0,1,3,2,0,2,23,158.0,65.0,2,0,1,0.0,25_26,10,26/10/2025,1,"[{'pases_ultimo_tercio': [3, 112.0]}, {'intercepciones': [6, 23.0]}, {'rojas': [2, 1.0]}]"
+Dean Huijsen,DF,real madrid,barcelona,1,90,0,0,0.3,0.0,1,0,1,28,85.7,1,0,0.0,0.0,0.0,1,2,2,0,0,2,1,1,2,0,0,0,19,69.0,41.0,0,0,0,0.0,25_26,10,26/10/2025,1,"[{'pases_ultimo_tercio': [10, 97.0]}, {'rojas': [2, 1.0]}]"
+Éder Militão,DF,real madrid,barcelona,1,90,0,1,0.1,0.8,2,2,0,25,92.0,1,0,0.0,0.0,0.0,9,4,3,0,0,1,1,0,4,1,0,1,15,88.0,51.0,0,2,1,66.7,25_26,10,26/10/2025,1,[]
+Federico Valverde,DF,real madrid,barcelona,1,71,0,0,0.0,0.0,1,1,0,31,80.6,1,0,0.0,0.0,0.0,2,3,2,0,1,2,0,2,2,3,1,2,14,58.0,34.0,0,1,0,100.0,25_26,10,26/10/2025,1,"[{'asistencias': [8, 4.0]}, {'pases_ultimo_tercio': [7, 101.0]}]"
+Dani Carvajal,DF,real madrid,barcelona,0,19,0,0,0.0,0.0,0,0,0,4,75.0,0,0,0.0,0.0,0.0,2,1,1,0,0,0,0,0,1,0,0,0,3,8.0,0.0,0,0,0,0.0,25_26,10,26/10/2025,1,"[{'rojas': [10, 1.0]}]"
+Thibaut Courtois,PT,real madrid,barcelona,1,90,0,0,0.0,0.0,0,0,0,33,78.8,0,0,1.0,80.0,1.1,10,0,0,0,0,0,0,0,1,0,0,0,19,96.0,58.0,0,1,0,100.0,25_26,10,26/10/2025,1,"[{'minutos': [1, 1620.0]}, {'porterias_cero': [1, 8.0]}, {'save_pct': [10, 75.4]}]"
+Ferrán Torres,DT,barcelona,real madrid,1,73,0,0,0.1,0.0,2,0,2,15,86.7,1,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,0,1,12,27.0,5.0,0,0,0,0.0,25_26,10,26/10/2025,0,"[{'goles': [2, 11.0]}, {'goles_90': [3, 0.92]}, {'tiros_puerta': [2, 22.0]}, {'goles_por_tiro': [6, 0.27]}]"
+Marc Casado,MC,barcelona,real madrid,0,17,0,0,0.1,0.0,1,1,0,28,92.9,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,0,0,0,24,113.0,43.0,0,0,0,0.0,25_26,10,26/10/2025,0,"[{'pases_completados_pct': [5, 92.5]}]"
+Marcus Rashford,DT,barcelona,real madrid,1,90,0,1,0.1,0.7,2,2,0,44,79.5,0,0,0.0,0.0,0.0,9,0,0,0,0,1,1,0,1,6,2,3,36,161.0,86.0,3,0,1,0.0,25_26,10,26/10/2025,0,"[{'asistencias': [2, 6.0]}, {'asistencias_90': [2, 0.51]}, {'tiros_puerta': [7, 17.0]}, {'pases_clave': [10, 28.0]}, {'corners': [2, 60.0]}]"
+Lamine Yamal,DT,barcelona,real madrid,1,90,0,0,0.0,0.1,2,2,0,58,79.3,0,0,0.0,0.0,0.0,7,1,0,0,0,0,0,0,0,8,4,4,47,254.0,183.0,4,0,0,0.0,25_26,10,26/10/2025,0,"[{'goles': [5, 7.0]}, {'goles_90': [8, 0.54]}, {'asistencias': [1, 7.0]}, {'asistencias_90': [1, 0.54]}, {'penaltis_marcados': [6, 2.0]}, {'tiros_puerta': [6, 18.0]}, {'pases_clave': [9, 31.0]}, {'regates_exitosos': [1, 78.0]}]"
+Fermin López,MC,barcelona,real madrid,1,90,1,0,0.7,0.0,4,1,3,33,78.8,1,0,0.0,0.0,0.0,8,0,0,0,0,0,0,0,1,1,0,1,28,105.0,57.0,1,1,0,100.0,25_26,10,26/10/2025,0,"[{'goles_90': [7, 0.55]}]"
+Pedri,MC,barcelona,real madrid,1,89,0,0,0.0,0.1,0,0,0,75,92.0,2,1,0.0,0.0,0.0,-1,7,8,0,6,4,0,4,1,2,1,1,59,426.0,183.0,4,1,0,100.0,25_26,10,26/10/2025,0,"[{'asistencias': [4, 5.0]}, {'asistencias_90': [7, 0.41]}, {'pases_clave': [6, 34.0]}, {'pases_ultimo_tercio': [1, 137.0]}, {'rojas': [2, 1.0]}]"
+Frenkie de Jong,MC,barcelona,real madrid,1,90,0,0,0.0,0.0,0,0,0,99,94.9,0,0,0.0,0.0,0.0,3,6,7,0,2,0,0,0,1,1,0,1,80,555.0,294.0,5,0,0,0.0,25_26,10,26/10/2025,0,"[{'pases_completados_pct': [3, 93.9]}, {'pases_ultimo_tercio': [4, 108.0]}, {'rojas': [2, 1.0]}]"
+Alejandro Balde,DF,barcelona,real madrid,1,89,0,0,0.0,0.0,0,0,0,69,84.1,1,0,0.0,0.0,0.0,-1,2,1,0,0,1,1,0,1,1,0,1,41,161.0,79.0,1,2,1,66.7,25_26,10,26/10/2025,0,[]
+Gerard Martín,DF,barcelona,real madrid,0,1,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,1,0.0,25_26,10,26/10/2025,0,[]
+Eric García,DF,barcelona,real madrid,1,73,0,0,0.0,0.1,1,1,0,65,93.8,0,0,0.0,0.0,0.0,-1,1,0,0,0,2,1,1,1,0,0,0,55,245.0,101.0,1,0,1,0.0,25_26,10,26/10/2025,0,"[{'pases_ultimo_tercio': [1, 137.0]}, {'intercepciones': [5, 24.0]}]"
+Ronald Araújo,DF,barcelona,real madrid,0,17,0,0,0.0,0.0,1,1,0,13,92.3,0,0,0.0,0.0,0.0,2,0,0,0,0,2,1,1,2,0,0,0,12,52.0,23.0,0,0,0,0.0,25_26,10,26/10/2025,0,"[{'pases_completados_pct': [5, 92.5]}]"
+Pau Cubarsí,DF,barcelona,real madrid,1,82,0,0,0.0,0.0,1,1,0,64,93.8,0,0,0.0,0.0,0.0,0,0,0,0,0,2,2,0,1,0,0,0,43,240.0,85.0,0,0,0,0.0,25_26,10,26/10/2025,0,"[{'pases_completados_pct': [2, 94.4]}, {'pases_ultimo_tercio': [8, 100.0]}]"
+Roony Bardghji,DT,barcelona,real madrid,0,8,0,0,0.0,0.0,0,0,0,6,50.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,1,1,0,5,12.0,10.0,0,0,0,0.0,25_26,10,26/10/2025,0,[]
+Jules Koundé,DF,barcelona,real madrid,1,90,0,0,0.1,0.0,1,1,0,68,91.2,0,0,0.0,0.0,0.0,-1,3,6,0,4,1,1,0,0,1,1,0,48,234.0,133.0,3,2,3,40.0,25_26,10,26/10/2025,0,"[{'pases_ultimo_tercio': [4, 267.0]}]"
+Wojciech Szczęsny,PT,barcelona,real madrid,1,90,0,0,0.0,0.0,0,0,0,37,91.9,0,0,2.0,80.0,4.3,15,0,0,0,0,0,0,0,1,0,0,0,22,71.0,21.0,0,0,0,0.0,25_26,10,26/10/2025,0,"[{'porterias_cero': [7, 8.0]}]"
+Lunin,PT,real madrid,barcelona,0,0,0,0,0.0,0.0,0,0,0,0,0.0,0,1,0.0,0.0,0.0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0.0,0,0,0,0.0,25_26,10,26/10/2025,1,[]
