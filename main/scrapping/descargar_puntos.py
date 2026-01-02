@@ -102,20 +102,30 @@ def descargar_html_con_reintentos(
 
 
 # =====================================================
-# DESCARGA DE PUNTOS 23/24 (j1-j38)
+# DESCARGA DE PUNTOS POR TEMPORADA (j1-j38)
 # =====================================================
 
 
-BASE_URL = "https://www.futbolfantasy.com/laliga/puntos/2024/{jornada}/laliga-fantasy"
-CARPETA_BASE = os.path.join("main", "html", "temporada_23_24")
-
-
-def descargar_puntos_temporada_23_24(j_ini=1, j_fin=38):
-    os.makedirs(CARPETA_BASE, exist_ok=True)
+def descargar_puntos_temporada(temporada: str, j_ini: int, j_fin: int):
+    """
+    Descarga los puntos de una temporada específica.
+    temporada: string en formato '22_23', '23_24', etc.
+    j_ini, j_fin: jornada inicial y final (sin restricciones)
+    """
+    # El año de la URL es el segundo número de la temporada
+    try:
+        anio_url = int(temporada.split('_')[1])
+        if anio_url < 100:
+            anio_url += 2000
+    except Exception:
+        raise ValueError("El formato de temporada debe ser 'xx_yy', por ejemplo '22_23'")
+    base_url = f"https://www.futbolfantasy.com/laliga/puntos/{anio_url}/{{jornada}}/laliga-fantasy"
+    carpeta_base = os.path.join("main", "html", f"temporada_{temporada}")
+    os.makedirs(carpeta_base, exist_ok=True)
 
     for j in range(j_ini, j_fin + 1):
-        url = BASE_URL.format(jornada=j)
-        carpeta_j = os.path.join(CARPETA_BASE, f"j{j}")
+        url = base_url.format(jornada=j)
+        carpeta_j = os.path.join(carpeta_base, f"j{j}")
         os.makedirs(carpeta_j, exist_ok=True)
 
         ruta_salida = os.path.join(carpeta_j, "puntos.html")
@@ -135,4 +145,4 @@ def descargar_puntos_temporada_23_24(j_ini=1, j_fin=38):
 
 
 if __name__ == "__main__":
-    descargar_puntos_temporada_23_24(1, 38)
+    descargar_puntos_temporada("22_23", 1, 38)
