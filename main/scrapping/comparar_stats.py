@@ -4,27 +4,9 @@ import pandas as pd
 from rapidfuzz import process, fuzz
 from io import StringIO
 
-from commons import (
-    normalizar_texto,
-    normalizar_equipo,
-    añadir_equipo_y_player_norm,
-    limpiar_numero_generico,
-    fmt_generico,
-    limpiar_minuto,
-    extraer_nombre_jugador,
-    _posicion_csv_es_medio,
-    _posicion_csv_es_defensa,
-    _posicion_html,
-)
-from fbref import (
-    normalizar_equipo_temporada,
-)
+from commons import *
+from fbref import *
 from bs4 import BeautifulSoup
-
-
-# =====================================================
-# HELPERS DE RUTAS POR TEMPORADA
-# =====================================================
 
 
 def _carpeta_html_partidos(codigo_temporada: str, num_jornada: int) -> str:
@@ -35,16 +17,10 @@ def _carpeta_csv_jornada(codigo_temporada: str, num_jornada: int) -> str:
     return os.path.join("data", f"temporada_{codigo_temporada}", f"jornada_{num_jornada}")
 
 
-# =====================================================
-# EXTRAER TABLAS FBREF Y DICCIONARIO JUGADORES
-# =====================================================
-
-
 def extraer_tablas_fbref(html_content: str):
     soup = BeautifulSoup(html_content, "lxml")
     tablas = []
 
-    # summary, passing, defense, possession, misc, keepers
     tipos = ["summary", "passing", "defense", "possession", "misc", "keepers"]
     for tipo in tipos:
         if tipo == "keepers":
@@ -63,18 +39,6 @@ def extraer_tablas_fbref(html_content: str):
 
 
 def construir_diccionario_jugadores(tablas):
-    """
-    Construye un diccionario:
-    {
-      nombre_norm: {
-         "summary:Min": ...,
-         "summary:Gls": ...,
-         ...
-      },
-      ...
-    }
-    usando las tablas de FBRef.
-    """
     jugadores_html = {}
 
     for tipo, tabla_html in tablas:
@@ -83,9 +47,6 @@ def construir_diccionario_jugadores(tablas):
             texto_caption = caption.get_text(strip=True)
         else:
             texto_caption = ""
-
-        equipo_local = ""
-        equipo_visitante = ""
 
         try:
             df_tabla = pd.read_html(StringIO(str(tabla_html)))[0]
@@ -120,11 +81,6 @@ def construir_diccionario_jugadores(tablas):
     return jugadores_html
 
 
-# =====================================================
-# LÓGICA PRINCIPAL
-# =====================================================
-
-
 def mostrar_analisis_jugador(resultado):
     if not resultado["ok"]:
         print(resultado["motivo"])
@@ -146,14 +102,9 @@ def mostrar_analisis_jugador(resultado):
 
 
 def comparar_partido_stats_precalculado(jugadores_html, df_csv, jugador_objetivo):
-    """
-    Igualar jugador en CSV y en HTML, y preparar getters de columnas FBRef.
-    Se evita fuzzy-match HTML para jugadores sin minutos (suplentes puros).
-    """
     fila_jugador = None
     equipo_jugador = None
 
-    # 1) match exacto en CSV por equipo propio
     for eq in df_csv["equipo_norm"].unique().tolist():
         obj_norm_eq = normalizar_texto(jugador_objetivo)
         cand = df_csv[
@@ -164,7 +115,6 @@ def comparar_partido_stats_precalculado(jugadores_html, df_csv, jugador_objetivo
             equipo_jugador = eq
             break
 
-    # 2) fuzzy en CSV si no hubo match exacto
     if fila_jugador is None:
         nombres_csv_norm = df_csv["player_norm"].tolist()
         match_norm, score, idx = process.extractOne(
@@ -181,26 +131,20 @@ def comparar_partido_stats_precalculado(jugadores_html, df_csv, jugador_objetivo
     if fila_jugador is None:
         return None
 
-    # minutos en CSV, para decidir si tiene sentido buscarlo en HTML
     try:
         min_csv = float(fila_jugador.get("Min_partido", 0) or 0)
     except Exception:
         min_csv = 0.0
 
-    # 3) localizar jugador en diccionario HTML
     jugador_norm = normalizar_texto(jugador_objetivo)
     nombres_html = list(jugadores_html.keys())
 
-    # --- CASO 3A: si no está en HTML y no jugó minutos, no comparar ---
     if jugador_norm not in jugadores_html and min_csv == 0:
-        # suplente sin minutos, stats FBRef no existen -> no se analiza
         return None
 
-    # --- CASO 3B: exacto en HTML ---
     if jugador_norm in jugadores_html:
         row_html = jugadores_html[jugador_norm]
     else:
-        # --- CASO 3C: fuzzy en HTML sólo si tiene minutos ---
         if not nombres_html:
             return None
 
@@ -271,23 +215,10 @@ def comparar_partido_stats_precalculado(jugadores_html, df_csv, jugador_objetivo
     }
 
 
-def _comparar_campos_stats(
-    fila_csv,
-    es_portero,
-    get_summary,
-    get_passing,
-    get_misc,
-    get_keepers,
-    get_defense,
-    get_possession,
-    codigo_temporada,
-    num_jornada,
-):
+def _comparar_campos_stats(fila_csv, es_portero, get_summary, get_passing, get_misc, get_keepers, get_defense, get_possession, codigo_temporada, num_jornada):
     campos_a_comprobar = [
-        # contexto
         ("temporada", lambda: (fila_csv.get("temporada", ""), codigo_temporada)),
         ("jornada",   lambda: (fila_csv.get("jornada", ""), num_jornada)),
-        # minutos y goles
         ("Min_partido", lambda: (fila_csv.get("Min_partido", ""), get_summary("Min"))),
         ("Gol_partido", lambda: (fila_csv.get("Gol_partido", ""), get_summary("Gls"))),
         ("Asist_partido", lambda: (fila_csv.get("Asist_partido", ""), get_summary("Ast"))),
@@ -313,9 +244,9 @@ def _comparar_campos_stats(
             lambda: (
                 fila_csv.get("Pases_Completados_Pct", ""),
                 (
-                    limpiar_numero_generico(get_passing("Cmp%"))
+                    limpiar_numero(get_passing("Cmp%"))
                     if str(get_passing("Cmp%")).strip() not in ("", "-", "nan", "NaN")
-                    else limpiar_numero_generico(get_summary("Cmp%"))
+                    else limpiar_numero(get_summary("Cmp%"))
                 ),
             ),
         ),
@@ -325,21 +256,21 @@ def _comparar_campos_stats(
             "Goles_en_contra",
             lambda: (
                 fila_csv.get("Goles_en_contra", ""),
-                limpiar_numero_generico(get_keepers("GA")) if es_portero else 0,
+                limpiar_numero(get_keepers("GA")) if es_portero else 0,
             ),
         ),
         (
             "Porcentaje_paradas",
             lambda: (
                 fila_csv.get("Porcentaje_paradas", ""),
-                limpiar_numero_generico(get_keepers("Save%")) if es_portero else 0,
+                limpiar_numero(get_keepers("Save%")) if es_portero else 0,
             ),
         ),
         (
             "PSxG",
             lambda: (
                 fila_csv.get("PSxG", ""),
-                limpiar_numero_generico(get_keepers("PSxG")) if es_portero else 0,
+                limpiar_numero(get_keepers("PSxG")) if es_portero else 0,
             ),
         ),
         ("Entradas", lambda: (fila_csv.get("Entradas", ""), get_defense("Tkl"))),
@@ -381,7 +312,7 @@ def _comparar_campos_stats(
             "DuelosAereosGanadosPct",
             lambda: (
                 fila_csv.get("DuelosAereosGanadosPct", ""),
-                limpiar_numero_generico(get_misc("Won%")),
+                limpiar_numero(get_misc("Won%")),
             ),
         ),
     ]
@@ -390,12 +321,16 @@ def _comparar_campos_stats(
     discrepancias = []
     for campo, getter in campos_a_comprobar:
         val_csv, val_html = getter()
-        val_csv_n = limpiar_numero_generico(val_csv)
-        val_html_n = limpiar_numero_generico(val_html)
+        val_csv_n = limpiar_numero(val_csv)
+        val_html_n = limpiar_numero(val_html)
         if val_csv_n != val_html_n:
             campos_mal.append(campo)
             discrepancias.append(
-                {"campo": campo, "csv": fmt_generico(val_csv_n), "html": fmt_generico(val_html_n)}
+                {
+                    "campo": campo,
+                    "csv": formatear_numero(val_csv_n),
+                    "html": formatear_numero(val_html_n),
+                }
             )
 
     return campos_mal, discrepancias
@@ -431,11 +366,6 @@ def analizar_jugador_interno_precalculado(jugadores_html, df_csv, nombre_jugador
         "campos_mal": campos_mal,
         "discrepancias": discrepancias,
     }
-
-
-# =====================================================
-# CLASIFICAR NO_ANALIZADOS SEGÚN TARJETA DESDE BANQUILLO
-# =====================================================
 
 
 def clasificar_no_analizados_tarjetas(codigo_temporada: str, no_analizados_globales):
@@ -499,11 +429,6 @@ def clasificar_no_analizados_tarjetas(codigo_temporada: str, no_analizados_globa
     return con_tarjeta_banquillo, otros
 
 
-# =====================================================
-# FUNCIONES PÚBLICAS CON MULTI‑TEMPORADA
-# =====================================================
-
-
 def analizar_jugador(codigo_temporada: str, num_jornada: int, num_partido: int, nombre_jugador: str):
     carpeta_html = _carpeta_html_partidos(codigo_temporada, num_jornada)
     carpeta_csv = _carpeta_csv_jornada(codigo_temporada, num_jornada)
@@ -539,8 +464,7 @@ def analizar_jugador(codigo_temporada: str, num_jornada: int, num_partido: int, 
     mostrar_analisis_jugador(resultado)
 
 
-def analizar_partido_completo(codigo_temporada: str, num_jornada: int, num_partido: int,
-                              errores_jornada, no_analizados_jornada):
+def analizar_partido_completo(codigo_temporada: str, num_jornada: int, num_partido: int, errores_jornada, no_analizados_jornada):
     carpeta_html = _carpeta_html_partidos(codigo_temporada, num_jornada)
     carpeta_csv = _carpeta_csv_jornada(codigo_temporada, num_jornada)
 
@@ -737,8 +661,7 @@ def analizar_rango_jornadas(codigo_temporada: str, jornada_inicio: int, jornada_
     imprimir_resumen_global(errores_globales, no_analizados_globales, codigo_temporada)
 
 
-def comparar_jugador_completo(codigo_temporada: str, num_jornada: int,
-                              num_partido: int, nombre_jugador: str):
+def comparar_jugador_completo(codigo_temporada: str, num_jornada: int, num_partido: int, nombre_jugador: str):
     carpeta_html = _carpeta_html_partidos(codigo_temporada, num_jornada)
     carpeta_csv = _carpeta_csv_jornada(codigo_temporada, num_jornada)
 
@@ -823,6 +746,6 @@ def comparar_jugador_completo(codigo_temporada: str, num_jornada: int,
 
 
 if __name__ == "__main__":
-    #analizar_rango_jornadas("23_24", 1, 38)
-    #analizar_rango_jornadas("24_25", 1, 38)
+    # analizar_rango_jornadas("23_24", 1, 38)
+    # analizar_rango_jornadas("24_25", 1, 38)
     analizar_rango_jornadas("25_26", 1, 18)

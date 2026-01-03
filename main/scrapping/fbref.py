@@ -1,530 +1,403 @@
 import os
-import re
-from io import StringIO
-import logging
-from datetime import datetime
+import re 
+from io import StringIO  
+import logging  
+from datetime import datetime 
+import time  
 
-import numpy as np
+import numpy as np  
 import pandas as pd
-from bs4 import BeautifulSoup
-import cloudscraper
+from bs4 import BeautifulSoup  
+from rapidfuzz import process as rf_process, fuzz as rf_fuzz  
+from commons import * 
+from alias import*  
+from roles import ROLES_DESTACADOS 
 
-from commons import (
-    normalizar_texto,
-    normalizar_equipo_temporada,
-    aplicar_alias_jugador_temporada,
-    limpiar_minuto,
-    extraer_nombre_jugador,
-    to_int,
-    to_float,
-    mapear_posicion,
-    normalizar_pos_clave,
-    obtener_match_nombre,
-    nombre_a_mayus,
-    coincide_inicial_apellido,
-    construir_fantasy_por_norm,
-    postprocesar_df_partido,
-    contar_tarjetas_banquillo,
+logging.basicConfig( 
+    level=logging.DEBUG,  
+    format="%(asctime)s [%(levelname)s] %(message)s",  
 )
-from alias import (
-    APELLIDOS_CRITICOS,
-    MAPEO_STATS,
-    COLUMNAS_MODELO,
-    UMBRAL_MATCH,
-)
-from roles import ROLES_DESTACADOS  # <--- NUEVO
+logger = logging.getLogger(__name__)  
+
+def log_jugadores_sin_entrada():  
+    logger.info("24/25 J10->Villareal:Pau Navarro no tiene entrada en futbolfantasy.com")  
+    logger.info("24/25 J15->Villareal:Pau Cabanes no tiene entrada en futbolfantasy.com")  
+
+TEMPORADA_ACTUAL = "25_26"  
+
+CARPETA_HTML, CARPETA_CSV = build_rutas_temporada(TEMPORADA_ACTUAL) 
+
+POS_MAP_FANTASY = {  
+    "Portero": "PT",  
+    "Defensa": "DF",  
+    "Mediocampista": "MC",  
+    "Centrocampista": "MC",  
+    "Delantero": "DT", 
+}
 
 
-# ========== LOGGING ==========
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-)
-logger = logging.getLogger(__name__)
+def buscar_fila_portero(keepers, resumen_summary, clave_fbref):
+    # 1) Coincde directamente
+    fila_portero = keepers.get(clave_fbref)
+    if fila_portero is not None:
+        return fila_portero
 
-
-def log_jugadores_sin_entrada():
-    logger.info(
-        "24/25 J10->Villareal:Pau Navarro no tiene entrada en futbolfantasy.com"
-    )
-    logger.info(
-        "24/25 J15->Villareal:Pau Cabanes no tiene entrada en futbolfantasy.com"
-    )
-
-
-TEMPORADA_ACTUAL = "25_26"  # valor por defecto
-
-
-def _build_rutas_temporada(temporada: str):
-    carpeta_html = os.path.join("main", "html", f"temporada_{temporada}")
-    carpeta_csv = os.path.join("data", f"temporada_{temporada}")
-    os.makedirs(carpeta_html, exist_ok=True)
-    os.makedirs(carpeta_csv, exist_ok=True)
-    return carpeta_html, carpeta_csv
-
-
-CARPETA_HTML, CARPETA_CSV = _build_rutas_temporada(TEMPORADA_ACTUAL)
-
-scraper = cloudscraper.create_scraper(
-    browser={
-        "browser": "chrome",
-        "platform": "windows",
-        "desktop": True,
-    }
-)
-
-
-def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo=None):
-    caption = tabla_html.find("caption")
-    if caption:
-        texto_caption = caption.get_text(strip=True)
+   
+    fila_sum = resumen_summary.get(clave_fbref)
+    if fila_sum is not None:
+        nombre_raw = limpiar_minuto(str(fila_sum.get("Player", "")).strip())
+        base_para_apellido = nombre_raw
     else:
-        texto_caption = ""
+        base_para_apellido = clave_fbref
 
-    equipo_caption = None
-    if texto_caption.endswith("Player Stats Table"):
-        equipo_caption = texto_caption.replace(" Player Stats Table", "").strip()
+    apellido_ref = normalizar_texto(base_para_apellido).split()[-1]
 
-    try:
-        df_tabla = pd.read_html(StringIO(str(tabla_html)))[0]
-    except Exception:
-        return {}
-
-    columnas = []
-    for columna in df_tabla.columns.get_level_values(-1):
-        texto_columna = str(columna)
-        texto_columna = texto_columna.split(",")[-1]
-        texto_columna = texto_columna.strip(" ()'")
-        texto_columna = texto_columna.replace(" ", "")
-        columnas.append(texto_columna)
-
-    df_tabla.columns = columnas
-
-    id_tabla = tabla_html.get("id", "")
-    jugadores = {}
-
-    for _, fila in df_tabla.iterrows():
-        nombre = str(fila["Player"])
-        nombre = re.sub(r"\s\(.*\)\s*", "", nombre).strip()
-
-        if nombre in ["nan", "Player", "Total", "Players"]:
+    # 2) Buscar por apellido
+    for clave_k, fila_k in keepers.items():
+        if not clave_k:
             continue
+        apellido_k = normalizar_texto(clave_k).split()[-1]
+        if apellido_k == apellido_ref:
+            return fila_k
 
-        if re.match(r"^\d+\s+Players$", nombre):
-            continue
+    return None
 
-        nombre = limpiar_minuto(nombre)
 
-        if "Squad" in fila:
-            equipo_fila = str(fila.get("Squad", "")).strip()
+def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo=None)->dict[str,pd.Series]: #[nombre,fila_stats]
+    caption = tabla_html.find("caption")  
+    texto_caption = caption.get_text(strip=True) if caption else ""  
+
+    equipo_caption = None  
+    if texto_caption.endswith("Player Stats Table"):  # Comprueba si el texto del caption termina con la cadena “Player Stats Table”, patrón típico en tablas de jugador en FBref.
+        equipo_caption = texto_caption.replace(" Player Stats Table", "").strip()  # Si coincide, elimina esa coletilla y deja solo el nombre del equipo (sin espacios adicionales).
+
+
+    try:  
+        df_tabla = pd.read_html(StringIO(str(tabla_html)))[0]  
+    except Exception:  
+        return {}  
+
+
+    nombres_columnas = []  
+    for col in df_tabla.columns.get_level_values(-1):  
+        nombre_columna = str(col).split(",")[-1].strip(" ()'").replace(" ", "")
+        nombres_columnas.append(nombre_columna)
+    df_tabla.columns = nombres_columnas  # Sobreescribo ocn mis nombres
+
+
+    id_tabla = tabla_html.get("id", "")  
+    jugadores = {}  
+    
+    for _, fila in df_tabla.iterrows(): 
+        nombre = str(fila["Player"]).strip()
+
+        if nombre in ["nan", "Player", "Total", "Players"]:  continue  
+
+        if re.match(r"^\d+\s+Players$", nombre):  # Eliminar fila 11 players
+            continue  
+
+        nombre = limpiar_minuto(nombre) 
+
+        if equipo_caption:
+            equipo_fila = equipo_caption
+        elif "_home_" in id_tabla:
+            equipo_fila = equipo_local
+        elif "_away_" in id_tabla:
+            equipo_fila = equipo_visitante
         else:
             equipo_fila = ""
 
-        if not equipo_fila:
-            if equipo_caption:
-                equipo_fila = equipo_caption
-            elif "_home_" in id_tabla:
-                equipo_fila = equipo_local
-            elif "_away_" in id_tabla:
-                equipo_fila = equipo_visitante
+        equipo_norm = normalizar_equipo_temporada(equipo_fila)
 
-        if equipo_fila:
-            equipo_norm = normalizar_equipo_temporada(equipo_fila)
-        else:
-            equipo_norm = None
+        nombre_con_alias = aplicar_alias_jugador_temporada(nombre, equipo_norm, TEMPORADA_ACTUAL)
+        nombre_norm = normalizar_texto(nombre_con_alias) 
+        nombre_base_norm = normalizar_texto(nombre)  # Clave alternativa en el caso especial de porteros.
 
-        nombre_con_alias = aplicar_alias_jugador_temporada(
-            nombre, equipo_norm, TEMPORADA_ACTUAL
-        )
-        nombre_norm = normalizar_texto(nombre_con_alias)
-        nombre_base_norm = normalizar_texto(nombre)
+        fila_copia = fila.copy()  
+        fila_copia["__nombre_norm"] = nombre_norm  
+        fila_copia["__equipo_norm"] = equipo_norm 
 
-        fila = fila.copy()
-        fila["__nombre_norm"] = nombre_norm
-        fila["__equipo_norm"] = equipo_norm
+        jugadores[nombre_norm] = fila_copia 
 
-        jugadores[nombre_norm] = fila
+        if tipo == "keepers": 
+            if nombre_base_norm not in jugadores:   
+                jugadores[nombre_base_norm] = fila_copia 
 
-        if tipo == "keepers":
-            if nombre_base_norm not in jugadores:
-                jugadores[nombre_base_norm] = fila
+    return jugadores 
 
-    return jugadores
+def rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val):  
+    for nombre_tipo, cfg in MAPEO_STATS.items():  
+        mapa_tipo = tablas_por_tipo.get(nombre_tipo, {})  
+        fila_tipo = mapa_tipo.get(clave_fbref)  
 
+        if fila_tipo is None:  
+            continue  
 
-def rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val):
-    for tipo, cfg in MAPEO_STATS.items():
-        mapa_tipo = tablas_por_tipo.get(tipo, {})
-        fila_tipo = mapa_tipo.get(clave_fbref)
+        for col_fb, col_dest in cfg["enteros"].items():  
+            valor_fb = fila_tipo.get(col_fb, 0)  
+            fila_salida[col_dest] = to_int(valor_fb)  
 
-        if fila_tipo is None:
-            continue
-
-        for col_fb, col_dest in cfg["enteros"].items():
-            valor_fb = fila_tipo.get(col_fb, 0)
-            fila_salida[col_dest] = to_int(valor_fb)
-
-        for col_fb, col_dest in cfg["decimales"].items():
-            valor_fb = fila_tipo.get(col_fb, 0)
+        for col_fb, col_dest in cfg["decimales"].items():  
+            valor_fb = fila_tipo.get(col_fb, 0)  
             fila_salida[col_dest] = to_float(valor_fb)
 
-    resumen = tablas_por_tipo.get("summary", {})
-    fila_summary = resumen.get(clave_fbref)
+    resumen = tablas_por_tipo.get("summary", {})  # summary
+    fila_summary = resumen.get(clave_fbref) 
 
-    if fila_summary is not None:
-        tiros_tot = to_int(fila_summary.get("Sh", 0))
-        tiros_puerta = to_int(fila_summary.get("SoT", 0))
+    if fila_summary is not None: 
+        tiros_tot = to_int(fila_summary.get("Sh", 0)) 
+        tiros_puerta = to_int(fila_summary.get("SoT", 0))  
 
-        fila_salida["TiroFallado_partido"] = max(tiros_tot - tiros_puerta, 0)
-        fila_salida["TiroPuerta_partido"] = tiros_puerta
-
-    passing = tablas_por_tipo.get("passing", {})
-    fila_pases = passing.get(clave_fbref)
-
-    if fila_pases is not None and "Cmp%" in fila_pases:
-        fila_salida["Pases_Completados_Pct"] = to_float(fila_pases["Cmp%"])
-    elif fila_summary is not None and "Cmp%" in fila_summary:
+        fila_salida["TiroFallado_partido"] = max(tiros_tot - tiros_puerta, 0)  # No viene directamente en FBref
+        fila_salida["TiroPuerta_partido"] = tiros_puerta  
         fila_salida["Pases_Completados_Pct"] = to_float(fila_summary["Cmp%"])
-    else:
-        fila_salida["Pases_Completados_Pct"] = 0.0
 
-    if pos_val == "PT":
-        keepers = tablas_por_tipo.get("keepers", {})
+    if pos_val == "PT":  
+        keepers = tablas_por_tipo.get("keepers", {})  
+        fila_portero = buscar_fila_portero(keepers, resumen, clave_fbref)
 
-        fila_portero = None
+        if fila_portero is not None:  
+            goles_contra = to_int(fila_portero.get("GA", 0))  
 
-        if clave_fbref in keepers:
-            fila_portero = keepers[clave_fbref]
-
-        if fila_portero is None and clave_fbref:
-            resumen_local = tablas_por_tipo.get("summary", {})
-            fila_sum = resumen_local.get(clave_fbref)
-            if fila_sum is not None:
-                nombre_raw = str(fila_sum.get("Player", "")).strip()
-                nombre_raw = limpiar_minuto(nombre_raw)
-                apellido_ref = normalizar_texto(nombre_raw).split()[-1]
-            else:
-                apellido_ref = normalizar_texto(clave_fbref).split()[-1]
-
-            for clave_k, fila_k in keepers.items():
-                if not clave_k:
-                    continue
-                ap_k = normalizar_texto(clave_k).split()[-1]
-                if ap_k == apellido_ref:
-                    fila_portero = fila_k
-                    break
-
-        if fila_portero is not None:
-            goles_contra = to_int(fila_portero.get("GA", 0))
-
-            pct_paradas = 0.0
-            for col_sv in ["Save%", "Sv%", "SV%"]:
-                if col_sv in fila_portero:
+            pct_paradas = 0.0  
+            for col_sv in ["Save%"]:  
+                if col_sv in fila_portero: 
                     pct_paradas = to_float(fila_portero[col_sv])
-                    break
+                    break 
 
-            if "PSxG" in fila_portero:
-                psxg = to_float(fila_portero.get("PSxG", 0))
-            else:
-                psxg = 0.0
+            if "PSxG" in fila_portero:  
+                psxg = to_float(fila_portero.get("PSxG", 0))  
+            else:  
+                psxg = 0.0 
 
-            fila_salida["Goles_en_contra"] = goles_contra
-            fila_salida["Porcentaje_paradas"] = pct_paradas
-            fila_salida["PSxG"] = psxg
-
-
-def obtener_calendario():
-    ruta_local = "calendario.html"
-
-    if os.path.exists(ruta_local):
-        with open(ruta_local, "r", encoding="utf-8") as f:
-            html = f.read()
-
-    soup = BeautifulSoup(html, "lxml")
-    calendario = {}
-
-    tabla_calendario = soup.find("table", {"id": re.compile("sched")})
-    if not tabla_calendario:
-        return {}
-
-    filas_calendario = tabla_calendario.find_all("tr")
-    for tr_fila in filas_calendario:
-        th_jornada = tr_fila.find("th", {"data-stat": "gameweek"})
-        td_report = tr_fila.find("td", {"data-stat": "match_report"})
-
-        if not th_jornada:
-            continue
-
-        if td_report:
-            a_enlace = td_report.find("a")
-        else:
-            a_enlace = None
-
-        if a_enlace is None:
-            continue
-
-        jornada = th_jornada.get_text().strip()
-        href = a_enlace.get("href", "").strip()
-
-        if not href:
-            continue
-
-        if href.startswith("http"):
-            url_partido = href
-        else:
-            url_partido = "https://fbref.com" + href
-
-        if jornada not in calendario:
-            calendario[jornada] = []
-
-        calendario[jornada].append(url_partido)
-
-    return calendario
+            fila_salida["Goles_en_contra"] = goles_contra  
+            fila_salida["Porcentaje_paradas"] = pct_paradas  
+            fila_salida["PSxG"] = psxg 
 
 
-def obtener_fantasy_jornada(jornada):
-    ruta_puntos = os.path.join(CARPETA_HTML, f"j{jornada}", "puntos.html")
+def obtener_calendario()->dict[str,list[str]]: #[j1:[enlace1],[enlace2]]  , luego no uso los enlaces porque me bloqeuaron pero está hecho
+    ruta_local = "calendario.html"  
+    html = leer_html(ruta_local, logger=logger)  
+    if not html:  
+        return {} 
 
-    if not os.path.exists(ruta_puntos):
-        print(f"     ⚠️ No se encuentra puntos.html en j{jornada}")
-        return {}
+    soup = BeautifulSoup(html, "lxml")  
+    calendario = {}  
 
-    with open(ruta_puntos, "r", encoding="utf-8") as f:
-        html = f.read()
+    tabla_calendario = soup.find("table", {"id": re.compile("sched")})  # <div class="table_container tabbed current is_setup" id="div_sched_2025-2026_12_1">
+    
+    if not tabla_calendario:  
+        return {} 
 
-    soup = BeautifulSoup(html, "lxml")
-    resultado = {}
+    filas_calendario = tabla_calendario.find_all("tr")  
+    for tr_fila in filas_calendario:  
+        jornada = tr_fila.find("th", {"data-stat": "gameweek"})  
+        report = tr_fila.find("td", {"data-stat": "match_report"}) 
 
-    secciones_partido = soup.find_all("section", class_="over fichapartido")
+        if report:  
+            enlace = report.find("a")  
+        else:  
+            enlace = None  
 
-    for section_partido in secciones_partido:
-        header_partido = section_partido.find("header", class_="encabezado-partido")
-        if not header_partido:
-            continue
+        jornada = jornada.get_text().strip()  
+        href = enlace.get("href", "").strip() 
+        
+        if not href:  
+            continue 
+        
+        url_partido = "https://fbref.com" + href  
+        
+        if jornada not in calendario:  
+            calendario[jornada] = [] 
+            
+        calendario[jornada].append(url_partido)  
+    return calendario  
 
-        div_local = header_partido.select_one(".equipo.local .nombre")
-        div_visit = header_partido.select_one(".equipo.visitante .nombre")
 
-        if not div_local or not div_visit:
-            continue
+def obtener_fantasy_jornada(jornada):  
+    """
+    resultado = {
+        "equipoLocalNorm-equipoVisitanteNorm": {   # clave_partido
+            "equipoNorm+NombreJugador": {          # clave_ff
+                ... info_jugador ...
+            },
+        ...
+        },
+        ...
+    }
+    id único por equipo+nombre-> evita colisiones de nombres/apellidos entre equipos 
+    Si ocurre dentro del equipo introduzco la posición para desempatar
+    """
+    ruta_puntos = os.path.join(CARPETA_HTML, f"j{jornada}", "puntos.html")  
 
-        nombre_local = div_local.get_text(strip=True)
-        nombre_visit = div_visit.get_text(strip=True)
 
-        local_norm = normalizar_equipo_temporada(nombre_local)
-        visit_norm = normalizar_equipo_temporada(nombre_visit)
+    if not os.path.exists(ruta_puntos):  
+        print(f"     ⚠️ No se encuentra puntos.html en j{jornada}")  
+        return {}  
 
-        clave_partido = f"{local_norm}-{visit_norm}"
 
-        mapa_puntos = {}
+    html = leer_html(ruta_puntos) 
+    if not html:  
+        return {} 
 
-        tablas_stats = section_partido.select("table.tablestats")
-        for indice_tabla, tabla_stats in enumerate(tablas_stats):
-            filas_jugadores = tabla_stats.select("tbody tr.plegado")
+    soup = BeautifulSoup(html, "lxml")  
+    resultado = {}  
 
-            equipo_tabla_norm = local_norm if indice_tabla == 0 else visit_norm
+    partidos = soup.find_all("section", class_="over fichapartido")  
 
-            for tr_jugador in filas_jugadores:
-                td_nombre = tr_jugador.find("td", class_="name")
-                if not td_nombre:
-                    continue
+    for partido in partidos: 
+        header_partido = partido.find("header", class_="encabezado-partido")  
 
-                nombre_sin_min = extraer_nombre_jugador(td_nombre)
-                nombre_sin_min = limpiar_minuto(nombre_sin_min)
+        div_local = header_partido.select_one(".equipo.local .nombre")  
+        div_visitante = header_partido.select_one(".equipo.visitante .nombre")
 
-                pos_fantasy_raw = td_nombre.get(
-                    "data-posicion-laliga-fantasy", ""
-                ) or ""
-                pos_fantasy_raw = pos_fantasy_raw.strip()
+        local_norm  = normalizar_equipo_temporada(div_local.get_text(strip=True))
+        visit_norm  = normalizar_equipo_temporada(div_visitante.get_text(strip=True))
 
-                pos_map_fantasy = {
-                    "Portero": "PT",
-                    "Defensa": "DF",
-                    "Mediocampista": "MC",
-                    "Centrocampista": "MC",
-                    "Delantero": "DT",
-                }
 
-                pos_fantasy = pos_map_fantasy.get(pos_fantasy_raw, "MC")
+        clave_partido = f"{local_norm}-{visit_norm}" 
 
-                puntos = 0
-                span_pts = (
-                    tr_jugador.select_one("span.laliga-fantasy")
-                    or tr_jugador.select_one("span.fantasy-points")
-                    or tr_jugador.select_one("span.puntos")
-                    or tr_jugador.select_one("span.points")
-                )
+        mapa_puntos = {}  
 
-                if span_pts:
-                    txt = span_pts.get_text(strip=True)
+        tablas_equipos = partido.select("table.tablestats")  
+        for indice, tabla_equipo in enumerate(tablas_equipos):  
+            filas_jugadores = tabla_equipo.select("tbody tr.plegado")  
+
+            equipo_tabla_norm = local_norm if indice == 0 else visit_norm  # la primera tabla (índice 0) se asocia al local, la segunda al visitante
+
+            for tr_jugador in filas_jugadores:  
+                td_nombre = tr_jugador.find("td", class_="name")  
+                if not td_nombre:  
+                    continue  
+
+                nombre_sin_min = limpiar_minuto(extraer_nombre_jugador(td_nombre))
+
+                pos_fantasy_raw = td_nombre.get(  "data-posicion-laliga-fantasy", "").strip()
+                pos_fantasy = POS_MAP_FANTASY.get(pos_fantasy_raw, "MC")
+
+                puntos = 0 
+                span_puntos = tr_jugador.select_one("span.laliga-fantasy")
+
+                if span_puntos:
                     try:
-                        puntos = int(float(txt.replace(",", ".")))
-                    except Exception:
+                        puntos = int(span_puntos.get_text(strip=True))
+                    except ValueError:
                         puntos = 0
 
-                td_events = tr_jugador.find("td", class_="events")
-                amarillas = 0
+                td_eventos = tr_jugador.find("td", class_="events")
+                amarillas = 0  
                 rojas = 0
 
-                if td_events:
-                    imagenes_evento = td_events.find_all("img")
-                    for img_evento in imagenes_evento:
-                        tooltip = (img_evento.get("data-tooltip") or "").strip().lower()
+                if td_eventos:  
+                    imagenes_evento = td_eventos.find_all("img")  
+                    for img_evento in imagenes_evento: 
+                        tooltip = (img_evento.get("data-tooltip") or "").strip().lower()  
                         alt = (img_evento.get("alt") or "").strip().lower()
-                        texto = tooltip if tooltip else alt
-                        if "amarilla" in texto:
-                            amarillas += 1
+                        texto = tooltip if tooltip else alt  # a veces falta 
+                        if "amarilla" in texto:  
+                            amarillas += 1 
                         elif "roja" in texto:
-                            rojas += 1
+                            rojas += 1 
 
                 equipo_norm = equipo_tabla_norm
                 clave_ff = f"{equipo_norm}|{nombre_sin_min}"
 
-                nombre_con_alias = aplicar_alias_jugador_temporada(
-                    nombre_sin_min, equipo_tabla_norm, TEMPORADA_ACTUAL
-                )
-                nombre_norm = normalizar_texto(nombre_con_alias)
+                nombre_con_alias = aplicar_alias_jugador_temporada(nombre_sin_min, equipo_tabla_norm, TEMPORADA_ACTUAL)
+                nombre_norm = normalizar_texto(nombre_con_alias)  
 
-                info = {
-                    "nombre_original": nombre_sin_min,
+                info_jugador = { 
+                    "nombre_original": nombre_sin_min, 
                     "nombre_norm": nombre_norm,
                     "puntos": puntos,
-                    "equipo": equipo_tabla_norm,
-                    "equipo_norm": equipo_norm,
-                    "amarillas": amarillas,
-                    "rojas": rojas,
-                    "posicion": pos_fantasy,
+                    "equipo": equipo_tabla_norm,  
+                    "equipo_norm": equipo_norm, 
+                    "amarillas": amarillas,  
+                    "rojas": rojas, 
+                    "posicion": pos_fantasy,  
                 }
 
-                if clave_ff in mapa_puntos:
-                    puntos_previos = mapa_puntos[clave_ff]["puntos"]
-                    if abs(puntos) > abs(puntos_previos):
-                        mapa_puntos[clave_ff] = info
-                else:
-                    mapa_puntos[clave_ff] = info
-
-        resultado[clave_partido] = mapa_puntos
-
-    return resultado
+                mapa_puntos[clave_ff] = info_jugador
+        resultado[clave_partido] = mapa_puntos 
+    return resultado  
 
 
-def obtener_nombres_partido(html_partido):
-    soup = BeautifulSoup(html_partido, "lxml")
-    tag_title = soup.find("title")
+def obtener_nombres_partido(html_partido)->tuple[str,str]:  #local, visitatne de FBRef
+    soup = BeautifulSoup(html_partido, "lxml")  
+    tag_title = soup.find("title").get_text()
 
-    if tag_title:
-        title = tag_title.get_text()
-    else:
-        title = "Match"
-
-    try:
-        equipo_local = title.split(" vs. ")[0]
-        equipo_visitante = title.split(" vs. ")[1].split(" Match")[0]
+    try: 
+        equipo_local = tag_title.split(" vs. ")[0] 
+        equipo_visitante = tag_title.split(" vs. ")[1].split(" Match")[0] 
     except Exception:
-        equipo_local = "Local"
+        equipo_local = "Local" 
         equipo_visitante = "Visitante"
+    return equipo_local, equipo_visitante 
 
-    return equipo_local, equipo_visitante
 
-
-def obtener_fecha_partido(html_partido):
-    """
-    Extrae la fecha del partido desde el div.scorebox_meta (atributo data-venue-date)
-    y la devuelve como cadena en formato dd/mm/yyyy.
-    """
-    soup = BeautifulSoup(html_partido, "lxml")
-    scorebox = soup.find("div", class_="scorebox_meta")
-    if not scorebox:
+def obtener_fecha_partido(html_partido):  # fbref dd/mm/YYYY
+    soup = BeautifulSoup(html_partido, "lxml")  
+    div_scorebox = soup.find("div", class_="scorebox_meta")  
+    if not div_scorebox:  
         return None
 
-    span_venuetime = scorebox.find("span", class_="venuetime")
-    if not span_venuetime:
-        return None
+    span_fecha = div_scorebox.find("span", class_="venuetime")
+    if not span_fecha: 
+        return None  
 
-    fecha_raw = span_venuetime.get("data-venue-date")
+    fecha_raw = span_fecha.get("data-venue-date") 
     if not fecha_raw:
         return None
 
-    try:
+    try:  
         dt = datetime.strptime(fecha_raw, "%Y-%m-%d")
         return dt.strftime("%d/%m/%Y")
     except ValueError:
-        return None
+        return None 
 
 
-def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido, jornada):
-    soup = BeautifulSoup(html_partido, "lxml")
-    tag_title = soup.find("title")
-
-    fecha_partido = obtener_fecha_partido(html_partido)
-
-    if tag_title:
-        title = tag_title.get_text()
-    else:
-        title = "Match"
-
-    try:
-        equipo_local = title.split(" vs. ")[0]
-        equipo_visitante = title.split(" vs. ")[1].split(" Match")[0]
-    except Exception:
-        equipo_local = "Local"
-        equipo_visitante = "Visitante"
-
-    local_norm = normalizar_equipo_temporada(equipo_local)
-    visit_norm = normalizar_equipo_temporada(equipo_visitante)
-
-    fantasy_partido = mapa_fantasy_partido
-
-    if isinstance(fantasy_partido, list):
-        logger.error(
-            "[ERROR] fantasy_partido es list para idx_partido=%s, corrigiendo a dict. valor=%s",
-            idx_partido,
-            fantasy_partido,
-        )
-        fantasy_partido = fantasy_partido[0] if fantasy_partido else {}
-    elif not isinstance(fantasy_partido, dict):
-        logger.error(
-            "[ERROR] fantasy_partido tipo inesperado para idx_partido=%s, tipo=%s, valor=%s",
-            idx_partido,
-            type(fantasy_partido).__name__,
-            fantasy_partido,
-        )
-        fantasy_partido = {}
-
+def _extraer_titulares_y_nombres_local(soup):
     divs_alineacion = soup.find_all("div", class_="lineup")
-    titulares = []
+    titulares = []  
+    nombres_local = []  
 
     if divs_alineacion:
         for div_lineup in divs_alineacion:
-            anclas = div_lineup.find_all("a")
-            nombres_equipo = []
-            for a_jugador in anclas:
-                texto_jugador = a_jugador.get_text().strip()
+            jugadores = div_lineup.find_all("a")
+            nombres_equipo = [] 
+            for jugador in jugadores:  
+                texto_jugador = jugador.get_text().strip()
                 texto_jugador = limpiar_minuto(texto_jugador)
                 nombres_equipo.append(texto_jugador)
             nombres_equipo = nombres_equipo[:11]
-            titulares.extend(nombres_equipo)
+            titulares.extend(nombres_equipo) 
 
-    if divs_alineacion:
-        anclas_local = divs_alineacion[0].find_all("a")
-        nombres_local = []
-        for a_local in anclas_local:
-            txt = a_local.get_text().strip()
+        equipo_local = divs_alineacion[0].find_all("a")  # Sale antes el equipo local
+        for jugador in equipo_local:
+            txt = jugador.get_text().strip()
             txt = limpiar_minuto(txt)
             nombres_local.append(txt)
-    else:
-        nombres_local = []
+    return titulares, nombres_local
 
-    tablas_por_tipo = {}
-    tipos = ["summary", "passing", "defense", "possession", "misc", "keepers"]
+def _parsear_tablas_partido(soup, equipo_local, equipo_visitante):
+    '''
+    {
+    "summary":  { "nombre_jugador_norm": fila_summary, "nombre_jugador_norm2": fila_summary2,... },
+    "passing":  { "nombre_jugador_norm": fila_passing, ... },
+    "defense":  { "nombre_jugador_norm": fila_defense, ... },
+    "possession":{ ... },
+    "misc":     { ... },
+    "keepers":  { ... },
+    }
+    '''
+    tablas_por_tipo = {}  
+    tipos = ["summary", "passing", "defense", "possession", "misc", "keepers"]  # Define la lista de tipos de tabla de stats que se quieren extraer del HTML.
+
 
     for tipo in tipos:
         jugadores_tipo = {}
-
+        
         if tipo == "keepers":
-            tablas = list(
-                soup.find_all("table", id=re.compile(r"stats_.*_keepers"))
-            )
+            tablas = soup.find_all("table", id=re.compile(r"stats_.*_keepers")) 
             for tabla in soup.find_all("table"):
                 tid = tabla.get("id") or ""
                 if "keeper_stats_" in tid and tabla not in tablas:
@@ -532,493 +405,382 @@ def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido, jornada):
         else:
             tablas = soup.find_all("table", id=re.compile(f"stats_.*_{tipo}"))
 
+
         for tabla_html in tablas:
-            jugadores_tabla = parsear_tabla_fbref(
-                tabla_html, equipo_local, equipo_visitante, tipo
-            )
-            for k, v in jugadores_tabla.items():
-                jugadores_tipo[k] = v
+            jugadores_tabla = parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo)
+            for clave_jugador, fila_jugador in jugadores_tabla.items():  #key:nombre normalizado de jugador // value: filas de stats
+                jugadores_tipo[clave_jugador] = fila_jugador  
 
         tablas_por_tipo[tipo] = jugadores_tipo
+    return tablas_por_tipo
 
-    propuestas = []
+# =========================
+# Matching FBref - Fantasy
+# =========================
 
-    resumen_summary = tablas_por_tipo.get("summary", {})
+def _generar_propuestas(resumen_summary, fantasy_partido, local_norm, visit_norm, nombres_local):
+    '''
+    resumen_summary: dict {nombre_fb_norm -> fila_summary} de FBref.
+    fantasy_partido: dict con todos los jugadores Fantasy de ese partido.
+    local_norm, visit_norm: nombres normalizados de los equipos.
+    nombres_local: lista de nombres “humanos” del once + banquillo del local.
+    SALIDA:propuestas-> lista de dicts, una por jugador FBref
+    '''
+    propuestas = [] 
     for nombre_fb_norm, fila_sum in resumen_summary.items():
         nombre_fb = str(fila_sum.get("Player", "")).strip()
-        nombre_fb = limpiar_minuto(nombre_fb)
+        nombre_fb = limpiar_minuto(nombre_fb) 
 
-        es_local = any(n_loc == nombre_fb for n_loc in nombres_local)
+        es_local = any(nombre_local == nombre_fb for nombre_local in nombres_local)
         equipo_fb_norm = local_norm if es_local else visit_norm
 
         minutos = to_int(fila_sum.get("Min", 0))
-
         pos_raw = str(fila_sum.get("Pos", "MC")).split(",")[0].strip()
         pos_val = mapear_posicion(pos_raw)
 
-        candidatos_equipo = {
-            clave: info
-            for clave, info in fantasy_partido.items()
-            if info.get("equipo_norm") == equipo_fb_norm
-        }
+        candidatos_equipo = {} #Separo por equipos
+        for clave, info in fantasy_partido.items():
+            if info.get("equipo_norm") == equipo_fb_norm:
+                candidatos_equipo[clave] = info
 
-        nombres_fantasy_norm = [info["nombre_norm"] for info in candidatos_equipo.values()]
+        nombres_fantasy_norm = [info["nombre_norm"] for info in candidatos_equipo.values()] 
         nombre_html_norm = nombre_fb_norm
 
         mejor_norm, mejor_score = obtener_match_nombre(
-            nombre_html_norm,
+            nombre_html_norm, 
             nombres_fantasy_norm,
             equipo_norm=equipo_fb_norm,
-            score_cutoff=UMBRAL_MATCH,
         )
 
-        if mejor_norm is None or mejor_score < UMBRAL_MATCH:
-            from rapidfuzz import process as rf_process, fuzz as rf_fuzz
 
-            mejor_basico = rf_process.extractOne(
-                nombre_html_norm,
+        if mejor_norm is None or mejor_score < UMBRAL_MATCH: 
+            # plan B usar WRatio
+            mejor_basico = rf_process.extractOne(  
+                nombre_html_norm,  
                 nombres_fantasy_norm,
-                scorer=rf_fuzz.WRatio,
+                scorer=rf_fuzz.WRatio, 
             )
-            if mejor_basico is not None:
+            if mejor_basico is not None: 
                 candidato_norm, score_basico, _ = mejor_basico
                 if score_basico >= UMBRAL_MATCH:
-                    mejor_norm = candidato_norm
+                    mejor_norm = candidato_norm 
                     mejor_score = score_basico
 
-        mejor_original = None
+        mejor_original = None 
         if mejor_norm is not None:
-            for info in candidatos_equipo.values():
-                if info["nombre_norm"] == mejor_norm:
-                    mejor_original = info["nombre_original"]
-                    break
+          for info in candidatos_equipo.values():
+                if info["nombre_norm"] == mejor_norm:  
+                    mejor_original = info["nombre_original"] 
+                    break 
 
-        propuesta = {
+        propuesta = {  
             "clave_fbref": nombre_fb_norm,
-            "nombre_fb": nombre_fb,
-            "nombre_fb_norm": nombre_fb_norm,
+            "nombre_fb": nombre_fb, 
+            "nombre_fb_norm": nombre_fb_norm, 
             "equipo_fb_norm": equipo_fb_norm,
             "minutos": minutos,
             "posicion": pos_val,
-            "mejor_norm": mejor_norm,
-            "mejor_original": mejor_original,
-            "score": mejor_score,
+            "mejor_norm": mejor_norm,  
+            "mejor_original": mejor_original, 
+            "score": mejor_score, 
         }
-        propuestas.append(propuesta)
+        propuestas.append(propuesta) 
+    return propuestas  
 
-    jugadores_por_apellido_equipo, fantasy_por_norm = construir_fantasy_por_norm(
-        fantasy_partido
-    )
+def _agrupar_propuestas_por_norm(propuestas, jugadores_por_apellido_equipo):
+    propuestas_por_norm = {} 
 
-    asignacion_fbref_a_fantasy = {}
-
-    propuestas_por_norm = {}
-    for propuesta in propuestas:
+    for propuesta in propuestas: 
         nombre_norm = propuesta["mejor_norm"]
         equipo_fb_norm = propuesta["equipo_fb_norm"]
-        pos_val = propuesta["posicion"]
+        pos_val = propuesta["posicion"] 
         score = propuesta["score"]
 
         if not nombre_norm:
-            continue
+            continue 
 
-        apellido = nombre_norm.split()[-1]
-        clave_ap = (apellido, equipo_fb_norm)
-        lista_fantasy_mismo_ap = jugadores_por_apellido_equipo.get(clave_ap, [])
-        hay_unico_candidato = len(lista_fantasy_mismo_ap) == 1
+        clave_norm = construir_clave_norm(nombre_norm, equipo_fb_norm, pos_val, jugadores_por_apellido_equipo)
 
-        if score < UMBRAL_MATCH and not hay_unico_candidato:
-            continue
+        if score < UMBRAL_MATCH: 
+            apellido = nombre_norm.split()[-1]  # Apellido
+            clave_ap = (apellido, equipo_fb_norm) 
+            lista_fantasy_mismo_ap = jugadores_por_apellido_equipo.get(clave_ap, [])  
+            hay_unico_candidato = len(lista_fantasy_mismo_ap) == 1  # Caso no ambiguo
+            if not hay_unico_candidato:  
+                continue  
 
-        hay_duplicados = (
-            apellido in APELLIDOS_CRITICOS and len(lista_fantasy_mismo_ap) > 1
-        )
-
-        if not lista_fantasy_mismo_ap:
-            clave_norm = (nombre_norm, equipo_fb_norm)
-        else:
-            if not hay_duplicados:
-                clave_norm = (nombre_norm, equipo_fb_norm)
-            else:
-                pos_clave = normalizar_pos_clave(pos_val)
-                clave_norm = (nombre_norm, equipo_fb_norm, pos_clave)
-
-        if clave_norm not in propuestas_por_norm:
+        if clave_norm not in propuestas_por_norm: 
             propuestas_por_norm[clave_norm] = []
-        propuestas_por_norm[clave_norm].append(propuesta)
+        propuestas_por_norm[clave_norm].append(propuesta)  
+    return propuestas_por_norm  
+
+
+def _resolver_matching(propuestas, jugadores_por_apellido_equipo, fantasy_por_norm):
+    asignacion_fbref_a_fantasy = {} 
+    propuestas_por_norm = _agrupar_propuestas_por_norm(propuestas, jugadores_por_apellido_equipo) 
 
     for clave_norm, lista_props in propuestas_por_norm.items():
-        candidatos_ff = fantasy_por_norm.get(clave_norm, [])
-        if not candidatos_ff:
+        candidatos_ff = fantasy_por_norm.get(clave_norm, [])  
+        if not candidatos_ff: 
             continue
 
-        lista_props_ordenada = sorted(
-            lista_props, key=lambda p: p["minutos"], reverse=True
-        )
-        candidatos_ff_ordenados = sorted(
-            candidatos_ff, key=lambda x: x["puntos"], reverse=True
-        )
+        lista_props_ordenada = sorted(lista_props, key=lambda p: p["minutos"], reverse=True) 
+        candidatos_ff_ordenados = sorted(candidatos_ff, key=lambda x: x["puntos"], reverse=True)
 
-        if len(candidatos_ff_ordenados) == 1 and len(lista_props_ordenada) > 1:
-            candidato = candidatos_ff_ordenados[0]
-            info_ff = candidato["info"]
-            nombre_ff_norm = info_ff["nombre_norm"]
-            apellido_ff = nombre_ff_norm.split()[-1]
-
-            mejor_prop = None
-            mejor_score_local = -1.0
+        if len(candidatos_ff_ordenados) == 1 and len(lista_props_ordenada) > 1:  # 1 jugador y varios candidatos
+            candidato = candidatos_ff_ordenados[0]  #
+            info_ff = candidato["info"] 
+            nombre_ff_norm = info_ff["nombre_norm"]  
+            apellido_ff = nombre_ff_norm.split()[-1] 
+            
+            mejor_prop = None  
+            mejor_score_local = -1.0 
             for p in lista_props_ordenada:
-                mejor_norm_p = p.get("mejor_norm")
-                score_p = p.get("score") or 0.0
-                if not mejor_norm_p:
-                    continue
-                apellido_p = mejor_norm_p.split()[-1]
-                if apellido_p == apellido_ff and score_p > mejor_score_local:
-                    mejor_prop = p
+                mejor_norm_p = p.get("mejor_norm") 
+                score_p = p.get("score") or 0.0  
+                if not mejor_norm_p:  
+                    continue  
+                apellido_p = mejor_norm_p.split()[-1]  
+                if apellido_p == apellido_ff and score_p > mejor_score_local:  # Si el apellido coincide con el del candidato Fantasy y el score supera al mejor score local.
+                    mejor_prop = p 
                     mejor_score_local = score_p
 
-            if mejor_prop is None:
-                mejor_prop = max(
-                    lista_props_ordenada, key=lambda p: p.get("score") or 0.0
-                )
+            if mejor_prop is None: 
+                mejor_prop = max(lista_props_ordenada, key=lambda p: p.get("score") or 0.0)
 
-            clave_fbref = mejor_prop["clave_fbref"]
-            asignacion_fbref_a_fantasy[clave_fbref] = candidato["clave_ff"]
-        else:
-            for propuesta, candidato in zip(
-                lista_props_ordenada, candidatos_ff_ordenados
-            ):
+            clave_fbref = mejor_prop["clave_fbref"] 
+            asignacion_fbref_a_fantasy[clave_fbref] = candidato["clave_ff"] 
+        else:  
+           for i in range(min(len(lista_props_ordenada), len(candidatos_ff_ordenados))):
+                propuesta = lista_props_ordenada[i]
+                candidato = candidatos_ff_ordenados[i]
                 clave_fbref = propuesta["clave_fbref"]
                 clave_ff = candidato["clave_ff"]
                 asignacion_fbref_a_fantasy[clave_fbref] = clave_ff
 
-    debug_matching_por_fbref = {}
-    for propuesta in propuestas:
-        clave_fbref = propuesta["clave_fbref"]
-        mejor_norm = propuesta["mejor_norm"]
-        equipo_fb_norm = propuesta["equipo_fb_norm"]
-        pos_val = propuesta["posicion"]
-        score = propuesta["score"]
-        clave_ff_asignada = asignacion_fbref_a_fantasy.get(clave_fbref)
 
-        if mejor_norm:
-            apellido = mejor_norm.split()[-1]
-            clave_ap = (apellido, equipo_fb_norm)
-            lista_fantasy_mismo_ap = jugadores_por_apellido_equipo.get(clave_ap, [])
-            hay_duplicados = (
-                apellido in APELLIDOS_CRITICOS and len(lista_fantasy_mismo_ap) > 1
-            )
+    debug_matching_por_fbref = {} 
+    for propuesta in propuestas:  
+        clave_fbref = propuesta["clave_fbref"]  
+        mejor_norm = propuesta["mejor_norm"] 
+        equipo_fb_norm = propuesta["equipo_fb_norm"]  
+        pos_val = propuesta["posicion"] 
+        score = propuesta["score"] 
+        clave_ff_asignada = asignacion_fbref_a_fantasy.get(clave_fbref) 
 
-            if not lista_fantasy_mismo_ap:
-                clave_norm = (mejor_norm, equipo_fb_norm)
-            else:
-                if not hay_duplicados:
-                    clave_norm = (mejor_norm, equipo_fb_norm)
-                else:
-                    pos_clave = normalizar_pos_clave(pos_val)
-                    clave_norm = (mejor_norm, equipo_fb_norm, pos_clave)
-        else:
-            clave_norm = None
+        clave_norm = construir_clave_norm(mejor_norm, equipo_fb_norm, pos_val, jugadores_por_apellido_equipo)
 
         debug_matching_por_fbref[clave_fbref] = {
             "mejor_norm": mejor_norm,
-            "equipo_fb_norm": equipo_fb_norm,
+            "equipo_fb_norm": equipo_fb_norm, 
             "pos_val": pos_val,
-            "score": score,
-            "clave_norm": clave_norm,
-            "clave_ff_asignada": clave_ff_asignada,
+            "score": score, 
+            "clave_norm": clave_norm, 
+            "clave_ff_asignada": clave_ff_asignada, 
         }
+    return asignacion_fbref_a_fantasy, debug_matching_por_fbref  
 
-    bd_partido = {}
 
-    for propuesta in propuestas:
-        clave_fbref = propuesta["clave_fbref"]
-        nombre_fb = propuesta["nombre_fb"]
+fantasy_por_norm_global = {} 
+def _construir_bd_partido(propuestas,tablas_por_tipo,asignacion_fbref_a_fantasy,debug_matching_por_fbref,fantasy_partido,titulares,local_norm,visit_norm,jornada,fecha_partido,):
+    bd_partido = {} 
+
+    for propuesta in propuestas: 
+        clave_fbref = propuesta["clave_fbref"] 
+        nombre_fb = propuesta["nombre_fb"] 
         nombre_fb_norm = propuesta["nombre_fb_norm"]
         equipo_fb_norm = propuesta["equipo_fb_norm"]
-        minutos = propuesta["minutos"]
-        pos_val = propuesta["posicion"]
+        minutos = propuesta["minutos"] 
+        pos_val = propuesta["posicion"] 
 
-        equipo_rival_norm = visit_norm if equipo_fb_norm == local_norm else local_norm
+        equipo_rival_norm = visit_norm if equipo_fb_norm == local_norm else local_norm 
+        clave_ff = asignacion_fbref_a_fantasy.get(clave_fbref)  
 
-        clave_ff = asignacion_fbref_a_fantasy.get(clave_fbref)
-
-        if clave_ff is not None:
-            clave_registro = f"{clave_ff}|{equipo_fb_norm}|{pos_val}"
-        else:
+        if clave_ff is not None: 
+            clave_registro = f"{clave_ff}|{equipo_fb_norm}|{pos_val}" 
+        else: 
             clave_registro = f"{nombre_fb_norm}|{equipo_fb_norm}|{minutos}|{pos_val}"
+            
+        if clave_registro not in bd_partido: 
+            fila_nueva = {col: np.nan for col in COLUMNAS_MODELO}  
 
-        if clave_registro not in bd_partido:
-            fila_nueva = {col: np.nan for col in COLUMNAS_MODELO}
-
-            # Contexto
-            fila_nueva["temporada"] = TEMPORADA_ACTUAL
-            fila_nueva["jornada"] = jornada
-            fila_nueva["fecha_partido"] = fecha_partido
-
-            # Entidad
-            fila_nueva["player"] = nombre_fb
-            fila_nueva["posicion"] = pos_val
-            fila_nueva["Equipo_propio"] = equipo_fb_norm
-            fila_nueva["Equipo_rival"] = equipo_rival_norm
-
-            # Flags
-            fila_nueva["local"] = 1 if equipo_fb_norm == local_norm else 0
-            fila_nueva["Titular"] = 1 if nombre_fb in titulares else 0
+            fila_nueva["temporada"] = TEMPORADA_ACTUAL  
+            fila_nueva["jornada"] = jornada 
+            fila_nueva["fecha_partido"] = fecha_partido  
+            fila_nueva["player"] = nombre_fb 
+            fila_nueva["posicion"] = pos_val  
+            fila_nueva["Equipo_propio"] = equipo_fb_norm 
+            fila_nueva["Equipo_rival"] = equipo_rival_norm 
+            fila_nueva["local"] = 1 if equipo_fb_norm == local_norm else 0  
+            fila_nueva["Titular"] = 1 if nombre_fb in titulares else 0  
             fila_nueva["Min_partido"] = minutos
-
-            # Stats portero inicializadas
             fila_nueva["Goles_en_contra"] = np.nan
-            fila_nueva["Porcentaje_paradas"] = np.nan
-            fila_nueva["PSxG"] = np.nan
+            fila_nueva["Porcentaje_paradas"] = np.nan 
+            fila_nueva["roles"] = []  
+            bd_partido[clave_registro] = fila_nueva  
 
-            # Columna roles: lista vacía
-            fila_nueva["roles"] = []
+        fila_salida = bd_partido[clave_registro] 
+        rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val) 
+        puntos = 6767  
+        if clave_ff is not None:  
+            puntos = fantasy_partido.get(clave_ff, {}).get("puntos", 6767) 
 
-            bd_partido[clave_registro] = fila_nueva
-
-        fila_salida = bd_partido[clave_registro]
-        rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val)
-
-        puntos = 6767
-        if clave_ff is not None:
-            puntos = fantasy_partido.get(clave_ff, {}).get("puntos", 6767)
-
-        fila_salida["puntosFantasy"] = puntos
-
+        fila_salida["puntosFantasy"] = puntos 
+        #DEBUG
         if puntos == 6767:
-            info_dbg = debug_matching_por_fbref.get(clave_fbref, {})
-            mejor_norm = info_dbg.get("mejor_norm")
-            score = info_dbg.get("score")
-            clave_norm = info_dbg.get("clave_norm")
-            clave_ff_asignada = info_dbg.get("clave_ff_asignada")
-            equipo_fb = equipo_fb_norm
-            pos_fb = pos_val
-
-            candidatos = []
-            if clave_norm in fantasy_por_norm:
-                for c in fantasy_por_norm[clave_norm]:
-                    inf = c["info"]
-                    candidatos.append(
-                        (
-                            c["clave_ff"],
-                            inf.get("nombre_original"),
-                            inf.get("nombre_norm"),
-                            inf.get("posicion"),
-                            inf.get("puntos"),
-                        )
-                    )
-
-            logger.debug(
-                "[DEBUG 6767] player_fb=%s | nombre_fb_norm=%s | equipo_fb=%s | "
-                "pos_fb=%s | min: %s | clave_fbref=%s | "
-                "mejor_norm=%s | score=%.2f | clave_norm=%s | "
-                "clave_ff_asignada=%s | candidatos_fantasy=%s",
+            _log_debug_6767(
+                clave_fbref,
                 nombre_fb,
                 nombre_fb_norm,
-                equipo_fb,
-                pos_fb,
+                equipo_fb_norm,
                 minutos,
-                clave_fbref,
-                mejor_norm,
-                score if score is not None else -1.0,
-                clave_norm,
-                clave_ff_asignada,
-                candidatos,
+                pos_val,
+                debug_matching_por_fbref,
+                fantasy_por_norm_global,
             )
+
+    return bd_partido
+
+def _log_debug_6767(clave_fbref,nombre_fb,nombre_fb_norm,equipo_fb_norm,minutos,pos_val,debug_matching_por_fbref,fantasy_por_norm_global,):
+    info_dbg = debug_matching_por_fbref.get(clave_fbref, {})
+    mejor_norm = info_dbg.get("mejor_norm")
+    score = info_dbg.get("score")
+    clave_norm = info_dbg.get("clave_norm")
+    clave_ff_asignada = info_dbg.get("clave_ff_asignada")
+
+    candidatos = []
+    if clave_norm in fantasy_por_norm_global:
+        for c in fantasy_por_norm_global[clave_norm]:
+            inf = c["info"]
+            candidatos.append(
+                (
+                    c["clave_ff"],
+                    inf.get("nombre_original"),
+                    inf.get("nombre_norm"),
+                    inf.get("posicion"),
+                    inf.get("puntos"),
+                )
+            )
+
+    logger.debug(
+        "[DEBUG 6767] player_fb=%s | nombre_fb_norm=%s | equipo_fb=%s | "
+        "pos_fb=%s | min: %s | clave_fbref=%s | "
+        "mejor_norm=%s | score=%.2f | clave_norm=%s | "
+        "clave_ff_asignada=%s | candidatos_fantasy=%s",
+        nombre_fb,
+        nombre_fb_norm,
+        equipo_fb_norm,
+        pos_val,
+        minutos,
+        clave_fbref,
+        mejor_norm,
+        score if score is not None else -1.0,
+        clave_norm,
+        clave_ff_asignada,
+        candidatos,
+    )
+
+
+def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido, jornada):
+    global fantasy_por_norm_global  
+
+    soup = BeautifulSoup(html_partido, "lxml")
+    fecha_partido = obtener_fecha_partido(html_partido)
+    equipo_local, equipo_visitante = obtener_nombres_partido(html_partido)
+    local_norm = normalizar_equipo_temporada(equipo_local)
+    visit_norm = normalizar_equipo_temporada(equipo_visitante)
+    fantasy_partido = mapa_fantasy_partido 
+    titulares, nombres_local = _extraer_titulares_y_nombres_local(soup)
+
+    tablas_por_tipo = _parsear_tablas_partido(soup, equipo_local, equipo_visitante)
+    resumen_summary = tablas_por_tipo.get("summary", {})
+    propuestas = _generar_propuestas(resumen_summary,fantasy_partido,local_norm,visit_norm,nombres_local)
+
+    jugadores_por_apellido_equipo, fantasy_por_norm = construir_fantasy_por_norm(fantasy_partido)
+    fantasy_por_norm_global = fantasy_por_norm 
+    
+    asignacion_fbref_a_fantasy, debug_matching_por_fbref = _resolver_matching(propuestas,jugadores_por_apellido_equipo,fantasy_por_norm)
+    bd_partido = _construir_bd_partido(
+        propuestas,
+        tablas_por_tipo,
+        asignacion_fbref_a_fantasy,
+        debug_matching_por_fbref,
+        fantasy_partido,
+        titulares,
+        local_norm,
+        visit_norm,
+        jornada,
+        fecha_partido,
+    )
 
     usadas_ff = set(asignacion_fbref_a_fantasy.values())
-
-    claves_canonicas_presentes = set()
-    nombres_canonicos_presentes = {}
-
-    for clave_registro, fila in bd_partido.items():
-        nombre_fb = fila["player"]
-        equipo_fb_norm = fila["Equipo_propio"]
-        pos_fb = fila["posicion"]
-
-        nombre_canonico_fb = normalizar_texto(
-            aplicar_alias_jugador_temporada(
-                nombre_fb, equipo_fb_norm, TEMPORADA_ACTUAL
-            )
-        )
-
-        claves_canonicas_presentes.add((nombre_canonico_fb, equipo_fb_norm, pos_fb))
-
-        clave_ep = (equipo_fb_norm, pos_fb)
-        if clave_ep not in nombres_canonicos_presentes:
-            nombres_canonicos_presentes[clave_ep] = set()
-        nombres_canonicos_presentes[clave_ep].add(nombre_canonico_fb)
-
-    for clave_ff, info in fantasy_partido.items():
-        nombre_original = info["nombre_original"]
-        equipo_norm = info["equipo_norm"]
-        pos_val = info.get("posicion", "MC")
-
-        nombre_canonico_ff = normalizar_texto(
-            aplicar_alias_jugador_temporada(
-                nombre_original, equipo_norm, TEMPORADA_ACTUAL
-            )
-        )
-
-        if (nombre_canonico_ff, equipo_norm, pos_val) in claves_canonicas_presentes:
-            continue
-
-        clave_ep = (equipo_norm, pos_val)
-        nombres_presentes = nombres_canonicos_presentes.get(clave_ep, set())
-
-        coincidencia = None
-        for n in nombres_presentes:
-            if coincide_inicial_apellido(nombre_canonico_ff, n):
-                coincidencia = n
-                break
-
-        if coincidencia:
-            for clave_registro, fila in bd_partido.items():
-                nombre_canonico_fila = normalizar_texto(
-                    aplicar_alias_jugador_temporada(
-                        fila["player"], fila["Equipo_propio"], TEMPORADA_ACTUAL
-                    )
-                )
-                if (
-                    nombre_canonico_fila == coincidencia
-                    and fila["Equipo_propio"] == equipo_norm
-                    and fila["posicion"] == pos_val
-                ):
-                    fila["puntosFantasy"] = info.get("puntos", 6767)
-                    break
-            continue
-
-        if clave_ff in usadas_ff:
-            continue
-
-        puntos = info.get("puntos", 6767)
-        amarillas_banquillo = info.get("amarillas", 0)
-        rojas_banquillo = info.get("rojas", 0)
-
-        if amarillas_banquillo == 0 and rojas_banquillo == 0:
-            continue
-
-        equipo_rival_norm = visit_norm if equipo_norm == local_norm else local_norm
-
-        nombre_norm = info["nombre_norm"]
-        clave_registro = f"{nombre_norm}|{equipo_norm}|0|{pos_val}|fantasy_only}}"
-
-        fila = {col: 0 for col in COLUMNAS_MODELO}
-
-        fila["temporada"] = TEMPORADA_ACTUAL
-        fila["jornada"] = jornada
-        fila["fecha_partido"] = fecha_partido
-        fila["player"] = nombre_a_mayus(nombre_canonico_ff)
-        fila["posicion"] = pos_val
-        fila["Equipo_propio"] = equipo_norm
-        fila["Equipo_rival"] = equipo_rival_norm
-        fila["local"] = 1 if equipo_norm == local_norm else 0
-        fila["Titular"] = 0
-        fila["Min_partido"] = 0
-        fila["puntosFantasy"] = puntos
-        fila["Amarillas"] = amarillas_banquillo
-        fila["Rojas"] = rojas_banquillo
-
-        # Columna roles también para estos casos
-        fila["roles"] = []
-
-        bd_partido[clave_registro] = fila
+    bd_partido = completar_fantasy_sin_match( 
+        bd_partido,
+        fantasy_partido,
+        usadas_ff,
+        local_norm,
+        visit_norm,
+        fecha_partido,
+        jornada,
+        TEMPORADA_ACTUAL,
+    )
 
     df_partido = pd.DataFrame.from_dict(bd_partido, orient="index")
     df_partido = postprocesar_df_partido(df_partido)
-
-    # Asegurar columna roles en el DataFrame, por si postprocesar la borra o reordena
-    if "roles" not in df_partido.columns:
-        df_partido["roles"] = df_partido.index.to_series().apply(lambda _: [])
-
-    # Rellenar roles desde el dict por temporada (y fallback a otras temporadas)
-    def _asignar_roles_fila(fila):
-        temporada_fila = fila["temporada"]
-        nombre_canonico = normalizar_texto(
-            aplicar_alias_jugador_temporada(
-                fila["player"], fila["Equipo_propio"], temporada_fila
-            )
-        )
-
-        # 1) probar en su temporada
-        roles_temp = ROLES_DESTACADOS.get(temporada_fila, {})
-        roles = roles_temp.get(nombre_canonico)
-        if roles:
-            return [r for r in roles]
-
-        # 2) fallback: buscar en cualquier otra temporada
-        for temp, mapa in ROLES_DESTACADOS.items():
-            if temp == temporada_fila:
-                continue
-            if nombre_canonico in mapa:
-                return [r for r in mapa[nombre_canonico]]
-
-        # 3) si no tiene rol en ninguna temporada
-        return []
-
-    df_partido["roles"] = df_partido.apply(_asignar_roles_fila, axis=1)
-
-    jugadores_6767 = df_partido[df_partido["puntosFantasy"] == 6767]
-    if not jugadores_6767.empty:
-        print("\nJugadores con puntosFantasy = 6767 en este partido:")
-        for _, fila in jugadores_6767.iterrows():
-            print(
-                f"- {fila['player']} ({fila['Equipo_propio']}) | "
-                f"pos: {fila['posicion']} | min: {fila['Min_partido']}"
-            )
-
+    df_partido = asignar_roles_df(df_partido, ROLES_DESTACADOS)
+    imprimir_mal_6767(df_partido, columna="puntosFantasy")
     return df_partido, equipo_local, equipo_visitante
 
+def procesar_y_guardar_partido(jornada: int, idx_partido: int, fantasy_por_partido):
+    sj = str(jornada) 
+    carpeta_html_j, carpeta_csv_j = obtener_rutas_jornada(CARPETA_HTML, CARPETA_CSV, jornada)  # Llama a obtener_rutas_jornada (commons) para obtener o crear las carpetas específicas de HTML y CSV para esta jornada concreta.
+    ruta_html = os.path.join(carpeta_html_j, f"p{idx_partido}.html")
+    html_partido = leer_html(ruta_html, logger=logger) 
+    if not html_partido: 
+        print(f"⚠️ No se pudo leer {ruta_html}")
+        return None, None, None 
 
-def procesar_jornada(jornada: int):
-    sj = str(jornada)
+    equipo_local, equipo_visitante = obtener_nombres_partido(html_partido) 
+    local_norm = normalizar_equipo_temporada(equipo_local) 
+    visit_norm = normalizar_equipo_temporada(equipo_visitante)
+    clave_partido = f"{local_norm}-{visit_norm}" 
+    fantasy_partido = fantasy_por_partido.get(clave_partido, {})
+    df_partido, eq_loc_csv, eq_vis_csv = procesar_partido(html_partido,fantasy_partido,idx_partido,jornada)
+
+    if df_partido is None or df_partido.empty: 
+        print("⚠️ DataFrame vacío para este partido")
+        return None, None, None
+
+
+    eq_loc_norm = normalizar_texto(eq_loc_csv)
+    eq_vis_norm = normalizar_texto(eq_vis_csv)
+    nombre_csv = f"p{idx_partido}_{eq_loc_norm}-{eq_vis_norm}.csv"
+
+    ruta_salida = os.path.join(carpeta_csv_j, nombre_csv) 
+
+    df_partido.to_csv( ruta_salida,index=False,encoding="utf-8-sig")
+    print(f"✅ CSV generado: J{sj} P{idx_partido} {eq_loc_norm}-{eq_vis_norm}") 
+    return df_partido, eq_loc_csv, eq_vis_csv  
+
+
+def procesar_jornada(jornada: int): 
+    sj = str(jornada) 
     print(f"\n=== JORNADA {sj} (temp {TEMPORADA_ACTUAL}) ===")
 
-    fantasy_por_partido = obtener_fantasy_jornada(sj)
+    fantasy_por_partido = obtener_fantasy_jornada(sj) 
+    jugadores_no_analizados = []  
+    for idx_partido in range(1, 10 + 1):  
+        df_partido, eq_loc_csv, eq_vis_csv = procesar_y_guardar_partido(jornada, idx_partido, fantasy_por_partido)
 
-    carpeta_html_j = os.path.join(CARPETA_HTML, f"j{jornada}")
-    carpeta_csv_j = os.path.join(CARPETA_CSV, f"jornada_{sj}")
-
-    os.makedirs(carpeta_html_j, exist_ok=True)
-    os.makedirs(carpeta_csv_j, exist_ok=True)
-
-    jugadores_no_analizados = []
-    for idx_partido in range(1, 10 + 1):
-        ruta_html = os.path.join(carpeta_html_j, f"p{idx_partido}.html")
-        if not os.path.exists(ruta_html):
-            continue
-        with open(ruta_html, "r", encoding="utf-8") as f:
-            html_partido = f.read()
-        equipo_local, equipo_visitante = obtener_nombres_partido(html_partido)
-        local_norm = normalizar_equipo_temporada(equipo_local)
-        visit_norm = normalizar_equipo_temporada(equipo_visitante)
-        clave_partido = f"{local_norm}-{visit_norm}"
-        fantasy_partido = fantasy_por_partido.get(clave_partido, {})
-        df_partido, eq_loc_csv, eq_vis_csv = procesar_partido(
-            html_partido,
-            fantasy_partido,
-            idx_partido,
-            jornada,
-        )
-        if df_partido is not None and not df_partido.empty:
-            eq_loc_norm = normalizar_texto(eq_loc_csv)
-            eq_vis_norm = normalizar_texto(eq_vis_csv)
-            nombre_csv = f"p{idx_partido}_{eq_loc_norm}-{eq_vis_norm}.csv"
-            ruta_salida = os.path.join(carpeta_csv_j, nombre_csv)
-            df_partido.to_csv(
-                ruta_salida,
-                index=False,
-                encoding="utf-8-sig",
-            )
-            print(f"✅ CSV generado: J{sj} P{idx_partido} {eq_loc_norm}-{eq_vis_norm}")
-            df_banquillo = contar_tarjetas_banquillo(df_partido)
+        if df_partido is not None and not df_partido.empty: 
+            df_banquillo = contar_tarjetas_banquillo(df_partido) 
             if not df_banquillo.empty:
                 jugadores_no_analizados.extend(df_banquillo.to_dict("records"))
-    if jugadores_no_analizados:
-        print("\nJugadores con tarjetas y 0 minutos (banquillo):")
-        for jugador in jugadores_no_analizados:
-            print(
+
+    if jugadores_no_analizados:  
+        print("\nJugadores con tarjetas y 0 minutos (banquillo):")  
+        for jugador in jugadores_no_analizados: 
+            print( 
                 f"- {jugador.get('player','')} ({jugador.get('Equipo_propio','')}) | "
                 f"Amarillas: {jugador.get('Amarillas',0)}, "
                 f"Rojas: {jugador.get('Rojas',0)} [banquillo]"
@@ -1026,79 +788,31 @@ def procesar_jornada(jornada: int):
 
 
 def procesar_rango_jornadas(jornada_inicio: int, jornada_fin: int):
-    for j in range(jornada_inicio, jornada_fin + 1):
-        procesar_jornada(j)
-
+    for j in range(jornada_inicio, jornada_fin + 1):  
+        procesar_jornada(j)  
 
 def analizar_temporada(codigo_temporada: str, j_ini: int = 1, j_fin: int = 38):
-    global TEMPORADA_ACTUAL, CARPETA_HTML, CARPETA_CSV
+    global TEMPORADA_ACTUAL, CARPETA_HTML, CARPETA_CSV 
+    TEMPORADA_ACTUAL = codigo_temporada 
+    CARPETA_HTML, CARPETA_CSV = build_rutas_temporada(codigo_temporada) 
 
-    TEMPORADA_ACTUAL = codigo_temporada
-    CARPETA_HTML, CARPETA_CSV = _build_rutas_temporada(codigo_temporada)
+    print(f"\n=== ANALIZANDO TEMPORADA {codigo_temporada} ===")  
+    procesar_rango_jornadas(j_ini, j_fin)  
 
-    print(f"\n=== ANALIZANDO TEMPORADA {codigo_temporada} ===")
-    procesar_rango_jornadas(j_ini, j_fin)
-
-
-def procesar_un_partido(jornada: int, idx_partido: int):
+def procesar_un_partido(jornada: int, idx_partido: int): 
     sj = str(jornada)
-
-    fantasy_por_partido = obtener_fantasy_jornada(sj)
-
-    carpeta_html_j = os.path.join(CARPETA_HTML, f"j{jornada}")
-    carpeta_csv_j = os.path.join(CARPETA_CSV, f"jornada_{sj}")
-
-    os.makedirs(carpeta_html_j, exist_ok=True)
-    os.makedirs(carpeta_csv_j, exist_ok=True)
-
-    ruta_html = os.path.join(carpeta_html_j, f"p{idx_partido}.html")
-    if not os.path.exists(ruta_html):
-        print(f"⚠️ No existe {ruta_html}")
-        return
-
-    with open(ruta_html, "r", encoding="utf-8") as f:
-        html_partido = f.read()
-
-    equipo_local, equipo_visitante = obtener_nombres_partido(html_partido)
-    local_norm = normalizar_equipo_temporada(equipo_local)
-    visit_norm = normalizar_equipo_temporada(equipo_visitante)
-    clave_partido = f"{local_norm}-{visit_norm}"
-
-    fantasy_partido = fantasy_por_partido.get(clave_partido, {})
-
-    df_partido, eq_loc_csv, eq_vis_csv = procesar_partido(
-        html_partido,
-        fantasy_partido,
-        idx_partido,
-        jornada,
-    )
-
-    if df_partido is None or df_partido.empty:
-        print("⚠️ DataFrame vacío para este partido")
-        return
-
-    eq_loc_norm = normalizar_texto(eq_loc_csv)
-    eq_vis_norm = normalizar_texto(eq_vis_csv)
-    nombre_csv = f"p{idx_partido}_{eq_loc_norm}-{eq_vis_norm}.csv"
-    ruta_salida = os.path.join(carpeta_csv_j, nombre_csv)
-
-    df_partido.to_csv(
-        ruta_salida,
-        index=False,
-        encoding="utf-8-sig",
-    )
-    print(f"✅ CSV generado: J{sj} P{idx_partido} {eq_loc_norm}-{eq_vis_norm}")
-
-
-import time
-
+    fantasy_por_partido = obtener_fantasy_jornada(sj) 
+    df_partido, _, _ = procesar_y_guardar_partido( jornada, idx_partido, fantasy_por_partido)
+    if df_partido is None or df_partido.empty: 
+        print("⚠️ DataFrame vacío para este partido")  
 
 if __name__ == "__main__":
-    inicio = time.perf_counter()
+    inicio = time.perf_counter()  
 
-    analizar_temporada("23_24", 1, 38)
-    analizar_temporada("24_25", 1, 38)
-    analizar_temporada("25_26", 1, 38)
-    fin = time.perf_counter()
-    duracion = fin - inicio
-    print(f"\nTiempo total de ejecución: {duracion:.2f} segundos")
+    analizar_temporada("23_24", 1, 38)  
+    analizar_temporada("24_25", 1, 38) 
+    analizar_temporada("25_26", 1, 18) 
+    
+    fin = time.perf_counter() 
+    duracion = fin - inicio  
+    print(f"\nTiempo total de ejecución: {duracion:.2f} segundos") 

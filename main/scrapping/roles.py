@@ -147,7 +147,6 @@ def generar_roles_para_temporada(codigo_temporada: str) -> dict:
     return _parsear_div_leaders(html, codigo_temporada)
 
 
-# ===== Construir ROLES_DESTACADOS en el propio módulo =====
 
 ROLES_DESTACADOS = {
     "23_24": generar_roles_para_temporada("23_24"),
@@ -157,7 +156,6 @@ ROLES_DESTACADOS = {
 
 
 if __name__ == "__main__":
-    # Debug: imprimir la temporada 25_26 en formato pegable
     temporada = "25_26"
     roles_por_jugador = ROLES_DESTACADOS[temporada]
 

@@ -1,54 +1,22 @@
-# comparar_puntos.py / comprobar_puntos.py
 import os
 import re
 import pandas as pd
 from rapidfuzz import fuzz
 
-from commons import (
-    normalizar_equipo,
-    normalizar_puntos,
-    obtener_match_nombre,
-    añadir_equipo_y_player_norm,
-    limpiar_minuto,
-    normalizar_texto,
-)
-from alias import get_alias_jugadores_reverse  # usamos alias invertidos
+from commons import *
+from alias import *
 
 
-# =====================================================
-# CONFIG DEBUG / LOG
-# =====================================================
-
-DEBUG_DETALLE = True  # ponlo a True solo cuando quieras ver trazas detalladas
-
-
-# =====================================================
-# RUTAS POR TEMPORADA
-# =====================================================
+DEBUG_DETALLE = False
 
 
 def _build_rutas_temporada(codigo_temporada: str):
-    """
-    codigo_temporada: '24_25', '25_26', etc.
-
-    HTML puntos: main/html/temporada_<codigo>/jX/puntos.html
-    CSV       : data/temporada_<codigo>/jornada_X/*.csv
-    """
     carpeta_html = os.path.join("main", "html", f"temporada_{codigo_temporada}")
     carpeta_csv = os.path.join("data", f"temporada_{codigo_temporada}")
     return carpeta_html, carpeta_csv
 
 
-# =====================================================
-# WRAPPER PARA LEER puntos.html USANDO fbref.py
-# =====================================================
-
-
 def scrapear_puntos_fantasy(path_html: str, codigo_temporada: str):
-    """
-    Devuelve:
-    { 'betis-leganes': [(equipo_raw, nombre_html, puntos, pos_fantasy), ...], ... }
-    """
     m = re.search(r"[\\/](j(\d+))[\\/]puntos\.html$", path_html)
     if not m:
         return {}
@@ -76,21 +44,7 @@ def scrapear_puntos_fantasy(path_html: str, codigo_temporada: str):
     return resultado
 
 
-# =====================================================
-# REGISTRO DE ERRORES
-# =====================================================
-
-
-def registrar_error(
-    errores,
-    partido,
-    equipo,
-    nombre_html,
-    puntos_html,
-    nombre_csv,
-    puntos_csv,
-    score,
-):
+def registrar_error(errores, partido, equipo, nombre_html, puntos_html, nombre_csv, puntos_csv, score):
     errores.append(
         {
             "partido": partido,
@@ -120,23 +74,8 @@ def mostrar_errores(errores):
         )
 
 
-# =====================================================
-# LOG LIGERO (DESACTIVADO)
-# =====================================================
-
-
 def _log_claves_partido(clave_partido, puntos_html_por_partido, df_partido):
-    # claves_html = list(puntos_html_por_partido.keys())
-    # equipos_csv = sorted(df_partido["equipo_norm"].unique())
-    # print(f"[PARTIDO] {clave_partido}")
-    # print(f"  HTML keys        : {claves_html}")
-    # print(f"  CSV equipos_norm : {equipos_csv}")
     pass
-
-
-# =====================================================
-# LOG ESPECIAL PARA HERRERA / ARNAU / YILDIRIM
-# =====================================================
 
 
 OBJ_ESPECIALES = {"herrera", "arnau", "yildirim"}
@@ -148,19 +87,7 @@ def _es_especial(nombre_html: str, nombre_match: str) -> bool:
     return n1 in OBJ_ESPECIALES or n2 in OBJ_ESPECIALES
 
 
-def log_debug_match_especial(
-    clave_partido,
-    equipo_html_norm,
-    nombre_html,
-    nombre_html_norm_original,
-    nombre_html_norm_aliased,
-    nombre_match_norm,
-    nombre_csv,
-    puntos_html,
-    puntos_csv,
-    score_match,
-    fila_match=None,
-):
+def log_debug_match_especial(clave_partido, equipo_html_norm, nombre_html, nombre_html_norm_original, nombre_html_norm_aliased, nombre_match_norm, nombre_csv, puntos_html, puntos_csv, score_match, fila_match=None):
     if not DEBUG_DETALLE:
         return
 
@@ -185,19 +112,7 @@ def log_debug_match_especial(
             print(f"    {k}: {v}")
 
 
-# =====================================================
-# LOG PARA AMBIGÜEDAD
-# =====================================================
-
-
-def log_match_ambiguo(
-    clave_partido,
-    equipo_html_norm,
-    nombre_html,
-    nombre_match_norm,
-    score_match,
-    coincidentes_df,
-):
+def log_match_ambiguo(clave_partido, equipo_html_norm, nombre_html, nombre_match_norm, score_match, coincidentes_df):
     if not DEBUG_DETALLE:
         return
 
@@ -208,39 +123,11 @@ def log_match_ambiguo(
     print(f"  MATCH_NORM       : {nombre_match_norm}")
     print(f"  SCORE            : {score_match}")
     print("  CANDIDATOS CSV:")
-    # for _, fila in coincidentes_df.iterrows():
-    #     print(
-    #         f"    - player={fila['player']} | player_norm={fila['player_norm']} | "
-    #         f"pos={fila.get('posicion', '')} | puntosFantasy={fila.get('puntosFantasy', '')}"
-    #     )
 
 
-# =====================================================
-# FUNCIONES AUXILIARES DE MATCH
-# =====================================================
-
-
-def _resolver_coincidente(
-    df_candidatos_equipo: pd.DataFrame,
-    nombre_html_norm: str,
-    apellido_html: str,
-    pos_fantasy: str,
-    puntos_html_normalizado: int,
-    nombre_match_norm: str,
-    clave_partido: str,
-    equipo_html_norm: str,
-    nombre_html: str,
-    score_match: float,
-):
-    """
-    Devuelve (fila_match, coincidentes_orden) filtrando por:
-    equipo -> (match_norm duro solo si el HTML tiene varias palabras) ->
-    posición opcional -> apellido -> diferencia de puntos.
-    Siempre devuelve una fila del CSV (no crea filas nuevas).
-    """
+def _resolver_coincidente(df_candidatos_equipo: pd.DataFrame, nombre_html_norm: str, apellido_html: str, pos_fantasy: str, puntos_html_normalizado: int, nombre_match_norm: str, clave_partido: str, equipo_html_norm: str, nombre_html: str, score_match: float):
     coincidentes = df_candidatos_equipo.copy()
 
-    # 1) Usar match_norm "duro" solo si el nombre HTML tiene al menos 2 palabras.
     usar_match_duro = bool(nombre_match_norm and " " in (nombre_html_norm or ""))
 
     if usar_match_duro and nombre_match_norm:
@@ -248,7 +135,6 @@ def _resolver_coincidente(
         if not coinc_nm.empty:
             coincidentes = coinc_nm
 
-    # 2) Si seguimos teniendo más de uno, usar posición solo cuando el score no es muy alto
     if (
         len(coincidentes) > 1
         and "posicion" in coincidentes.columns
@@ -259,7 +145,6 @@ def _resolver_coincidente(
         if not coinc_pos.empty:
             coincidentes = coinc_pos
 
-    # 3) si aún hay varios y el HTML tiene apellido, filtrar por apellido
     if len(coincidentes) > 1 and apellido_html and " " in (nombre_html_norm or ""):
         coinc_ap = coincidentes[
             coincidentes["player_norm"].str.split().str[-1] == apellido_html
@@ -267,21 +152,17 @@ def _resolver_coincidente(
         if not coinc_ap.empty:
             coincidentes = coinc_ap
 
-    # 4) si solo queda uno, perfecto
     if len(coincidentes) == 1:
         coincidentes_orden = coincidentes.copy()
         fila_match = coincidentes_orden.iloc[0]
         return fila_match, coincidentes_orden
 
-    # 5) si hay varios aún, usar diferencia de puntos como desempate final
     coincidentes = coincidentes.copy()
     coincidentes["__diff_puntos__"] = (
         coincidentes["puntosFantasy"].apply(normalizar_puntos)
         - puntos_html_normalizado
     ).abs()
 
-    # Si el nombre HTML tiene apellido y el score es alto,
-    # solo desempatar entre el mismo player_norm que dio el fuzzy.
     tiene_apellido = " " in (nombre_html_norm or "")
     if tiene_apellido and score_match >= 80 and nombre_match_norm:
         mismos_nombre = coincidentes[
@@ -304,11 +185,6 @@ def _resolver_coincidente(
 
     fila_match = coincidentes_orden.iloc[0]
     return fila_match, coincidentes_orden
-
-
-# =====================================================
-# LÓGICA DE COMPROBACIÓN (RANGO / JORNADA)
-# =====================================================
 
 
 def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cutoff=70):
@@ -373,7 +249,6 @@ def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cut
             )
 
             if not nombre_match_norm or score_match < score_cutoff:
-                # solo log de fallo global, sin detalle por jugador
                 registrar_error(
                     errores,
                     clave_partido,
@@ -405,7 +280,6 @@ def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cut
             nombre_csv = fila_match["player"]
             puntos_csv = normalizar_puntos(fila_match["puntosFantasy"])
 
-            # Salvaguarda contra emparejamientos sin sentido (Allende, etc.)
             diff_puntos = abs(puntos_csv - puntos_html_normalizado)
             if diff_puntos >= 5 and score_match < 80:
                 registrar_error(
@@ -447,16 +321,10 @@ def comprobar_jornada_paths(path_html, csv_dir, codigo_temporada: str, score_cut
                 )
                 partido_ok = False
 
-        # LOG PRINCIPAL POR PARTIDO:
         print(f"{clave_partido} {'✔' if partido_ok else '✖'}")
 
     mostrar_errores(errores)
     return errores
-
-
-# =====================================================
-# API PÚBLICA
-# =====================================================
 
 
 def comprobar_jornada(codigo_temporada: str, num_jornada: int, score_cutoff=70):
@@ -474,16 +342,10 @@ def comprobar_jornada(codigo_temporada: str, num_jornada: int, score_cutoff=70):
     )
 
 
-def comprobar_rango_jornadas(
-    codigo_temporada: str,
-    jornada_inicio: int,
-    jornada_fin: int,
-    score_cutoff=70,
-):
+def comprobar_rango_jornadas(codigo_temporada: str, jornada_inicio: int, jornada_fin: int, score_cutoff=70):
     carpeta_html, carpeta_csv = _build_rutas_temporada(codigo_temporada)
     errores_globales = []
 
-    # ========= WARNING ESPECÍFICO POR TEMPORADA =========
     def mostrar_warnings_temporada(cod_temp: str, j_ini: int, j_fin: int):
         msg = []
 
@@ -505,7 +367,6 @@ def comprobar_rango_jornadas(
             print("\nWARNINGS (incidencias ajenas al scraping):")
             for linea in msg:
                 print(f"  - {linea}")
-    # ====================================================
 
     for j in range(jornada_inicio, jornada_fin + 1):
         print("\n" + "=" * 80)
@@ -549,8 +410,6 @@ def comprobar_rango_jornadas(
                 f"{err.get('puntos_csv', '')} | {err.get('score', 0)}"
             )
 
-    # warnings “fuera de tu control” también en el resumen global,
-    # justo encima de la Nota:
     mostrar_warnings_temporada(codigo_temporada, jornada_inicio, jornada_fin)
 
     if errores_globales:
@@ -561,17 +420,7 @@ def comprobar_rango_jornadas(
         )
 
 
-# =====================================================
-# COMPARAR UN PARTIDO
-# =====================================================
-
-
-def comparar_partido(
-    codigo_temporada: str,
-    num_jornada: int,
-    num_partido: int,
-    score_cutoff=70,
-):
+def comparar_partido(codigo_temporada: str, num_jornada: int, num_partido: int, score_cutoff=70):
     carpeta_html, carpeta_csv = _build_rutas_temporada(codigo_temporada)
 
     alias_temp = get_alias_jugadores_reverse(codigo_temporada)
@@ -689,7 +538,4 @@ def comparar_partido(
 
 
 if __name__ == "__main__":
-    # ejemplo: rango completo
     comprobar_rango_jornadas("23_24", 1, 2)
-    # o solo un partido:
-    # comparar_partido("24_25", 15, 2)

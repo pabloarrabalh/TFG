@@ -1,91 +1,78 @@
-"""
-commons.py
-
-Módulo de utilidades genéricas:
-- Normalización de textos, equipos y jugadores.
-- Conversión numérica segura (int/float) desde strings HTML/CSV.
-- Mapping de posiciones.
-- Lógica de fuzzy matching de nombres (RapidFuzz).
-- Helpers de alias por temporada.
-- Lógica genérica de colapso de registros de Fantasy y postprocesado de DataFrames.
-"""
-
-
+import os
 import re
 import unicodedata
 from collections import defaultdict
 
 from numpy import nan
-import numpy as np
 import pandas as pd
 from bs4 import NavigableString
 from rapidfuzz import process, fuzz
 
-from alias import (
-    ALIAS_EQUIPOS,
-    APELLIDOS_CRITICOS,
-    POSICION_MAP,
-    MAPEO_STATS,
-    COLUMNAS_MODELO,
-    UMBRAL_MATCH,
-    get_alias_jugadores,
-)
+from alias import *
 
 
 # ==========================
-# Normalización básica
+# Lectura y rutas
 # ==========================
+
+
+def leer_html(ruta: str, logger=None) -> str:
+    if not ruta:
+        return ""
+
+    if not os.path.exists(ruta):
+        if logger is not None:
+            logger.warning("No existe el HTML: %s", ruta)
+        return ""
+
+    try:
+        with open(ruta, "r", encoding="utf-8") as f:
+            contenido = f.read()
+    except Exception as e:
+        if logger is not None:
+            logger.warning("Error leyendo HTML %s: %s", ruta, e)
+        return ""
+    return contenido
+
+
+def build_rutas_temporada(temporada: str):
+    carpeta_html = os.path.join("main", "html", f"temporada_{temporada}")
+    carpeta_csv = os.path.join("data", f"temporada_{temporada}")
+    os.makedirs(carpeta_html, exist_ok=True)
+    os.makedirs(carpeta_csv, exist_ok=True)
+    return carpeta_html, carpeta_csv
+
+
+def obtener_rutas_jornada(carpeta_html_base: str, carpeta_csv_base: str, jornada: int):
+    sj = str(jornada)
+    carpeta_html_j = os.path.join(carpeta_html_base, f"j{jornada}")
+    carpeta_csv_j = os.path.join(carpeta_csv_base, f"jornada_{sj}")
+    os.makedirs(carpeta_html_j, exist_ok=True)
+    os.makedirs(carpeta_csv_j, exist_ok=True)
+    return carpeta_html_j, carpeta_csv_j
 
 
 def normalizar_texto(texto):
-    """
-    Normaliza un texto para comparación:
-    - Convierte a str.
-    - Pasa a minúsculas.
-    - Elimina tildes/acentos (NFD).
-    - Sustituye '-' y '.' por espacios.
-    - Colapsa espacios múltiples en uno solo.
-    """
     texto = str(texto).lower().strip()
-    texto = "".join(
-        c for c in unicodedata.normalize("NFD", texto)
-        if unicodedata.category(c) != "Mn"
-    )
+    texto = unicodedata.normalize("NFD", texto)  # Tildes raras
+    texto = "".join(c for c in texto if unicodedata.category(c) != "Mn")
+
     texto = re.sub(r"[-.]", " ", texto)
-    return re.sub(r"\s+", " ", texto).strip()
+    texto = re.sub(r"\s+", " ", texto)
+    return texto.strip()
 
 
 def normalizar_equipo(nombre_equipo: str) -> str:
-    """
-    Normaliza un nombre de equipo y aplica ALIAS_EQUIPOS.
-    Devuelve un identificador canónico de equipo (ej: "atletico madrid").
-    """
     nombre_norm = normalizar_texto(nombre_equipo)
     return ALIAS_EQUIPOS.get(nombre_norm, nombre_norm)
 
 
-def aplicar_alias(nombre, equipo=None):
-    """
-    Punto de extensión para alias genéricos (no por temporada).
-    Actualmente no hace nada, pero se mantiene por compatibilidad.
-    """
-    return nombre
-
-
-def aplicar_alias_contextual(nombre, equipo_norm):
-    """
-    Wrapper por compatibilidad: aplica alias teniendo en cuenta el equipo.
-    Ahora mismo llama directamente a aplicar_alias, pero se puede extender.
-    """
-    return aplicar_alias(nombre, equipo_norm)
+def normalizar_equipo_temporada(nombre: str) -> str:
+    nombre_norm = normalizar_texto(nombre)
+    return ALIAS_EQUIPOS.get(nombre_norm, nombre_norm)
 
 
 def normalizar_puntos(valor):
-    """
-    Normaliza un valor de puntos de Fantasy:
-    - Si viene como '-', '–', '', None -> 0.
-    - Si no, intenta convertir a int (aceptando floats como '3.0').
-    """
     if valor in ["-", "–", "", None]:
         return 0
     try:
@@ -95,10 +82,6 @@ def normalizar_puntos(valor):
 
 
 def limpiar_minuto(nombre):
-    """
-    Elimina sufijos de minuto en nombres de jugador tipo "Fulano 90+2'".
-    También quita '+' o '-' sueltos al final.
-    """
     if not nombre:
         return nombre
     nombre = nombre.replace("+", "").replace("-", "").strip()
@@ -107,31 +90,16 @@ def limpiar_minuto(nombre):
 
 
 def extraer_nombre_jugador(td_nombre):
-    """
-    Extrae el texto de un TD de nombre de jugador en HTML,
-    ignorando etiquetas internas y quedándose solo con el texto directo.
-    """
     textos = []
-    for hijo in td_nombre.children:
-        if isinstance(hijo, NavigableString):
-            txt = hijo.strip()
+    for h in td_nombre.children:
+        if isinstance(h, NavigableString):
+            txt = h.strip()
             if txt:
                 textos.append(txt)
     return " ".join(textos)
 
 
-# ==========================
-# Conversión numérica genérica
-# ==========================
-
-
 def _convertir_a_numero(valor):
-    """
-    Intenta convertir un valor que viene de HTML/CSV a float, de forma robusta.
-    - Si es una Serie de pandas, toma el primer valor.
-    - Quita porcentajes y saltos de línea.
-    - Devuelve nan si no puede convertir.
-    """
     if isinstance(valor, pd.Series):
         valor = valor.iloc[0]
     if valor in (None, "", "-"):
@@ -145,17 +113,10 @@ def _convertir_a_numero(valor):
 
 
 def to_float(valor):
-    """
-    Envuelve _convertir_a_numero para dejar claro el tipo de salida.
-    """
     return _convertir_a_numero(valor)
 
 
 def to_int(valor):
-    """
-    Convierte a entero, redondeando si es float.
-    Devuelve nan si no se puede convertir.
-    """
     v = _convertir_a_numero(valor)
     if pd.isna(v):
         return nan
@@ -163,10 +124,6 @@ def to_int(valor):
 
 
 def limpiar_numero(valor):
-    """
-    Conversión a float, con fallback 0.0 en caso de error.
-    Útil para columnas donde no quieres nan, sino cero.
-    """
     if isinstance(valor, pd.Series):
         valor = valor.iloc[0]
     if valor is None:
@@ -181,9 +138,6 @@ def limpiar_numero(valor):
 
 
 def formatear_numero(valor):
-    """
-    Devuelve el número formateado como string, sin decimales si es entero.
-    """
     try:
         f = float(valor)
         if f.is_integer():
@@ -191,112 +145,33 @@ def formatear_numero(valor):
         return str(f)
     except Exception:
         return str(valor)
-
-
-def limpiar_numero_generico(valor):
-    """
-    Alias de limpiar_numero; se deja para compatibilidad con código antiguo.
-    """
-    if isinstance(valor, pd.Series):
-        valor = valor.iloc[0]
-    if valor is None:
-        return 0.0
-    s = str(valor).split("\n")[0].replace("%", "").strip()
-    if s in ["", "-", "nan", "NaN", "None"]:
-        return 0.0
-    num = pd.to_numeric(s, errors="coerce")
-    if pd.isna(num):
-        return 0.0
-    return float(num)
-
-
-def fmt_generico(valor):
-    """
-    Alias de formatear_numero; se mantiene por compatibilidad.
-    """
-    try:
-        f = float(valor)
-        if f.is_integer():
-            return str(int(f))
-        return str(f)
-    except Exception:
-        return str(valor)
-
-
-# ==========================
-# Posiciones y mapping
-# ==========================
 
 
 def mapear_posicion(pos):
-    """
-    Mapear una abreviatura de posición (FBRef u otros) a la posición interna
-    usando POSICION_MAP. Por defecto 'MC'.
-    """
     pos = (pos or "MC").upper()
     return POSICION_MAP.get(pos, "MC")
 
 
 def añadir_equipo_y_player_norm(df, col_equipo="Equipo_propio", col_player="player"):
-    """
-    Añade columnas:
-      - 'equipo_norm': normalizada usando normalizar_equipo.
-      - 'player_norm': nombre del jugador normalizado con alias (si hubiera).
-    """
     df["equipo_norm"] = df[col_equipo].apply(normalizar_equipo)
-    df["player_norm"] = df.apply(
-        lambda row: normalizar_texto(
-            aplicar_alias(row[col_player], row["equipo_norm"])
-        ),
-        axis=1,
-    )
+    df["player_norm"] = df[col_player].apply(normalizar_texto)
     return df
 
 
-def _posicion_csv_es_medio(fila_csv):
-    pos = str(fila_csv.get("posicion", "")).upper()
-    return any(p in pos for p in ["MC", "MD", "MI", "MCD", "MCO", "MF", "DM", "CM"])
-
-
-def _posicion_csv_es_defensa(fila_csv):
-    pos = str(fila_csv.get("posicion", "")).upper()
-    return any(p in pos for p in ["DF", "DC", "LD", "LI", "CB", "LB", "RB"])
-
-
-def _posicion_html(row_html):
-    for key in ["summary:Pos", "summary:position", "Pos", "position"]:
-        if key in row_html:
-            return str(row_html[key]).upper()
-    return ""
-
-
 def normalizar_pos_clave(pos_val: str) -> str:
-    """
-    Normaliza posición a una clave agregada usada para distinguir jugadores
-    con mismo apellido:
-      - PT -> PT
-      - MC/DT -> MDT (ataque/medio)
-      - MC/DF -> MDF (medio/defensa)
-    """
+    # Para matching dentro del mismo equipo
     if pos_val == "PT":
         return "PT"
-    if pos_val in ("MC", "DT"):
+    if pos_val == "DT":
         return "MDT"
-    if pos_val in ("MC", "DF"):
+    if pos_val == "DF":
         return "MDF"
+    if pos_val == "MC":
+        return "MC"
     return pos_val
 
 
-# ==========================
-# Matching de nombres
-# ==========================
-
-
 def es_apellido_conflictivo(nombre_normalizado_html, nombres_normalizados_equipo):
-    """
-    Determina si un nombre compuesto por una sola palabra es un apellido
-    conflictivo (varios jugadores con ese apellido en el mismo equipo).
-    """
     partes = nombre_normalizado_html.split()
     if len(partes) != 1:
         return False
@@ -314,15 +189,19 @@ def es_apellido_conflictivo(nombre_normalizado_html, nombres_normalizados_equipo
 
 def obtener_match_nombre(nombre_html_norm, nombres_norm_equipo, equipo_norm=None, score_cutoff=85):
     """
-    Resuelve el mejor match fuzzy entre un nombre de HTML (FBRef) y una lista
-    de nombres normalizados de Fantasy/CSV.
+    - Si hay nombre + apellido y el apellido es crítico, intenta match exacto
+      por nombre dentro del equipo.
+    - Si hay solo una palabra y no es apellido crítico, intenta heurísticas de
+      prefix/suffix con un único candidato.
+    - Si no se resuelve, usa process.extractOne con WRatio.
+    - Devuelve (nombre_match, score) o (None, 0) si no se supera el score_cutoff.
     """
     if not nombres_norm_equipo:
         return None, 0
 
     partes = nombre_html_norm.split()
 
-    # Caso 1: dos palabras y apellido crítico -> intentar solo por nombre
+    # Caso nombre + apellido y apellido crítico
     if len(partes) == 2:
         nombre = partes[0]
         apellido = partes[1]
@@ -337,7 +216,7 @@ def obtener_match_nombre(nombre_html_norm, nombres_norm_equipo, equipo_norm=None
                 unico = candidatos_nombre[0]
                 return unico, 100
 
-    # Caso 2: una palabra no crítica -> apodo
+    # Caso solo una palabra
     if len(partes) == 1:
         palabra = partes[0]
 
@@ -353,7 +232,6 @@ def obtener_match_nombre(nombre_html_norm, nombres_norm_equipo, equipo_norm=None
             if len(candidatos) == 1:
                 return candidatos[0], 95
 
-    # Caso 3: fuzzy normal
     mejor, score, _ = process.extractOne(
         nombre_html_norm,
         nombres_norm_equipo,
@@ -367,20 +245,12 @@ def obtener_match_nombre(nombre_html_norm, nombres_norm_equipo, equipo_norm=None
 
 
 def nombre_a_mayus(nombre_norm):
-    """
-    Pasa un nombre normalizado (minúsculas) a formato "Nombre Apellido".
-    """
     partes = str(nombre_norm).split()
     partes_capitalizadas = [p.capitalize() for p in partes]
     return " ".join(partes_capitalizadas)
 
 
 def coincide_inicial_apellido(nombre1, nombre2):
-    """
-    Comprueba si dos nombres coinciden en:
-      - apellido exacto
-      - y la inicial del nombre de pila (permitiendo abreviaturas tipo 'J.')
-    """
     partes1 = nombre1.split()
     partes2 = nombre2.split()
 
@@ -418,15 +288,10 @@ def coincide_inicial_apellido(nombre1, nombre2):
 
 
 def normalizar_clave_html(nombre_raw, equipo_norm, jugadores_html):
-    """
-    Normaliza la clave de un jugador que viene del HTML (nombre + equipo),
-    aplicando alias y comparando con el conjunto de claves ya conocidas.
-    """
     equipo_norm_n = normalizar_equipo(equipo_norm) if equipo_norm else None
 
-    nombre_alias = normalizar_texto(
-        aplicar_alias_contextual(nombre_raw, equipo_norm_n)
-    )
+    # Ya no hay aplicar_alias genérico; usamos directamente el nombre normalizado
+    nombre_alias = normalizar_texto(nombre_raw)
     nombre_sin_alias = normalizar_texto(nombre_raw)
 
     if nombre_alias in jugadores_html:
@@ -436,24 +301,7 @@ def normalizar_clave_html(nombre_raw, equipo_norm, jugadores_html):
     return nombre_alias
 
 
-# ==========================
-# Helpers dependientes de temporada
-# ==========================
-
-
-def normalizar_equipo_temporada(nombre: str) -> str:
-    """
-    Normaliza un nombre de equipo para una temporada concreta,
-    usando ALIAS_EQUIPOS (actualmente compartido para todas).
-    """
-    nombre_norm = normalizar_texto(nombre)
-    return ALIAS_EQUIPOS.get(nombre_norm, nombre_norm)
-
-
 def aplicar_alias_jugador_temporada(nombre: str, equipo_norm: str, temporada: str) -> str:
-    """
-    Aplica alias de jugadores específicos de una temporada y un equipo.
-    """
     alias_jug = get_alias_jugadores(temporada)
 
     equipo_norm = normalizar_texto(equipo_norm or "")
@@ -467,22 +315,57 @@ def aplicar_alias_jugador_temporada(nombre: str, equipo_norm: str, temporada: st
     return nombre
 
 
-# ==========================
-# Lógica genérica Fantasy y DF
-# ==========================
+def construir_clave_norm(mejor_norm, equipo_norm, pos_val, jugadores_por_apellido_equipo):
+    """
+    - Si no hay mejor_norm, devuelve None.
+    - Obtiene el apellido de mejor_norm y mira en jugadores_por_apellido_equipo
+      cuántos jugadores Fantasy hay para (apellido, equipo).
+    - Si no hay ningún jugador para ese (apellido, equipo), clave_norm = (mejor_norm, equipo_norm).
+    - Si el apellido NO es crítico o no está duplicado, clave_norm = (mejor_norm, equipo_norm).
+    - Si el apellido es crítico y está duplicado, incluye también la posición
+      normalizada: clave_norm = (mejor_norm, equipo_norm, pos_clave).
+    """
+    if not mejor_norm:
+        return None
+
+    apellido = mejor_norm.split()[-1]
+    clave_ap = (apellido, equipo_norm)
+    lista_fantasy_mismo_ap = jugadores_por_apellido_equipo.get(clave_ap, [])
+    hay_duplicados = (
+        apellido in APELLIDOS_CRITICOS and len(lista_fantasy_mismo_ap) > 1
+    )
+
+    if not lista_fantasy_mismo_ap:
+        return (mejor_norm, equipo_norm)
+    if not hay_duplicados:
+        return (mejor_norm, equipo_norm)
+    pos_clave = normalizar_pos_clave(pos_val)
+    return (mejor_norm, equipo_norm, pos_clave)
 
 
 def construir_fantasy_por_norm(fantasy_partido: dict):
     """
-    A partir de un diccionario de Fantasy de partido:
-        { clave_ff: info }
+    A partir de fantasy_partido (dict de jugadores Fantasy de un partido)
+    construye dos estructuras:
 
-    construye:
-        - jugadores_por_apellido_equipo:
-            { (apellido, equipo_norm): [(clave_ff, info), ...] }
+    - jugadores_por_apellido_equipo:
+        dict[(apellido, equipo_norm)] -> lista de (clave_ff, info)
+        útil para saber cuántos jugadores comparten apellido por equipo.
 
-        - fantasy_por_norm:
-            clave_norm -> lista de entradas Fantasy
+    - fantasy_por_norm:
+        dict[clave_norm] -> lista de entradas con:
+            {
+                "clave_ff": clave_ff,
+                "puntos": info["puntos"],
+                "info": info,
+            }
+
+        donde clave_norm es:
+          (nombre_norm, equipo_norm)            si no hay conflicto,
+          (nombre_norm, equipo_norm, pos_clave) si el apellido es crítico y hay duplicados.
+
+    Además, si hay duplicados exactos en fantasy_partido (mismo nombre_norm/equipo),
+    colapsa el mejor usando minutos jugados o, en su defecto, puntos.
     """
     agrupado = defaultdict(list)
     for clave_ff, info in fantasy_partido.items():
@@ -507,6 +390,7 @@ def construir_fantasy_por_norm(fantasy_partido: dict):
             }
         )
 
+    # Colapsar duplicados por (nombre_norm, equipo_norm)
     colapsado = {}
     for clave_basica, entradas in agrupado.items():
         con_minutos = [e for e in entradas if (e["min"] or 0) > 0]
@@ -519,14 +403,17 @@ def construir_fantasy_por_norm(fantasy_partido: dict):
     jugadores_por_apellido_equipo = defaultdict(list)
     fantasy_por_norm = {}
 
+    # Construir jugadores_por_apellido_equipo
     for (nombre_norm, equipo_norm), entrada in colapsado.items():
         clave_ff = entrada["clave_ff"]
         info = entrada["info"]
-        pos_val = info.get("posicion", "MC")
 
         apellido = nombre_norm.split()[-1]
-        jugadores_por_apellido_equipo[(apellido, equipo_norm)].append((clave_ff, info))
+        jugadores_por_apellido_equipo[(apellido, equipo_norm)].append(
+            (clave_ff, info)
+        )
 
+    # Construir fantasy_por_norm a partir de jugadores_por_apellido_equipo
     for (apellido, equipo_norm), lista_jugadores in jugadores_por_apellido_equipo.items():
         for clave_ff, info in lista_jugadores:
             nombre_norm = info["nombre_norm"]
@@ -556,10 +443,12 @@ def construir_fantasy_por_norm(fantasy_partido: dict):
 
 def postprocesar_df_partido(df):
     """
-    Postprocesa el DataFrame de un partido antes de guardarlo:
-      - Normaliza equipos propios/rivales.
-      - Pone a 0 stats de portero para no-porteros.
-      - Asegura columnas de tarjetas y rellena NaN con 0.
+    Postprocesa el DataFrame de un partido:
+
+    - Normaliza nombres de equipos.
+    - Pone a 0 las stats de portero en jugadores que no son PT.
+    - Asegura columnas Amarillas/Rojas (int).
+    - Rellena NaNs con 0.
     """
     if df.empty:
         return df
@@ -570,7 +459,6 @@ def postprocesar_df_partido(df):
     if "Equipo_rival" in df.columns:
         df["Equipo_rival"] = df["Equipo_rival"].apply(normalizar_equipo_temporada)
 
-    # Porteros vs no porteros
     if "posicion" in df.columns:
         mask_no_portero = df["posicion"] != "PT"
         if "Goles_en_contra" in df.columns:
@@ -578,7 +466,6 @@ def postprocesar_df_partido(df):
         if "Porcentaje_paradas" in df.columns:
             df.loc[mask_no_portero, "Porcentaje_paradas"] = 0.0
 
-    # Tarjetas
     if "Amarillas" not in df.columns:
         df["Amarillas"] = 0
     if "Rojas" not in df.columns:
@@ -587,18 +474,12 @@ def postprocesar_df_partido(df):
     df["Amarillas"] = df["Amarillas"].fillna(0).astype(int)
     df["Rojas"] = df["Rojas"].fillna(0).astype(int)
 
-    # Rellenar NaN genérico
     df = df.fillna(0)
 
     return df
 
 
 def contar_tarjetas_banquillo(df):
-    """
-    Devuelve un DataFrame con los jugadores que:
-      - Tienen al menos una amarilla o roja.
-      - Tienen 0 minutos jugados.
-    """
     if df is None or df.empty:
         return pd.DataFrame()
     mask = (
@@ -608,3 +489,166 @@ def contar_tarjetas_banquillo(df):
     df_banquillo = df[mask].copy()
     df_banquillo["banquillo"] = True
     return df_banquillo
+
+
+def completar_fantasy_sin_match(bd_partido, fantasy_partido, usadas_ff, local_norm, visit_norm, fecha_partido, jornada, temporada):
+    """
+    Completa bd_partido con jugadores que solo aparecen en Fantasy:
+
+    - Usa alias/normalización para detectar equivalencias por inicial + apellido
+      con filas ya existentes.
+    - Si encuentra equivalencia, rellena puntosFantasy en la fila ya creada.
+    - Si no hay equivalencia y el jugador tiene tarjetas con 0 minutos, crea una
+      fila nueva 'fantasy_only' para reflejar esas tarjetas.
+    """
+    claves_canonicas_presentes = set()
+    nombres_canonicos_presentes = {}
+
+    # 1) Construir el set de claves canónicas presentes en bd_partido
+    for _, fila in bd_partido.items():
+        nombre_fb = fila["player"]
+        equipo_fb_norm = fila["Equipo_propio"]
+        pos_fb = fila["posicion"]
+
+        nombre_canonico_fb = normalizar_texto(
+            aplicar_alias_jugador_temporada(
+                nombre_fb, equipo_fb_norm, temporada
+            )
+        )
+
+        claves_canonicas_presentes.add((nombre_canonico_fb, equipo_fb_norm, pos_fb))
+
+        clave_ep = (equipo_fb_norm, pos_fb)
+        if clave_ep not in nombres_canonicos_presentes:
+            nombres_canonicos_presentes[clave_ep] = set()
+        nombres_canonicos_presentes[clave_ep].add(nombre_canonico_fb)
+
+    # 2) Recorrer jugadores Fantasy y ver qué hacer con los que no están en bd_partido
+    for clave_ff, info in fantasy_partido.items():
+        nombre_original = info["nombre_original"]
+        equipo_norm = info["equipo_norm"]
+        pos_val = info.get("posicion", "MC")
+
+        nombre_canonico_ff = normalizar_texto(
+            aplicar_alias_jugador_temporada(
+                nombre_original, equipo_norm, temporada
+            )
+        )
+
+        if (nombre_canonico_ff, equipo_norm, pos_val) in claves_canonicas_presentes:
+            continue
+
+        clave_ep = (equipo_norm, pos_val)
+        nombres_presentes = nombres_canonicos_presentes.get(clave_ep, set())
+
+        # 2a) Intentar emparejar por inicial + apellido
+        coincidencia = None
+        for n in nombres_presentes:
+            if coincide_inicial_apellido(nombre_canonico_ff, n):
+                coincidencia = n
+                break
+
+        if coincidencia:
+            for fila in bd_partido.values():
+                nombre_canonico_fila = normalizar_texto(
+                    aplicar_alias_jugador_temporada(
+                        fila["player"], fila["Equipo_propio"], temporada
+                    )
+                )
+                if (
+                    nombre_canonico_fila == coincidencia
+                    and fila["Equipo_propio"] == equipo_norm
+                    and fila["posicion"] == pos_val
+                ):
+                    fila["puntosFantasy"] = info.get("puntos", 6767)
+                    break
+            continue
+
+        # 2b) Evitar duplicar jugadores ya usados en matching
+        if clave_ff in usadas_ff:
+            continue
+
+        puntos = info.get("puntos", 6767)
+        amarillas_banquillo = info.get("amarillas", 0)
+        rojas_banquillo = info.get("rojas", 0)
+
+        # Si no tiene tarjetas, no lo añadimos como fantasy_only
+        if amarillas_banquillo == 0 and rojas_banquillo == 0:
+            continue
+
+        equipo_rival_norm = visit_norm if equipo_norm == local_norm else local_norm
+
+        nombre_norm = info["nombre_norm"]
+        clave_registro = f"{nombre_norm}|{equipo_norm}|0|{pos_val}|fantasy_only}}"
+
+        fila = {col: 0 for col in COLUMNAS_MODELO}
+
+        fila["temporada"] = temporada
+        fila["jornada"] = jornada
+        fila["fecha_partido"] = fecha_partido
+        fila["player"] = nombre_a_mayus(nombre_canonico_ff)
+        fila["posicion"] = pos_val
+        fila["Equipo_propio"] = equipo_norm
+        fila["Equipo_rival"] = equipo_rival_norm
+        fila["local"] = 1 if equipo_norm == local_norm else 0
+        fila["Titular"] = 0
+        fila["Min_partido"] = 0
+        fila["puntosFantasy"] = puntos
+        fila["Amarillas"] = amarillas_banquillo
+        fila["Rojas"] = rojas_banquillo
+        fila["roles"] = []
+
+        bd_partido[clave_registro] = fila
+
+    return bd_partido
+
+
+def asignar_roles_df(df_partido, roles_destacados):
+    """
+    Asigna roles (lista de etiquetas) a cada fila del DataFrame de partido,
+    usando el diccionario roles_destacados:
+
+    - Intenta primero roles de la misma temporada.
+    - Si no hay, busca en otras temporadas por nombre canónico.
+    - Si no hay en ninguna, deja la lista vacía.
+    """
+    def _asignar_roles_fila(fila):
+        temporada_fila = fila["temporada"]
+        nombre_canonico = normalizar_texto(
+            aplicar_alias_jugador_temporada(
+                fila["player"], fila["Equipo_propio"], temporada_fila
+            )
+        )
+
+        roles_temp = roles_destacados.get(temporada_fila, {})
+        roles = roles_temp.get(nombre_canonico)
+        if roles:
+            return [r for r in roles]
+
+        for temp, mapa in roles_destacados.items():
+            if temp == temporada_fila:
+                continue
+            if nombre_canonico in mapa:
+                return [r for r in mapa[nombre_canonico]]
+
+        return []
+
+    if "roles" not in df_partido.columns:
+        df_partido["roles"] = df_partido.index.to_series().apply(lambda _: [])
+
+    df_partido["roles"] = df_partido.apply(_asignar_roles_fila, axis=1)
+    return df_partido
+
+
+def imprimir_mal_6767(df_partido, columna="puntosFantasy"):
+    if columna not in df_partido.columns:
+        return
+    jugadores = df_partido[df_partido[columna] == 6767]
+    if jugadores.empty:
+        return
+    print(f"\nJugadores con {columna} = {6767} en este partido:")
+    for _, fila in jugadores.iterrows():
+        print(
+            f"- {fila['player']} ({fila['Equipo_propio']}) | "
+            f"pos: {fila['posicion']} | min: {fila['Min_partido']}"
+        )

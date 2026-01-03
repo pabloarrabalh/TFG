@@ -1,11 +1,3 @@
-"""
-alias.py
-
-Mapa de alias de equipos, alias de jugadores por temporada
-y configuración de mapping / columnas / umbrales.
-"""
-
-# Alias de equipos, válidos para todas las temporadas
 ALIAS_EQUIPOS = {
     "rayo vallecano": "rayo",
     "villarreal cf": "villarreal",
@@ -24,8 +16,7 @@ ALIAS_EQUIPOS = {
     "atletico madrid": "atletico madrid",
 }
 
-# Solo ALIAS_JUGADORES cambia por temporada
-# Dirección: nombre_largo_norm (CSV/FBRef) -> alias_corto_norm (Fantasy/HTML)
+# (CSV/FBRef) -> (Fantasy/HTML)
 ALIAS_JUGADORES_POR_TEMPORADA = {
     "25_26": {
         "espanyol": {"antoniu": "roca"},
@@ -83,26 +74,18 @@ ALIAS_JUGADORES_POR_TEMPORADA = {
 }
 
 def get_alias_jugadores(temporada: str) -> dict:
-    """Devuelve { equipo_norm: {nombre_largo_norm: alias_corto_norm} } para la temporada dada."""
     return ALIAS_JUGADORES_POR_TEMPORADA.get(temporada, {})
 
 def get_alias_jugadores_reverse(temporada: str) -> dict:
-    """
-    Devuelve el mapa invertido por temporada:
-      { equipo_norm: {alias_corto_norm -> nombre_largo_norm} }
-    """
     original = ALIAS_JUGADORES_POR_TEMPORADA.get(temporada, {})
     invertido = {}
     for equipo_norm, mapa in original.items():
-        inv_equipo = {alias_corto_norm: nombre_largo_norm
-                      for nombre_largo_norm, alias_corto_norm in mapa.items()}
+        inv_equipo = {alias_corto_norm: nombre_largo_norm for nombre_largo_norm, alias_corto_norm in mapa.items()}
         invertido[equipo_norm] = inv_equipo
     return invertido
 
-# Apellidos conflictivos para matching
 APELLIDOS_CRITICOS = {"rodriguez", "gonzalez", "herrera"}
 
-# Mapeo de posiciones FBRef -> posiciones internas
 POSICION_MAP = {
     "GK": "PT",
     "DF": "DF",
@@ -114,7 +97,6 @@ POSICION_MAP = {
     "LW": "DT",
 }
 
-# Mapping de columnas FBRef -> columnas modelo
 MAPEO_STATS = {
     "summary": {
         "enteros": {"Min": "Min_partido", "Gls": "Gol_partido", "Ast": "Asist_partido",
@@ -139,7 +121,6 @@ MAPEO_STATS = {
     },
 }
 
-# Orden de columnas del DataFrame que alimenta el modelo
 COLUMNAS_MODELO = [
     "player", "posicion", "Equipo_propio", "Equipo_rival", "Titular",
     "Min_partido", "Gol_partido", "Asist_partido", "xG_partido", "xAG",
@@ -154,5 +135,4 @@ COLUMNAS_MODELO = [
     "DuelosAereosPerdidos", "DuelosAereosGanadosPct",
 ]
 
-# Umbral RapidFuzz para aceptar un match
 UMBRAL_MATCH = 72.0
