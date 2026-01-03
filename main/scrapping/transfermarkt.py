@@ -93,11 +93,17 @@ def parse_tabla_jornada_transfermarkt(html: str, temporada: str, jornada: int):
     return filas_out
 
 
-def scrapear_rango_jornadas_online(codigo_temporada: str, temporada_transfermarkt: int, j_ini: int, j_fin: int):
+def scrapear_rango_jornadas_online(
+    codigo_temporada: str,
+    temporada_transfermarkt: int,
+    j_ini: int,
+    j_fin: int,
+    carpeta_salida: str,  # <-- carpeta donde quieres guardar el CSV
+):
     """
     Descarga TODAS las jornadas indicadas y las mete en un único CSV:
 
-        data/temporada_<codigo_temporada>/clasificacion_temporada.csv
+        <carpeta_salida>/clasificacion_temporada.csv
 
     Una fila = un equipo en una jornada, con racha5partidos ya calculada
     dinámicamente a medida que se recorre la temporada.
@@ -107,9 +113,9 @@ def scrapear_rango_jornadas_online(codigo_temporada: str, temporada_transfermark
         f"saison_id={temporada_transfermarkt}, jornadas {j_ini}..{j_fin}"
     )
 
-    carpeta_csv = os.path.join("data", f"temporada_{codigo_temporada}")
-    os.makedirs(carpeta_csv, exist_ok=True)
-    ruta_csv = os.path.join(carpeta_csv, "clasificacion_temporada.csv")
+    # Asegurar que la carpeta de salida existe
+    os.makedirs(carpeta_salida, exist_ok=True)
+    ruta_csv = os.path.join(carpeta_salida, "clasificacion_temporada.csv")
 
     campos = [
         "temporada",
@@ -197,5 +203,12 @@ def scrapear_rango_jornadas_online(codigo_temporada: str, temporada_transfermark
 
 
 if __name__ == "__main__":
-    # ejemplo: scrapear jornadas 1..38 para saison_id=2025
-    scrapear_rango_jornadas_online("25_26", temporada_transfermarkt=2025, j_ini=1, j_fin=38)
+    # ejemplo: scrapear jornadas 1..38 para LaLiga 24/25 (saison_id=2024)
+    carpeta_destino = os.path.join("data", "temporada_23_24")
+    scrapear_rango_jornadas_online(
+        codigo_temporada="23_24",
+        temporada_transfermarkt=2023,  # saison_id de la 23/24
+        j_ini=1,
+        j_fin=38,
+        carpeta_salida=carpeta_destino,
+    )
