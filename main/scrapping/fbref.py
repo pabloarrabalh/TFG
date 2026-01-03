@@ -626,60 +626,7 @@ def _construir_bd_partido(propuestas,tablas_por_tipo,asignacion_fbref_a_fantasy,
             puntos = fantasy_partido.get(clave_ff, {}).get("puntos", 6767) 
 
         fila_salida["puntosFantasy"] = puntos 
-        #DEBUG
-        if puntos == 6767:
-            _log_debug_6767(
-                clave_fbref,
-                nombre_fb,
-                nombre_fb_norm,
-                equipo_fb_norm,
-                minutos,
-                pos_val,
-                debug_matching_por_fbref,
-                fantasy_por_norm_global,
-            )
-
     return bd_partido
-
-def _log_debug_6767(clave_fbref,nombre_fb,nombre_fb_norm,equipo_fb_norm,minutos,pos_val,debug_matching_por_fbref,fantasy_por_norm_global,):
-    info_dbg = debug_matching_por_fbref.get(clave_fbref, {})
-    mejor_norm = info_dbg.get("mejor_norm")
-    score = info_dbg.get("score")
-    clave_norm = info_dbg.get("clave_norm")
-    clave_ff_asignada = info_dbg.get("clave_ff_asignada")
-
-    candidatos = []
-    if clave_norm in fantasy_por_norm_global:
-        for c in fantasy_por_norm_global[clave_norm]:
-            inf = c["info"]
-            candidatos.append(
-                (
-                    c["clave_ff"],
-                    inf.get("nombre_original"),
-                    inf.get("nombre_norm"),
-                    inf.get("posicion"),
-                    inf.get("puntos"),
-                )
-            )
-
-    logger.debug(
-        "[DEBUG 6767] player_fb=%s | nombre_fb_norm=%s | equipo_fb=%s | "
-        "pos_fb=%s | min: %s | clave_fbref=%s | "
-        "mejor_norm=%s | score=%.2f | clave_norm=%s | "
-        "clave_ff_asignada=%s | candidatos_fantasy=%s",
-        nombre_fb,
-        nombre_fb_norm,
-        equipo_fb_norm,
-        pos_val,
-        minutos,
-        clave_fbref,
-        mejor_norm,
-        score if score is not None else -1.0,
-        clave_norm,
-        clave_ff_asignada,
-        candidatos,
-    )
-
 
 def procesar_partido(html_partido, mapa_fantasy_partido, idx_partido, jornada):
     global fantasy_por_norm_global  
@@ -809,9 +756,9 @@ def procesar_un_partido(jornada: int, idx_partido: int):
 if __name__ == "__main__":
     inicio = time.perf_counter()  
 
-    analizar_temporada("23_24", 1, 38)  
-    analizar_temporada("24_25", 1, 38) 
-    analizar_temporada("25_26", 1, 18) 
+    #analizar_temporada("23_24", 1, 38)  
+    analizar_temporada("24_25", 12, 14) 
+    #analizar_temporada("25_26", 1, 17) 
     
     fin = time.perf_counter() 
     duracion = fin - inicio  
