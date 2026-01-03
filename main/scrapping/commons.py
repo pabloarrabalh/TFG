@@ -290,7 +290,6 @@ def coincide_inicial_apellido(nombre1, nombre2):
 def normalizar_clave_html(nombre_raw, equipo_norm, jugadores_html):
     equipo_norm_n = normalizar_equipo(equipo_norm) if equipo_norm else None
 
-    # Ya no hay aplicar_alias genérico; usamos directamente el nombre normalizado
     nombre_alias = normalizar_texto(nombre_raw)
     nombre_sin_alias = normalizar_texto(nombre_raw)
 
@@ -317,7 +316,6 @@ def aplicar_alias_jugador_temporada(nombre: str, equipo_norm: str, temporada: st
 
 def construir_clave_norm(mejor_norm, equipo_norm, pos_val, jugadores_por_apellido_equipo):
     """
-    - Si no hay mejor_norm, devuelve None.
     - Obtiene el apellido de mejor_norm y mira en jugadores_por_apellido_equipo
       cuántos jugadores Fantasy hay para (apellido, equipo).
     - Si no hay ningún jugador para ese (apellido, equipo), clave_norm = (mejor_norm, equipo_norm).
@@ -345,27 +343,10 @@ def construir_clave_norm(mejor_norm, equipo_norm, pos_val, jugadores_por_apellid
 
 def construir_fantasy_por_norm(fantasy_partido: dict):
     """
-    A partir de fantasy_partido (dict de jugadores Fantasy de un partido)
-    construye dos estructuras:
-
-    - jugadores_por_apellido_equipo:
-        dict[(apellido, equipo_norm)] -> lista de (clave_ff, info)
-        útil para saber cuántos jugadores comparten apellido por equipo.
-
-    - fantasy_por_norm:
-        dict[clave_norm] -> lista de entradas con:
-            {
-                "clave_ff": clave_ff,
-                "puntos": info["puntos"],
-                "info": info,
-            }
-
-        donde clave_norm es:
-          (nombre_norm, equipo_norm)            si no hay conflicto,
-          (nombre_norm, equipo_norm, pos_clave) si el apellido es crítico y hay duplicados.
-
-    Además, si hay duplicados exactos en fantasy_partido (mismo nombre_norm/equipo),
-    colapsa el mejor usando minutos jugados o, en su defecto, puntos.
+    - jugadores_por_apellido_equipo:dict[(apellido, equipo_norm)] 
+    
+    (nombre_norm, equipo_norm)            si no hay conflicto,
+    (nombre_norm, equipo_norm, pos_clave) si el apellido es crítico y hay duplicados.
     """
     agrupado = defaultdict(list)
     for clave_ff, info in fantasy_partido.items():
@@ -493,8 +474,6 @@ def contar_tarjetas_banquillo(df):
 
 def completar_fantasy_sin_match(bd_partido, fantasy_partido, usadas_ff, local_norm, visit_norm, fecha_partido, jornada, temporada):
     """
-    Completa bd_partido con jugadores que solo aparecen en Fantasy:
-
     - Usa alias/normalización para detectar equivalencias por inicial + apellido
       con filas ya existentes.
     - Si encuentra equivalencia, rellena puntosFantasy en la fila ya creada.
