@@ -135,32 +135,28 @@ def load_player_matches_temporada(base_folder: str, temporada_tag: str) -> pd.Da
     ).reset_index(drop=True)
     return full
 
-def add_role_ranks(df: pd.DataFrame) -> pd.DataFrame:
+def add_role_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
-    def get_rank(lst, key):
-        for d in lst:
-            if key in d:
-                return d[key][0]   # posición en ranking
-        return None
-
-    # rankings brutos
-    df["rank_porterias_cero"] = df["roles"].apply(
-        lambda lst: get_rank(lst, "porterias_cero")
-    )
-    df["rank_save_pct"] = df["roles"].apply(
-        lambda lst: get_rank(lst, "save_pct")
-    )
-
-    # scores en [0,1] solo donde haya ranking; el resto quedará NaN
+    # 1) Normalizar rank a score [0,1] como ya haces
     max_rank_pc = df["rank_porterias_cero"].max()
     max_rank_sp = df["rank_save_pct"].max()
 
     df["score_porterias_cero"] = 1 - (df["rank_porterias_cero"] - 1) / (max_rank_pc - 1)
     df["score_save_pct"] = 1 - (df["rank_save_pct"] - 1) / (max_rank_sp - 1)
 
-    return df
+    # 2) Flags de TOP 5
+    df["is_top5_porterias_cero"] = (df["rank_porterias_cero"] <= 5).astype(int)
+    df["is_top5_save_pct"] = (df["rank_save_pct"] <= 5).astype(int)
 
+    # 3) Roles reforzados (más peso cuando es top 5)
+    df["score_pc_boost"] = df["score_porterias_cero"] * (1 + 0.5 * df["is_top5_porterias_cero"])
+    df["score_sp_boost"] = df["score_save_pct"] * (1 + 0.5 * df["is_top5_save_pct"])
+
+    # 4) Interacciones con xG rival, solo para top 5 se amplifica
+    df["rol_x_xg_rival_boost"] = df["score_sp_boost"] * df["xg_last5_mean_rival"]
+
+    return df
 
 def load_standings(path: str, temporada_tag: str) -> pd.DataFrame:
     standings = pd.read_csv(path)
@@ -220,8 +216,8 @@ def build_all_data():
     for col in ["Equipo_propio", "Equipo_rival"]:
         df_players[col] = normalizar_equipo_series(df_players[col])
 
-    # NUEVO: añadir scores de roles (rankings)
-    df_players = add_role_ranks(df_players)
+   # NUEVO: añadir scores de roles (rankings y boosts) a todos los partidos
+    df_players = add_role_features(df_players)
 
     standings = pd.concat(
         [standings_23_24, standings_24_25, standings_25_26],
@@ -413,7 +409,6 @@ def experimento_2(df: pd.DataFrame) -> pd.DataFrame:
     )
     return df
 
-
 def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
     """
     Añade features de:
@@ -423,8 +418,8 @@ def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
     - flags de posición en la tabla
     - varianza y ratios por 90 del portero (ventana 5)
     - flags ataque top / defensa floja
+    - producción ofensiva rival (goles/tiros) vs defensiva propia
     """
-    # Orden básico
     df = df.sort_values(["temporada", "jornada", "fecha_partido"])
 
     # ==========================
@@ -477,9 +472,20 @@ def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # ==========================
-    # RACHA EQUIPO RIVAL (GOLES + xG)
+    # RACHA EQUIPO RIVAL (GOLES + xG + TIROS)
     # ==========================
     g_rival = df.groupby(["Equipo_rival", "temporada"])
+
+    # Rachas de tiros del rival (ventana 5)
+    df["shots_last5_mean_rival"] = g_rival["shots_rival"].transform(
+        lambda s: s.shift(1).rolling(5, min_periods=1).mean()
+    )
+    df["shots_on_target_last5_mean_rival"] = g_rival["shots_on_target_rival"].transform(
+        lambda s: s.shift(1).rolling(5, min_periods=1).mean()
+    )
+    df["shots_on_target_ratio_rival"] = (
+        df["shots_on_target_last5_mean_rival"] / df["shots_last5_mean_rival"]
+    )
 
     df["gf_last5_mean_rival"] = g_rival["gf_rival"].transform(
         lambda s: s.shift(1).rolling(5, min_periods=1).mean()
@@ -491,12 +497,25 @@ def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
         df["gf_last5_mean_rival"] - df["gc_last5_mean_rival"]
     )
 
-    # cuidado: xg_team/xg_rival vistos desde el rival
+    # xG vistos desde el rival
     df["xg_last5_mean_rival"] = g_rival["xg_team"].transform(
         lambda s: s.shift(1).rolling(5, min_periods=1).mean()
     )
     df["xg_contra_last5_mean_rival"] = g_rival["xg_rival"].transform(
         lambda s: s.shift(1).rolling(5, min_periods=1).mean()
+    )
+
+    # ==========================
+    # NUEVAS: eficiencia y cruce ataque rival vs defensa propia
+    # ==========================
+    # % gol por tiro del rival en racha (si no tira, NaN)
+    df["goal_per_shot_rival"] = (
+        df["gf_last5_mean_rival"] / df["shots_last5_mean_rival"]
+    )
+
+    # ataque rival (goles) vs defensa propia (goles encajados)
+    df["goal_attack_vs_defense"] = (
+        df["gf_last5_mean_rival"] - df["gc_last5_mean_team"]
     )
 
     # ==========================
@@ -511,7 +530,6 @@ def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
     # ==========================
     df["is_top4_propio"] = (df["posicion_equipo"] <= 4).astype(int)
     df["is_top4_rival"] = (df["posicion_rival"] <= 4).astype(int)
-    df["is_bottom3_propio"] = (df["posicion_equipo"] >= 18).astype(int)
     df["is_bottom3_rival"] = (df["posicion_rival"] >= 18).astype(int)
 
     # ==========================
@@ -625,7 +643,7 @@ def entrenar_modelo_porteros(df: pd.DataFrame):
         lambda s: s.shift(1).rolling(5, min_periods=1).sum()
     )
 
-    # Picos de puntos recientes (NUEVO)
+    # Picos de puntos recientes
     df_gk["pf_last5_max"] = g["puntosFantasy"].transform(
         lambda s: s.shift(1).rolling(5, min_periods=1).max()
     )
@@ -636,7 +654,22 @@ def entrenar_modelo_porteros(df: pd.DataFrame):
         df_gk["pf_last5_max"] >= 12
     ).astype(int)
 
-    feature_cols = [
+    # === INTERACCIONES PORTERO × RIVAL ===
+    df_gk["xg_rival_x_savepct"] = (
+        df_gk["xg_last5_mean_rival"] * df_gk["savepct_last5_mean"]
+    )
+    df_gk["xg_rival_x_gc_per90"] = (
+        df_gk["xg_last5_mean_rival"] * df_gk["gc_per90_last5"]
+    )
+    df_gk["gf_rival_last5_x_gc_per90"] = (
+        df_gk["gf_last5_mean_rival"] * df_gk["gc_per90_last5"]
+    )
+    df_gk["goal_diff_rival_x_pf_var"] = (
+        df_gk["goal_diff_last5_rival"] * df_gk["pf_last5_std"]
+    )
+
+    # Features base sin roles “raros” para el filtrado de NaN
+    feature_cols_base = [
         "pf_last5_mean",
         "pf_last5_sum",
         "min_last5_mean",
@@ -653,7 +686,10 @@ def entrenar_modelo_porteros(df: pd.DataFrame):
         "pts_rival", "gf_rival", "gc_rival",
         "pts_diff", "gf_diff", "gc_diff",
         "is_top4_propio", "is_top4_rival",
-        "is_bottom3_propio", "is_bottom3_rival",
+        "shots_last5_mean_rival",
+        "shots_on_target_last5_mean_rival",
+        "shots_on_target_ratio_rival",
+        "is_bottom3_rival",
         "gf_last5_mean_team",
         "gc_last5_mean_team",
         "gf_last5_mean_rival",
@@ -681,26 +717,12 @@ def entrenar_modelo_porteros(df: pd.DataFrame):
         "shots_rival",
         "shots_on_target_propio",
         "shots_on_target_rival",
-        "score_porterias_cero",
-        "score_save_pct",
-        "score_porterias_cero_strong",
-        "score_save_pct_strong",
-        "rol_x_xg_rival",
-        "elite_keeper",
-        "pf_last5_max",
-        "pf_last5_min",
-        "pf_spike_last5",
+        "xg_rival_x_savepct",
+        "xg_rival_x_gc_per90",
+        "gf_rival_last5_x_gc_per90",
+        "goal_diff_rival_x_pf_var",
     ]
 
-    feature_cols_base = [
-        c for c in feature_cols
-        if c not in [
-            "score_porterias_cero", "score_save_pct",
-            "score_porterias_cero_strong", "score_save_pct_strong",
-            "rol_x_xg_rival", "elite_keeper",
-            "pf_last5_max", "pf_last5_min", "pf_spike_last5",
-        ]
-    ]
     subset_cols = ["target_pf_next", *feature_cols_base]
     df_sub = df_gk[subset_cols].copy()
     mask_ok = df_sub.notna().all(axis=1)
@@ -715,20 +737,49 @@ def entrenar_modelo_porteros(df: pd.DataFrame):
         if col in df_gk_model.columns:
             df_gk_model[col] = df_gk_model[col].fillna(0.0)
 
-    # Features de roles potenciados e interacción
-    df_gk_model["score_porterias_cero_strong"] = df_gk_model["score_porterias_cero"] ** 2
-    df_gk_model["score_save_pct_strong"] = df_gk_model["score_save_pct"] ** 2
+    # Features de roles originales
+    df_gk_model["score_porterias_cero_strong"] = df_gk_model["score_porterias_cero"] ** 5
+    df_gk_model["score_save_pct_strong"] = df_gk_model["score_save_pct"] ** 5
     df_gk_model["rol_x_xg_rival"] = (
         df_gk_model["score_save_pct"] * df_gk_model["xg_last5_mean_rival"]
     )
     df_gk_model["elite_keeper"] = (
-        (df_gk_model["score_porterias_cero"] > 0.8) &
-        (df_gk_model["score_save_pct"] > 0.8)
+        (df_gk_model["score_porterias_cero"] > 0.6) &
+        (df_gk_model["score_save_pct"] > 0.6)
     ).astype(int)
+    df_gk_model["ataque_top_rival_x_elite"] = (
+        df_gk_model["ataque_top_rival"] * df_gk_model["elite_keeper"]
+    )
 
+    # NUEVO: roles potenciados (top 5)
+    df_gk_model = add_role_features(df_gk_model)
+
+    # Filtrar target
     df_gk_model = df_gk_model[
         df_gk_model["target_pf_next"].between(-10, 30)
     ].copy()
+
+    # Features finales (base + roles)
+    feature_cols = (
+        feature_cols_base
+        + [
+            "score_porterias_cero",
+            "score_save_pct",
+            "score_porterias_cero_strong",
+            "score_save_pct_strong",
+            "rol_x_xg_rival",
+            "elite_keeper",
+            "pf_last5_max",
+            "pf_last5_min",
+            "pf_spike_last5",
+            "is_top5_porterias_cero",
+            "is_top5_save_pct",
+            "score_pc_boost",
+            "score_sp_boost",
+            "rol_x_xg_rival_boost",
+            "ataque_top_rival_x_elite",
+        ]
+    )
 
     print("Filas finales usadas para entrenar/testear:", df_gk_model.shape[0])
 
@@ -741,23 +792,64 @@ def entrenar_modelo_porteros(df: pd.DataFrame):
     X_test = df_gk_model.loc[test_mask, feature_cols]
     y_test = df_gk_model.loc[test_mask, "target_pf_next"]
 
+    # Asegurar orden consistente
+    cols = list(X_train.columns)
+    assert cols == list(X_test.columns)
+
     print("Tamaño X_train:", X_train.shape)
     print("Tamaño X_test :", X_test.shape)
 
+    # ==========================
+    # MODELO 1: Random Forest GLOBAL
+    # ==========================
     rf = RandomForestRegressor(
-        n_estimators=300,
+        n_estimators=100,
+        max_features=0.5,
+        min_samples_leaf=1,
         random_state=42,
         n_jobs=-1
     )
+
     rf.fit(X_train, y_train)
     y_pred_rf = rf.predict(X_test)
-    mae_rf = mean_absolute_error(y_test, y_pred_rf)
-    print("MAE RF porteros ventana5 (test 25_26):", mae_rf)
+    y_pred_rf_rounded = y_pred_rf.round()
+    mae_rf = mean_absolute_error(y_test, y_pred_rf_rounded)
+    print("MAE RF porteros ventana5 (test 25_26, pred redondeada):", mae_rf)
 
     importancias_rf = pd.Series(rf.feature_importances_, index=X_train.columns)
     print("\nTop 15 features RF por importancia:")
     print(importancias_rf.sort_values(ascending=False).head(15))
 
+    # ==========================
+    # MODELO RF ESPECÍFICO ÉLITE
+    # ==========================
+    df_elite = df_gk_model[df_gk_model["elite_keeper"] == 1].copy()
+    train_mask_elite = df_elite["temporada"].isin(["23_24", "24_25"])
+    test_mask_elite = df_elite["temporada"] == "25_26"
+
+    X_train_elite = df_elite.loc[train_mask_elite, cols]
+    y_train_elite = df_elite.loc[train_mask_elite, "target_pf_next"]
+
+    X_test_elite = df_elite.loc[test_mask_elite, cols]
+    y_test_elite = df_elite.loc[test_mask_elite, "target_pf_next"]
+
+    rf_elite = RandomForestRegressor(
+        n_estimators=300,
+        random_state=42,
+        n_jobs=-1
+    )
+    if len(X_train_elite) > 0 and len(X_test_elite) > 0:
+        rf_elite.fit(X_train_elite, y_train_elite)
+        y_pred_elite = rf_elite.predict(X_test_elite).round()
+        mae_elite = mean_absolute_error(y_test_elite, y_pred_elite)
+        print("MAE RF porteros ÉLITE ventana5 (test 25_26, pred redondeada):", mae_elite)
+    else:
+        rf_elite = None
+        print("No hay suficientes datos para modelo élite.")
+
+    # ==========================
+    # MODELO 2: HistGradientBoosting
+    # ==========================
     hgb = HistGradientBoostingRegressor(random_state=42)
     hgb.fit(X_train, y_train)
     y_pred_hgb = hgb.predict(X_test)
@@ -771,21 +863,54 @@ def entrenar_modelo_porteros(df: pd.DataFrame):
     except AttributeError:
         print("HGB no expone feature_importances_ en esta versión.")
 
-    lin = LinearRegression()
-    lin.fit(X_train, y_train)
-    y_pred_lin = lin.predict(X_test)
-    mae_lin = mean_absolute_error(y_test, y_pred_lin)
-    print("MAE LIN porteros ventana5 (test 25_26):", mae_lin)
+    # ==========================
+    # MODELO 3: Regresión lineal
+    # ==========================
+    try:
+        X_train_lin = X_train.dropna()
+        y_train_lin = y_train.loc[X_train_lin.index]
 
-    coef_series = pd.Series(lin.coef_, index=X_train.columns)
-    print("\nTop 20 features LINEAL por |coeficiente|:")
-    print(coef_series.reindex(
-        coef_series.abs().sort_values(ascending=False).head(20).index
-    ))
+        X_test_lin = X_test.dropna()
+        y_test_lin = y_test.loc[X_test_lin.index]
 
-    model = rf
-    y_pred = y_pred_rf
-    mae = mae_rf
+        lin = LinearRegression()
+        lin.fit(X_train_lin, y_train_lin)
+        y_pred_lin = lin.predict(X_test_lin)
+        mae_lin = mean_absolute_error(y_test_lin, y_pred_lin)
+        print("MAE LIN porteros ventana5 (test 25_26):", mae_lin)
+
+        coef_series = pd.Series(lin.coef_, index=X_train_lin.columns)
+        print("\nTop 20 features LINEAL por |coeficiente|:")
+        print(coef_series.reindex(
+            coef_series.abs().sort_values(ascending=False).head(20).index
+        ))
+    except ValueError as e:
+        print("No se ha podido ajustar la regresión lineal por NaNs:", e)
+
+    # ==========================
+    # PREDICCIÓN MIXTA (GLOBAL + ÉLITE)
+    # ==========================
+    if rf_elite is not None:
+        y_pred_final = []
+        for idx, row in X_test.iterrows():
+            x_row = row[cols].to_frame().T
+            if row["elite_keeper"] == 1:
+                pred = rf_elite.predict(x_row)[0]
+            else:
+                pred = rf.predict(x_row)[0]
+            y_pred_final.append(pred)
+
+        y_pred_final = pd.Series(y_pred_final, index=X_test.index).round()
+        mae_mix = mean_absolute_error(y_test, y_pred_final)
+        print("MAE RF MIXTO (global+élite) ventana5 (test 25_26, redondeada):", mae_mix)
+
+        model = rf
+        y_pred = y_pred_final
+        mae = mae_mix
+    else:
+        model = rf
+        y_pred = y_pred_rf_rounded
+        mae = mae_rf
 
     df_test = df_gk_model.loc[test_mask].copy()
     df_test = df_test.assign(pred_pf_next=y_pred)
@@ -793,6 +918,9 @@ def entrenar_modelo_porteros(df: pd.DataFrame):
 
     print("\n=== FIN ENTRENAR MODELO PORTEROS ===")
     return model, df_gk_model, df_test, mae
+
+
+
 
 if __name__ == "__main__":
     # 1) Leer datasets base desde CSV ya existentes
@@ -830,7 +958,7 @@ if __name__ == "__main__":
     tabla_gk = tabla_gk.sort_values("abs_error", ascending=False)
     print(tabla_gk.head(50))
 
-    # 8) MAE por jugador, solo con porteros con ≥ 5 predicciones
+    # 8) MAE por jugador, solo porteros con ≥ 5 predicciones
     from sklearn.metrics import mean_absolute_error
 
     df_eval = df_test_25_26.copy()
@@ -844,10 +972,21 @@ if __name__ == "__main__":
                .reset_index(name="mae")
                .sort_values("mae")
     )
-
+    print("\nMAE por jugador (≥5 partidos):")
     print(mae_por_jugador)
 
-    # 9) Gráficas por portero (solo los con ≥ 5 partidos si quieres)
+    # 9) MAE global por rival (todos los porteros con ≥5 partidos)
+    df_eval["abs_error"] = (df_eval["pred_pf_next"] - df_eval["puntosFantasy"]).abs()
+    mae_por_rival_global = (
+        df_eval.groupby("Equipo_rival")["abs_error"]
+               .mean()
+               .reset_index(name="mae_vs_rival")
+               .sort_values("mae_vs_rival", ascending=False)
+    )
+    print("\nMAE medio global por equipo rival:")
+    print(mae_por_rival_global)
+
+    # 10) Gráficas por portero (solo los con ≥ 5 partidos)
     import os
     output_dir = "graficas_porteros"
     os.makedirs(output_dir, exist_ok=True)
@@ -858,23 +997,48 @@ if __name__ == "__main__":
 
         x = df_gk_plot["jornada"]
 
-        plt.figure(figsize=(8, 4))
+        plt.figure(figsize=(10, 4))
         plt.scatter(x, df_gk_plot["pred_pf_next"], color="blue", marker="o", label="Predicho")
         plt.scatter(x, df_gk_plot["puntosFantasy"], color="red", marker="x", label="Real")
 
-        for j, y in zip(x, df_gk_plot["pred_pf_next"]):
-            plt.text(j + 0.05, y, f"{y:.1f}", color="blue", fontsize=7, va="bottom")
-        for j, y in zip(x, df_gk_plot["puntosFantasy"]):
-            plt.text(j - 0.05, y, f"{y:.1f}", color="red", fontsize=7, ha="right", va="top")
+        # Etiquetas: puntos reales + rival (rojo, entero)
+        for j, y_real, rival in zip(
+            x,
+            df_gk_plot["puntosFantasy"],
+            df_gk_plot["Equipo_rival"]
+        ):
+            plt.text(
+                j - 0.05,
+                y_real,
+                f"{int(round(y_real))}\n{rival}",
+                color="red",
+                fontsize=6,
+                ha="right",
+                va="top"
+            )
+
+        # Etiquetas: puntos predichos (azul, entero)
+        for j, y_pred in zip(
+            x,
+            df_gk_plot["pred_pf_next"]
+        ):
+            plt.text(
+                j + 0.05,
+                y_pred,
+                f"{int(round(y_pred))}",
+                color="blue",
+                fontsize=6,
+                ha="left",
+                va="bottom"
+            )
 
         plt.xticks(x, [f"J{int(j)}" for j in x])
         plt.xlabel(f"Jornadas de {nombre}")
         plt.ylabel("Puntos Fantasy")
-        plt.title(f"{nombre}: predicho (azul) vs real (rojo)")
+        plt.title(f"{nombre}: predicho (azul) vs real (rojo, con rival)")
         plt.legend()
         plt.tight_layout()
 
         fname = f"{nombre.replace(' ', '_')}.png"
         plt.savefig(os.path.join(output_dir, fname))
         plt.close()
-  # mejores
