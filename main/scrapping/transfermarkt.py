@@ -204,11 +204,11 @@ def scrapear_rango_jornadas_online(
 
 if __name__ == "__main__":
     # ejemplo: scrapear jornadas 1..38 para LaLiga 24/25 (saison_id=2024)
-    carpeta_destino = os.path.join("data", "temporada_23_24")
+    carpeta_destino = os.path.join("data", "temporada_25_26")
     scrapear_rango_jornadas_online(
-        codigo_temporada="23_24",
-        temporada_transfermarkt=2023,  # saison_id de la 23/24
+        codigo_temporada="25_26",
+        temporada_transfermarkt=2025,  # saison_id de la 23/24
         j_ini=1,
-        j_fin=38,
+        j_fin=18,
         carpeta_salida=carpeta_destino,
     )
