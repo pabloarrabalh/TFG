@@ -249,12 +249,12 @@ def guardar_modelo_con_roles(
         LEAK_FEATURES = [
             # conducciones (no te interesan)
             "DistanciaConduccion",
-            
+            "gc_last5_sum",
+            "psxg_last5_sum",
+
             "p_win_propio",
             "p_loss_propio",
             "p_draw_match",
-            "p_over25_match",
-            "ah_line_match",
             "Despejes",
             "xAG",
             "is_top4_propio",

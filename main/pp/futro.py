@@ -297,6 +297,7 @@ def cargar_datos_temporada(temporada: str = "25_26") -> pd.DataFrame:
     return df
 
 
+
 def predecir_partido(
     partido: str,
     portero: str,
@@ -331,31 +332,14 @@ def predecir_partido(
 
     if equipos_posibles:
         for equipo_norm in equipos_posibles:
-            # DEBUG: ver qué se está intentando matchear
-            '''print(
-                f"[MATCH ESTRICTO] partido={partido} equipo_norm_loop={equipo_norm} "
-                f"portero_raw={portero!r}"
-            )'''
-
-            # aplicar alias “corto -> largo” y normalizar igual que el CSV
             nombre_alias = aplicar_alias_portero_futro(portero, equipo_norm, temporada)
             nombre_busqueda_norm = _norm_text_futro(nombre_alias)
 
-            # ver algunos players candidatos de ese equipo
             mask_equipo = (
                 (df["temporada"] == temporada)
                 & (df["Equipo_propio"].str.lower() == equipo_norm)
                 & (df["posicion"] == "PT")
             )
-            candidatos = (
-                df.loc[mask_equipo, "player"]
-                .drop_duplicates()
-                .tolist()
-            )
-            '''
-            print(
-                f"[MATCH ESTRICTO] posibles players PT en {equipo_norm}: {candidatos}"
-            )'''
 
             mask = (
                 (df["temporada"] == temporada)
@@ -363,10 +347,6 @@ def predecir_partido(
                 & (df["player"].apply(_norm_text_futro) == nombre_busqueda_norm)
                 & (df["posicion"] == "PT")
             )
-            '''print(
-                f"[MATCH ESTRICTO] coincidencias mask.sum()={mask.sum()} "
-                f"para alias_normalizado={nombre_busqueda_norm!r}"
-            )'''
 
             if mask.sum() > 0:
                 df_portero = df[mask].sort_values("jornada", ascending=False)
@@ -374,11 +354,10 @@ def predecir_partido(
                 break
 
     # ============================
-    # 2) FALLBACK: CONTAINS POR NOMBRE (CON LOG EXTRA)
+    # 2) FALLBACK: CONTAINS POR NOMBRE
     # ============================
     if row is None:
         porterolower = portero.lower().strip()
-        #print(f"[FALLBACK CONTAINS] buscando '{porterolower}' en df['player'] PT temporada={temporada}")
 
         mask = (
             df["player"].str.lower().str.contains(porterolower, na=False)
@@ -386,17 +365,6 @@ def predecir_partido(
         )
 
         if mask.sum() == 0:
-            players_pt = (
-                df.loc[df["posicion"] == "PT", "player"]
-                .drop_duplicates()
-                .tolist()
-            )
-            #print("[FALLBACK CONTAINS] Ejemplo players PT temporada:", players_pt[:20])
-            #print(
-            #    "[FALLBACK DEBUG] Candidatos que contienen 'bergstr':",
-            #    [p for p in players_pt if "bergstr" in _norm_text_futro(p)],
-            #)
-
             return {
                 "error": f"Portero '{portero}' no encontrado en la temporada {temporada}",
                 "partido": partido,
@@ -407,7 +375,7 @@ def predecir_partido(
         row = df_portero.iloc[0]
 
     # ============================
-    # 3) RESTO IGUAL QUE TENÍAS
+    # 3) CONSTRUIR CONTEXTO (igual que tenías)
     # ============================
     info_portero = {
         "nombre": row["player"],
@@ -469,8 +437,11 @@ def predecir_partido(
         "p_win": float(row["p_win_propio"]) if pd.notna(row.get("p_win_propio")) else None,
     }
 
+    # ============================
+    # 4) FEATURES -> X (aquí va el cambio para XGB)
+    # ============================
     try:
-        X = pd.DataFrame(row[feature_cols]).T
+        X = preparar_X_para_modelo(row, feature_cols)
     except KeyError as e:
         return {
             "error": f"Falta la columna {str(e)} en los datos de predicción",
@@ -478,8 +449,9 @@ def predecir_partido(
             "portero": portero,
         }
 
-    X = X.replace([np.inf, -np.inf], np.nan).fillna(0)
-
+    # ============================
+    # 5) PREDICCIÓN
+    # ============================
     try:
         pred_raw = float(modelo.predict(X)[0])
         pred_redondeada = int(round(pred_raw))
@@ -508,7 +480,6 @@ def predecir_partido(
         "row_original": row,
         "features_usadas": X.to_dict(orient="records")[0],
     }
-
 
 def mostrar_prediccion_detallada(pred: dict, verbose: bool = True):
     if pred.get("error"):
@@ -548,6 +519,16 @@ def mostrar_prediccion_detallada(pred: dict, verbose: bool = True):
 
     print("=" * 100)
 
+
+def preparar_X_para_modelo(df_row, feature_cols):
+    """
+    Deja las features en formato numérico (float) para modelos como XGBoost.
+    Es independiente del resto de la lógica; se puede borrar sin romper nada.
+    """
+    X = pd.DataFrame(df_row[feature_cols]).T
+    X = X.apply(pd.to_numeric, errors="coerce")
+    X = X.replace([np.inf, -np.inf], np.nan).fillna(0.0)
+    return X
 
 if __name__ == "__main__":
     print("futro.py v3 - Módulo de predicción con rachas recalculadas")
