@@ -153,63 +153,63 @@ def guardar_modelo_con_roles(
     Guarda modelo entrenado con roles destacados integrados
     Maneja correctamente roles opcionales
     """
-    
+
     # ============================================================
     # 1. VERIFICAR CSV
     # ============================================================
-    
+
     if not os.path.exists(path_csv):
         print(f"❌ Error: No se encontró {path_csv}")
         print("\n⚠️ NECESITAS EJECUTAR PRIMERO:")
         print("   $ python completo.py\n")
         return False
-    
+
     print(f"✅ CSV encontrado: {path_csv}")
     print(f"   Tamaño: {os.path.getsize(path_csv) / 1024 / 1024:.1f} MB\n")
-    
+
     # ============================================================
     # 2. CARGAR CSV
     # ============================================================
-    
+
     print("⏳ Cargando datos procesados...\n")
-    
+
     try:
         from sklearn.ensemble import RandomForestRegressor
-        
+
         df = pd.read_csv(path_csv)
         print(f"✅ Datos cargados: {df.shape[0]} filas, {df.shape[1]} columnas\n")
-        
+
         # ============================================================
         # 3. FILTRAR PORTEROS
         # ============================================================
-        
+
         print("🎯 Filtrando porteros...\n")
-        
+
         df_gk = df[df["posicion"] == "PT"].copy()
         print(f"✅ Porteros encontrados: {len(df_gk)}")
-        
+
         df_gk = df_gk[df_gk["puntosFantasy"].between(-10, 30)].copy()
         print(f"✅ Porteros tras filtro: {len(df_gk)}\n")
-        
+
         # ============================================================
         # 4. EXTRAER FEATURES DE ROLES
         # ============================================================
-        
+
         df_roles = extraer_roles_destacados(df_gk)
         feature_top5 = crear_feature_es_top5(df_gk)
-        
+
         # Agregar features de roles al dataframe
         df_gk_con_roles = df_gk.copy()
         for col in df_roles.columns:
             df_gk_con_roles[col] = df_roles[col].values
-        df_gk_con_roles['is_top5_en_algo'] = feature_top5.values
-        
+        df_gk_con_roles["is_top5_en_algo"] = feature_top5.values
+
         # ============================================================
         # 5. PREPARAR FEATURES NUMÉRICAS
         # ============================================================
-        
+
         print("📊 Preparando features base...\n")
-        
+
         meta_cols = [
             "puntosFantasy", "temporada", "jornada", "player", "posicion",
             "Equipo_propio", "Equipo_rival", "fecha_partido", "target_pf_next",
@@ -218,132 +218,188 @@ def guardar_modelo_con_roles(
             "rank_save_pct", "roles", "home", "away", "Date", "HS", "AS", "HST", "AST",
             "Unnamed: 0"
         ]
-        
+
         candidate_cols = [col for col in df_gk_con_roles.columns if col not in meta_cols]
-        
+
         print(f"✅ Candidatas iniciales: {len(candidate_cols)}\n")
-        
+
         # ============================================================
         # 6. FILTRAR SOLO NUMÉRICAS
         # ============================================================
-        
+
         print("🔍 Filtrando columnas numéricas...\n")
-        
+
         numeric_cols = []
-        
+
         for col in candidate_cols:
             try:
                 if df_gk_con_roles[col].dtype in [np.float64, np.int64, np.float32, np.int32]:
                     numeric_cols.append(col)
-                elif df_gk_con_roles[col].dtype == 'object':
-                    test_convert = pd.to_numeric(df_gk_con_roles[col], errors='coerce')
+                elif df_gk_con_roles[col].dtype == "object":
+                    test_convert = pd.to_numeric(df_gk_con_roles[col], errors="coerce")
                     if test_convert.notna().sum() / len(df_gk_con_roles) > 0.5:
                         numeric_cols.append(col)
                         df_gk_con_roles[col] = test_convert
-            except:
+            except Exception:
                 continue
-        
+
         feature_cols = numeric_cols
-        
-        print(f"✅ Features numéricas: {len(feature_cols)}")
-        roles_cols_final = [c for c in feature_cols if 'rol_' in c or 'is_top5' in c]
+
+        # 🔴 Quitar conducciones y datos del propio partido (leak)
+        LEAK_FEATURES = [
+            # conducciones (no te interesan)
+            "DistanciaConduccion",
+            
+            "p_win_propio",
+            "p_loss_propio",
+            "p_draw_match",
+            "p_over25_match",
+            "ah_line_match",
+            "Despejes",
+            "xAG",
+            "is_top4_propio",
+            "is_top4_rival",
+            "is_bottom3_rival",
+            "defensa_floja_propia",
+            "ataque_top_y_defensa_floja",
+            "MetrosAvanzadosConduccion",
+            "Conducciones",
+            "ConduccionesProgresivas",
+            "Pases_Completados_Pct",
+            "Pases_Totales",
+
+            # datos del propio partido (solo se conocen después)
+            "shots_propio_partido",
+            "shots_rival_partido",
+            "shots_on_target_propio_partido",
+            "shots_on_target_rival_partido",
+            "xg_team_partido",
+            "xg_rival_partido",
+            "xG_partido",
+
+            # otras stats de partido a nivel jugador
+            "Asist_partido",
+            "Tiros",
+            "TiroFallado_partido",
+            "TiroPuerta_partido",
+            "Entradas",
+            "Regates",
+            "RegatesCompletados",
+            "RegatesFallidos",
+            "Duelos",
+            "DuelosGanados",
+            "DuelosPerdidos",
+            "DuelosAereosGanados",
+            "DuelosAereosPerdidos",
+            "DuelosAereosGanadosPct",
+            "Bloqueos",
+            "BloqueoTiros",
+            "BloqueoPase",
+        ]
+
+        feature_cols = [c for c in feature_cols if c not in LEAK_FEATURES]
+        print(f"✅ Features numéricas tras quitar leak: {len(feature_cols)}")
+
+        roles_cols_final = [c for c in feature_cols if "rol_" in c or "is_top5" in c]
         print(f"   Incluidas (roles): {roles_cols_final}\n")
-        
+
         # ============================================================
         # 7. PREPARAR X, y
         # ============================================================
-        
+
         print("📈 Preparando datos de entrenamiento...\n")
-        
+
         X = df_gk_con_roles[feature_cols].fillna(0)
         y = df_gk_con_roles["puntosFantasy"]
-        
+
         if X.isna().any().any():
             print("⚠️ Rellenando NaN restantes...")
             X = X.fillna(0)
-        
+
         if np.isinf(X.values).any():
             print("⚠️ Reemplazando inf...")
+            pd.set_option("future.no_silent_downcasting", True)
             X = X.replace([np.inf, -np.inf], 0)
-        
+
         print(f"✅ X shape: {X.shape}")
         print(f"✅ y shape: {y.shape}")
         print(f"✅ Sin NaN: {not X.isna().any().any()}")
         print(f"✅ Sin inf: {not np.isinf(X.values).any()}\n")
-        
+
         # ============================================================
         # 8. ENTRENAR RANDOM FOREST
         # ============================================================
-        
+
         print("⏳ Entrenando Random Forest (incluyendo roles)...\n")
-        
+
         modelo = RandomForestRegressor(
             n_estimators=100,
             max_depth=10,
             random_state=42,
             n_jobs=-1,
-            verbose=0
+            verbose=0,
         )
-        
+
         modelo.fit(X, y)
-        print(f"✅ Modelo entrenado\n")
-        
+        print("✅ Modelo entrenado\n")
+
         # Feature importance de roles
         feature_importance = pd.Series(
             modelo.feature_importances_,
-            index=feature_cols
+            index=feature_cols,
         ).sort_values(ascending=False)
-        
-        roles_cols_imp = [c for c in feature_cols if 'rol_' in c or 'is_top5' in c]
+
+        roles_cols_imp = [c for c in feature_cols if "rol_" in c or "is_top5" in c]
         if len(roles_cols_imp) > 0:
             roles_importance = feature_importance[roles_cols_imp]
-            
+
             print("📊 Importancia de features de roles:")
             for col, imp in roles_importance.items():
                 print(f"   {col}: {imp:.4f}")
             print()
-        
+
         # ============================================================
         # 9. GUARDAR ARCHIVOS
         # ============================================================
-        
+
         print("💾 Guardando archivos...\n")
-        
-        with open(path_modelo, 'wb') as f:
+
+        with open(path_modelo, "wb") as f:
             pickle.dump(modelo, f)
         print(f"✅ Modelo guardado: {path_modelo}")
         print(f"   Tamaño: {os.path.getsize(path_modelo) / 1024 / 1024:.1f} MB\n")
-        
-        with open(path_features, 'wb') as f:
+
+        with open(path_features, "wb") as f:
             pickle.dump(feature_cols, f)
         print(f"✅ Features guardadas: {path_features}")
         print(f"   Total: {len(feature_cols)} (incluyendo {len(roles_cols_imp)} de roles)\n")
-        
+
         # ============================================================
         # 10. RESUMEN
         # ============================================================
-        
-        print("="*80)
+
+        print("=" * 80)
         print("✅ PROCESO COMPLETADO")
-        print("="*80)
-        print(f"Modelo: Random Forest + Roles Destacados")
+        print("=" * 80)
+        print("Modelo: Random Forest + Roles Destacados")
         print(f"Features base: {len(feature_cols) - len(roles_cols_imp)}")
         print(f"Features de roles: {len(roles_cols_imp)}")
         print(f"Total features: {len(feature_cols)}")
         print(f"Muestras entrenamiento: {len(X)}")
-        print(f"\nArchivos generados:")
+        print("\nArchivos generados:")
         print(f"  ✅ {path_modelo}")
         print(f"  ✅ {path_features}\n")
-        
+
         print("🚀 Próximo paso:")
         print("   $ python predictor.py\n")
-        
+
         return True
-    
+
     except Exception as e:
-        print(f"\n❌ Error durante el entrenamiento:")
+        print("\n❌ Error durante el entrenamiento:")
         print(f"{type(e).__name__}: {e}\n")
         import traceback
+
         traceback.print_exc()
         return False
 

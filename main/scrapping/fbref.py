@@ -9,9 +9,9 @@ import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup  
 from rapidfuzz import process as rf_process, fuzz as rf_fuzz  
-from commons import * 
-from alias import*  
-from roles import ROLES_DESTACADOS 
+from scrapping.commons import * 
+from scrapping.alias import*  
+from scrapping.roles import ROLES_DESTACADOS 
 
 logging.basicConfig( 
     level=logging.DEBUG,  

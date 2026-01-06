@@ -236,14 +236,13 @@ print(f"   X_test: {X_test.shape}")
 print(f"\n⏳ Entrenando Random Forest (sin data leakage)...")
 
 modelo_limpio = RandomForestRegressor(
-    n_estimators=200,
-    max_depth=15,
-    min_samples_split=10,
-    min_samples_leaf=5,
+    n_estimators=300,
+    max_features=0.5,
+    max_depth=8,        # menos profundo
+    min_samples_leaf=10,# hojas más grandes
     random_state=42,
     n_jobs=-1
-)
-
+    )
 modelo_limpio.fit(X_train, y_train)
 
 # ============================================================

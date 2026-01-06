@@ -5,10 +5,121 @@ import pandas as pd
 import numpy as np
 import pickle
 from pathlib import Path
+import unicodedata
+import os,sys
+# === UTILIDADES LOCALES DE TEXTO PARA FUTRO ===
+
+ROOT = Path(__file__).resolve().parents[1]  
+if str(ROOT) not in sys.path:
+    sys.path.append(str(ROOT))
+
+from scrapping.commons import normalizar_equipo
+
+def buscar_csv_partido(temporada: str, jornada: int, idx_partido: int, local_html: str, visit_html: str) -> str:
+    """
+    Devuelve la ruta al CSV del partido, normalizando los nombres de equipo
+    usando ALIAS_EQUIPOS (celta vigo -> celta, athletic club -> athletic, rayo vallecano -> rayo, etc.).
+    """
+    carpeta_csv = os.path.join("data", f"temporada_{temporada}", f"jornada_{jornada}")
+
+    # Nombres tal como están en el CSV: ya usas normalizar_equipo en commons
+    local_norm = normalizar_equipo(local_html)      # "celta vigo" -> "celta"; "athletic club" -> "athletic"
+    visit_norm = normalizar_equipo(visit_html)      # "rayo vallecano" -> "rayo", etc.
+
+    # Montar filename con los nombres normalizados
+    filename = f"p{idx_partido}_{local_norm}-{visit_norm}.csv"
+    ruta_csv = os.path.join(carpeta_csv, filename)
+
+    if not os.path.exists(ruta_csv):
+        raise FileNotFoundError(f"No se encuentra CSV de partido: {ruta_csv}")
+
+    return ruta_csv
+
+
+def _norm_text_futro(s: str) -> str:
+    if s is None:
+        return ""
+    s = str(s).lower().strip()
+    s = unicodedata.normalize("NFD", s)
+    s = "".join(c for c in s if unicodedata.category(c) != "Mn")
+    s = s.replace("-", " ").replace(".", " ")
+    return " ".join(s.split())
+
+
+# Mapeo SOLO PORTEROS 25_26 (todo local a futro):
+
+
+def aplicar_alias_portero_futro(nombre_portero: str, equipo_norm: str, temporada: str) -> str:
+    """
+    Convierte el nombre que viene de Fantasy (ej. 'Valles', 'Dmitrovic', 'Joan Garcia')
+    al nombre largo que hay en el CSV (ej. 'Alvaro Valles', 'Marko Dmitrovic', 'Joan Garcia'),
+    usando equipo_norm ya normalizado ('betis', 'espanyol', 'barcelona').
+    Solo actúa en temporada 25_26.
+    """
+    if temporada != "25_26":
+        return nombre_portero
+
+    equipo_norm_n = _norm_text_futro(equipo_norm or "")
+    nombre_norm = _norm_text_futro(nombre_portero or "")
+
+    mapa_equipo = ALIAS_PORTEROS_25_26.get(equipo_norm_n, {})
+    nombre_largo_norm = mapa_equipo.get(nombre_norm)
+
+    if nombre_largo_norm:
+        # capitalizar tipo "Alvaro Valles"
+        partes = nombre_largo_norm.split()
+        return " ".join(p.capitalize() for p in partes)
+
+    return nombre_portero
+
+ALIAS_PORTEROS_25_26 = {
+    "betis": {
+        "valles": "alvaro valles",
+        "pau lópez": "pau lopez",
+    },
+    "espanyol": {
+        "dmitrovic": "marko dmitrovic",
+    },
+    "barcelona": {
+        "joan garcia": "joan garcia",
+        "szczesny": "wojciech szczesny",
+    },
+    "villarreal": {
+        "luiz junior": "luiz lucio reis junior",
+    },
+    "levante": {
+        "cunat campos": "pablo cuñat",
+        "cuñat campos": "pablo cuñat",
+    },
+    "mallorca": {
+        # fantasy: "Bergstrom"  -> CSV: "Lucas Bergström"
+        "bergstrom": "lucas bergstrom",
+    },
+}
+
+def normalizar_nombre_portero(nombre_raw: str, equipo_norm: str, temporada: str) -> str:
+    """
+    Normaliza el nombre del portero a una forma sin tildes/minúsculas
+    y aplica alias por equipo/temporada si existe.
+
+    Ejemplos 25_26:
+      'Valles'    + 'betis'    -> 'álvaro vallés'
+      'Bergstrom' + 'mallorca' -> 'lucas bergström'
+    """
+    nombre_norm = _norm_text_futro(nombre_raw or "")
+    equipo_norm_n = _norm_text_futro(equipo_norm or "")
+
+    if temporada == "25_26":
+        alias_equipo = ALIAS_PORTEROS_25_26.get(equipo_norm_n, {})
+        # alias_equipo debe tener las claves ya normalizadas con _norm_text_futro
+        return alias_equipo.get(nombre_norm, nombre_norm)
+
+    return nombre_norm
+
 
 
 CSV_NAME = "players_with_features_exp3_CORREGIDO.csv"
-
+pd.set_option('future.no_silent_downcasting', True)
 
 def cargar_datos_temporada(temporada: str = "25_26") -> pd.DataFrame:
     """
@@ -198,29 +309,106 @@ def predecir_partido(
     Predice los puntos fantasy de un portero para un partido.
     Usa siempre la última fila disponible de ese portero en la temporada (jornada máxima).
     """
-    df = cargar_datos_temporada("25_26")
+    temporada = "25_26"
+
+    df = cargar_datos_temporada(temporada)
     if df is None or len(df) == 0:
         return {
-            "error": "No se encontraron datos históricos de la temporada 25_26",
+            "error": f"No se encontraron datos históricos de la temporada {temporada}",
             "partido": partido,
             "portero": portero,
         }
 
-    porterolower = portero.lower().strip()
-    mask = (
-        df["player"].str.lower().str.contains(porterolower, na=False)
-        & (df["posicion"] == "PT")
-    )
-    if mask.sum() == 0:
-        return {
-            "error": f"Portero '{portero}' no encontrado en la temporada 25_26",
-            "partido": partido,
-            "portero": portero,
-        }
+    # ============================
+    # 1) MATCH ESTRICTO EQUIPO+ALIAS
+    # ============================
+    row = None
+    try:
+        local_norm, visit_norm = partido.split("-")  # ej: "celta-betis"
+        equipos_posibles = [local_norm, visit_norm]
+    except ValueError:
+        equipos_posibles = []
 
-    df_portero = df[mask].sort_values("jornada", ascending=False)
-    row = df_portero.iloc[0]
+    if equipos_posibles:
+        for equipo_norm in equipos_posibles:
+            # DEBUG: ver qué se está intentando matchear
+            '''print(
+                f"[MATCH ESTRICTO] partido={partido} equipo_norm_loop={equipo_norm} "
+                f"portero_raw={portero!r}"
+            )'''
 
+            # aplicar alias “corto -> largo” y normalizar igual que el CSV
+            nombre_alias = aplicar_alias_portero_futro(portero, equipo_norm, temporada)
+            nombre_busqueda_norm = _norm_text_futro(nombre_alias)
+
+            # ver algunos players candidatos de ese equipo
+            mask_equipo = (
+                (df["temporada"] == temporada)
+                & (df["Equipo_propio"].str.lower() == equipo_norm)
+                & (df["posicion"] == "PT")
+            )
+            candidatos = (
+                df.loc[mask_equipo, "player"]
+                .drop_duplicates()
+                .tolist()
+            )
+            '''
+            print(
+                f"[MATCH ESTRICTO] posibles players PT en {equipo_norm}: {candidatos}"
+            )'''
+
+            mask = (
+                (df["temporada"] == temporada)
+                & (df["Equipo_propio"].str.lower() == equipo_norm)
+                & (df["player"].apply(_norm_text_futro) == nombre_busqueda_norm)
+                & (df["posicion"] == "PT")
+            )
+            '''print(
+                f"[MATCH ESTRICTO] coincidencias mask.sum()={mask.sum()} "
+                f"para alias_normalizado={nombre_busqueda_norm!r}"
+            )'''
+
+            if mask.sum() > 0:
+                df_portero = df[mask].sort_values("jornada", ascending=False)
+                row = df_portero.iloc[0]
+                break
+
+    # ============================
+    # 2) FALLBACK: CONTAINS POR NOMBRE (CON LOG EXTRA)
+    # ============================
+    if row is None:
+        porterolower = portero.lower().strip()
+        #print(f"[FALLBACK CONTAINS] buscando '{porterolower}' en df['player'] PT temporada={temporada}")
+
+        mask = (
+            df["player"].str.lower().str.contains(porterolower, na=False)
+            & (df["posicion"] == "PT")
+        )
+
+        if mask.sum() == 0:
+            players_pt = (
+                df.loc[df["posicion"] == "PT", "player"]
+                .drop_duplicates()
+                .tolist()
+            )
+            #print("[FALLBACK CONTAINS] Ejemplo players PT temporada:", players_pt[:20])
+            #print(
+            #    "[FALLBACK DEBUG] Candidatos que contienen 'bergstr':",
+            #    [p for p in players_pt if "bergstr" in _norm_text_futro(p)],
+            #)
+
+            return {
+                "error": f"Portero '{portero}' no encontrado en la temporada {temporada}",
+                "partido": partido,
+                "portero": portero,
+            }
+
+        df_portero = df[mask].sort_values("jornada", ascending=False)
+        row = df_portero.iloc[0]
+
+    # ============================
+    # 3) RESTO IGUAL QUE TENÍAS
+    # ============================
     info_portero = {
         "nombre": row["player"],
         "equipo": row["Equipo_propio"],
@@ -230,7 +418,6 @@ def predecir_partido(
         "jornada_predicha": int(jornada) if jornada is not None else None,
         "temporada": row.get("temporada"),
         "posicion": row.get("posicion"),
-        # Rachas portero (solo si las tenemos)
         "pf_last5_mean": float(row["pf_last5_mean"]) if "pf_last5_mean" in row and pd.notna(row["pf_last5_mean"]) else None,
         "gc_last5_mean": float(row["gc_last5_mean"]) if "gc_last5_mean" in row and pd.notna(row["gc_last5_mean"]) else None,
         "psxg_last5_mean": float(row["psxg_last5_mean"]) if "psxg_last5_mean" in row and pd.notna(row["psxg_last5_mean"]) else None,
@@ -282,7 +469,6 @@ def predecir_partido(
         "p_win": float(row["p_win_propio"]) if pd.notna(row.get("p_win_propio")) else None,
     }
 
-    # Construir X con las mismas columnas que el modelo espera
     try:
         X = pd.DataFrame(row[feature_cols]).T
     except KeyError as e:

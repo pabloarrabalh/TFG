@@ -8,7 +8,7 @@ import pandas as pd
 from bs4 import NavigableString
 from rapidfuzz import process, fuzz
 
-from alias import *
+from scrapping.alias import *
 
 
 # ==========================

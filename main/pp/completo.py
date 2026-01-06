@@ -767,14 +767,15 @@ def entrenar_modelo_porteros(df: pd.DataFrame):
     print("\n" + "="*60)
     print("MODELO 1: RANDOM FOREST")
     print("="*60)
-
     rf = RandomForestRegressor(
-        n_estimators=100,
-        max_features=0.5,
-        min_samples_leaf=1,
-        random_state=42,
-        n_jobs=-1
-    )
+    n_estimators=300,
+    max_features=0.5,
+    max_depth=8,        # menos profundo
+    min_samples_leaf=10,# hojas más grandes
+    random_state=42,
+    n_jobs=-1
+)
+
 
     rf.fit(X_train, y_train)
     y_pred_rf = rf.predict(X_test)
