@@ -1,0 +1,1622 @@
+RandomForest feature importances por configuración (porteros) - ventana 3
+
+Modelo: win3_rf_ne200_d6_l5_mf3
+  n_estimators=200, max_depth=6, min_samples_leaf=5, max_features=0.3
+  MAE_test=3.1277  R2_test=0.0181
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1028
+    p_away: 0.0970
+    p_home: 0.0791
+    pts_diff: 0.0754
+    posicion_rival: 0.0628
+    goal_diff_last3_rival: 0.0623
+    p_win_propio: 0.0621
+    p_loss_propio: 0.0619
+    psxg_last3_std: 0.0583
+    p_draw_match: 0.0568
+
+Modelo: win3_rf_ne200_d6_l5_mf4
+  n_estimators=200, max_depth=6, min_samples_leaf=5, max_features=0.4
+  MAE_test=3.1155  R2_test=0.0207
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1062
+    p_away: 0.0953
+    pts_diff: 0.0788
+    p_home: 0.0738
+    goal_diff_last3_rival: 0.0710
+    p_win_propio: 0.0639
+    posicion_rival: 0.0636
+    psxg_last3_std: 0.0582
+    p_loss_propio: 0.0580
+    xg_last3_mean_rival: 0.0525
+
+Modelo: win3_rf_ne200_d6_l5_mf5
+  n_estimators=200, max_depth=6, min_samples_leaf=5, max_features=0.5
+  MAE_test=3.1307  R2_test=0.0160
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1133
+    p_away: 0.1026
+    p_home: 0.0765
+    pts_diff: 0.0753
+    goal_diff_last3_rival: 0.0712
+    posicion_rival: 0.0669
+    psxg_last3_std: 0.0644
+    p_win_propio: 0.0597
+    p_loss_propio: 0.0558
+    goal_diff_last3_team: 0.0481
+
+Modelo: win3_rf_ne200_d6_l10_mf3
+  n_estimators=200, max_depth=6, min_samples_leaf=10, max_features=0.3
+  MAE_test=3.0912  R2_test=0.0225
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1047
+    p_away: 0.0948
+    p_home: 0.0851
+    pts_diff: 0.0743
+    goal_diff_last3_rival: 0.0719
+    posicion_rival: 0.0694
+    p_loss_propio: 0.0569
+    psxg_last3_std: 0.0563
+    p_win_propio: 0.0534
+    goal_diff_last3_team: 0.0523
+
+Modelo: win3_rf_ne200_d6_l10_mf4
+  n_estimators=200, max_depth=6, min_samples_leaf=10, max_features=0.4
+  MAE_test=3.1185  R2_test=0.0168
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1101
+    p_away: 0.1069
+    pts_diff: 0.0774
+    p_home: 0.0764
+    posicion_rival: 0.0694
+    goal_diff_last3_rival: 0.0656
+    psxg_last3_std: 0.0621
+    p_win_propio: 0.0567
+    p_loss_propio: 0.0557
+    p_draw: 0.0467
+
+Modelo: win3_rf_ne200_d6_l10_mf5
+  n_estimators=200, max_depth=6, min_samples_leaf=10, max_features=0.5
+  MAE_test=3.1064  R2_test=0.0222
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1205
+    p_away: 0.1015
+    p_home: 0.0774
+    posicion_rival: 0.0725
+    goal_diff_last3_rival: 0.0707
+    pts_diff: 0.0699
+    psxg_last3_std: 0.0613
+    p_loss_propio: 0.0588
+    p_win_propio: 0.0521
+    xg_last3_mean_rival: 0.0488
+
+Modelo: win3_rf_ne200_d6_l20_mf3
+  n_estimators=200, max_depth=6, min_samples_leaf=20, max_features=0.3
+  MAE_test=3.0912  R2_test=0.0308
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1068
+    p_away: 0.1063
+    p_home: 0.0861
+    pts_diff: 0.0802
+    posicion_rival: 0.0762
+    goal_diff_last3_rival: 0.0727
+    p_loss_propio: 0.0541
+    p_win_propio: 0.0511
+    psxg_last3_std: 0.0497
+    goal_diff_last3_team: 0.0470
+
+Modelo: win3_rf_ne200_d6_l20_mf4
+  n_estimators=200, max_depth=6, min_samples_leaf=20, max_features=0.4
+  MAE_test=3.0881  R2_test=0.0274
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1158
+    p_away: 0.1135
+    p_home: 0.0803
+    posicion_rival: 0.0770
+    pts_diff: 0.0758
+    goal_diff_last3_rival: 0.0756
+    psxg_last3_std: 0.0547
+    p_win_propio: 0.0528
+    p_draw: 0.0455
+    p_loss_propio: 0.0448
+
+Modelo: win3_rf_ne200_d6_l20_mf5
+  n_estimators=200, max_depth=6, min_samples_leaf=20, max_features=0.5
+  MAE_test=3.0942  R2_test=0.0247
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1292
+    p_away: 0.1127
+    p_home: 0.0826
+    posicion_rival: 0.0805
+    goal_diff_last3_rival: 0.0764
+    pts_diff: 0.0746
+    psxg_last3_std: 0.0552
+    p_win_propio: 0.0522
+    p_loss_propio: 0.0493
+    xg_last3_mean_rival: 0.0469
+
+Modelo: win3_rf_ne200_d8_l5_mf3
+  n_estimators=200, max_depth=8, min_samples_leaf=5, max_features=0.3
+  MAE_test=3.1520  R2_test=0.0129
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0939
+    p_away: 0.0839
+    p_home: 0.0710
+    pts_diff: 0.0710
+    goal_diff_last3_rival: 0.0644
+    p_loss_propio: 0.0637
+    psxg_last3_std: 0.0625
+    p_win_propio: 0.0616
+    posicion_rival: 0.0568
+    goal_diff_last3_team: 0.0551
+
+Modelo: win3_rf_ne200_d8_l5_mf4
+  n_estimators=200, max_depth=8, min_samples_leaf=5, max_features=0.4
+  MAE_test=3.1733  R2_test=0.0072
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0967
+    p_away: 0.0886
+    p_home: 0.0692
+    pts_diff: 0.0687
+    goal_diff_last3_rival: 0.0682
+    psxg_last3_std: 0.0661
+    p_loss_propio: 0.0622
+    p_win_propio: 0.0592
+    posicion_rival: 0.0557
+    xg_last3_mean_rival: 0.0546
+
+Modelo: win3_rf_ne200_d8_l5_mf5
+  n_estimators=200, max_depth=8, min_samples_leaf=5, max_features=0.5
+  MAE_test=3.1368  R2_test=0.0077
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1044
+    p_away: 0.0836
+    pts_diff: 0.0711
+    p_home: 0.0690
+    psxg_last3_std: 0.0676
+    goal_diff_last3_rival: 0.0660
+    p_win_propio: 0.0640
+    p_loss_propio: 0.0594
+    posicion_rival: 0.0571
+    xg_last3_mean_rival: 0.0555
+
+Modelo: win3_rf_ne200_d8_l10_mf3
+  n_estimators=200, max_depth=8, min_samples_leaf=10, max_features=0.3
+  MAE_test=3.1398  R2_test=0.0158
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1020
+    p_away: 0.0921
+    p_home: 0.0787
+    pts_diff: 0.0703
+    goal_diff_last3_rival: 0.0677
+    posicion_rival: 0.0629
+    psxg_last3_std: 0.0615
+    p_loss_propio: 0.0598
+    p_win_propio: 0.0553
+    p_draw: 0.0537
+
+Modelo: win3_rf_ne200_d8_l10_mf4
+  n_estimators=200, max_depth=8, min_samples_leaf=10, max_features=0.4
+  MAE_test=3.1216  R2_test=0.0144
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1054
+    p_away: 0.0936
+    p_home: 0.0721
+    pts_diff: 0.0700
+    goal_diff_last3_rival: 0.0658
+    psxg_last3_std: 0.0608
+    posicion_rival: 0.0596
+    p_loss_propio: 0.0578
+    xg_last3_mean_rival: 0.0574
+    p_win_propio: 0.0557
+
+Modelo: win3_rf_ne200_d8_l10_mf5
+  n_estimators=200, max_depth=8, min_samples_leaf=10, max_features=0.5
+  MAE_test=3.1307  R2_test=0.0177
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1037
+    p_away: 0.0881
+    p_home: 0.0733
+    pts_diff: 0.0690
+    psxg_last3_std: 0.0676
+    goal_diff_last3_rival: 0.0666
+    posicion_rival: 0.0640
+    p_win_propio: 0.0585
+    p_loss_propio: 0.0573
+    xg_last3_mean_rival: 0.0556
+
+Modelo: win3_rf_ne200_d8_l20_mf3
+  n_estimators=200, max_depth=8, min_samples_leaf=20, max_features=0.3
+  MAE_test=3.0881  R2_test=0.0275
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1001
+    p_away: 0.0996
+    p_home: 0.0855
+    pts_diff: 0.0741
+    posicion_rival: 0.0734
+    goal_diff_last3_rival: 0.0708
+    p_loss_propio: 0.0583
+    p_win_propio: 0.0567
+    psxg_last3_std: 0.0535
+    xg_last3_mean_rival: 0.0524
+
+Modelo: win3_rf_ne200_d8_l20_mf4
+  n_estimators=200, max_depth=8, min_samples_leaf=20, max_features=0.4
+  MAE_test=3.1033  R2_test=0.0239
+  Top 10 features:
+    p_away: 0.1083
+    shots_on_target_ratio_rival_last3: 0.1078
+    p_home: 0.0759
+    goal_diff_last3_rival: 0.0722
+    posicion_rival: 0.0718
+    pts_diff: 0.0708
+    psxg_last3_std: 0.0617
+    p_win_propio: 0.0560
+    xg_last3_mean_rival: 0.0506
+    p_loss_propio: 0.0497
+
+Modelo: win3_rf_ne200_d8_l20_mf5
+  n_estimators=200, max_depth=8, min_samples_leaf=20, max_features=0.5
+  MAE_test=3.1185  R2_test=0.0222
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1210
+    p_away: 0.1031
+    posicion_rival: 0.0769
+    p_home: 0.0756
+    goal_diff_last3_rival: 0.0726
+    pts_diff: 0.0661
+    p_win_propio: 0.0596
+    psxg_last3_std: 0.0581
+    xg_last3_mean_rival: 0.0521
+    p_loss_propio: 0.0502
+
+Modelo: win3_rf_ne200_d10_l5_mf3
+  n_estimators=200, max_depth=10, min_samples_leaf=5, max_features=0.3
+  MAE_test=3.1520  R2_test=0.0067
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0893
+    p_away: 0.0814
+    p_home: 0.0743
+    pts_diff: 0.0663
+    psxg_last3_std: 0.0644
+    p_loss_propio: 0.0631
+    p_win_propio: 0.0627
+    goal_diff_last3_rival: 0.0614
+    posicion_rival: 0.0569
+    xg_last3_mean_rival: 0.0561
+
+Modelo: win3_rf_ne200_d10_l5_mf4
+  n_estimators=200, max_depth=10, min_samples_leaf=5, max_features=0.4
+  MAE_test=3.1337  R2_test=0.0044
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0884
+    p_away: 0.0824
+    pts_diff: 0.0698
+    psxg_last3_std: 0.0691
+    p_home: 0.0682
+    goal_diff_last3_rival: 0.0657
+    p_loss_propio: 0.0614
+    p_win_propio: 0.0594
+    xg_last3_mean_rival: 0.0585
+    psxg_per90_last3: 0.0578
+
+Modelo: win3_rf_ne200_d10_l5_mf5
+  n_estimators=200, max_depth=10, min_samples_leaf=5, max_features=0.5
+  MAE_test=3.1459  R2_test=0.0076
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0958
+    p_away: 0.0828
+    psxg_last3_std: 0.0749
+    pts_diff: 0.0675
+    goal_diff_last3_rival: 0.0675
+    p_home: 0.0673
+    p_win_propio: 0.0607
+    p_loss_propio: 0.0606
+    xg_last3_mean_rival: 0.0575
+    psxg_per90_last3: 0.0573
+
+Modelo: win3_rf_ne200_d10_l10_mf3
+  n_estimators=200, max_depth=10, min_samples_leaf=10, max_features=0.3
+  MAE_test=3.1307  R2_test=0.0143
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0974
+    p_away: 0.0906
+    p_home: 0.0793
+    goal_diff_last3_rival: 0.0693
+    pts_diff: 0.0683
+    p_loss_propio: 0.0628
+    psxg_last3_std: 0.0621
+    posicion_rival: 0.0602
+    p_win_propio: 0.0556
+    xg_last3_mean_rival: 0.0538
+
+Modelo: win3_rf_ne200_d10_l10_mf4
+  n_estimators=200, max_depth=10, min_samples_leaf=10, max_features=0.4
+  MAE_test=3.1368  R2_test=0.0101
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0973
+    p_away: 0.0892
+    p_home: 0.0709
+    pts_diff: 0.0703
+    psxg_last3_std: 0.0661
+    goal_diff_last3_rival: 0.0635
+    p_loss_propio: 0.0612
+    posicion_rival: 0.0602
+    p_win_propio: 0.0569
+    xg_last3_mean_rival: 0.0558
+
+Modelo: win3_rf_ne200_d10_l10_mf5
+  n_estimators=200, max_depth=10, min_samples_leaf=10, max_features=0.5
+  MAE_test=3.1429  R2_test=0.0116
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1032
+    p_away: 0.0885
+    goal_diff_last3_rival: 0.0726
+    psxg_last3_std: 0.0718
+    p_home: 0.0704
+    pts_diff: 0.0690
+    p_loss_propio: 0.0634
+    xg_last3_mean_rival: 0.0581
+    p_win_propio: 0.0569
+    posicion_rival: 0.0562
+
+Modelo: win3_rf_ne200_d10_l20_mf3
+  n_estimators=200, max_depth=10, min_samples_leaf=20, max_features=0.3
+  MAE_test=3.0821  R2_test=0.0279
+  Top 10 features:
+    p_away: 0.0974
+    shots_on_target_ratio_rival_last3: 0.0963
+    p_home: 0.0831
+    pts_diff: 0.0727
+    posicion_rival: 0.0714
+    goal_diff_last3_rival: 0.0678
+    p_loss_propio: 0.0615
+    p_win_propio: 0.0605
+    psxg_last3_std: 0.0564
+    xg_last3_mean_rival: 0.0508
+
+Modelo: win3_rf_ne200_d10_l20_mf4
+  n_estimators=200, max_depth=10, min_samples_leaf=20, max_features=0.4
+  MAE_test=3.1003  R2_test=0.0225
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1078
+    p_away: 0.1038
+    p_home: 0.0762
+    goal_diff_last3_rival: 0.0709
+    posicion_rival: 0.0705
+    pts_diff: 0.0666
+    psxg_last3_std: 0.0631
+    p_win_propio: 0.0576
+    p_loss_propio: 0.0522
+    xg_last3_mean_rival: 0.0512
+
+Modelo: win3_rf_ne200_d10_l20_mf5
+  n_estimators=200, max_depth=10, min_samples_leaf=20, max_features=0.5
+  MAE_test=3.1246  R2_test=0.0211
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1156
+    p_away: 0.1004
+    p_home: 0.0767
+    posicion_rival: 0.0740
+    goal_diff_last3_rival: 0.0703
+    psxg_last3_std: 0.0620
+    pts_diff: 0.0619
+    p_win_propio: 0.0577
+    p_loss_propio: 0.0534
+    xg_last3_mean_rival: 0.0523
+
+Modelo: win3_rf_ne200_d12_l5_mf3
+  n_estimators=200, max_depth=12, min_samples_leaf=5, max_features=0.3
+  MAE_test=3.1489  R2_test=0.0112
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0855
+    p_away: 0.0782
+    p_home: 0.0704
+    psxg_last3_std: 0.0670
+    pts_diff: 0.0662
+    p_loss_propio: 0.0643
+    p_win_propio: 0.0606
+    goal_diff_last3_rival: 0.0600
+    psxg_per90_last3: 0.0577
+    xg_last3_mean_rival: 0.0571
+
+Modelo: win3_rf_ne200_d12_l5_mf4
+  n_estimators=200, max_depth=12, min_samples_leaf=5, max_features=0.4
+  MAE_test=3.1337  R2_test=0.0031
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0902
+    p_away: 0.0828
+    psxg_last3_std: 0.0704
+    pts_diff: 0.0665
+    p_home: 0.0665
+    goal_diff_last3_rival: 0.0663
+    p_win_propio: 0.0606
+    xg_last3_mean_rival: 0.0593
+    p_loss_propio: 0.0586
+    psxg_per90_last3: 0.0580
+
+Modelo: win3_rf_ne200_d12_l5_mf5
+  n_estimators=200, max_depth=12, min_samples_leaf=5, max_features=0.5
+  MAE_test=3.1702  R2_test=-0.0056
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0928
+    p_away: 0.0790
+    psxg_last3_std: 0.0745
+    p_home: 0.0679
+    pts_diff: 0.0674
+    goal_diff_last3_rival: 0.0656
+    p_loss_propio: 0.0611
+    xg_last3_mean_rival: 0.0594
+    p_win_propio: 0.0585
+    psxg_per90_last3: 0.0585
+
+Modelo: win3_rf_ne200_d12_l10_mf3
+  n_estimators=200, max_depth=12, min_samples_leaf=10, max_features=0.3
+  MAE_test=3.1429  R2_test=0.0150
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0945
+    p_away: 0.0900
+    p_home: 0.0764
+    pts_diff: 0.0683
+    goal_diff_last3_rival: 0.0653
+    psxg_last3_std: 0.0642
+    p_loss_propio: 0.0637
+    posicion_rival: 0.0576
+    p_win_propio: 0.0575
+    p_draw: 0.0547
+
+Modelo: win3_rf_ne200_d12_l10_mf4
+  n_estimators=200, max_depth=12, min_samples_leaf=10, max_features=0.4
+  MAE_test=3.1368  R2_test=0.0160
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0975
+    p_away: 0.0887
+    pts_diff: 0.0715
+    p_home: 0.0692
+    psxg_last3_std: 0.0658
+    goal_diff_last3_rival: 0.0627
+    p_win_propio: 0.0613
+    p_loss_propio: 0.0598
+    posicion_rival: 0.0589
+    xg_last3_mean_rival: 0.0588
+
+Modelo: win3_rf_ne200_d12_l10_mf5
+  n_estimators=200, max_depth=12, min_samples_leaf=10, max_features=0.5
+  MAE_test=3.1489  R2_test=0.0097
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1013
+    p_away: 0.0869
+    psxg_last3_std: 0.0719
+    pts_diff: 0.0697
+    goal_diff_last3_rival: 0.0671
+    p_home: 0.0671
+    p_loss_propio: 0.0600
+    xg_last3_mean_rival: 0.0590
+    posicion_rival: 0.0581
+    p_win_propio: 0.0568
+
+Modelo: win3_rf_ne200_d12_l20_mf3
+  n_estimators=200, max_depth=12, min_samples_leaf=20, max_features=0.3
+  MAE_test=3.0881  R2_test=0.0263
+  Top 10 features:
+    p_away: 0.0975
+    shots_on_target_ratio_rival_last3: 0.0964
+    p_home: 0.0840
+    pts_diff: 0.0718
+    posicion_rival: 0.0700
+    goal_diff_last3_rival: 0.0683
+    p_loss_propio: 0.0623
+    p_win_propio: 0.0582
+    psxg_last3_std: 0.0573
+    p_draw: 0.0496
+
+Modelo: win3_rf_ne200_d12_l20_mf4
+  n_estimators=200, max_depth=12, min_samples_leaf=20, max_features=0.4
+  MAE_test=3.0942  R2_test=0.0218
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1066
+    p_away: 0.1025
+    p_home: 0.0769
+    goal_diff_last3_rival: 0.0717
+    posicion_rival: 0.0698
+    pts_diff: 0.0656
+    psxg_last3_std: 0.0635
+    p_win_propio: 0.0568
+    p_loss_propio: 0.0524
+    xg_last3_mean_rival: 0.0522
+
+Modelo: win3_rf_ne200_d12_l20_mf5
+  n_estimators=200, max_depth=12, min_samples_leaf=20, max_features=0.5
+  MAE_test=3.1277  R2_test=0.0212
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1172
+    p_away: 0.1014
+    p_home: 0.0746
+    posicion_rival: 0.0720
+    goal_diff_last3_rival: 0.0699
+    pts_diff: 0.0619
+    psxg_last3_std: 0.0611
+    p_win_propio: 0.0576
+    p_loss_propio: 0.0552
+    xg_last3_mean_rival: 0.0530
+
+Modelo: win3_rf_ne400_d6_l5_mf3
+  n_estimators=400, max_depth=6, min_samples_leaf=5, max_features=0.3
+  MAE_test=3.1246  R2_test=0.0163
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1011
+    p_away: 0.0981
+    p_home: 0.0804
+    pts_diff: 0.0762
+    goal_diff_last3_rival: 0.0721
+    p_win_propio: 0.0629
+    p_loss_propio: 0.0627
+    psxg_last3_std: 0.0599
+    posicion_rival: 0.0555
+    p_draw_match: 0.0515
+
+Modelo: win3_rf_ne400_d6_l5_mf4
+  n_estimators=400, max_depth=6, min_samples_leaf=5, max_features=0.4
+  MAE_test=3.1185  R2_test=0.0219
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1090
+    p_away: 0.0989
+    pts_diff: 0.0752
+    p_home: 0.0750
+    goal_diff_last3_rival: 0.0741
+    p_win_propio: 0.0615
+    p_loss_propio: 0.0603
+    psxg_last3_std: 0.0602
+    posicion_rival: 0.0595
+    xg_last3_mean_rival: 0.0506
+
+Modelo: win3_rf_ne400_d6_l5_mf5
+  n_estimators=400, max_depth=6, min_samples_leaf=5, max_features=0.5
+  MAE_test=3.1155  R2_test=0.0177
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1146
+    p_away: 0.1061
+    p_home: 0.0791
+    goal_diff_last3_rival: 0.0725
+    pts_diff: 0.0716
+    psxg_last3_std: 0.0642
+    posicion_rival: 0.0598
+    p_win_propio: 0.0594
+    p_loss_propio: 0.0566
+    goal_diff_last3_team: 0.0512
+
+Modelo: win3_rf_ne400_d6_l10_mf3
+  n_estimators=400, max_depth=6, min_samples_leaf=10, max_features=0.3
+  MAE_test=3.1003  R2_test=0.0224
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1052
+    p_away: 0.1000
+    p_home: 0.0823
+    goal_diff_last3_rival: 0.0781
+    pts_diff: 0.0755
+    posicion_rival: 0.0621
+    p_loss_propio: 0.0592
+    psxg_last3_std: 0.0558
+    p_win_propio: 0.0557
+    p_draw: 0.0505
+
+Modelo: win3_rf_ne400_d6_l10_mf4
+  n_estimators=400, max_depth=6, min_samples_leaf=10, max_features=0.4
+  MAE_test=3.1003  R2_test=0.0213
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1179
+    p_away: 0.1068
+    p_home: 0.0796
+    pts_diff: 0.0737
+    goal_diff_last3_rival: 0.0714
+    posicion_rival: 0.0659
+    psxg_last3_std: 0.0583
+    p_win_propio: 0.0560
+    p_loss_propio: 0.0547
+    xg_last3_mean_rival: 0.0459
+
+Modelo: win3_rf_ne400_d6_l10_mf5
+  n_estimators=400, max_depth=6, min_samples_leaf=10, max_features=0.5
+  MAE_test=3.0821  R2_test=0.0222
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1208
+    p_away: 0.1086
+    p_home: 0.0806
+    goal_diff_last3_rival: 0.0743
+    pts_diff: 0.0709
+    posicion_rival: 0.0658
+    psxg_last3_std: 0.0643
+    p_loss_propio: 0.0589
+    p_win_propio: 0.0521
+    xg_last3_mean_rival: 0.0470
+
+Modelo: win3_rf_ne400_d6_l20_mf3
+  n_estimators=400, max_depth=6, min_samples_leaf=20, max_features=0.3
+  MAE_test=3.0912  R2_test=0.0284
+  Top 10 features:
+    p_away: 0.1106
+    shots_on_target_ratio_rival_last3: 0.1100
+    p_home: 0.0881
+    goal_diff_last3_rival: 0.0815
+    pts_diff: 0.0769
+    posicion_rival: 0.0696
+    p_loss_propio: 0.0558
+    psxg_last3_std: 0.0526
+    p_win_propio: 0.0513
+    goal_diff_last3_team: 0.0452
+
+Modelo: win3_rf_ne400_d6_l20_mf4
+  n_estimators=400, max_depth=6, min_samples_leaf=20, max_features=0.4
+  MAE_test=3.0851  R2_test=0.0279
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1204
+    p_away: 0.1185
+    p_home: 0.0830
+    goal_diff_last3_rival: 0.0787
+    posicion_rival: 0.0736
+    pts_diff: 0.0714
+    psxg_last3_std: 0.0516
+    p_win_propio: 0.0508
+    p_loss_propio: 0.0505
+    xg_last3_mean_rival: 0.0459
+
+Modelo: win3_rf_ne400_d6_l20_mf5
+  n_estimators=400, max_depth=6, min_samples_leaf=20, max_features=0.5
+  MAE_test=3.1094  R2_test=0.0245
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1303
+    p_away: 0.1182
+    p_home: 0.0848
+    goal_diff_last3_rival: 0.0811
+    posicion_rival: 0.0736
+    pts_diff: 0.0689
+    psxg_last3_std: 0.0588
+    p_win_propio: 0.0522
+    p_loss_propio: 0.0471
+    xg_last3_mean_rival: 0.0453
+
+Modelo: win3_rf_ne400_d8_l5_mf3
+  n_estimators=400, max_depth=8, min_samples_leaf=5, max_features=0.3
+  MAE_test=3.1125  R2_test=0.0138
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0952
+    p_away: 0.0868
+    p_home: 0.0749
+    pts_diff: 0.0726
+    goal_diff_last3_rival: 0.0675
+    p_win_propio: 0.0630
+    psxg_last3_std: 0.0618
+    p_loss_propio: 0.0615
+    xg_last3_mean_rival: 0.0538
+    p_draw: 0.0528
+
+Modelo: win3_rf_ne400_d8_l5_mf4
+  n_estimators=400, max_depth=8, min_samples_leaf=5, max_features=0.4
+  MAE_test=3.1429  R2_test=0.0106
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0989
+    p_away: 0.0891
+    goal_diff_last3_rival: 0.0711
+    p_home: 0.0706
+    pts_diff: 0.0664
+    psxg_last3_std: 0.0661
+    p_loss_propio: 0.0643
+    p_win_propio: 0.0611
+    p_draw: 0.0527
+    posicion_rival: 0.0525
+
+Modelo: win3_rf_ne400_d8_l5_mf5
+  n_estimators=400, max_depth=8, min_samples_leaf=5, max_features=0.5
+  MAE_test=3.1368  R2_test=0.0094
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1030
+    p_away: 0.0870
+    p_home: 0.0720
+    goal_diff_last3_rival: 0.0698
+    psxg_last3_std: 0.0694
+    pts_diff: 0.0689
+    p_win_propio: 0.0620
+    p_loss_propio: 0.0617
+    posicion_rival: 0.0537
+    xg_last3_mean_rival: 0.0532
+
+Modelo: win3_rf_ne400_d8_l10_mf3
+  n_estimators=400, max_depth=8, min_samples_leaf=10, max_features=0.3
+  MAE_test=3.1216  R2_test=0.0170
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1010
+    p_away: 0.0946
+    p_home: 0.0773
+    goal_diff_last3_rival: 0.0722
+    pts_diff: 0.0693
+    psxg_last3_std: 0.0609
+    p_win_propio: 0.0602
+    p_loss_propio: 0.0599
+    posicion_rival: 0.0570
+    p_draw: 0.0545
+
+Modelo: win3_rf_ne400_d8_l10_mf4
+  n_estimators=400, max_depth=8, min_samples_leaf=10, max_features=0.4
+  MAE_test=3.1125  R2_test=0.0143
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1062
+    p_away: 0.0941
+    p_home: 0.0726
+    goal_diff_last3_rival: 0.0692
+    pts_diff: 0.0681
+    p_win_propio: 0.0613
+    psxg_last3_std: 0.0609
+    p_loss_propio: 0.0592
+    posicion_rival: 0.0584
+    xg_last3_mean_rival: 0.0544
+
+Modelo: win3_rf_ne400_d8_l10_mf5
+  n_estimators=400, max_depth=8, min_samples_leaf=10, max_features=0.5
+  MAE_test=3.1003  R2_test=0.0201
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1074
+    p_away: 0.0940
+    p_home: 0.0735
+    goal_diff_last3_rival: 0.0709
+    psxg_last3_std: 0.0705
+    pts_diff: 0.0663
+    posicion_rival: 0.0582
+    p_win_propio: 0.0572
+    p_loss_propio: 0.0569
+    xg_last3_mean_rival: 0.0544
+
+Modelo: win3_rf_ne400_d8_l20_mf3
+  n_estimators=400, max_depth=8, min_samples_leaf=20, max_features=0.3
+  MAE_test=3.0973  R2_test=0.0287
+  Top 10 features:
+    p_away: 0.1041
+    shots_on_target_ratio_rival_last3: 0.1037
+    p_home: 0.0844
+    goal_diff_last3_rival: 0.0773
+    pts_diff: 0.0727
+    posicion_rival: 0.0644
+    p_loss_propio: 0.0579
+    p_win_propio: 0.0575
+    psxg_last3_std: 0.0535
+    xg_last3_mean_rival: 0.0512
+
+Modelo: win3_rf_ne400_d8_l20_mf4
+  n_estimators=400, max_depth=8, min_samples_leaf=20, max_features=0.4
+  MAE_test=3.1003  R2_test=0.0248
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1140
+    p_away: 0.1096
+    p_home: 0.0787
+    goal_diff_last3_rival: 0.0756
+    pts_diff: 0.0674
+    posicion_rival: 0.0662
+    psxg_last3_std: 0.0584
+    p_win_propio: 0.0556
+    p_loss_propio: 0.0538
+    xg_last3_mean_rival: 0.0506
+
+Modelo: win3_rf_ne400_d8_l20_mf5
+  n_estimators=400, max_depth=8, min_samples_leaf=20, max_features=0.5
+  MAE_test=3.0942  R2_test=0.0228
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1213
+    p_away: 0.1085
+    p_home: 0.0800
+    goal_diff_last3_rival: 0.0773
+    posicion_rival: 0.0685
+    pts_diff: 0.0637
+    psxg_last3_std: 0.0618
+    p_win_propio: 0.0567
+    xg_last3_mean_rival: 0.0539
+    p_loss_propio: 0.0508
+
+Modelo: win3_rf_ne400_d10_l5_mf3
+  n_estimators=400, max_depth=10, min_samples_leaf=5, max_features=0.3
+  MAE_test=3.1368  R2_test=0.0043
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0897
+    p_away: 0.0837
+    p_home: 0.0734
+    pts_diff: 0.0679
+    goal_diff_last3_rival: 0.0653
+    psxg_last3_std: 0.0653
+    p_loss_propio: 0.0641
+    p_win_propio: 0.0619
+    psxg_per90_last3: 0.0560
+    xg_last3_mean_rival: 0.0551
+
+Modelo: win3_rf_ne400_d10_l5_mf4
+  n_estimators=400, max_depth=10, min_samples_leaf=5, max_features=0.4
+  MAE_test=3.1337  R2_test=0.0072
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0910
+    p_away: 0.0851
+    p_home: 0.0689
+    psxg_last3_std: 0.0683
+    goal_diff_last3_rival: 0.0678
+    pts_diff: 0.0677
+    p_win_propio: 0.0613
+    p_loss_propio: 0.0607
+    xg_last3_mean_rival: 0.0583
+    psxg_per90_last3: 0.0569
+
+Modelo: win3_rf_ne400_d10_l5_mf5
+  n_estimators=400, max_depth=10, min_samples_leaf=5, max_features=0.5
+  MAE_test=3.1489  R2_test=0.0056
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0970
+    p_away: 0.0833
+    psxg_last3_std: 0.0736
+    p_home: 0.0700
+    goal_diff_last3_rival: 0.0680
+    pts_diff: 0.0662
+    p_win_propio: 0.0608
+    p_loss_propio: 0.0599
+    xg_last3_mean_rival: 0.0588
+    psxg_per90_last3: 0.0559
+
+Modelo: win3_rf_ne400_d10_l10_mf3
+  n_estimators=400, max_depth=10, min_samples_leaf=10, max_features=0.3
+  MAE_test=3.1216  R2_test=0.0133
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0966
+    p_away: 0.0907
+    p_home: 0.0791
+    goal_diff_last3_rival: 0.0724
+    pts_diff: 0.0671
+    psxg_last3_std: 0.0625
+    p_loss_propio: 0.0609
+    p_win_propio: 0.0597
+    posicion_rival: 0.0554
+    p_draw: 0.0548
+
+Modelo: win3_rf_ne400_d10_l10_mf4
+  n_estimators=400, max_depth=10, min_samples_leaf=10, max_features=0.4
+  MAE_test=3.1368  R2_test=0.0141
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1027
+    p_away: 0.0910
+    p_home: 0.0717
+    goal_diff_last3_rival: 0.0680
+    pts_diff: 0.0665
+    psxg_last3_std: 0.0641
+    p_loss_propio: 0.0616
+    p_win_propio: 0.0582
+    posicion_rival: 0.0572
+    xg_last3_mean_rival: 0.0559
+
+Modelo: win3_rf_ne400_d10_l10_mf5
+  n_estimators=400, max_depth=10, min_samples_leaf=10, max_features=0.5
+  MAE_test=3.1307  R2_test=0.0152
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1033
+    p_away: 0.0920
+    psxg_last3_std: 0.0736
+    goal_diff_last3_rival: 0.0709
+    p_home: 0.0701
+    pts_diff: 0.0671
+    p_loss_propio: 0.0623
+    p_win_propio: 0.0586
+    xg_last3_mean_rival: 0.0575
+    psxg_per90_last3: 0.0549
+
+Modelo: win3_rf_ne400_d10_l20_mf3
+  n_estimators=400, max_depth=10, min_samples_leaf=20, max_features=0.3
+  MAE_test=3.1033  R2_test=0.0282
+  Top 10 features:
+    p_away: 0.1027
+    shots_on_target_ratio_rival_last3: 0.0999
+    p_home: 0.0827
+    goal_diff_last3_rival: 0.0754
+    pts_diff: 0.0710
+    posicion_rival: 0.0643
+    p_loss_propio: 0.0603
+    psxg_last3_std: 0.0579
+    p_win_propio: 0.0575
+    p_draw: 0.0500
+
+Modelo: win3_rf_ne400_d10_l20_mf4
+  n_estimators=400, max_depth=10, min_samples_leaf=20, max_features=0.4
+  MAE_test=3.1003  R2_test=0.0237
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1126
+    p_away: 0.1059
+    p_home: 0.0784
+    goal_diff_last3_rival: 0.0740
+    posicion_rival: 0.0660
+    pts_diff: 0.0641
+    psxg_last3_std: 0.0626
+    p_win_propio: 0.0559
+    p_loss_propio: 0.0552
+    xg_last3_mean_rival: 0.0509
+
+Modelo: win3_rf_ne400_d10_l20_mf5
+  n_estimators=400, max_depth=10, min_samples_leaf=20, max_features=0.5
+  MAE_test=3.1125  R2_test=0.0201
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1173
+    p_away: 0.1063
+    p_home: 0.0790
+    goal_diff_last3_rival: 0.0742
+    posicion_rival: 0.0657
+    psxg_last3_std: 0.0649
+    pts_diff: 0.0611
+    p_win_propio: 0.0567
+    xg_last3_mean_rival: 0.0538
+    p_loss_propio: 0.0522
+
+Modelo: win3_rf_ne400_d12_l5_mf3
+  n_estimators=400, max_depth=12, min_samples_leaf=5, max_features=0.3
+  MAE_test=3.1459  R2_test=0.0093
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0873
+    p_away: 0.0802
+    p_home: 0.0708
+    pts_diff: 0.0670
+    psxg_last3_std: 0.0660
+    goal_diff_last3_rival: 0.0647
+    p_loss_propio: 0.0632
+    p_win_propio: 0.0612
+    psxg_per90_last3: 0.0580
+    xg_last3_mean_rival: 0.0567
+
+Modelo: win3_rf_ne400_d12_l5_mf4
+  n_estimators=400, max_depth=12, min_samples_leaf=5, max_features=0.4
+  MAE_test=3.1641  R2_test=0.0046
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0917
+    p_away: 0.0822
+    psxg_last3_std: 0.0719
+    goal_diff_last3_rival: 0.0679
+    p_home: 0.0668
+    pts_diff: 0.0654
+    p_win_propio: 0.0609
+    xg_last3_mean_rival: 0.0586
+    p_loss_propio: 0.0585
+    psxg_per90_last3: 0.0580
+
+Modelo: win3_rf_ne400_d12_l5_mf5
+  n_estimators=400, max_depth=12, min_samples_leaf=5, max_features=0.5
+  MAE_test=3.1733  R2_test=0.0021
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0945
+    p_away: 0.0811
+    psxg_last3_std: 0.0751
+    p_home: 0.0675
+    goal_diff_last3_rival: 0.0670
+    pts_diff: 0.0641
+    p_loss_propio: 0.0616
+    xg_last3_mean_rival: 0.0594
+    p_win_propio: 0.0584
+    psxg_per90_last3: 0.0582
+
+Modelo: win3_rf_ne400_d12_l10_mf3
+  n_estimators=400, max_depth=12, min_samples_leaf=10, max_features=0.3
+  MAE_test=3.1337  R2_test=0.0153
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0939
+    p_away: 0.0899
+    p_home: 0.0764
+    goal_diff_last3_rival: 0.0686
+    pts_diff: 0.0671
+    psxg_last3_std: 0.0651
+    p_loss_propio: 0.0630
+    p_win_propio: 0.0597
+    p_draw: 0.0558
+    xg_last3_mean_rival: 0.0533
+
+Modelo: win3_rf_ne400_d12_l10_mf4
+  n_estimators=400, max_depth=12, min_samples_leaf=10, max_features=0.4
+  MAE_test=3.1246  R2_test=0.0173
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1010
+    p_away: 0.0899
+    p_home: 0.0699
+    pts_diff: 0.0680
+    psxg_last3_std: 0.0672
+    goal_diff_last3_rival: 0.0644
+    p_win_propio: 0.0619
+    p_loss_propio: 0.0587
+    xg_last3_mean_rival: 0.0578
+    posicion_rival: 0.0559
+
+Modelo: win3_rf_ne400_d12_l10_mf5
+  n_estimators=400, max_depth=12, min_samples_leaf=10, max_features=0.5
+  MAE_test=3.1337  R2_test=0.0103
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1015
+    p_away: 0.0909
+    psxg_last3_std: 0.0729
+    p_home: 0.0692
+    goal_diff_last3_rival: 0.0677
+    pts_diff: 0.0673
+    p_loss_propio: 0.0590
+    p_win_propio: 0.0584
+    xg_last3_mean_rival: 0.0583
+    psxg_per90_last3: 0.0548
+
+Modelo: win3_rf_ne400_d12_l20_mf3
+  n_estimators=400, max_depth=12, min_samples_leaf=20, max_features=0.3
+  MAE_test=3.1094  R2_test=0.0269
+  Top 10 features:
+    p_away: 0.1024
+    shots_on_target_ratio_rival_last3: 0.0997
+    p_home: 0.0832
+    goal_diff_last3_rival: 0.0743
+    pts_diff: 0.0703
+    posicion_rival: 0.0629
+    p_loss_propio: 0.0600
+    psxg_last3_std: 0.0598
+    p_win_propio: 0.0563
+    p_draw: 0.0510
+
+Modelo: win3_rf_ne400_d12_l20_mf4
+  n_estimators=400, max_depth=12, min_samples_leaf=20, max_features=0.4
+  MAE_test=3.1155  R2_test=0.0223
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1119
+    p_away: 0.1058
+    p_home: 0.0786
+    goal_diff_last3_rival: 0.0749
+    posicion_rival: 0.0651
+    pts_diff: 0.0638
+    psxg_last3_std: 0.0624
+    p_loss_propio: 0.0562
+    p_win_propio: 0.0537
+    xg_last3_mean_rival: 0.0520
+
+Modelo: win3_rf_ne400_d12_l20_mf5
+  n_estimators=400, max_depth=12, min_samples_leaf=20, max_features=0.5
+  MAE_test=3.1064  R2_test=0.0203
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1179
+    p_away: 0.1072
+    p_home: 0.0773
+    goal_diff_last3_rival: 0.0729
+    posicion_rival: 0.0646
+    psxg_last3_std: 0.0640
+    pts_diff: 0.0618
+    p_win_propio: 0.0563
+    xg_last3_mean_rival: 0.0552
+    p_loss_propio: 0.0536
+
+Modelo: win3_rf_ne800_d6_l5_mf3
+  n_estimators=800, max_depth=6, min_samples_leaf=5, max_features=0.3
+  MAE_test=3.1064  R2_test=0.0196
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1031
+    p_away: 0.0979
+    p_home: 0.0767
+    pts_diff: 0.0762
+    goal_diff_last3_rival: 0.0711
+    p_loss_propio: 0.0624
+    p_win_propio: 0.0599
+    psxg_last3_std: 0.0590
+    posicion_rival: 0.0588
+    p_draw_match: 0.0489
+
+Modelo: win3_rf_ne800_d6_l5_mf4
+  n_estimators=800, max_depth=6, min_samples_leaf=5, max_features=0.4
+  MAE_test=3.1185  R2_test=0.0185
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1088
+    p_away: 0.1014
+    pts_diff: 0.0766
+    p_home: 0.0747
+    goal_diff_last3_rival: 0.0721
+    p_loss_propio: 0.0619
+    posicion_rival: 0.0607
+    p_win_propio: 0.0587
+    psxg_last3_std: 0.0581
+    xg_last3_mean_rival: 0.0511
+
+Modelo: win3_rf_ne800_d6_l5_mf5
+  n_estimators=800, max_depth=6, min_samples_leaf=5, max_features=0.5
+  MAE_test=3.1033  R2_test=0.0178
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1156
+    p_away: 0.1038
+    p_home: 0.0758
+    pts_diff: 0.0741
+    goal_diff_last3_rival: 0.0705
+    psxg_last3_std: 0.0628
+    posicion_rival: 0.0597
+    p_loss_propio: 0.0590
+    p_win_propio: 0.0582
+    goal_diff_last3_team: 0.0494
+
+Modelo: win3_rf_ne800_d6_l10_mf3
+  n_estimators=800, max_depth=6, min_samples_leaf=10, max_features=0.3
+  MAE_test=3.1003  R2_test=0.0230
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1056
+    p_away: 0.0999
+    p_home: 0.0820
+    pts_diff: 0.0759
+    goal_diff_last3_rival: 0.0739
+    posicion_rival: 0.0659
+    p_loss_propio: 0.0590
+    psxg_last3_std: 0.0564
+    p_win_propio: 0.0550
+    p_draw: 0.0484
+
+Modelo: win3_rf_ne800_d6_l10_mf4
+  n_estimators=800, max_depth=6, min_samples_leaf=10, max_features=0.4
+  MAE_test=3.1094  R2_test=0.0196
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1160
+    p_away: 0.1069
+    p_home: 0.0782
+    pts_diff: 0.0730
+    goal_diff_last3_rival: 0.0724
+    posicion_rival: 0.0660
+    psxg_last3_std: 0.0592
+    p_loss_propio: 0.0568
+    p_win_propio: 0.0538
+    xg_last3_mean_rival: 0.0465
+
+Modelo: win3_rf_ne800_d6_l10_mf5
+  n_estimators=800, max_depth=6, min_samples_leaf=10, max_features=0.5
+  MAE_test=3.1033  R2_test=0.0225
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1203
+    p_away: 0.1085
+    p_home: 0.0771
+    goal_diff_last3_rival: 0.0745
+    pts_diff: 0.0717
+    posicion_rival: 0.0657
+    psxg_last3_std: 0.0627
+    p_loss_propio: 0.0588
+    p_win_propio: 0.0531
+    xg_last3_mean_rival: 0.0478
+
+Modelo: win3_rf_ne800_d6_l20_mf3
+  n_estimators=800, max_depth=6, min_samples_leaf=20, max_features=0.3
+  MAE_test=3.0912  R2_test=0.0286
+  Top 10 features:
+    p_away: 0.1122
+    shots_on_target_ratio_rival_last3: 0.1117
+    p_home: 0.0849
+    pts_diff: 0.0794
+    goal_diff_last3_rival: 0.0774
+    posicion_rival: 0.0732
+    p_loss_propio: 0.0537
+    psxg_last3_std: 0.0521
+    p_win_propio: 0.0502
+    p_draw: 0.0455
+
+Modelo: win3_rf_ne800_d6_l20_mf4
+  n_estimators=800, max_depth=6, min_samples_leaf=20, max_features=0.4
+  MAE_test=3.1033  R2_test=0.0275
+  Top 10 features:
+    p_away: 0.1195
+    shots_on_target_ratio_rival_last3: 0.1187
+    p_home: 0.0820
+    posicion_rival: 0.0761
+    goal_diff_last3_rival: 0.0760
+    pts_diff: 0.0759
+    psxg_last3_std: 0.0528
+    p_loss_propio: 0.0512
+    p_win_propio: 0.0496
+    xg_last3_mean_rival: 0.0445
+
+Modelo: win3_rf_ne800_d6_l20_mf5
+  n_estimators=800, max_depth=6, min_samples_leaf=20, max_features=0.5
+  MAE_test=3.0942  R2_test=0.0262
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1293
+    p_away: 0.1197
+    p_home: 0.0815
+    goal_diff_last3_rival: 0.0787
+    posicion_rival: 0.0739
+    pts_diff: 0.0709
+    psxg_last3_std: 0.0559
+    p_win_propio: 0.0518
+    p_loss_propio: 0.0495
+    xg_last3_mean_rival: 0.0457
+
+Modelo: win3_rf_ne800_d8_l5_mf3
+  n_estimators=800, max_depth=8, min_samples_leaf=5, max_features=0.3
+  MAE_test=3.1337  R2_test=0.0128
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0957
+    p_away: 0.0868
+    p_home: 0.0730
+    pts_diff: 0.0726
+    goal_diff_last3_rival: 0.0673
+    psxg_last3_std: 0.0627
+    p_win_propio: 0.0615
+    p_loss_propio: 0.0610
+    p_draw: 0.0531
+    posicion_rival: 0.0529
+
+Modelo: win3_rf_ne800_d8_l5_mf4
+  n_estimators=800, max_depth=8, min_samples_leaf=5, max_features=0.4
+  MAE_test=3.1277  R2_test=0.0102
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0997
+    p_away: 0.0897
+    pts_diff: 0.0701
+    goal_diff_last3_rival: 0.0688
+    p_home: 0.0684
+    psxg_last3_std: 0.0664
+    p_loss_propio: 0.0628
+    p_win_propio: 0.0597
+    posicion_rival: 0.0534
+    xg_last3_mean_rival: 0.0532
+
+Modelo: win3_rf_ne800_d8_l5_mf5
+  n_estimators=800, max_depth=8, min_samples_leaf=5, max_features=0.5
+  MAE_test=3.1368  R2_test=0.0107
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1030
+    p_away: 0.0901
+    pts_diff: 0.0703
+    goal_diff_last3_rival: 0.0699
+    psxg_last3_std: 0.0684
+    p_home: 0.0680
+    p_loss_propio: 0.0616
+    p_win_propio: 0.0603
+    xg_last3_mean_rival: 0.0557
+    posicion_rival: 0.0532
+
+Modelo: win3_rf_ne800_d8_l10_mf3
+  n_estimators=800, max_depth=8, min_samples_leaf=10, max_features=0.3
+  MAE_test=3.1185  R2_test=0.0166
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1003
+    p_away: 0.0932
+    p_home: 0.0758
+    pts_diff: 0.0712
+    goal_diff_last3_rival: 0.0699
+    psxg_last3_std: 0.0617
+    p_loss_propio: 0.0593
+    posicion_rival: 0.0592
+    p_win_propio: 0.0579
+    p_draw: 0.0534
+
+Modelo: win3_rf_ne800_d8_l10_mf4
+  n_estimators=800, max_depth=8, min_samples_leaf=10, max_features=0.4
+  MAE_test=3.1033  R2_test=0.0166
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1057
+    p_away: 0.0946
+    p_home: 0.0728
+    pts_diff: 0.0695
+    goal_diff_last3_rival: 0.0691
+    psxg_last3_std: 0.0609
+    p_loss_propio: 0.0599
+    posicion_rival: 0.0582
+    p_win_propio: 0.0568
+    xg_last3_mean_rival: 0.0540
+
+Modelo: win3_rf_ne800_d8_l10_mf5
+  n_estimators=800, max_depth=8, min_samples_leaf=10, max_features=0.5
+  MAE_test=3.1125  R2_test=0.0175
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1082
+    p_away: 0.0940
+    p_home: 0.0715
+    goal_diff_last3_rival: 0.0710
+    psxg_last3_std: 0.0687
+    pts_diff: 0.0683
+    posicion_rival: 0.0581
+    p_loss_propio: 0.0576
+    p_win_propio: 0.0575
+    xg_last3_mean_rival: 0.0553
+
+Modelo: win3_rf_ne800_d8_l20_mf3
+  n_estimators=800, max_depth=8, min_samples_leaf=20, max_features=0.3
+  MAE_test=3.0851  R2_test=0.0284
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1053
+    p_away: 0.1042
+    p_home: 0.0847
+    goal_diff_last3_rival: 0.0737
+    pts_diff: 0.0728
+    posicion_rival: 0.0671
+    p_loss_propio: 0.0573
+    p_win_propio: 0.0548
+    psxg_last3_std: 0.0541
+    xg_last3_mean_rival: 0.0507
+
+Modelo: win3_rf_ne800_d8_l20_mf4
+  n_estimators=800, max_depth=8, min_samples_leaf=20, max_features=0.4
+  MAE_test=3.0973  R2_test=0.0243
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1118
+    p_away: 0.1100
+    p_home: 0.0766
+    goal_diff_last3_rival: 0.0739
+    pts_diff: 0.0713
+    posicion_rival: 0.0700
+    psxg_last3_std: 0.0580
+    p_win_propio: 0.0559
+    p_loss_propio: 0.0538
+    xg_last3_mean_rival: 0.0501
+
+Modelo: win3_rf_ne800_d8_l20_mf5
+  n_estimators=800, max_depth=8, min_samples_leaf=20, max_features=0.5
+  MAE_test=3.1064  R2_test=0.0243
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1214
+    p_away: 0.1086
+    p_home: 0.0772
+    goal_diff_last3_rival: 0.0751
+    posicion_rival: 0.0680
+    pts_diff: 0.0676
+    psxg_last3_std: 0.0609
+    p_win_propio: 0.0551
+    p_loss_propio: 0.0532
+    xg_last3_mean_rival: 0.0520
+
+Modelo: win3_rf_ne800_d10_l5_mf3
+  n_estimators=800, max_depth=10, min_samples_leaf=5, max_features=0.3
+  MAE_test=3.1337  R2_test=0.0070
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0894
+    p_away: 0.0832
+    p_home: 0.0719
+    pts_diff: 0.0692
+    psxg_last3_std: 0.0658
+    goal_diff_last3_rival: 0.0654
+    p_loss_propio: 0.0624
+    p_win_propio: 0.0614
+    psxg_per90_last3: 0.0557
+    xg_last3_mean_rival: 0.0538
+
+Modelo: win3_rf_ne800_d10_l5_mf4
+  n_estimators=800, max_depth=10, min_samples_leaf=5, max_features=0.4
+  MAE_test=3.1429  R2_test=0.0055
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0928
+    p_away: 0.0859
+    psxg_last3_std: 0.0684
+    pts_diff: 0.0683
+    p_home: 0.0674
+    goal_diff_last3_rival: 0.0663
+    p_loss_propio: 0.0625
+    p_win_propio: 0.0604
+    xg_last3_mean_rival: 0.0571
+    psxg_per90_last3: 0.0564
+
+Modelo: win3_rf_ne800_d10_l5_mf5
+  n_estimators=800, max_depth=10, min_samples_leaf=5, max_features=0.5
+  MAE_test=3.1307  R2_test=0.0020
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0984
+    p_away: 0.0831
+    psxg_last3_std: 0.0728
+    pts_diff: 0.0674
+    p_home: 0.0673
+    goal_diff_last3_rival: 0.0671
+    p_loss_propio: 0.0608
+    p_win_propio: 0.0604
+    xg_last3_mean_rival: 0.0586
+    psxg_per90_last3: 0.0560
+
+Modelo: win3_rf_ne800_d10_l10_mf3
+  n_estimators=800, max_depth=10, min_samples_leaf=10, max_features=0.3
+  MAE_test=3.1185  R2_test=0.0142
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0966
+    p_away: 0.0901
+    p_home: 0.0754
+    goal_diff_last3_rival: 0.0698
+    pts_diff: 0.0687
+    psxg_last3_std: 0.0648
+    p_loss_propio: 0.0596
+    p_win_propio: 0.0594
+    posicion_rival: 0.0572
+    p_draw: 0.0533
+
+Modelo: win3_rf_ne800_d10_l10_mf4
+  n_estimators=800, max_depth=10, min_samples_leaf=10, max_features=0.4
+  MAE_test=3.1368  R2_test=0.0137
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1010
+    p_away: 0.0916
+    p_home: 0.0711
+    goal_diff_last3_rival: 0.0684
+    pts_diff: 0.0678
+    psxg_last3_std: 0.0649
+    p_loss_propio: 0.0605
+    p_win_propio: 0.0573
+    posicion_rival: 0.0571
+    xg_last3_mean_rival: 0.0568
+
+Modelo: win3_rf_ne800_d10_l10_mf5
+  n_estimators=800, max_depth=10, min_samples_leaf=10, max_features=0.5
+  MAE_test=3.1246  R2_test=0.0158
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1047
+    p_away: 0.0921
+    psxg_last3_std: 0.0704
+    goal_diff_last3_rival: 0.0703
+    p_home: 0.0682
+    pts_diff: 0.0675
+    p_loss_propio: 0.0607
+    p_win_propio: 0.0582
+    xg_last3_mean_rival: 0.0568
+    psxg_per90_last3: 0.0546
+
+Modelo: win3_rf_ne800_d10_l20_mf3
+  n_estimators=800, max_depth=10, min_samples_leaf=20, max_features=0.3
+  MAE_test=3.0973  R2_test=0.0287
+  Top 10 features:
+    p_away: 0.1033
+    shots_on_target_ratio_rival_last3: 0.1025
+    p_home: 0.0829
+    pts_diff: 0.0717
+    goal_diff_last3_rival: 0.0716
+    posicion_rival: 0.0670
+    p_loss_propio: 0.0589
+    psxg_last3_std: 0.0578
+    p_win_propio: 0.0556
+    p_draw: 0.0494
+
+Modelo: win3_rf_ne800_d10_l20_mf4
+  n_estimators=800, max_depth=10, min_samples_leaf=20, max_features=0.4
+  MAE_test=3.0942  R2_test=0.0250
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1099
+    p_away: 0.1063
+    p_home: 0.0774
+    goal_diff_last3_rival: 0.0729
+    pts_diff: 0.0698
+    posicion_rival: 0.0682
+    psxg_last3_std: 0.0619
+    p_win_propio: 0.0556
+    p_loss_propio: 0.0547
+    xg_last3_mean_rival: 0.0507
+
+Modelo: win3_rf_ne800_d10_l20_mf5
+  n_estimators=800, max_depth=10, min_samples_leaf=20, max_features=0.5
+  MAE_test=3.1003  R2_test=0.0226
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1164
+    p_away: 0.1065
+    p_home: 0.0759
+    goal_diff_last3_rival: 0.0732
+    pts_diff: 0.0657
+    posicion_rival: 0.0652
+    psxg_last3_std: 0.0622
+    p_win_propio: 0.0556
+    p_loss_propio: 0.0545
+    xg_last3_mean_rival: 0.0528
+
+Modelo: win3_rf_ne800_d12_l5_mf3
+  n_estimators=800, max_depth=12, min_samples_leaf=5, max_features=0.3
+  MAE_test=3.1337  R2_test=0.0088
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0875
+    p_away: 0.0809
+    p_home: 0.0693
+    pts_diff: 0.0671
+    psxg_last3_std: 0.0659
+    goal_diff_last3_rival: 0.0648
+    p_loss_propio: 0.0635
+    p_win_propio: 0.0618
+    xg_last3_mean_rival: 0.0566
+    psxg_per90_last3: 0.0566
+
+Modelo: win3_rf_ne800_d12_l5_mf4
+  n_estimators=800, max_depth=12, min_samples_leaf=5, max_features=0.4
+  MAE_test=3.1368  R2_test=0.0049
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0908
+    p_away: 0.0816
+    psxg_last3_std: 0.0709
+    goal_diff_last3_rival: 0.0661
+    pts_diff: 0.0659
+    p_home: 0.0657
+    p_win_propio: 0.0612
+    p_loss_propio: 0.0609
+    psxg_per90_last3: 0.0587
+    xg_last3_mean_rival: 0.0584
+
+Modelo: win3_rf_ne800_d12_l5_mf5
+  n_estimators=800, max_depth=12, min_samples_leaf=5, max_features=0.5
+  MAE_test=3.1459  R2_test=0.0000
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0940
+    p_away: 0.0807
+    psxg_last3_std: 0.0751
+    p_home: 0.0658
+    goal_diff_last3_rival: 0.0657
+    pts_diff: 0.0649
+    p_loss_propio: 0.0622
+    xg_last3_mean_rival: 0.0599
+    psxg_per90_last3: 0.0597
+    p_win_propio: 0.0591
+
+Modelo: win3_rf_ne800_d12_l10_mf3
+  n_estimators=800, max_depth=12, min_samples_leaf=10, max_features=0.3
+  MAE_test=3.1246  R2_test=0.0162
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0949
+    p_away: 0.0894
+    p_home: 0.0744
+    pts_diff: 0.0676
+    goal_diff_last3_rival: 0.0675
+    psxg_last3_std: 0.0647
+    p_loss_propio: 0.0615
+    p_win_propio: 0.0588
+    p_draw: 0.0549
+    posicion_rival: 0.0545
+
+Modelo: win3_rf_ne800_d12_l10_mf4
+  n_estimators=800, max_depth=12, min_samples_leaf=10, max_features=0.4
+  MAE_test=3.1185  R2_test=0.0159
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.0983
+    p_away: 0.0902
+    p_home: 0.0696
+    pts_diff: 0.0684
+    psxg_last3_std: 0.0662
+    goal_diff_last3_rival: 0.0655
+    p_win_propio: 0.0599
+    p_loss_propio: 0.0595
+    xg_last3_mean_rival: 0.0579
+    posicion_rival: 0.0559
+
+Modelo: win3_rf_ne800_d12_l10_mf5
+  n_estimators=800, max_depth=12, min_samples_leaf=10, max_features=0.5
+  MAE_test=3.1368  R2_test=0.0127
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1017
+    p_away: 0.0903
+    psxg_last3_std: 0.0733
+    goal_diff_last3_rival: 0.0687
+    pts_diff: 0.0680
+    p_home: 0.0679
+    p_loss_propio: 0.0601
+    p_win_propio: 0.0581
+    xg_last3_mean_rival: 0.0579
+    psxg_per90_last3: 0.0553
+
+Modelo: win3_rf_ne800_d12_l20_mf3
+  n_estimators=800, max_depth=12, min_samples_leaf=20, max_features=0.3
+  MAE_test=3.0821  R2_test=0.0280
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1022
+    p_away: 0.1020
+    p_home: 0.0839
+    pts_diff: 0.0711
+    goal_diff_last3_rival: 0.0709
+    posicion_rival: 0.0659
+    psxg_last3_std: 0.0590
+    p_loss_propio: 0.0587
+    p_win_propio: 0.0546
+    xg_last3_mean_rival: 0.0499
+
+Modelo: win3_rf_ne800_d12_l20_mf4
+  n_estimators=800, max_depth=12, min_samples_leaf=20, max_features=0.4
+  MAE_test=3.1064  R2_test=0.0249
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1093
+    p_away: 0.1057
+    p_home: 0.0767
+    goal_diff_last3_rival: 0.0734
+    pts_diff: 0.0694
+    posicion_rival: 0.0679
+    psxg_last3_std: 0.0619
+    p_loss_propio: 0.0556
+    p_win_propio: 0.0549
+    xg_last3_mean_rival: 0.0514
+
+Modelo: win3_rf_ne800_d12_l20_mf5
+  n_estimators=800, max_depth=12, min_samples_leaf=20, max_features=0.5
+  MAE_test=3.1125  R2_test=0.0224
+  Top 10 features:
+    shots_on_target_ratio_rival_last3: 0.1158
+    p_away: 0.1063
+    p_home: 0.0758
+    goal_diff_last3_rival: 0.0725
+    pts_diff: 0.0655
+    posicion_rival: 0.0650
+    psxg_last3_std: 0.0621
+    p_win_propio: 0.0558
+    p_loss_propio: 0.0542
+    xg_last3_mean_rival: 0.0540
+

@@ -341,7 +341,8 @@ def experimento_1(
 
 def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
     """
-    ⚠️ CAMBIO CLAVE: Rachas de tiros y xG usando .shift(1)
+    ⚠️ Rachas de equipos y portero usando .shift(1) para evitar data leakage.
+    Incluye ventanas de 3, 5 y 8 partidos.
     """
 
     df = df.sort_values(["temporada", "jornada", "fecha_partido"])
@@ -380,7 +381,7 @@ def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
 
     g_team = df.groupby(["Equipo_propio", "temporada"])
 
-    # Rachas de goles
+    # --- Ventana 5 (ya tenías) ---
     df["gf_last5_mean_team"] = g_team["gf"].transform(
         lambda s: s.shift(1).rolling(5, min_periods=1).mean()
     )
@@ -391,12 +392,47 @@ def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
         df["gf_last5_mean_team"] - df["gc_last5_mean_team"]
     )
 
-    # Rachas de xG
     df["xg_last5_mean_team"] = g_team["xg_team_partido"].transform(
         lambda s: s.shift(1).rolling(5, min_periods=1).mean()
     )
     df["xg_contra_last5_mean_team"] = g_team["xg_rival_partido"].transform(
         lambda s: s.shift(1).rolling(5, min_periods=1).mean()
+    )
+
+    # --- Ventana 3 ---
+    df["gf_last3_mean_team"] = g_team["gf"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).mean()
+    )
+    df["gc_last3_mean_team"] = g_team["gc"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).mean()
+    )
+    df["goal_diff_last3_team"] = (
+        df["gf_last3_mean_team"] - df["gc_last3_mean_team"]
+    )
+
+    df["xg_last3_mean_team"] = g_team["xg_team_partido"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).mean()
+    )
+    df["xg_contra_last3_mean_team"] = g_team["xg_rival_partido"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).mean()
+    )
+
+    # --- Ventana 8 ---
+    df["gf_last8_mean_team"] = g_team["gf"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).mean()
+    )
+    df["gc_last8_mean_team"] = g_team["gc"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).mean()
+    )
+    df["goal_diff_last8_team"] = (
+        df["gf_last8_mean_team"] - df["gc_last8_mean_team"]
+    )
+
+    df["xg_last8_mean_team"] = g_team["xg_team_partido"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).mean()
+    )
+    df["xg_contra_last8_mean_team"] = g_team["xg_rival_partido"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).mean()
     )
 
     # ============================================================
@@ -405,7 +441,7 @@ def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
 
     g_rival = df.groupby(["Equipo_rival", "temporada"])
 
-    # Rachas de tiros del rival
+    # --- Ventana 5 (ya tenías) ---
     df["shots_last5_mean_rival"] = g_rival["shots_rival_partido"].transform(
         lambda s: s.shift(1).rolling(5, min_periods=1).mean()
     )
@@ -413,10 +449,10 @@ def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
         lambda s: s.shift(1).rolling(5, min_periods=1).mean()
     )
     df["shots_on_target_ratio_rival"] = (
-        df["shots_on_target_last5_mean_rival"] / df["shots_last5_mean_rival"].replace(0, np.nan)
+        df["shots_on_target_last5_mean_rival"] /
+        df["shots_last5_mean_rival"].replace(0, np.nan)
     )
 
-    # Rachas de goles del rival
     df["gf_last5_mean_rival"] = g_rival["gf_rival"].transform(
         lambda s: s.shift(1).rolling(5, min_periods=1).mean()
     )
@@ -427,7 +463,6 @@ def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
         df["gf_last5_mean_rival"] - df["gc_last5_mean_rival"]
     )
 
-    # Rachas de xG del rival
     df["xg_last5_mean_rival"] = g_rival["xg_team_partido"].transform(
         lambda s: s.shift(1).rolling(5, min_periods=1).mean()
     )
@@ -435,12 +470,71 @@ def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
         lambda s: s.shift(1).rolling(5, min_periods=1).mean()
     )
 
+    # --- Ventana 3 ---
+    df["shots_last3_mean_rival"] = g_rival["shots_rival_partido"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).mean()
+    )
+    df["shots_on_target_last3_mean_rival"] = g_rival["shots_on_target_rival_partido"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).mean()
+    )
+    df["shots_on_target_ratio_rival_last3"] = (
+        df["shots_on_target_last3_mean_rival"] /
+        df["shots_last3_mean_rival"].replace(0, np.nan)
+    )
+
+    df["gf_last3_mean_rival"] = g_rival["gf_rival"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).mean()
+    )
+    df["gc_last3_mean_rival"] = g_rival["gc_rival"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).mean()
+    )
+    df["goal_diff_last3_rival"] = (
+        df["gf_last3_mean_rival"] - df["gc_last3_mean_rival"]
+    )
+
+    df["xg_last3_mean_rival"] = g_rival["xg_team_partido"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).mean()
+    )
+    df["xg_contra_last3_mean_rival"] = g_rival["xg_rival_partido"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).mean()
+    )
+
+    # --- Ventana 8 ---
+    df["shots_last8_mean_rival"] = g_rival["shots_rival_partido"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).mean()
+    )
+    df["shots_on_target_last8_mean_rival"] = g_rival["shots_on_target_rival_partido"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).mean()
+    )
+    df["shots_on_target_ratio_rival_last8"] = (
+        df["shots_on_target_last8_mean_rival"] /
+        df["shots_last8_mean_rival"].replace(0, np.nan)
+    )
+
+    df["gf_last8_mean_rival"] = g_rival["gf_rival"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).mean()
+    )
+    df["gc_last8_mean_rival"] = g_rival["gc_rival"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).mean()
+    )
+    df["goal_diff_last8_rival"] = (
+        df["gf_last8_mean_rival"] - df["gc_last8_mean_rival"]
+    )
+
+    df["xg_last8_mean_rival"] = g_rival["xg_team_partido"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).mean()
+    )
+    df["xg_contra_last8_mean_rival"] = g_rival["xg_rival_partido"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).mean()
+    )
+
     # ============================================================
-    # EFICIENCIA Y CRUCES
+    # EFICIENCIA Y CRUCES (siguen igual, usando ventana 5)
     # ============================================================
 
     df["goal_per_shot_rival"] = (
-        df["gf_last5_mean_rival"] / df["shots_last5_mean_rival"].replace(0, np.nan)
+        df["gf_last5_mean_rival"] /
+        df["shots_last5_mean_rival"].replace(0, np.nan)
     )
 
     df["goal_attack_vs_defense"] = (
@@ -470,6 +564,7 @@ def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
     df = df.sort_values(["player", "temporada", "jornada", "fecha_partido"])
     gk_group = df.groupby(["player", "temporada"])
 
+    # --- std ventana 5 (original) ---
     df["pf_last5_std"] = gk_group["puntosFantasy"].transform(
         lambda s: s.shift(1).rolling(5, min_periods=1).std()
     )
@@ -491,18 +586,80 @@ def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     umbral_min = 180
-    cond = df["min_last5_sum"] >= umbral_min
     df["psxg_per90_last5"] = pd.NA
     df["gc_per90_last5"] = pd.NA
-    df.loc[cond, "psxg_per90_last5"] = (
-        df.loc[cond, "psxg_last5_sum"] * 90 / df.loc[cond, "min_last5_sum"]
+    cond5 = df["min_last5_sum"] >= umbral_min
+    df.loc[cond5, "psxg_per90_last5"] = (
+        df.loc[cond5, "psxg_last5_sum"] * 90 / df.loc[cond5, "min_last5_sum"]
     )
-    df.loc[cond, "gc_per90_last5"] = (
-        df.loc[cond, "gc_last5_sum"] * 90 / df.loc[cond, "min_last5_sum"]
+    df.loc[cond5, "gc_per90_last5"] = (
+        df.loc[cond5, "gc_last5_sum"] * 90 / df.loc[cond5, "min_last5_sum"]
+    )
+
+    # --- std y per90 ventana 3 ---
+    df["pf_last3_std"] = gk_group["puntosFantasy"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).std()
+    )
+    df["gc_last3_std"] = gk_group["Goles_en_contra"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).std()
+    )
+    df["psxg_last3_std"] = gk_group["PSxG"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).std()
+    )
+
+    df["min_last3_sum"] = gk_group["Min_partido"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).sum()
+    )
+    df["psxg_last3_sum"] = gk_group["PSxG"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).sum()
+    )
+    df["gc_last3_sum"] = gk_group["Goles_en_contra"].transform(
+        lambda s: s.shift(1).rolling(3, min_periods=1).sum()
+    )
+
+    df["psxg_per90_last3"] = pd.NA
+    df["gc_per90_last3"] = pd.NA
+    cond3 = df["min_last3_sum"] >= umbral_min
+    df.loc[cond3, "psxg_per90_last3"] = (
+        df.loc[cond3, "psxg_last3_sum"] * 90 / df.loc[cond3, "min_last3_sum"]
+    )
+    df.loc[cond3, "gc_per90_last3"] = (
+        df.loc[cond3, "gc_last3_sum"] * 90 / df.loc[cond3, "min_last3_sum"]
+    )
+
+    # --- std y per90 ventana 8 ---
+    df["pf_last8_std"] = gk_group["puntosFantasy"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).std()
+    )
+    df["gc_last8_std"] = gk_group["Goles_en_contra"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).std()
+    )
+    df["psxg_last8_std"] = gk_group["PSxG"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).std()
+    )
+
+    df["min_last8_sum"] = gk_group["Min_partido"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).sum()
+    )
+    df["psxg_last8_sum"] = gk_group["PSxG"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).sum()
+    )
+    df["gc_last8_sum"] = gk_group["Goles_en_contra"].transform(
+        lambda s: s.shift(1).rolling(8, min_periods=1).sum()
+    )
+
+    df["psxg_per90_last8"] = pd.NA
+    df["gc_per90_last8"] = pd.NA
+    cond8 = df["min_last8_sum"] >= umbral_min
+    df.loc[cond8, "psxg_per90_last8"] = (
+        df.loc[cond8, "psxg_last8_sum"] * 90 / df.loc[cond8, "min_last8_sum"]
+    )
+    df.loc[cond8, "gc_per90_last8"] = (
+        df.loc[cond8, "gc_last8_sum"] * 90 / df.loc[cond8, "min_last8_sum"]
     )
 
     # ============================================================
-    # FLAGS ATAQUE TOP / DEFENSA FLOJA
+    # FLAGS ATAQUE TOP / DEFENSA FLOJA (siguen con ventana 5)
     # ============================================================
 
     p80_xg_rival = df["xg_last5_mean_rival"].quantile(0.8)
@@ -519,7 +676,6 @@ def experimento_3(df: pd.DataFrame) -> pd.DataFrame:
     ).astype(int)
 
     return df
-
 
 # ==============================
 # ENTRENAR MODELO - MANTIENE TUS 3 MODELOS
