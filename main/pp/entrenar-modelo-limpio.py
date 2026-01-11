@@ -176,10 +176,10 @@ def get_features_for_window(window: int):
 # DEFINICIÓN DE GRIDS (COMÚN A TODAS LAS VENTANAS)
 # ============================================================
 
-n_estimators_list = [200, 400, 800]
-max_depth_list = [6, 8, 10, 12]
-min_samples_leaf_list = [5, 10, 20]
-max_features_list = [0.3, 0.4, 0.5]
+n_estimators_list = [200, 400,600, 800,1000]
+max_depth_list = [4,6, 8, 10, 12,14]
+min_samples_leaf_list = [3,5, 10,15, 20]
+max_features_list = [0.2,0.3, 0.4, 0.5,0.6]
 
 rf_configs = []
 for n_est, depth, leaf, mf in product(
@@ -197,9 +197,9 @@ for n_est, depth, leaf, mf in product(
         "max_features": mf,
     })
 
-xgb_depth_list = [2, 3, 4, 5]
-xgb_n_estimators_list = [400, 800, 1200]
-xgb_lr_list = [0.015, 0.025, 0.04]
+xgb_depth_list = [2, 3, 4, 5,6]
+xgb_n_estimators_list = [200,400,600 ,800,1000, 1200]
+xgb_lr_list = [0.001,0.015,0.002, 0.025, 0.04]
 
 xgb_configs = []
 for depth, n_est, lr in product(
@@ -222,7 +222,7 @@ for depth, n_est, lr in product(
 resultados_mae = []
 resultados_r2 = []
 
-for window in [3, 5, 8]:
+for window in [3, 5]:
     print("\n" + "="*80)
     print(f"ENTRENANDO PARA VENTANA {window} PARTIDOS")
     print("="*80)
