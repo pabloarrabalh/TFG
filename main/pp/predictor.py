@@ -646,33 +646,44 @@ def mostrar_top_errores(resultados, top_n=10):
 # ============================================================
 if __name__ == "__main__":
     
-    modelo, feature_cols = cargar_modelo()
-    if modelo is None:
-        exit(1)
 
-    jornadas_a_probar = [1,2,3,4,5,6,7, 8,9,10,11,12,13,14,15,16,17]  # pon aquí las jornadas que quieras
-    mae_por_jornada = []
-    #resultados = predecir_partidos(modelo, feature_cols, jornada=11)
-    for j in jornadas_a_probar:
-        print(f"\n\n===== JORNADA {j} =====\n")
-        resultados = predecir_partidos(modelo, feature_cols, jornada=j)
-        #mostrar_tabla_por_partido(resultados)
+    modelos_a_probar = [
+        "modelos/best_mae_win3_rf_win3_rf_ne400_d8_l15_mf6_mae1.6421_rmse2.2088_r20.7049.pkl",
+        "modelos/best_mae_win3_rf_win3_rf_ne400_d14_l20_mf6_mae1.6474_rmse2.2219_r20.7014.pkl",
+        "modelos/best_mae_win3_rf_win3_rf_ne400_d12_l20_mf6_mae1.6474_rmse2.2219_r20.7014.pkl",
+        "modelos/best_r2_win5_rf_win5_rf_ne400_d10_l15_mf6_mae1.6842_rmse2.1920_r20.7094.pkl",
+        "modelos/best_r2_win5_rf_win5_rf_ne400_d12_l15_mf6_mae1.6737_rmse2.1915_r20.7095.pkl",
+        "modelos/best_r2_win5_rf_win5_rf_ne400_d14_l15_mf6_mae1.6737_rmse2.1915_r20.7095.pkl",
+    ]
 
-        mae_j = calcular_mae_jornada(resultados)
-        if mae_j is not None:
-            print(f"\nMAE jornada {j}: {mae_j:.3f}")
-            mae_por_jornada.append((j, mae_j))
-        else:
-            print(f"\nMAE jornada {j}: no hay datos reales")
+    jornadas_a_probar = [18]  # puedes cambiar las jornadas aquí
 
-    # resumen final
-    if mae_por_jornada:
-        print("\n" + "="*60)
-        print("RESUMEN MAE POR JORNADA")
-        print("="*60)
-        for j, mae_j in mae_por_jornada:
-            print(f"- Jornada {j}: MAE = {mae_j:.3f}")
-        mae_media = sum(m for _, m in mae_por_jornada) / len(mae_por_jornada)
-        print(f"\nMAE medio en {len(mae_por_jornada)} jornadas: {mae_media:.3f}")
-    else:
-        print("\nNo se pudo calcular MAE en ninguna jornada.")
+    for modelo_path in modelos_a_probar:
+        print("\n" + "#"*100)
+        print(f"Probando modelo: {modelo_path}")
+        print("#"*100)
+        try:
+            with open(modelo_path, "rb") as f:
+                modelo = pickle.load(f)
+        except Exception as e:
+            print(f"❌ Error cargando modelo {modelo_path}: {e}")
+            continue
+
+        # Intentar cargar las features asociadas (puedes ajustar el nombre si cada modelo tiene su propio features)
+        features_path = "feature_cols.pkl"
+        try:
+            with open(features_path, "rb") as f:
+                feature_cols = pickle.load(f)
+        except Exception as e:
+            print(f"❌ Error cargando features: {e}")
+            continue
+
+        for j in jornadas_a_probar:
+            print(f"\n===== JORNADA {j} =====\n")
+            resultados = predecir_partidos(modelo, feature_cols, jornada=j)
+            mostrar_tabla_por_partido(resultados)
+            mae_j = calcular_mae_jornada(resultados)
+            if mae_j is not None:
+                print(f"\nMAE jornada {j}: {mae_j:.3f}")
+            else:
+                print(f"\nMAE jornada {j}: no hay datos reales")

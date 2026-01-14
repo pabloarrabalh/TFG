@@ -11,7 +11,11 @@ from itertools import product
 
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error, r2_score
+from sklearn.metrics import (
+    mean_absolute_error,
+    r2_score,
+    root_mean_squared_error,
+)
 from xgboost import XGBRegressor
 
 # Carpeta de salida para modelos
@@ -21,7 +25,7 @@ output_dir.mkdir(exist_ok=True)
 print("Número de porteros:")
 df_check = pd.read_csv("players_with_features_exp3_CORREGIDO.csv")
 df_pt_check = df_check[df_check["posicion"] == "PT"]
-print(len(df_pt_check))
+print(len(df_pt_check))  # [file:34]
 
 print("\n" + "="*80)
 print("ENTRENANDO MODELOS LIMPIOS - SOLO PORTEROS - SIN DATA LEAKAGE")
@@ -55,27 +59,223 @@ if not csv_path:
 print(f"📂 Cargando solo porteros desde: {csv_path}")
 df = pd.read_csv(csv_path)
 df = df[df["posicion"] == "PT"].copy()
-print(f"✅ Cargado: {df.shape[0]} filas de porteros, {df.shape[1]} columnas\n")
+print(f"✅ Cargado: {df.shape[0]} filas de porteros, {df.shape[1]} columnas\n")  # [file:34]
+
+# ============================================================
+# ORDEN TEMPORAL + PF_MEDIA_HISTORICA (SIN LEAKAGE)
+# ============================================================
+
+# Usamos columnas temporales existentes: temporada, jornada, fecha_partido
+sort_cols = []
+for c in ["temporada", "jornada", "fecha_partido"]:
+    if c in df.columns:
+        sort_cols.append(c)
+
+df = df.sort_values(sort_cols).reset_index(drop=True)
+
+# pf_media_historica: media de puntosFantasy previa por jugador (player)
+if "puntosFantasy" in df.columns:
+    df["pf_media_historica"] = (
+        df.groupby("player")["puntosFantasy"]
+          .transform(lambda s: s.shift().expanding().mean())
+    )
+else:
+    df["pf_media_historica"] = np.nan
+# =========================
+# FEATURES EXTRA PORTEROS
+# =========================
+
+# 1) Bombardeo partido (solo info del propio partido)
+df["bombardeo_partido"] = (
+    df["shots_on_target_rival_partido"].clip(lower=0) *
+    (1 - df["Goles_en_contra"].clip(lower=0))
+)
+
+# 2) Saves partido
+df["saves_partido"] = (
+    df["shots_on_target_rival_partido"].clip(lower=0) -
+    df["Goles_en_contra"].clip(lower=0)
+).clip(lower=0)
+
+# 3) Clean sheet flag
+df["clean_sheet_flag"] = (df["Goles_en_contra"] == 0).astype(int)
+
+# 4) Rolling por portero sin leakage (shift + rolling)
+def rolling_feat(col, window, agg, new_name):
+    df[new_name] = (
+        df.groupby("player")[col]
+          .transform(lambda s: getattr(s.shift().rolling(window, min_periods=1), agg)())
+    )
+
+# Bombardeo medio
+rolling_feat("bombardeo_partido", 3, "mean", "bombardeo_last3_mean")
+rolling_feat("bombardeo_partido", 5, "mean", "bombardeo_last5_mean")
+
+# Saves medios
+rolling_feat("saves_partido", 3, "mean", "saves_last3_mean_extra")
+rolling_feat("saves_partido", 5, "mean", "saves_last5_mean_extra")
+
+# Ratio de clean sheets
+rolling_feat("clean_sheet_flag", 3, "mean", "clean_last3_ratio_extra")
+rolling_feat("clean_sheet_flag", 5, "mean", "clean_last5_ratio_extra")
+
+# 5) Partido muy desequilibrado (solo info de cuotas pre-partido)
+df["partido_muy_desequilibrado"] = (df["ah_line_match"].abs() >= 1.5).astype(int)
+
+
+# =========================
+# FEATURES AVANZADAS PORTERO X RIVAL
+# =========================
+
+# 1) ratio_paradas_dificiles
+#   Aproximación: PSxG - goles_en_contra = goles evitados.
+#   Normalizamos por tiros a puerta recibidos del rival.
+df["goles_ev_prt"] = (df["PSxG"] - df["Goles_en_contra"]).clip(lower=0)
+df["ratio_paradas_dificiles"] = np.where(
+    df["shots_on_target_rival_partido"] > 0,
+    df["goles_ev_prt"] / df["shots_on_target_rival_partido"],
+    0
+)
+
+# 2) xg_rival_x_savepct
+df["xg_rival_x_savepct"] = df["xg_last5_mean_rival"] * (df["Porcentaje_paradas"] / 100.0)
+
+# 3) xg_rival_x_gc_per90
+df["xg_rival_x_gc_per90"] = df["xg_last5_mean_rival"] * df["gc_per90_last5"]
+
+# 4) gf_rival_last5_x_gc_per90
+df["gf_rival_last5_x_gc_per90"] = df["gf_last5_mean_rival"] * df["gc_per90_last5"]
+
+# =========================
+# ROLES / CALIDAD PORTERO
+# =========================
+
+# Portero “de porterías a cero” vs “de paradas”
+df["score_porterias_cero"] = (1 - df["gc_per90_last5"]).clip(lower=0)
+df["score_save_pct"] = df["Porcentaje_paradas"] / 100.0
+
+# Clasificación en percentiles globales
+q_pc = df["score_porterias_cero"].quantile(0.8)
+q_sp = df["score_save_pct"].quantile(0.8)
+
+df["elite_keeper"] = ((df["score_porterias_cero"] >= q_pc) & (df["score_save_pct"] >= q_sp)).astype(int)
+df["is_top5_porterias_cero"] = (df["score_porterias_cero"] >= q_pc).astype(int)
+df["is_top5_save_pct"] = (df["score_save_pct"] >= q_sp).astype(int)
+df["is_top5_en_algo"] = ((df["is_top5_porterias_cero"] == 1) | (df["is_top5_save_pct"] == 1)).astype(int)
+
+# Boosts y rol_x_xg_rival
+df["score_pc_boost"] = df["score_porterias_cero"] * (df["ataque_top_rival"].fillna(0) + 1)
+df["score_sp_boost"] = df["score_save_pct"] * (df["ataque_top_rival"].fillna(0) + 1)
+df["rol_x_xg_rival"] = df[["score_porterias_cero", "score_save_pct"]].mean(axis=1) * df["xg_last5_mean_rival"]
+df["rol_x_xg_rival_boost"] = df["rol_x_xg_rival"] * (df["ataque_top_rival"].fillna(0) + 1)
+
+# Interacción ataque top rival x elite
+df["ataque_top_rival_x_elite"] = df["ataque_top_rival"].fillna(0) * df["elite_keeper"]
+
+# =========================
+# RACHAS PORTERO (3 PARTIDOS) SIN LEAKAGE
+# =========================
+
+# 1) pf_last3_mean: media PF últimos 3
+df["pf_last3_mean"] = (
+    df.groupby("player")["puntosFantasy"]
+      .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
+)
+
+# 2) savepct_last3_mean: media % paradas últimos 3
+df["savepct_last3_mean"] = (
+    df.groupby("player")["Porcentaje_paradas"]
+      .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
+)
+
+# 3) clean_last3_ratio: ratio porterías a cero últimos 3
+df["clean_last3_ratio"] = (
+    df.groupby("player")["clean_sheet_flag"]
+      .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
+)
+
+# 4) titular_last3_ratio: % de partidos jugados (Min > 0) últimos 3
+df["es_titular_partido"] = (df["Min_partido"] > 0).astype(int)
+df["titular_last3_ratio"] = (
+    df.groupby("player")["es_titular_partido"]
+      .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
+)
+
+# 5) psxg_gc_diff_last3_mean: media (PSxG - GC) últimos 3
+df["psxg_gc_diff"] = df["PSxG"] - df["Goles_en_contra"]
+df["psxg_gc_diff_last3_mean"] = (
+    df.groupby("player")["psxg_gc_diff"]
+      .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
+)
+
+# 6) saves_last3_mean: media paradas últimos 3
+df["saves_partido"] = (
+    df["shots_on_target_rival_partido"].clip(lower=0)
+    - df["Goles_en_contra"].clip(lower=0)
+).clip(lower=0)
+
+df["saves_last3_mean"] = (
+    df.groupby("player")["saves_partido"]
+      .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
+)
+
+# 7) form_vs_class_keeper_3: forma reciente vs media histórica
+df["form_vs_class_keeper_3"] = df["pf_last3_mean"] - df["pf_media_historica"]
+# =========================
+# RACHAS PORTERO (5 PARTIDOS) SIN LEAKAGE
+# =========================
+
+df["pf_last5_mean"] = (
+    df.groupby("player")["puntosFantasy"]
+      .transform(lambda s: s.shift().rolling(5, min_periods=1).mean())
+)
+
+df["savepct_last5_mean"] = (
+    df.groupby("player")["Porcentaje_paradas"]
+      .transform(lambda s: s.shift().rolling(5, min_periods=1).mean())
+)
+
+df["clean_last5_ratio"] = (
+    df.groupby("player")["clean_sheet_flag"]
+      .transform(lambda s: s.shift().rolling(5, min_periods=1).mean())
+)
+
+df["titular_last5_ratio"] = (
+    df.groupby("player")["es_titular_partido"]
+      .transform(lambda s: s.shift().rolling(5, min_periods=1).mean())
+)
+
+df["psxg_gc_diff_last5_mean"] = (
+    df.groupby("player")["psxg_gc_diff"]
+      .transform(lambda s: s.shift().rolling(5, min_periods=1).mean())
+)
+
+df["saves_last5_mean"] = (
+    df.groupby("player")["saves_partido"]
+      .transform(lambda s: s.shift().rolling(5, min_periods=1).mean())
+)
+
+df["form_vs_class_keeper"] = df["pf_last5_mean"] - df["pf_media_historica"]
 
 # ============================================================
 # DEFINICIÓN DE FEATURES POR VENTANA
 # ============================================================
-
 features_comunes = [
     # Contexto partido / apuestas
     "local",
-    "posicion_equipo",
-    "posicion_rival",
-    "p_home",
-    "p_draw",
-    "p_away",
-    "p_win_propio",
+    #"posicion_equipo",
+    #"posicion_rival",
+    #"p_home",
+    # "p_draw",
+    # "p_away",
+    #"p_win_propio",
     "p_loss_propio",
-    "p_draw_match",
+    #"p_draw_match",
+    "partido_muy_desequilibrado",
 
     # Fuerza relativa clasificación
-    "pts_diff",
-    "is_top4_propio",
+    # "pts_diff",
+    #"is_top4_propio",
     "is_top4_rival",
     "is_bottom3_rival",
 
@@ -84,7 +284,7 @@ features_comunes = [
     "xg_rival_x_savepct",
     "xg_rival_x_gc_per90",
     "gf_rival_last5_x_gc_per90",
-    "goal_diff_rival_x_pf_var",
+    #"goal_diff_rival_x_pf_var",
 
     # Roles / calidad portero
     "score_porterias_cero",
@@ -98,88 +298,81 @@ features_comunes = [
     "rol_x_xg_rival_boost",
     "ataque_top_rival_x_elite",
     "is_top5_en_algo",
+
+    # Histórica global PF previa
+    #"pf_media_historica",
 ]
 
 features_window5 = [
     # Racha fantasy portero
     "pf_last5_mean",
-    "gc_last5_std",
-    "psxg_last5_std",
+    #"gc_last5_std",
+    #"psxg_last5_std",
     "savepct_last5_mean",
     "clean_last5_ratio",
+    "clean_last5_ratio_extra",       # NUEVA
     "titular_last5_ratio",
     "psxg_gc_diff_last5_mean",
     "form_vs_class_keeper",
     "saves_last5_mean",
+    "saves_last5_mean_extra",        # NUEVA
     "psxg_per90_last5",
     "gc_per90_last5",
 
     # Racha equipo propio
-    "goal_diff_last5_team",
+    #"goal_diff_last5_team",
 
     # Racha rival
-    "goal_diff_last5_rival",
+    #"goal_diff_last5_rival",
     "xg_last5_mean_rival",
     "shots_on_target_ratio_rival",
+
+    # Bombardeo medio rival
+    "bombardeo_last5_mean",          # NUEVA
 ]
 
 features_window3 = [
     "pf_last3_mean",
-    "gc_last3_std",
-    "psxg_last3_std",
+    #"gc_last3_std",
+    #"psxg_last3_std",
     "savepct_last3_mean",
     "clean_last3_ratio",
+    "clean_last3_ratio_extra",       # NUEVA
     "titular_last3_ratio",
     "psxg_gc_diff_last3_mean",
     "form_vs_class_keeper_3",
     "saves_last3_mean",
+    "saves_last3_mean_extra",        # NUEVA
     "psxg_per90_last3",
     "gc_per90_last3",
 
-    "goal_diff_last3_team",
+    #"goal_diff_last3_team",
 
-    "goal_diff_last3_rival",
+    #"goal_diff_last3_rival",
     "xg_last3_mean_rival",
     "shots_on_target_ratio_rival_last3",
-]
 
-features_window8 = [
-    "pf_last8_mean",
-    "gc_last8_std",
-    "psxg_last8_std",
-    "savepct_last8_mean",
-    "clean_last8_ratio",
-    "titular_last8_ratio",
-    "psxg_gc_diff_last8_mean",
-    "form_vs_class_keeper_8",
-    "saves_last8_mean",
-    "psxg_per90_last8",
-    "gc_per90_last8",
-
-    "goal_diff_last8_team",
-
-    "goal_diff_last8_rival",
-    "xg_last8_mean_rival",
-    "shots_on_target_ratio_rival_last8",
+    # Bombardeo medio rival
+    "bombardeo_last3_mean",          # NUEVA
 ]
 
 def get_features_for_window(window: int):
     if window == 3:
         base_window_feats = features_window3
-    elif window == 8:
-        base_window_feats = features_window8
-    else:
+    elif window == 5:
         base_window_feats = features_window5
+    else:
+        base_window_feats = []
     return features_comunes + base_window_feats
 
 # ============================================================
 # DEFINICIÓN DE GRIDS (COMÚN A TODAS LAS VENTANAS)
 # ============================================================
 
-n_estimators_list = [200, 400,600, 800,1000]
-max_depth_list = [4,6, 8, 10, 12,14]
-min_samples_leaf_list = [3,5, 10,15, 20]
-max_features_list = [0.2,0.3, 0.4, 0.5,0.6]
+n_estimators_list = [200, 400, 600, 800, 1000]
+max_depth_list = [4, 6, 8, 10, 12, 14]
+min_samples_leaf_list = [3, 5, 10, 15, 20]
+max_features_list = [0.3, 0.4, 0.5, 0.6]
 
 rf_configs = []
 for n_est, depth, leaf, mf in product(
@@ -197,9 +390,9 @@ for n_est, depth, leaf, mf in product(
         "max_features": mf,
     })
 
-xgb_depth_list = [2, 3, 4, 5,6]
-xgb_n_estimators_list = [200,400,600 ,800,1000, 1200]
-xgb_lr_list = [0.001,0.015,0.002, 0.025, 0.04]
+xgb_depth_list = [2, 3, 4, 5, 6]
+xgb_n_estimators_list = [200, 400, 600, 800, 1000, 1200]
+xgb_lr_list = [0.001, 0.015, 0.002, 0.025, 0.04]
 
 xgb_configs = []
 for depth, n_est, lr in product(
@@ -216,8 +409,111 @@ for depth, n_est, lr in product(
     })
 
 # ============================================================
-# BUCLE POR VENTANA (3,5,8) + ENTRENAMIENTO RF/XGB
+# BUCLE POR VENTANA + ENTRENAMIENTO RF/XGB
 # ============================================================
+from pathlib import Path
+import pandas as pd
+
+def log_filas_problematicas_porteros(
+    df: pd.DataFrame,
+    feature_cols: list,
+    log_path: str,
+):
+    """
+    Loguea filas donde alguna feature tiene NaN.
+    - Para jornadas 1 y 2: resumen por temporada y jornada -> "temporada X | jornada 1: N porteros"
+    - A partir de la jornada 3: listado detallado como antes.
+    Se asume que df ya solo contiene porteros.
+    """
+    cols_id = [
+        "player",
+        "Equipo_propio",
+        "Equipo_rival",
+        "temporada",
+        "jornada",
+        "fecha_partido",
+    ]
+    cols_id = [c for c in cols_id if c in df.columns]
+
+    cols_existentes = [c for c in feature_cols if c in df.columns]
+    if not cols_existentes:
+        with open(log_path, "w", encoding="utf-8") as f:
+            f.write("No hay features de esta ventana en el df\n")
+        return
+
+    feature_na = df[cols_existentes].isna()
+    mask_fila_mal = feature_na.any(axis=1)
+
+    df_bad = df.loc[mask_fila_mal, cols_id + cols_existentes].copy()
+    if df_bad.empty:
+        with open(log_path, "w", encoding="utf-8") as f:
+            f.write("No hay filas problemáticas (sin NaN en features)\n")
+        return
+
+    log_file = Path(log_path)
+    with open(log_file, "w", encoding="utf-8") as f:
+        # ============================
+        # RESUMEN JORNADAS 1 Y 2
+        # ============================
+        if {"jornada", "player", "temporada"}.issubset(df_bad.columns):
+            f.write("RESUMEN NULOS JORNADAS 1 Y 2 (por temporada y jornada)\n\n")
+            df_j1_2 = df_bad[df_bad["jornada"].isin([1, 2])].copy()
+
+            if df_j1_2.empty:
+                f.write("No hay porteros con NaN en jornadas 1 y 2.\n\n")
+            else:
+                resumen = (
+                    df_j1_2
+                    .groupby(["temporada", "jornada"])["player"]
+                    .nunique()
+                    .reset_index(name="n_porteros")
+                )
+                for _, row in resumen.iterrows():
+                    f.write(
+                        f"temporada {row['temporada']} | "
+                        f"jornada {int(row['jornada'])}: "
+                        f"{int(row['n_porteros'])} porteros con NaN\n"
+                    )
+                f.write("\n")
+
+            # Para el detalle, nos quedamos solo con jornadas >= 3
+            df_bad_detalle = df_bad[~df_bad["jornada"].isin([1, 2])].copy()
+        else:
+            df_bad_detalle = df_bad
+
+        # ============================
+        # DETALLE JORNADAS >= 3
+        # ============================
+        if df_bad_detalle.empty:
+            f.write("No hay filas problemáticas a partir de la jornada 3.\n")
+            return
+
+        def columnas_con_nan(row):
+            return [col for col in cols_existentes if pd.isna(row[col])]
+
+        df_bad_detalle["cols_nan"] = df_bad_detalle.apply(columnas_con_nan, axis=1)
+
+        f.write("FILAS PROBLEMÁTICAS (jornadas >= 3)\n\n")
+        for _, row in df_bad_detalle.iterrows():
+            ident_parts = []
+            if "temporada" in row:
+                ident_parts.append(f"temporada={row['temporada']}")
+            if "jornada" in row:
+                ident_parts.append(
+                    f"jornada={int(row['jornada']) if pd.notna(row['jornada']) else 'NA'}"
+                )
+            if "fecha_partido" in row:
+                ident_parts.append(f"fecha={row['fecha_partido']}")
+            if "player" in row:
+                ident_parts.append(f"player={row['player']}")
+            if "Equipo_propio" in row:
+                ident_parts.append(f"equipo={row['Equipo_propio']}")
+            if "Equipo_rival" in row:
+                ident_parts.append(f"rival={row['Equipo_rival']}")
+
+            f.write(" | ".join(ident_parts) + "\n")
+            f.write(f"  cols_nan: {row['cols_nan']}\n")
+            f.write("-" * 80 + "\n")
 
 resultados_mae = []
 resultados_r2 = []
@@ -227,22 +523,72 @@ for window in [3, 5]:
     print(f"ENTRENANDO PARA VENTANA {window} PARTIDOS")
     print("="*80)
 
-    # Features según ventana
+    # 1) Features según ventana
     features_validas = get_features_for_window(window)
     features_disponibles = [f for f in features_validas if f in df.columns]
     print(f"✅ Features válidas ventana {window}: {len(features_disponibles)}")
+    
+    
+    
+    log_feats_path = Path(f"features_porteros_win{window}.txt")
 
-    # ============================================================
-    # PREPARAR DATOS
-    # ============================================================
+    all_feats = list(dict.fromkeys(features_validas))  # mantiene orden
+    available = [f for f in all_feats if f in df.columns]
+    missing = [f for f in all_feats if f not in df.columns]
 
-    df_filtrado = df[features_disponibles + ["puntosFantasy"]].dropna()
-    print(f"   Filas sin NaN (ventana {window}): {len(df_filtrado)}")
+    with open(log_feats_path, "w", encoding="utf-8") as f:
+        f.write(f"VENTANA {window}\n\n")
 
+        f.write("✅ FEATURES USADAS (existen en df):\n")
+        for feat in available:
+            f.write(f"  - {feat}\n")
+
+        f.write("\n❌ FEATURES DESCARTADAS:\n")
+        for feat in missing:
+            f.write(
+                f"  - {feat} | motivo: columna no presente en players_with_features_exp3_CORREGIDO.csv\n"
+            )
+
+
+    # 2) Subset con target (solo para NaN y entrenamiento)
+    df_subset = df[features_disponibles + ["puntosFantasy"]].copy()
+
+    # 3) Log de NaN por columna
+    nan_log_path = Path(f"nan_report_porteros_win{window}.txt")
+    na_counts = df_subset.isna().sum().sort_values(ascending=False)
+
+    with open(nan_log_path, "w", encoding="utf-8") as f:
+        f.write(f"Nulos por columna (ventana {window}):\n")
+        f.write(na_counts.to_string())
+        f.write("\n")
+
+    umbral = 10
+    problematicas = na_counts[na_counts > umbral]
+    with open(nan_log_path, "a", encoding="utf-8") as f:
+        f.write(f"\nColumnas con más de {umbral} NaN (ventana {window}):\n")
+        f.write(problematicas.to_string())
+        f.write("\n")
+
+    # 3bis) Máscara de filas con NaN en alguna feature de esta ventana
+    mask_fila_mal = df_subset[features_disponibles].isna().any(axis=1)
+
+    # Log de filas problemáticas usando df completo (tiene player, temporada, etc.)
+    log_filas_problematicas_porteros(
+        df[mask_fila_mal],  # df original, ya filtrado a PT al inicio del script
+        feature_cols=features_disponibles,
+        log_path=f"nan_report_porteros_win{window}_filas.txt",
+    )
+    print("NaN antes de imputar:", df_subset[features_disponibles].isna().sum().sum())
+
+    # 4) Dropna UNA sola vez para entrenar
+    # 4) Imputar NaN con 6767 UNA sola vez para entrenar
+    df_filtrado = df_subset.fillna(0)
+    
     if len(df_filtrado) < 100:
         print(f"❌ Muy pocas filas para ventana {window}, se omite.")
         continue
 
+    # 5) X, y y split
     X = df_filtrado[features_disponibles].copy()
     y = df_filtrado["puntosFantasy"].copy()
 
@@ -271,18 +617,27 @@ for window in [3, 5]:
     modelo_limpio.fit(X_train, y_train)
 
     y_pred_test_base = modelo_limpio.predict(X_test)
-    mae_test_base = mean_absolute_error(y_test, np.round(y_pred_test_base))
+    y_pred_test_base_round = np.round(y_pred_test_base)
+
+    mae_test_base = mean_absolute_error(y_test, y_pred_test_base_round)
+    rmse_test_base = root_mean_squared_error(y_test, y_pred_test_base)
     r2_test_base = r2_score(y_test, y_pred_test_base)
 
-    print(f"[ventana {window}] RF_base MAE: {mae_test_base:.4f} | R2: {r2_test_base:.4f}")
+    print(
+        f"[ventana {window}] RF_base MAE: {mae_test_base:.4f} | "
+        f"RMSE: {rmse_test_base:.4f} | R2: {r2_test_base:.4f}"
+    )
 
     # ============================================================
     # LOG DE IMPORTANCIAS RF (POR VENTANA)
     # ============================================================
 
-    log_path = f"rf_feature_importances_porteros_win{window}.txt"
-    with open(log_path, "w", encoding="utf-8") as f:
-        f.write(f"RandomForest feature importances por configuración (porteros) - ventana {window}\n\n")
+    log_path_imp = f"rf_feature_importances_porteros_win{window}.txt"
+    with open(log_path_imp, "w", encoding="utf-8") as f:
+        f.write(
+            "RandomForest feature importances por configuración "
+            f"(porteros) - ventana {window}\n\n"
+        )
 
     # ============================================================
     # GRID RANDOM FOREST (POR VENTANA)
@@ -307,13 +662,18 @@ for window in [3, 5]:
         y_pred_test_rf_round = np.round(y_pred_test_rf)
 
         mae_test_rf = mean_absolute_error(y_test, y_pred_test_rf_round)
+        rmse_test_rf = root_mean_squared_error(y_test, y_pred_test_rf)
         r2_test_rf = r2_score(y_test, y_pred_test_rf)
 
-        print(f"[ventana {window}] MAE Test {name_win}: {mae_test_rf:.4f} | R2: {r2_test_rf:.4f}")
+        print(
+            f"[ventana {window}] MAE Test {name_win}: {mae_test_rf:.4f} | "
+            f"RMSE: {rmse_test_rf:.4f} | R2: {r2_test_rf:.4f}"
+        )
 
         resultados_mae.append({
             "name": name_win,
             "mae": mae_test_rf,
+            "rmse": rmse_test_rf,
             "r2": r2_test_rf,
             "model": modelo_rf,
             "tipo": "rf",
@@ -322,6 +682,7 @@ for window in [3, 5]:
         resultados_r2.append({
             "name": name_win,
             "mae": mae_test_rf,
+            "rmse": rmse_test_rf,
             "r2": r2_test_rf,
             "model": modelo_rf,
             "tipo": "rf",
@@ -334,7 +695,7 @@ for window in [3, 5]:
             reverse=True
         )
 
-        with open(log_path, "a", encoding="utf-8") as f:
+        with open(log_path_imp, "a", encoding="utf-8") as f:
             f.write(f"Modelo: {name_win}\n")
             f.write(
                 f"  n_estimators={cfg['n_estimators']}, "
@@ -342,10 +703,14 @@ for window in [3, 5]:
                 f"min_samples_leaf={cfg['min_samples_leaf']}, "
                 f"max_features={cfg['max_features']}\n"
             )
-            f.write(f"  MAE_test={mae_test_rf:.4f}  R2_test={r2_test_rf:.4f}\n")
+            f.write(
+                f"  MAE_test={mae_test_rf:.4f}  "
+                f"RMSE_test={rmse_test_rf:.4f}  "
+                f"R2_test={r2_test_rf:.4f}\n"
+            )
             f.write("  Top 10 features:\n")
-            for imp, name in ranking[:10]:
-                f.write(f"    {name}: {imp:.4f}\n")
+            for imp, fname in ranking[:10]:
+                f.write(f"    {fname}: {imp:.4f}\n")
             f.write("\n")
 
         if mae_test_rf < mejor_mae_rf_grid:
@@ -385,13 +750,18 @@ for window in [3, 5]:
         y_pred_test_xgb_round = np.round(y_pred_test_xgb)
 
         mae_test_xgb = mean_absolute_error(y_test, y_pred_test_xgb_round)
+        rmse_test_xgb = root_mean_squared_error(y_test, y_pred_test_xgb)
         r2_test_xgb = r2_score(y_test, y_pred_test_xgb)
 
-        print(f"[ventana {window}] MAE Test {name_win}: {mae_test_xgb:.4f} | R2: {r2_test_xgb:.4f}")
+        print(
+            f"[ventana {window}] MAE Test {name_win}: {mae_test_xgb:.4f} | "
+            f"RMSE: {rmse_test_xgb:.4f} | R2: {r2_test_xgb:.4f}"
+        )
 
         resultados_mae.append({
             "name": name_win,
             "mae": mae_test_xgb,
+            "rmse": rmse_test_xgb,
             "r2": r2_test_xgb,
             "model": modelo_xgb,
             "tipo": "xgb",
@@ -400,6 +770,7 @@ for window in [3, 5]:
         resultados_r2.append({
             "name": name_win,
             "mae": mae_test_xgb,
+            "rmse": rmse_test_xgb,
             "r2": r2_test_xgb,
             "model": modelo_xgb,
             "tipo": "xgb",
@@ -415,7 +786,7 @@ for window in [3, 5]:
 # ============================================================
 
 print("\n" + "="*80)
-print("RESULTADOS MEJORES MODELOS (PORTEROS) - GLOBAL (VENTANAS 3,5,8)")
+print("RESULTADOS MEJORES MODELOS (PORTEROS) - GLOBAL (VENTANAS 3,5)")
 print("="*80)
 
 # Top 3 por MAE (global)
@@ -423,8 +794,14 @@ top3_mae = sorted(resultados_mae, key=lambda d: d["mae"])[:3]
 
 print("\nTop 3 modelos globales por MAE:")
 for res in top3_mae:
-    print(f"- win{res['window']} {res['tipo'].upper()} {res['name']}: MAE={res['mae']:.4f}, R2={res['r2']:.4f}")
-    filename = output_dir / f"best_mae_win{res['window']}_{res['tipo']}_{res['name']}_mae{res['mae']:.4f}_r2{res['r2']:.4f}.pkl"
+    print(
+        f"- win{res['window']} {res['tipo'].upper()} {res['name']}: "
+        f"MAE={res['mae']:.4f}, RMSE={res['rmse']:.4f}, R2={res['r2']:.4f}"
+    )
+    filename = output_dir / (
+        f"best_mae_win{res['window']}_{res['tipo']}_{res['name']}"
+        f"_mae{res['mae']:.4f}_rmse{res['rmse']:.4f}_r2{res['r2']:.4f}.pkl"
+    )
     with open(filename, "wb") as f:
         pickle.dump(res["model"], f)
 
@@ -433,7 +810,13 @@ top3_r2 = sorted(resultados_r2, key=lambda d: d["r2"], reverse=True)[:3]
 
 print("\nTop 3 modelos globales por R2:")
 for res in top3_r2:
-    print(f"- win{res['window']} {res['tipo'].upper()} {res['name']}: MAE={res['mae']:.4f}, R2={res['r2']:.4f}")
-    filename = output_dir / f"best_r2_win{res['window']}_{res['tipo']}_{res['name']}_mae{res['mae']:.4f}_r2{res['r2']:.4f}.pkl"
+    print(
+        f"- win{res['window']} {res['tipo'].upper()} {res['name']}: "
+        f"MAE={res['mae']:.4f}, RMSE={res['rmse']:.4f}, R2={res['r2']:.4f}"
+    )
+    filename = output_dir / (
+        f"best_r2_win{res['window']}_{res['tipo']}_{res['name']}"
+        f"_mae{res['mae']:.4f}_rmse{res['rmse']:.4f}_r2{res['r2']:.4f}.pkl"
+    )
     with open(filename, "wb") as f:
         pickle.dump(res["model"], f)
