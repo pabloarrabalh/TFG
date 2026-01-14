@@ -125,6 +125,7 @@ def cargar_datos_temporada(temporada: str = "25_26") -> pd.DataFrame:
     """
     Carga datos históricos de porteros y recalcula rachas necesarias
     sobre el CSV players_with_features_exp3_CORREGIDO.csv.
+    Todo se calcula solo con información anterior al partido (shift/expanding).
     """
     search_paths = [
         Path.cwd(),
@@ -156,19 +157,8 @@ def cargar_datos_temporada(temporada: str = "25_26") -> pd.DataFrame:
         print(f"❌ Error: No hay datos para la temporada {temporada} en {CSV_NAME}")
         return None
 
-    # Asegurar columnas básicas mínimas
-    # Notas: tomamos nombres que sí existen en tu CSV actual según el listado.
-    # - puntosFantasy, pts, pts_rival, pts_diff, posicion_equipo, posicion_rival
-    # - racha5partidos, racha5partidos_rival
-    # - xg_last5_mean_team, xg_last5_mean_rival
-    # - xg_contra_last5_mean_team, xg_contra_last5_mean_rival
-    # - shots_last5_mean_rival, shots_on_target_last5_mean_rival, shots_on_target_ratio_rival
-    # - pf_last5_std (ya existe), psxg_last5_std, psxg_per90_last5, psxg_last5_sum
-
-    # Recalcular rachas de portero si no existen
-    # (necesitamos jornada para ordenar; si no está, asumimos que ya está ordenado)
+    # Orden temporal
     if "jornada" not in df.columns:
-        # Si no tienes jornada en este CSV, simplemente ordena por Date
         if "Date" in df.columns:
             df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
             df = df.sort_values(["player", "Date"])
@@ -181,15 +171,94 @@ def cargar_datos_temporada(temporada: str = "25_26") -> pd.DataFrame:
         else:
             df = df.sort_values(["player", "temporada", "jornada"])
 
+    # Agrupación por portero+temporada
     gk_group = df.groupby(["player", "temporada"])
 
-    # pf_last5_mean (promedio PF últimos 5, sin jornada actual)
+    # =========================
+    # FEATURES EXTRA PORTEROS
+    # =========================
+    df["bombardeo_partido"] = (
+        df["shots_on_target_rival_partido"].clip(lower=0)
+        * (1 - df["Goles_en_contra"].clip(lower=0))
+    )
+
+    df["saves_partido"] = (
+        df["shots_on_target_rival_partido"].clip(lower=0)
+        - df["Goles_en_contra"].clip(lower=0)
+    ).clip(lower=0)
+
+    df["clean_sheet_flag"] = (df["Goles_en_contra"] == 0).astype(int)
+    df["partido_muy_desequilibrado"] = (df["ah_line_match"].abs() >= 1.5).astype(int)
+
+    df["goles_ev_prt"] = (df["PSxG"] - df["Goles_en_contra"]).clip(lower=0)
+    df["ratio_paradas_dificiles"] = np.where(
+        df["shots_on_target_rival_partido"] > 0,
+        df["goles_ev_prt"] / df["shots_on_target_rival_partido"],
+        0
+    )
+
+    # === SAVE% HISTÓRICO (NUEVO, SIN LEAKAGE) ===
+    df["paradas_partido"] = df["saves_partido"]
+
+    df["shots_on_target_hist"] = (
+        df.groupby("player")["shots_on_target_rival_partido"]
+          .transform(lambda s: s.shift().expanding().sum())
+    )
+
+    df["paradas_hist"] = (
+        df.groupby("player")["paradas_partido"]
+          .transform(lambda s: s.shift().expanding().sum())
+    )
+
+    df["savepct_hist"] = np.where(
+        df["shots_on_target_hist"] > 0,
+        df["paradas_hist"] / df["shots_on_target_hist"],
+        np.nan
+    )
+
+    # Usamos SOLO savepct_hist para mezclar con xG rival
+    df["xg_rival_x_savepct"] = df["xg_last5_mean_rival"] * df["savepct_hist"]
+    df["xg_rival_x_gc_per90"] = df["xg_last5_mean_rival"] * df["gc_per90_last5"]
+    df["gf_rival_last5_x_gc_per90"] = df["gf_last5_mean_rival"] * df["gc_per90_last5"]
+
+    # =========================
+    # ROLES / CALIDAD PORTERO
+    # =========================
+    df["score_porterias_cero"] = (1 - df["gc_per90_last5"]).clip(lower=0)
+    df["score_save_pct"] = df["savepct_hist"]
+
+    q_pc = df["score_porterias_cero"].quantile(0.8)
+    q_sp = df["score_save_pct"].quantile(0.8)
+
+    df["elite_keeper"] = (
+        (df["score_porterias_cero"] >= q_pc) &
+        (df["score_save_pct"] >= q_sp)
+    ).astype(int)
+
+    df["is_top5_porterias_cero"] = (df["score_porterias_cero"] >= q_pc).astype(int)
+    df["is_top5_save_pct"] = (df["score_save_pct"] >= q_sp).astype(int)
+    df["is_top5_en_algo"] = (
+        (df["is_top5_porterias_cero"] == 1) |
+        (df["is_top5_save_pct"] == 1)
+    ).astype(int)
+
+    df["score_pc_boost"] = df["score_porterias_cero"] * (df["ataque_top_rival"].fillna(0) + 1)
+    df["score_sp_boost"] = df["score_save_pct"] * (df["ataque_top_rival"].fillna(0) + 1)
+    df["rol_x_xg_rival"] = (
+        df[["score_porterias_cero", "score_save_pct"]].mean(axis=1)
+        * df["xg_last5_mean_rival"]
+    )
+    df["rol_x_xg_rival_boost"] = df["rol_x_xg_rival"] * (df["ataque_top_rival"].fillna(0) + 1)
+    df["ataque_top_rival_x_elite"] = df["ataque_top_rival"].fillna(0) * df["elite_keeper"]
+
+    # =========================
+    # RACHAS 5 PARTIDOS
+    # =========================
     if "pf_last5_mean" not in df.columns and "puntosFantasy" in df.columns:
         df["pf_last5_mean"] = gk_group["puntosFantasy"].transform(
             lambda s: s.shift(1).rolling(5, min_periods=1).mean()
         )
 
-    # gc_last5_mean / psxg_last5_mean etc. solo si existen columnas base
     if "Goles_en_contra" in df.columns:
         if "gc_last5_mean" not in df.columns:
             df["gc_last5_mean"] = gk_group["Goles_en_contra"].transform(
@@ -210,7 +279,6 @@ def cargar_datos_temporada(temporada: str = "25_26") -> pd.DataFrame:
                 lambda s: s.shift(1).rolling(5, min_periods=1).sum()
             )
 
-    # Clean sheets y rachas
     if "Goles_en_contra" in df.columns:
         if "clean_last5_sum" not in df.columns:
             df["clean_sheet"] = (df["Goles_en_contra"] == 0).astype(int)
@@ -224,63 +292,57 @@ def cargar_datos_temporada(temporada: str = "25_26") -> pd.DataFrame:
                 lambda s: s.shift(1).rolling(5, min_periods=1).mean()
             )
 
-    # Tarjetas y titularidad si existen
-    if "Amarillas" in df.columns:
-        if "yellow_last5_sum" not in df.columns:
-            df["yellow_last5_sum"] = gk_group["Amarillas"].transform(
-                lambda s: s.shift(1).rolling(5, min_periods=1).sum()
-            )
-    if "Rojas" in df.columns:
-        if "red_last5_sum" not in df.columns:
-            df["red_last5_sum"] = gk_group["Rojas"].transform(
-                lambda s: s.shift(1).rolling(5, min_periods=1).sum()
-            )
-    if "Titular" in df.columns:
-        if "titular_last5_ratio" not in df.columns:
-            df["titular_last5_ratio"] = gk_group["Titular"].transform(
-                lambda s: s.shift(1).rolling(5, min_periods=1).mean()
-            )
+    # =========================
+    # RACHAS 3 PARTIDOS (WIN3)
+    # =========================
+    if "pf_media_historica" not in df.columns and "puntosFantasy" in df.columns:
+        df["pf_media_historica"] = (
+            df.groupby("player")["puntosFantasy"]
+              .transform(lambda s: s.shift().expanding().mean())
+        )
 
-    # Rachas de equipo (si tienes GF/GC y xG de equipos)
-    # Ojo: en tu CSV final quizá no tienes gf/gc por equipo; estas partes solo se calculan si existen.
-    if {"gf", "gc", "Equipo_propio"}.issubset(df.columns):
-        df = df.sort_values(["temporada", "jornada", "Equipo_propio"])
-        team_group = df.groupby(["Equipo_propio", "temporada"])
-        if "gf_last5_mean_team" not in df.columns:
-            df["gf_last5_mean_team"] = team_group["gf"].transform(
-                lambda s: s.shift(1).rolling(5, min_periods=1).mean()
-            )
-        if "gc_last5_mean_team" not in df.columns:
-            df["gc_last5_mean_team"] = team_group["gc"].transform(
-                lambda s: s.shift(1).rolling(5, min_periods=1).mean()
-            )
-        if "goal_diff_last5_team" not in df.columns:
-            df["goal_diff_last5_team"] = (
-                df["gf_last5_mean_team"] - df["gc_last5_mean_team"]
-            )
+    g = df.groupby("player")
 
-    if {"gf_rival", "gc_rival", "Equipo_rival"}.issubset(df.columns):
-        df = df.sort_values(["temporada", "jornada", "Equipo_rival"])
-        r_group = df.groupby(["Equipo_rival", "temporada"])
-        if "gf_last5_mean_rival" not in df.columns:
-            df["gf_last5_mean_rival"] = r_group["gf_rival"].transform(
-                lambda s: s.shift(1).rolling(5, min_periods=1).mean()
-            )
-        if "gc_last5_mean_rival" not in df.columns:
-            df["gc_last5_mean_rival"] = r_group["gc_rival"].transform(
-                lambda s: s.shift(1).rolling(5, min_periods=1).mean()
-            )
-        if "goal_diff_last5_rival" not in df.columns:
-            df["goal_diff_last5_rival"] = (
-                df["gf_last5_mean_rival"] - df["gc_last5_mean_rival"]
-            )
+    df["pf_last3_mean"] = g["puntosFantasy"].transform(
+        lambda s: s.shift().rolling(3, min_periods=1).mean()
+    )
 
-    # Ya tienes en el CSV:
-    # xg_last5_mean_team, xg_contra_last5_mean_team,
-    # xg_last5_mean_rival, xg_contra_last5_mean_rival,
-    # shots_last5_mean_rival, shots_on_target_last5_mean_rival, shots_on_target_ratio_rival,
-    # pf_last5_std, psxg_last5_std, psxg_per90_last5, etc.
-        # Asegurar columnas de roles que el modelo espera
+    # IMPORTANTE: usar savepct_hist en vez de Porcentaje_paradas
+    df["savepct_last3_mean"] = g["savepct_hist"].transform(
+        lambda s: s.rolling(3, min_periods=1).mean()
+    )
+
+    df["clean_last3_ratio"] = g["clean_sheet_flag"].transform(
+        lambda s: s.shift().rolling(3, min_periods=1).mean()
+    )
+
+    df["es_titular_partido"] = (df["Min_partido"] > 0).astype(int)
+    df["titular_last3_ratio"] = g["es_titular_partido"].transform(
+        lambda s: s.shift().rolling(3, min_periods=1).mean()
+    )
+
+    df["psxg_gc_diff"] = df["PSxG"] - df["Goles_en_contra"]
+    df["psxg_gc_diff_last3_mean"] = g["psxg_gc_diff"].transform(
+        lambda s: s.shift().rolling(3, min_periods=1).mean()
+    )
+
+    df["saves_last3_mean"] = g["saves_partido"].transform(
+        lambda s: s.shift().rolling(3, min_periods=1).mean()
+    )
+
+    df["form_vs_class_keeper_3"] = df["pf_last3_mean"] - df["pf_media_historica"]
+
+    df["bombardeo_last3_mean"] = g["bombardeo_partido"].transform(
+        lambda s: s.shift().rolling(3, min_periods=1).mean()
+    )
+    df["clean_last3_ratio_extra"] = g["clean_sheet_flag"].transform(
+        lambda s: s.shift().rolling(3, min_periods=1).mean()
+    )
+    df["saves_last3_mean_extra"] = g["saves_partido"].transform(
+        lambda s: s.shift().rolling(3, min_periods=1).mean()
+    )
+
+    # roles mínimos
     role_cols = [
         "rol_pos_porterias_cero",
         "rol_val_porterias_cero",
@@ -295,7 +357,6 @@ def cargar_datos_temporada(temporada: str = "25_26") -> pd.DataFrame:
             df[col] = 0
 
     return df
-
 
 
 def predecir_partido(

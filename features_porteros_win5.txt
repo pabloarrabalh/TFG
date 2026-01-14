@@ -2,11 +2,9 @@ VENTANA 5
 
 ✅ FEATURES USADAS (existen en df):
   - local
-  - p_loss_propio
+  - p_loss_soft
+  - p_win_minus_loss
   - partido_muy_desequilibrado
-  - is_top4_rival
-  - is_bottom3_rival
-  - ratio_paradas_dificiles
   - xg_rival_x_savepct
   - xg_rival_x_gc_per90
   - gf_rival_last5_x_gc_per90

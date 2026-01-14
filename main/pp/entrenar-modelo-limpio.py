@@ -81,6 +81,7 @@ if "puntosFantasy" in df.columns:
     )
 else:
     df["pf_media_historica"] = np.nan
+
 # =========================
 # FEATURES EXTRA PORTEROS
 # =========================
@@ -97,6 +98,25 @@ df["saves_partido"] = (
     df["Goles_en_contra"].clip(lower=0)
 ).clip(lower=0)
 
+# 2bis) Porcentaje de paradas histórico (solo partidos anteriores)
+df["paradas_partido"] = df["saves_partido"]
+
+df["shots_on_target_hist"] = (
+    df.groupby("player")["shots_on_target_rival_partido"]
+      .transform(lambda s: s.shift().expanding().sum())
+)
+
+df["paradas_hist"] = (
+    df.groupby("player")["paradas_partido"]
+      .transform(lambda s: s.shift().expanding().sum())
+)
+
+df["savepct_hist"] = np.where(
+    df["shots_on_target_hist"] > 0,
+    df["paradas_hist"] / df["shots_on_target_hist"],
+    np.nan
+)
+
 # 3) Clean sheet flag
 df["clean_sheet_flag"] = (df["Goles_en_contra"] == 0).astype(int)
 
@@ -111,11 +131,11 @@ def rolling_feat(col, window, agg, new_name):
 rolling_feat("bombardeo_partido", 3, "mean", "bombardeo_last3_mean")
 rolling_feat("bombardeo_partido", 5, "mean", "bombardeo_last5_mean")
 
-# Saves medios
+# Saves medios extra
 rolling_feat("saves_partido", 3, "mean", "saves_last3_mean_extra")
 rolling_feat("saves_partido", 5, "mean", "saves_last5_mean_extra")
 
-# Ratio de clean sheets
+# Ratio de clean sheets extra
 rolling_feat("clean_sheet_flag", 3, "mean", "clean_last3_ratio_extra")
 rolling_feat("clean_sheet_flag", 5, "mean", "clean_last5_ratio_extra")
 
@@ -127,9 +147,7 @@ df["partido_muy_desequilibrado"] = (df["ah_line_match"].abs() >= 1.5).astype(int
 # FEATURES AVANZADAS PORTERO X RIVAL
 # =========================
 
-# 1) ratio_paradas_dificiles
-#   Aproximación: PSxG - goles_en_contra = goles evitados.
-#   Normalizamos por tiros a puerta recibidos del rival.
+# 1) ratio_paradas_dificiles (se usa solo para análisis, no como feature directa)
 df["goles_ev_prt"] = (df["PSxG"] - df["Goles_en_contra"]).clip(lower=0)
 df["ratio_paradas_dificiles"] = np.where(
     df["shots_on_target_rival_partido"] > 0,
@@ -137,8 +155,8 @@ df["ratio_paradas_dificiles"] = np.where(
     0
 )
 
-# 2) xg_rival_x_savepct
-df["xg_rival_x_savepct"] = df["xg_last5_mean_rival"] * (df["Porcentaje_paradas"] / 100.0)
+# 2) xg_rival_x_savepct (usa histórico)
+df["xg_rival_x_savepct"] = df["xg_last5_mean_rival"] * df["savepct_hist"]
 
 # 3) xg_rival_x_gc_per90
 df["xg_rival_x_gc_per90"] = df["xg_last5_mean_rival"] * df["gc_per90_last5"]
@@ -146,27 +164,39 @@ df["xg_rival_x_gc_per90"] = df["xg_last5_mean_rival"] * df["gc_per90_last5"]
 # 4) gf_rival_last5_x_gc_per90
 df["gf_rival_last5_x_gc_per90"] = df["gf_last5_mean_rival"] * df["gc_per90_last5"]
 
+
 # =========================
 # ROLES / CALIDAD PORTERO
 # =========================
 
 # Portero “de porterías a cero” vs “de paradas”
 df["score_porterias_cero"] = (1 - df["gc_per90_last5"]).clip(lower=0)
-df["score_save_pct"] = df["Porcentaje_paradas"] / 100.0
+df["score_save_pct"] = df["savepct_hist"]
 
 # Clasificación en percentiles globales
 q_pc = df["score_porterias_cero"].quantile(0.8)
 q_sp = df["score_save_pct"].quantile(0.8)
 
-df["elite_keeper"] = ((df["score_porterias_cero"] >= q_pc) & (df["score_save_pct"] >= q_sp)).astype(int)
+df["elite_keeper"] = (
+    (df["score_porterias_cero"] >= q_pc) &
+    (df["score_save_pct"] >= q_sp)
+).astype(int)
+
 df["is_top5_porterias_cero"] = (df["score_porterias_cero"] >= q_pc).astype(int)
 df["is_top5_save_pct"] = (df["score_save_pct"] >= q_sp).astype(int)
-df["is_top5_en_algo"] = ((df["is_top5_porterias_cero"] == 1) | (df["is_top5_save_pct"] == 1)).astype(int)
+df["is_top5_en_algo"] = (
+    (df["is_top5_porterias_cero"] == 1) |
+    (df["is_top5_save_pct"] == 1)
+).astype(int)
 
 # Boosts y rol_x_xg_rival
 df["score_pc_boost"] = df["score_porterias_cero"] * (df["ataque_top_rival"].fillna(0) + 1)
 df["score_sp_boost"] = df["score_save_pct"] * (df["ataque_top_rival"].fillna(0) + 1)
-df["rol_x_xg_rival"] = df[["score_porterias_cero", "score_save_pct"]].mean(axis=1) * df["xg_last5_mean_rival"]
+
+df["rol_x_xg_rival"] = (
+    df[["score_porterias_cero", "score_save_pct"]].mean(axis=1) *
+    df["xg_last5_mean_rival"]
+)
 df["rol_x_xg_rival_boost"] = df["rol_x_xg_rival"] * (df["ataque_top_rival"].fillna(0) + 1)
 
 # Interacción ataque top rival x elite
@@ -182,45 +212,41 @@ df["pf_last3_mean"] = (
       .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
 )
 
-# 2) savepct_last3_mean: media % paradas últimos 3
+# 2) savepct_last3_mean: media % paradas históricos últimos 3
 df["savepct_last3_mean"] = (
-    df.groupby("player")["Porcentaje_paradas"]
-      .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
+    df.groupby("player")["savepct_hist"]
+      .transform(lambda s: s.rolling(3, min_periods=1).mean())
 )
 
-# 3) clean_last3_ratio: ratio porterías a cero últimos 3
+# 3) clean_last3_ratio
 df["clean_last3_ratio"] = (
     df.groupby("player")["clean_sheet_flag"]
       .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
 )
 
-# 4) titular_last3_ratio: % de partidos jugados (Min > 0) últimos 3
+# 4) titular_last3_ratio
 df["es_titular_partido"] = (df["Min_partido"] > 0).astype(int)
 df["titular_last3_ratio"] = (
     df.groupby("player")["es_titular_partido"]
       .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
 )
 
-# 5) psxg_gc_diff_last3_mean: media (PSxG - GC) últimos 3
+# 5) psxg_gc_diff_last3_mean
 df["psxg_gc_diff"] = df["PSxG"] - df["Goles_en_contra"]
 df["psxg_gc_diff_last3_mean"] = (
     df.groupby("player")["psxg_gc_diff"]
       .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
 )
 
-# 6) saves_last3_mean: media paradas últimos 3
-df["saves_partido"] = (
-    df["shots_on_target_rival_partido"].clip(lower=0)
-    - df["Goles_en_contra"].clip(lower=0)
-).clip(lower=0)
-
+# 6) saves_last3_mean
 df["saves_last3_mean"] = (
     df.groupby("player")["saves_partido"]
       .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
 )
 
-# 7) form_vs_class_keeper_3: forma reciente vs media histórica
+# 7) form_vs_class_keeper_3
 df["form_vs_class_keeper_3"] = df["pf_last3_mean"] - df["pf_media_historica"]
+
 # =========================
 # RACHAS PORTERO (5 PARTIDOS) SIN LEAKAGE
 # =========================
@@ -231,8 +257,8 @@ df["pf_last5_mean"] = (
 )
 
 df["savepct_last5_mean"] = (
-    df.groupby("player")["Porcentaje_paradas"]
-      .transform(lambda s: s.shift().rolling(5, min_periods=1).mean())
+    df.groupby("player")["savepct_hist"]
+      .transform(lambda s: s.rolling(5, min_periods=1).mean())
 )
 
 df["clean_last5_ratio"] = (
@@ -257,38 +283,43 @@ df["saves_last5_mean"] = (
 
 df["form_vs_class_keeper"] = df["pf_last5_mean"] - df["pf_media_historica"]
 
+# --- Ajuste apuestas: balancear win/loss ---
+
+# 1) Versión suavizada de p_loss (que no dispare tanto)
+df["p_loss_soft"] = np.sqrt(df["p_loss_propio"].clip(0, 1))
+
+# 2) Diferencial de probabilidad: muy alta victoria => menos tiros esperados
+#    (si no tienes p_win_propio, puedes crearlo a partir de cuotas antes)
+if "p_win_propio" in df.columns:
+    df["p_win_minus_loss"] = (
+        df["p_win_propio"].clip(0, 1) - df["p_loss_propio"].clip(0, 1)
+    )
+else:
+    df["p_win_minus_loss"] = np.nan
+
+
 # ============================================================
 # DEFINICIÓN DE FEATURES POR VENTANA
 # ============================================================
 features_comunes = [
-    # Contexto partido / apuestas
+    # Contexto partido / apuestas (pre‑match)
     "local",
-    #"posicion_equipo",
-    #"posicion_rival",
-    #"p_home",
-    # "p_draw",
-    # "p_away",
-    #"p_win_propio",
-    "p_loss_propio",
-    #"p_draw_match",
+    #"p_loss_soft",          # en vez de p_loss_propio
+    "p_win_minus_loss",
     "partido_muy_desequilibrado",
 
-    # Fuerza relativa clasificación
-    # "pts_diff",
-    #"is_top4_propio",
-    "is_top4_rival",
-    "is_bottom3_rival",
+    # Fuerza relativa clasificación (pre‑match)
+    #"is_top4_rival",
+    #"is_bottom3_rival",
 
-    # Features “mixtas” portero x rival
-    "ratio_paradas_dificiles",
+    # Mixtas portero x rival (rolling/pre‑match)
     "xg_rival_x_savepct",
     "xg_rival_x_gc_per90",
     "gf_rival_last5_x_gc_per90",
-    #"goal_diff_rival_x_pf_var",
 
-    # Roles / calidad portero
+    # Roles / calidad portero (derivan de rolling históricos)
     "score_porterias_cero",
-    "score_save_pct",
+    #"score_save_pct",
     "rol_x_xg_rival",
     "elite_keeper",
     "is_top5_porterias_cero",
@@ -298,62 +329,40 @@ features_comunes = [
     "rol_x_xg_rival_boost",
     "ataque_top_rival_x_elite",
     "is_top5_en_algo",
-
-    # Histórica global PF previa
-    #"pf_media_historica",
-]
-
-features_window5 = [
-    # Racha fantasy portero
-    "pf_last5_mean",
-    #"gc_last5_std",
-    #"psxg_last5_std",
-    "savepct_last5_mean",
-    "clean_last5_ratio",
-    "clean_last5_ratio_extra",       # NUEVA
-    "titular_last5_ratio",
-    "psxg_gc_diff_last5_mean",
-    "form_vs_class_keeper",
-    "saves_last5_mean",
-    "saves_last5_mean_extra",        # NUEVA
-    "psxg_per90_last5",
-    "gc_per90_last5",
-
-    # Racha equipo propio
-    #"goal_diff_last5_team",
-
-    # Racha rival
-    #"goal_diff_last5_rival",
-    "xg_last5_mean_rival",
-    "shots_on_target_ratio_rival",
-
-    # Bombardeo medio rival
-    "bombardeo_last5_mean",          # NUEVA
 ]
 
 features_window3 = [
     "pf_last3_mean",
-    #"gc_last3_std",
-    #"psxg_last3_std",
     "savepct_last3_mean",
     "clean_last3_ratio",
-    "clean_last3_ratio_extra",       # NUEVA
+    "clean_last3_ratio_extra",
     "titular_last3_ratio",
     "psxg_gc_diff_last3_mean",
     "form_vs_class_keeper_3",
     "saves_last3_mean",
-    "saves_last3_mean_extra",        # NUEVA
+    "saves_last3_mean_extra",
     "psxg_per90_last3",
     "gc_per90_last3",
-
-    #"goal_diff_last3_team",
-
-    #"goal_diff_last3_rival",
     "xg_last3_mean_rival",
     "shots_on_target_ratio_rival_last3",
+    "bombardeo_last3_mean",
+]
 
-    # Bombardeo medio rival
-    "bombardeo_last3_mean",          # NUEVA
+features_window5 = [
+    "pf_last5_mean",
+    "savepct_last5_mean",
+    "clean_last5_ratio",
+    "clean_last5_ratio_extra",
+    "titular_last5_ratio",
+    "psxg_gc_diff_last5_mean",
+    "form_vs_class_keeper",
+    "saves_last5_mean",
+    "saves_last5_mean_extra",
+    "psxg_per90_last5",
+    "gc_per90_last5",
+    "xg_last5_mean_rival",
+    "shots_on_target_ratio_rival",
+    "bombardeo_last5_mean",
 ]
 
 def get_features_for_window(window: int):
@@ -369,9 +378,9 @@ def get_features_for_window(window: int):
 # DEFINICIÓN DE GRIDS (COMÚN A TODAS LAS VENTANAS)
 # ============================================================
 
-n_estimators_list = [200, 400, 600, 800, 1000]
-max_depth_list = [4, 6, 8, 10, 12, 14]
-min_samples_leaf_list = [3, 5, 10, 15, 20]
+n_estimators_list = [200, 400, 600]
+max_depth_list = [ 6, 8, 10, 12, 14]
+min_samples_leaf_list = [3, 5, 10, 15,]
 max_features_list = [0.3, 0.4, 0.5, 0.6]
 
 rf_configs = []
@@ -528,8 +537,16 @@ for window in [3, 5]:
     features_disponibles = [f for f in features_validas if f in df.columns]
     print(f"✅ Features válidas ventana {window}: {len(features_disponibles)}")
     
-    
-    
+    feature_cols_win3 = [f for f in get_features_for_window(3) if f in df.columns]
+    feature_cols_win5 = [f for f in get_features_for_window(5) if f in df.columns]
+
+    # por ejemplo, si tu predictor sólo va a usar win3:
+    with open("feature_cols_win3.pkl", "wb") as f:
+        pickle.dump(feature_cols_win3, f)
+
+    with open("feature_cols_win5.pkl", "wb") as f:
+        pickle.dump(feature_cols_win5, f)
+        
     log_feats_path = Path(f"features_porteros_win{window}.txt")
 
     all_feats = list(dict.fromkeys(features_validas))  # mantiene orden
@@ -592,14 +609,17 @@ for window in [3, 5]:
     X = df_filtrado[features_disponibles].copy()
     y = df_filtrado["puntosFantasy"].copy()
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y,
-        test_size=0.2,
-        random_state=42
-    )
+    # Split temporal: primeras filas (jornadas iniciales) = train, últimas = test
+    split_point = int(len(X) * 0.8)
 
-    print(f"   X_train: {X_train.shape}")
-    print(f"   X_test:  {X_test.shape}\n")
+    X_train = X.iloc[:split_point].copy()
+    X_test  = X.iloc[split_point:].copy()
+    y_train = y.iloc[:split_point].copy()
+    y_test  = y.iloc[split_point:].copy()
+
+    print(f"✅ Temporal split ventana {window}:")
+    print(f"   Train: {X_train.shape}, Test: {X_test.shape}")
+
 
     # ============================================================
     # RF BASE (POR VENTANA)
@@ -789,10 +809,12 @@ print("\n" + "="*80)
 print("RESULTADOS MEJORES MODELOS (PORTEROS) - GLOBAL (VENTANAS 3,5)")
 print("="*80)
 
-# Top 3 por MAE (global)
+# Top 3 por MAE (global)# Top 3 por MAE (global)
 top3_mae = sorted(resultados_mae, key=lambda d: d["mae"])[:3]
 
-print("\nTop 3 modelos globales por MAE:")
+print("\n" + "#"*80)
+print("##### TOP 3 MODELOS GLOBALES POR MAE #####")
+print("#"*80)
 for res in top3_mae:
     print(
         f"- win{res['window']} {res['tipo'].upper()} {res['name']}: "
@@ -808,7 +830,9 @@ for res in top3_mae:
 # Top 3 por R2 (global)
 top3_r2 = sorted(resultados_r2, key=lambda d: d["r2"], reverse=True)[:3]
 
-print("\nTop 3 modelos globales por R2:")
+print("\n" + "#"*80)
+print("##### TOP 3 MODELOS GLOBALES POR R2 #####")
+print("#"*80)
 for res in top3_r2:
     print(
         f"- win{res['window']} {res['tipo'].upper()} {res['name']}: "
