@@ -1,18 +1,9 @@
-"""
-ANÁLISIS SHAP GLOBAL - PORTEROS
-Usa el modelo entrenado para generar gráficos de explicabilidad
-"""
-
 import pickle
 import shap
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
-
-# ============================================================
-# 1) Cargar modelo, explainer, SHAP values y features
-# ============================================================
 
 MODELO_PATH = "modelos/best_mae_win3_rf_win3_rf_ne200_d8_l3_mf5_mae3.2658_rmse3.9936_r20.0206.pkl"
 EXPLAINER_PATH = "explainer_shap.pkl"
