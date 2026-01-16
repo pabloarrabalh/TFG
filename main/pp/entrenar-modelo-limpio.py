@@ -12,26 +12,31 @@ from sklearn.linear_model import ElasticNet
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
     mean_absolute_error,
     r2_score,
     root_mean_squared_error,
 )
 from xgboost import XGBRegressor
+import shap
+import matplotlib.pyplot as plt
+
 
 # Carpeta de salida para modelos
 output_dir = Path("modelos")
 output_dir.mkdir(exist_ok=True)
 
+
 print("Número de porteros:")
 df_check = pd.read_csv("players_with_features_exp3_CORREGIDO.csv")
 df_pt_check = df_check[df_check["posicion"] == "PT"]
-print(len(df_pt_check))  # [file:34]
+print(len(df_pt_check))
+
 
 print("\n" + "="*80)
 print("ENTRENANDO MODELOS LIMPIOS - SOLO PORTEROS - SIN DATA LEAKAGE")
 print("="*80 + "\n")
+
 
 # ============================================================
 # CARGAR DATOS (SOLO PORTEROS)
@@ -61,13 +66,13 @@ if not csv_path:
 print(f"📂 Cargando solo porteros desde: {csv_path}")
 df = pd.read_csv(csv_path)
 df = df[df["posicion"] == "PT"].copy()
-print(f"✅ Cargado: {df.shape[0]} filas de porteros, {df.shape[1]} columnas\n")  # [file:34]
+print(f"✅ Cargado: {df.shape[0]} filas de porteros, {df.shape[1]} columnas\n")
+
 
 # ============================================================
 # ORDEN TEMPORAL + PF_MEDIA_HISTORICA (SIN LEAKAGE)
 # ============================================================
 
-# Usamos columnas temporales existentes: temporada, jornada, fecha_partido
 sort_cols = []
 for c in ["temporada", "jornada", "fecha_partido"]:
     if c in df.columns:
@@ -75,7 +80,6 @@ for c in ["temporada", "jornada", "fecha_partido"]:
 
 df = df.sort_values(sort_cols).reset_index(drop=True)
 
-# pf_media_historica: media de puntosFantasy previa por jugador (player)
 if "puntosFantasy" in df.columns:
     df["pf_media_historica"] = (
         df.groupby("player")["puntosFantasy"]
@@ -84,33 +88,42 @@ if "puntosFantasy" in df.columns:
 else:
     df["pf_media_historica"] = np.nan
 
+
 # =========================
 # FEATURES EXTRA PORTEROS
 # =========================
 
-# 1) Bombardeo partido (solo info del propio partido)
 df["bombardeo_partido"] = (
     df["shots_on_target_rival_partido"].clip(lower=0) *
     (1 - df["Goles_en_contra"].clip(lower=0))
 )
 
-# 2) Saves partido
 df["saves_partido"] = (
     df["shots_on_target_rival_partido"].clip(lower=0) -
     df["Goles_en_contra"].clip(lower=0)
 ).clip(lower=0)
 
-# 2bis) Porcentaje de paradas histórico (solo partidos anteriores)
 df["paradas_partido"] = df["saves_partido"]
 
-df["shots_on_target_hist"] = (
+df["shots_on_target_hist_raw"] = (
     df.groupby("player")["shots_on_target_rival_partido"]
       .transform(lambda s: s.shift().expanding().sum())
 )
 
-df["paradas_hist"] = (
+df["paradas_hist_raw"] = (
     df.groupby("player")["paradas_partido"]
       .transform(lambda s: s.shift().expanding().sum())
+)
+
+# savepct_hist rolling 5
+df["shots_on_target_hist"] = (
+    df.groupby("player")["shots_on_target_rival_partido"]
+      .transform(lambda s: s.shift().rolling(5, min_periods=1).sum())
+)
+
+df["paradas_hist"] = (
+    df.groupby("player")["paradas_partido"]
+      .transform(lambda s: s.shift().rolling(5, min_periods=1).sum())
 )
 
 df["savepct_hist"] = np.where(
@@ -119,29 +132,24 @@ df["savepct_hist"] = np.where(
     np.nan
 )
 
-# 3) Clean sheet flag
 df["clean_sheet_flag"] = (df["Goles_en_contra"] == 0).astype(int)
 
-# 4) Rolling por portero sin leakage (shift + rolling)
+
 def rolling_feat(col, window, agg, new_name):
     df[new_name] = (
         df.groupby("player")[col]
           .transform(lambda s: getattr(s.shift().rolling(window, min_periods=1), agg)())
     )
 
-# Bombardeo medio
 rolling_feat("bombardeo_partido", 3, "mean", "bombardeo_last3_mean")
 rolling_feat("bombardeo_partido", 5, "mean", "bombardeo_last5_mean")
 
-# Saves medios extra
 rolling_feat("saves_partido", 3, "mean", "saves_last3_mean_extra")
 rolling_feat("saves_partido", 5, "mean", "saves_last5_mean_extra")
 
-# Ratio de clean sheets extra
 rolling_feat("clean_sheet_flag", 3, "mean", "clean_last3_ratio_extra")
 rolling_feat("clean_sheet_flag", 5, "mean", "clean_last5_ratio_extra")
 
-# 5) Partido muy desequilibrado (solo info de cuotas pre-partido)
 df["partido_muy_desequilibrado"] = (df["ah_line_match"].abs() >= 1.5).astype(int)
 
 
@@ -149,7 +157,6 @@ df["partido_muy_desequilibrado"] = (df["ah_line_match"].abs() >= 1.5).astype(int
 # FEATURES AVANZADAS PORTERO X RIVAL
 # =========================
 
-# 1) ratio_paradas_dificiles (se usa solo para análisis, no como feature directa)
 df["goles_ev_prt"] = (df["PSxG"] - df["Goles_en_contra"]).clip(lower=0)
 df["ratio_paradas_dificiles"] = np.where(
     df["shots_on_target_rival_partido"] > 0,
@@ -157,13 +164,7 @@ df["ratio_paradas_dificiles"] = np.where(
     0
 )
 
-# 2) xg_rival_x_savepct (usa histórico)
 df["xg_rival_x_savepct"] = df["xg_last5_mean_rival"] * df["savepct_hist"]
-
-# 3) xg_rival_x_gc_per90
-df["xg_rival_x_gc_per90"] = df["xg_last5_mean_rival"] * df["gc_per90_last5"]
-
-# 4) gf_rival_last5_x_gc_per90
 df["gf_rival_last5_x_gc_per90"] = df["gf_last5_mean_rival"] * df["gc_per90_last5"]
 
 
@@ -171,13 +172,11 @@ df["gf_rival_last5_x_gc_per90"] = df["gf_last5_mean_rival"] * df["gc_per90_last5
 # ROLES / CALIDAD PORTERO
 # =========================
 
-# Portero “de porterías a cero” vs “de paradas”
 df["score_porterias_cero"] = (1 - df["gc_per90_last5"]).clip(lower=0)
 df["score_save_pct"] = df["savepct_hist"]
 
-# Clasificación en percentiles globales
-q_pc = df["score_porterias_cero"].quantile(0.8)
-q_sp = df["score_save_pct"].quantile(0.8)
+q_pc = df["score_porterias_cero"].quantile(0.6)
+q_sp = df["score_save_pct"].quantile(0.6)
 
 df["elite_keeper"] = (
     (df["score_porterias_cero"] >= q_pc) &
@@ -191,7 +190,6 @@ df["is_top5_en_algo"] = (
     (df["is_top5_save_pct"] == 1)
 ).astype(int)
 
-# Boosts y rol_x_xg_rival
 df["score_pc_boost"] = df["score_porterias_cero"] * (df["ataque_top_rival"].fillna(0) + 1)
 df["score_sp_boost"] = df["score_save_pct"] * (df["ataque_top_rival"].fillna(0) + 1)
 
@@ -201,53 +199,47 @@ df["rol_x_xg_rival"] = (
 )
 df["rol_x_xg_rival_boost"] = df["rol_x_xg_rival"] * (df["ataque_top_rival"].fillna(0) + 1)
 
-# Interacción ataque top rival x elite
 df["ataque_top_rival_x_elite"] = df["ataque_top_rival"].fillna(0) * df["elite_keeper"]
+
 
 # =========================
 # RACHAS PORTERO (3 PARTIDOS) SIN LEAKAGE
 # =========================
 
-# 1) pf_last3_mean: media PF últimos 3
 df["pf_last3_mean"] = (
     df.groupby("player")["puntosFantasy"]
       .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
 )
 
-# 2) savepct_last3_mean: media % paradas históricos últimos 3
 df["savepct_last3_mean"] = (
     df.groupby("player")["savepct_hist"]
-      .transform(lambda s: s.rolling(3, min_periods=1).mean())
+      .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
 )
 
-# 3) clean_last3_ratio
 df["clean_last3_ratio"] = (
     df.groupby("player")["clean_sheet_flag"]
       .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
 )
 
-# 4) titular_last3_ratio
 df["es_titular_partido"] = (df["Min_partido"] > 0).astype(int)
 df["titular_last3_ratio"] = (
     df.groupby("player")["es_titular_partido"]
       .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
 )
 
-# 5) psxg_gc_diff_last3_mean
 df["psxg_gc_diff"] = df["PSxG"] - df["Goles_en_contra"]
 df["psxg_gc_diff_last3_mean"] = (
     df.groupby("player")["psxg_gc_diff"]
       .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
 )
 
-# 6) saves_last3_mean
 df["saves_last3_mean"] = (
     df.groupby("player")["saves_partido"]
       .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
 )
 
-# 7) form_vs_class_keeper_3
 df["form_vs_class_keeper_3"] = df["pf_last3_mean"] - df["pf_media_historica"]
+
 
 # =========================
 # RACHAS PORTERO (5 PARTIDOS) SIN LEAKAGE
@@ -260,7 +252,7 @@ df["pf_last5_mean"] = (
 
 df["savepct_last5_mean"] = (
     df.groupby("player")["savepct_hist"]
-      .transform(lambda s: s.rolling(5, min_periods=1).mean())
+      .transform(lambda s: s.shift().rolling(5, min_periods=1).mean())
 )
 
 df["clean_last5_ratio"] = (
@@ -285,13 +277,96 @@ df["saves_last5_mean"] = (
 
 df["form_vs_class_keeper"] = df["pf_last5_mean"] - df["pf_media_historica"]
 
+
+# ==============================================================================
+# NUEVAS FEATURES DERIVADAS (3 Y 5 PARTIDOS)
+# ==============================================================================
+
+# 1. Calidad media del tiro del rival (xG por disparo) last5
+df["rival_xg_per_shot_last5"] = np.where(
+    df["shots_last5_mean_rival"] > 0,
+    df["xg_last5_mean_rival"] / df["shots_last5_mean_rival"],
+    0
+)
+
+# 1b. Versión last3 coherente con tus columnas last3
+df["rival_xg_per_shot_last3"] = np.where(
+    df["shots_last3_mean_rival"] > 0,
+    df["xg_last3_mean_rival"] / df["shots_last3_mean_rival"],
+    0
+)
+
+# 2. Puntería del Rival (ratio tiros a puerta) last5
+df["rival_sot_ratio_last5"] = np.where(
+    df["shots_last5_mean_rival"] > 0,
+    df["shots_on_target_last5_mean_rival"] / df["shots_last5_mean_rival"],
+    0
+)
+
+# 2b. Versión last3
+df["rival_sot_ratio_last3"] = np.where(
+    df["shots_last3_mean_rival"] > 0,
+    df["shots_on_target_last3_mean_rival"] / df["shots_last3_mean_rival"],
+    0
+)
+
+# 3. Forma REAL del portero (goles evitados) rolling last5 y last3
+df["goles_evitados_partido"] = df["PSxG"] - df["Goles_en_contra"]
+
+df["form_goles_evitados_last5"] = (
+    df.groupby("player")["goles_evitados_partido"]
+      .transform(lambda s: s.shift().rolling(5, min_periods=1).mean())
+)
+
+df["form_goles_evitados_last3"] = (
+    df.groupby("player")["goles_evitados_partido"]
+      .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
+)
+
+# 4. Potencial de puntos por paradas (last5 y last3)
+df["save_pct_rolling5"] = (
+    df.groupby("player")["Porcentaje_paradas"]
+      .transform(lambda s: s.shift().rolling(5, min_periods=1).mean())
+)
+
+df["save_pct_rolling3"] = (
+    df.groupby("player")["Porcentaje_paradas"]
+      .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
+)
+
+df["potencial_paradas_match_last5"] = (
+    df["shots_on_target_last5_mean_rival"] * df["save_pct_rolling5"]
+)
+
+df["potencial_paradas_match_last3"] = (
+    df["shots_on_target_last3_mean_rival"] * df["save_pct_rolling3"]
+)
+
+# 5. Dominio aéreo last5 y last3
+df["dominio_aereo_last5"] = (
+    df.groupby("player")["DuelosAereosGanadosPct"]
+      .transform(lambda s: s.shift().rolling(5, min_periods=1).mean())
+)
+
+df["dominio_aereo_last3"] = (
+    df.groupby("player")["DuelosAereosGanadosPct"]
+      .transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
+)
+
+# 6. Riesgo de goleada (xG contra propio x xG rival) last5 y last3
+df["riesgo_goleada_last5"] = (
+    df["xg_contra_last5_mean_team"] * df["xg_last5_mean_rival"]
+)
+
+df["riesgo_goleada_last3"] = (
+    df["xg_contra_last3_mean_team"] * df["xg_last3_mean_rival"]
+)
+
+
 # --- Ajuste apuestas: balancear win/loss ---
 
-# 1) Versión suavizada de p_loss (que no dispare tanto)
 df["p_loss_soft"] = np.sqrt(df["p_loss_propio"].clip(0, 1))
 
-# 2) Diferencial de probabilidad: muy alta victoria => menos tiros esperados
-#    (si no tienes p_win_propio, puedes crearlo a partir de cuotas antes)
 if "p_win_propio" in df.columns:
     df["p_win_minus_loss"] = (
         df["p_win_propio"].clip(0, 1) - df["p_loss_propio"].clip(0, 1)
@@ -304,24 +379,14 @@ else:
 # DEFINICIÓN DE FEATURES POR VENTANA
 # ============================================================
 features_comunes = [
-    # Contexto partido / apuestas (pre‑match)
     "local",
-    #"p_loss_soft",          # en vez de p_loss_propio
     "p_win_minus_loss",
     "partido_muy_desequilibrado",
 
-    # Fuerza relativa clasificación (pre‑match)
-    #"is_top4_rival",
-    #"is_bottom3_rival",
-
-    # Mixtas portero x rival (rolling/pre‑match)
     "xg_rival_x_savepct",
-    "xg_rival_x_gc_per90",
     "gf_rival_last5_x_gc_per90",
 
-    # Roles / calidad portero (derivan de rolling históricos)
     "score_porterias_cero",
-    #"score_save_pct",
     "rol_x_xg_rival",
     "elite_keeper",
     "is_top5_porterias_cero",
@@ -348,6 +413,14 @@ features_window3 = [
     "xg_last3_mean_rival",
     "shots_on_target_ratio_rival_last3",
     "bombardeo_last3_mean",
+
+    # nuevas derivadas ventana 3
+    "rival_xg_per_shot_last3",
+    "rival_sot_ratio_last3",
+    "form_goles_evitados_last3",
+    "potencial_paradas_match_last3",
+    "dominio_aereo_last3",
+    "riesgo_goleada_last3",
 ]
 
 features_window5 = [
@@ -365,7 +438,16 @@ features_window5 = [
     "xg_last5_mean_rival",
     "shots_on_target_ratio_rival",
     "bombardeo_last5_mean",
+
+    # nuevas derivadas ventana 5
+    "rival_xg_per_shot_last5",
+    "rival_sot_ratio_last5",
+    "form_goles_evitados_last5",
+    "potencial_paradas_match_last5",
+    "dominio_aereo_last5",
+    "riesgo_goleada_last5",
 ]
+
 
 def get_features_for_window(window: int):
     if window == 3:
@@ -376,13 +458,14 @@ def get_features_for_window(window: int):
         base_window_feats = []
     return features_comunes + base_window_feats
 
+
 # ============================================================
 # DEFINICIÓN DE GRIDS (COMÚN A TODAS LAS VENTANAS)
 # ============================================================
 
 n_estimators_list = [200, 400, 600]
-max_depth_list = [ 6, 8, 10, 12, 14]
-min_samples_leaf_list = [3, 5, 10, 15,]
+max_depth_list = [6, 8, 10, 12, 14]
+min_samples_leaf_list = [3, 5, 10, 15]
 max_features_list = [0.3, 0.4, 0.5, 0.6]
 
 rf_configs = []
@@ -422,7 +505,6 @@ for depth, n_est, lr in product(
 elastic_alphas = [0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5]
 elastic_l1_ratios = [0.0, 0.1, 0.25, 0.5, 0.75, 0.9]
 
-
 elastic_configs = []
 for alpha, l1 in product(elastic_alphas, elastic_l1_ratios):
     name = f"elastic_a{alpha}_l1{l1}"
@@ -431,116 +513,11 @@ for alpha, l1 in product(elastic_alphas, elastic_l1_ratios):
         "alpha": alpha,
         "l1_ratio": l1,
     })
-    
+
+
 # ============================================================
-# BUCLE POR VENTANA + ENTRENAMIENTO RF/XGB
+# BUCLE POR VENTANA + ENTRENAMIENTO RF/XGB/ELASTIC
 # ============================================================
-from pathlib import Path
-import pandas as pd
-
-def log_filas_problematicas_porteros(
-    df: pd.DataFrame,
-    feature_cols: list,
-    log_path: str,
-):
-    """
-    Loguea filas donde alguna feature tiene NaN.
-    - Para jornadas 1 y 2: resumen por temporada y jornada -> "temporada X | jornada 1: N porteros"
-    - A partir de la jornada 3: listado detallado como antes.
-    Se asume que df ya solo contiene porteros.
-    """
-    cols_id = [
-        "player",
-        "Equipo_propio",
-        "Equipo_rival",
-        "temporada",
-        "jornada",
-        "fecha_partido",
-    ]
-    cols_id = [c for c in cols_id if c in df.columns]
-
-    cols_existentes = [c for c in feature_cols if c in df.columns]
-    if not cols_existentes:
-        with open(log_path, "w", encoding="utf-8") as f:
-            f.write("No hay features de esta ventana en el df\n")
-        return
-
-    feature_na = df[cols_existentes].isna()
-    mask_fila_mal = feature_na.any(axis=1)
-
-    df_bad = df.loc[mask_fila_mal, cols_id + cols_existentes].copy()
-    if df_bad.empty:
-        with open(log_path, "w", encoding="utf-8") as f:
-            f.write("No hay filas problemáticas (sin NaN en features)\n")
-        return
-
-    log_file = Path(log_path)
-    with open(log_file, "w", encoding="utf-8") as f:
-        # ============================
-        # RESUMEN JORNADAS 1 Y 2
-        # ============================
-        if {"jornada", "player", "temporada"}.issubset(df_bad.columns):
-            f.write("RESUMEN NULOS JORNADAS 1 Y 2 (por temporada y jornada)\n\n")
-            df_j1_2 = df_bad[df_bad["jornada"].isin([1, 2])].copy()
-
-            if df_j1_2.empty:
-                f.write("No hay porteros con NaN en jornadas 1 y 2.\n\n")
-            else:
-                resumen = (
-                    df_j1_2
-                    .groupby(["temporada", "jornada"])["player"]
-                    .nunique()
-                    .reset_index(name="n_porteros")
-                )
-                for _, row in resumen.iterrows():
-                    f.write(
-                        f"temporada {row['temporada']} | "
-                        f"jornada {int(row['jornada'])}: "
-                        f"{int(row['n_porteros'])} porteros con NaN\n"
-                    )
-                f.write("\n")
-
-            # Para el detalle, nos quedamos solo con jornadas >= 3
-            df_bad_detalle = df_bad[~df_bad["jornada"].isin([1, 2])].copy()
-        else:
-            df_bad_detalle = df_bad
-
-        # ============================
-        # DETALLE JORNADAS >= 3
-        # ============================
-        if df_bad_detalle.empty:
-            f.write("No hay filas problemáticas a partir de la jornada 3.\n")
-            return
-
-        def columnas_con_nan(row):
-            return [col for col in cols_existentes if pd.isna(row[col])]
-
-        df_bad_detalle["cols_nan"] = df_bad_detalle.apply(columnas_con_nan, axis=1)
-
-        f.write("FILAS PROBLEMÁTICAS (jornadas >= 3)\n\n")
-        for _, row in df_bad_detalle.iterrows():
-            ident_parts = []
-            if "temporada" in row:
-                ident_parts.append(f"temporada={row['temporada']}")
-            if "jornada" in row:
-                ident_parts.append(
-                    f"jornada={int(row['jornada']) if pd.notna(row['jornada']) else 'NA'}"
-                )
-            if "fecha_partido" in row:
-                ident_parts.append(f"fecha={row['fecha_partido']}")
-            if "player" in row:
-                ident_parts.append(f"player={row['player']}")
-            if "Equipo_propio" in row:
-                ident_parts.append(f"equipo={row['Equipo_propio']}")
-            if "Equipo_rival" in row:
-                ident_parts.append(f"rival={row['Equipo_rival']}")
-
-            f.write(" | ".join(ident_parts) + "\n")
-            f.write(f"  cols_nan: {row['cols_nan']}\n")
-            f.write("-" * 80 + "\n")
-
-resultados_mae = []
-resultados_r2 = []
 
 resultados_mae = []
 resultados_r2 = []
@@ -550,7 +527,6 @@ for window in [3, 5]:
     print(f"ENTRENANDO PARA VENTANA {window} PARTIDOS")
     print("="*80)
 
-    # 1) Features según ventana
     features_validas = get_features_for_window(window)
     features_disponibles = [f for f in features_validas if f in df.columns]
     print(f"✅ Features válidas ventana {window}: {len(features_disponibles)}")
@@ -566,7 +542,7 @@ for window in [3, 5]:
 
     log_feats_path = Path(f"features_porteros_win{window}.txt")
 
-    all_feats = list(dict.fromkeys(features_validas))  # mantiene orden
+    all_feats = list(dict.fromkeys(features_validas))
     available = [f for f in all_feats if f in df.columns]
     missing = [f for f in all_feats if f not in df.columns]
 
@@ -583,10 +559,8 @@ for window in [3, 5]:
                 "players_with_features_exp3_CORREGIDO.csv\n"
             )
 
-    # 2) Subset con target (solo para NaN y entrenamiento)
     df_subset = df[features_disponibles + ["puntosFantasy"]].copy()
 
-    # 3) Log de NaN por columna
     nan_log_path = Path(f"nan_report_porteros_win{window}.txt")
     na_counts = df_subset.isna().sum().sort_values(ascending=False)
 
@@ -595,36 +569,15 @@ for window in [3, 5]:
         f.write(na_counts.to_string())
         f.write("\n")
 
-    umbral = 10
-    problematicas = na_counts[na_counts > umbral]
-    with open(nan_log_path, "a", encoding="utf-8") as f:
-        f.write(f"\nColumnas con más de {umbral} NaN (ventana {window}):\n")
-        f.write(problematicas.to_string())
-        f.write("\n")
-
-    # 3bis) Máscara de filas con NaN en alguna feature de esta ventana
-    mask_fila_mal = df_subset[features_disponibles].isna().any(axis=1)
-
-    # Log de filas problemáticas usando df completo (tiene player, temporada, etc.)
-    log_filas_problematicas_porteros(
-        df[mask_fila_mal],  # df original, ya filtrado a PT al inicio del script
-        feature_cols=features_disponibles,
-        log_path=f"nan_report_porteros_win{window}_filas.txt",
-    )
-    print("NaN antes de imputar:", df_subset[features_disponibles].isna().sum().sum())
-
-    # 4) Imputar NaN con 0 una sola vez para entrenar
     df_filtrado = df_subset.fillna(0)
 
     if len(df_filtrado) < 100:
         print(f"❌ Muy pocas filas para ventana {window}, se omite.")
         continue
 
-    # 5) X, y y split
     X = df_filtrado[features_disponibles].copy()
     y = df_filtrado["puntosFantasy"].copy()
 
-    # Split temporal: primeras filas (jornadas iniciales) = train, últimas = test
     split_point = int(len(X) * 0.8)
 
     X_train = X.iloc[:split_point].copy()
@@ -635,10 +588,7 @@ for window in [3, 5]:
     print(f"✅ Temporal split ventana {window}:")
     print(f"   Train: {X_train.shape}, Test: {X_test.shape}")
 
-    # ============================================================
-    # RF BASE (POR VENTANA)
-    # ============================================================
-
+    # RF base
     print(f"⏳ Entrenando RF_base ventana {window}...")
     modelo_limpio = RandomForestRegressor(
         n_estimators=300,
@@ -662,21 +612,7 @@ for window in [3, 5]:
         f"RMSE: {rmse_test_base:.4f} | R2: {r2_test_base:.4f}"
     )
 
-    # ============================================================
-    # LOG DE IMPORTANCIAS RF (POR VENTANA)
-    # ============================================================
-
-    log_path_imp = f"rf_feature_importances_porteros_win{window}.txt"
-    with open(log_path_imp, "w", encoding="utf-8") as f:
-        f.write(
-            "RandomForest feature importances por configuración "
-            f"(porteros) - ventana {window}\n\n"
-        )
-
-    # ============================================================
-    # GRID RANDOM FOREST (POR VENTANA)
-    # ============================================================
-
+    # GRID RF
     mejor_rf_grid = None
     mejor_mae_rf_grid = np.inf
 
@@ -723,38 +659,11 @@ for window in [3, 5]:
             "window": window,
         })
 
-        importancias = modelo_rf.feature_importances_
-        ranking = sorted(
-            zip(importancias, features_disponibles),
-            reverse=True
-        )
-
-        with open(log_path_imp, "a", encoding="utf-8") as f:
-            f.write(f"Modelo: {name_win}\n")
-            f.write(
-                f"  n_estimators={cfg['n_estimators']}, "
-                f"max_depth={cfg['max_depth']}, "
-                f"min_samples_leaf={cfg['min_samples_leaf']}, "
-                f"max_features={cfg['max_features']}\n"
-            )
-            f.write(
-                f"  MAE_test={mae_test_rf:.4f}  "
-                f"RMSE_test={rmse_test_rf:.4f}  "
-                f"R2_test={r2_test_rf:.4f}\n"
-            )
-            f.write("  Top 10 features:\n")
-            for imp, fname in ranking[:10]:
-                f.write(f"    {fname}: {imp:.4f}\n")
-            f.write("\n")
-
         if mae_test_rf < mejor_mae_rf_grid:
             mejor_mae_rf_grid = mae_test_rf
             mejor_rf_grid = modelo_rf
 
-    # ============================================================
-    # GRID XGBOOST (POR VENTANA)
-    # ============================================================
-
+    # GRID XGBOOST
     mejor_xgb = None
     mejor_mae_xgb = np.inf
 
@@ -815,10 +724,7 @@ for window in [3, 5]:
             mejor_mae_xgb = mae_test_xgb
             mejor_xgb = modelo_xgb
 
-    # ============================================================
-    # GRID ELASTICNET (POR VENTANA)
-    # ============================================================
-
+    # GRID ELASTICNET
     mejor_elastic = None
     mejor_mae_elastic = np.inf
 
@@ -875,70 +781,61 @@ for window in [3, 5]:
         if mae_test_elastic < mejor_mae_elastic:
             mejor_mae_elastic = mae_test_elastic
             mejor_elastic = modelo_elastic
-      
-            
+
+
 # ============================================================
-# COMPARATIVA FINAL GLOBAL (PORTEROS)
+# COMPARATIVA FINAL GLOBAL (PORTEROS) Y GUARDADO DE 2 MODELOS
 # ============================================================
 
 print("\n" + "="*80)
 print("RESULTADOS MEJORES MODELOS (PORTEROS) - GLOBAL (VENTANAS 3,5)")
 print("="*80)
 
-# Top 3 por MAE (global)
-top3_mae = sorted(resultados_mae, key=lambda d: d["mae"])[:3]
-
+best_mae_entry = min(resultados_mae, key=lambda d: d["mae"])
 print("\n" + "#"*80)
-print("##### TOP 3 MODELOS GLOBALES POR MAE #####")
+print("##### MEJOR MODELO GLOBAL POR MAE #####")
 print("#"*80)
-for res in top3_mae:
-    print(
-        f"- win{res['window']} {res['tipo'].upper()} {res['name']}: "
-        f"MAE={res['mae']:.4f}, RMSE={res['rmse']:.4f}, R2={res['r2']:.4f}"
-    )
-    filename = output_dir / (
-        f"best_mae_win{res['window']}_{res['tipo']}_{res['name']}"
-        f"_mae{res['mae']:.4f}_rmse{res['rmse']:.4f}_r2{res['r2']:.4f}.pkl"
-    )
-    with open(filename, "wb") as f:
-        pickle.dump(res["model"], f)
+print(
+    f"- win{best_mae_entry['window']} {best_mae_entry['tipo'].upper()} {best_mae_entry['name']}: "
+    f"MAE={best_mae_entry['mae']:.4f}, RMSE={best_mae_entry['rmse']:.4f}, R2={best_mae_entry['r2']:.4f}"
+)
+best_mae_filename = output_dir / (
+    f"best_global_mae_win{best_mae_entry['window']}_{best_mae_entry['tipo']}_{best_mae_entry['name']}"
+    f"_mae{best_mae_entry['mae']:.4f}_rmse{best_mae_entry['rmse']:.4f}_r2{best_mae_entry['r2']:.4f}.pkl"
+)
+with open(best_mae_filename, "wb") as f:
+    pickle.dump(best_mae_entry["model"], f)
+print(f"✅ Modelo global por MAE guardado en: {best_mae_filename}")
 
-# Top 3 por R2 (global)
-top3_r2 = sorted(resultados_r2, key=lambda d: d["r2"], reverse=True)[:3]
-
+best_r2_entry = max(resultados_r2, key=lambda d: d["r2"])
 print("\n" + "#"*80)
-print("##### TOP 3 MODELOS GLOBALES POR R2 #####")
+print("##### MEJOR MODELO GLOBAL POR R2 #####")
 print("#"*80)
-for res in top3_r2:
-    print(
-        f"- win{res['window']} {res['tipo'].upper()} {res['name']}: "
-        f"MAE={res['mae']:.4f}, RMSE={res['rmse']:.4f}, R2={res['r2']:.4f}"
-    )
-    filename = output_dir / (
-        f"best_r2_win{res['window']}_{res['tipo']}_{res['name']}"
-        f"_mae{res['mae']:.4f}_rmse{res['rmse']:.4f}_r2{res['r2']:.4f}.pkl"
-    )
-    with open(filename, "wb") as f:
-        pickle.dump(res["model"], f)
+print(
+    f"- win{best_r2_entry['window']} {best_r2_entry['tipo'].upper()} {best_r2_entry['name']}: "
+    f"MAE={best_r2_entry['mae']:.4f}, RMSE={best_r2_entry['rmse']:.4f}, R2={best_r2_entry['r2']:.4f}"
+)
+best_r2_filename = output_dir / (
+    f"best_global_r2_win{best_r2_entry['window']}_{best_r2_entry['tipo']}_{best_r2_entry['name']}"
+    f"_mae{best_r2_entry['mae']:.4f}_rmse{best_r2_entry['rmse']:.4f}_r2{best_r2_entry['r2']:.4f}.pkl"
+)
+with open(best_r2_filename, "wb") as f:
+    pickle.dump(best_r2_entry["model"], f)
+print(f"✅ Modelo global por R2 guardado en: {best_r2_filename}")
+
 
 # ============================================================
-# EXPLICABILIDAD GLOBAL SHAP (PORTEROS)
+# EXPLICABILIDAD GLOBAL SHAP (PORTEROS) + XAI AVANZADO
 # ============================================================
-
-import shap
 
 print("\n" + "="*80)
 print("🎯 CALCULANDO EXPLAINER SHAP GLOBAL (TreeExplainer)")
 print("="*80 + "\n")
 
-# Usar el MEJOR modelo por MAE (de todos los probados)
-mejor_modelo_mae = top3_mae[0]["model"]
-mejor_window = top3_mae[0]["window"]
+mejor_modelo_mae = best_mae_entry["model"]
+mejor_window = best_mae_entry["window"]
 
 print(f"Usando mejor modelo global (ventana {mejor_window}) para SHAP")
-
-# OJO: aquí X_test y features_disponibles son los de la última ventana.
-# Para que cuadre, volvemos a construir X_test para esa ventana.
 
 features_validas_mejor = get_features_for_window(mejor_window)
 features_disponibles_mejor = [f for f in features_validas_mejor if f in df.columns]
@@ -957,25 +854,21 @@ print("⏳ Calculando SHAP values para el conjunto de test del mejor modelo...")
 explainer_shap = shap.TreeExplainer(mejor_modelo_mae)
 shap_values_global = explainer_shap.shap_values(X_test_mejor)
 
-# Guardar explainer
 explainer_path = "explainer_shap.pkl"
 with open(explainer_path, "wb") as f:
     pickle.dump(explainer_shap, f)
 print(f"✅ Explainer guardado: {explainer_path}")
 
-# Guardar SHAP values
 shap_values_path = "shap_values_test.pkl"
 with open(shap_values_path, "wb") as f:
     pickle.dump(shap_values_global, f)
 print(f"✅ SHAP values guardados: {shap_values_path}")
 
-# Guardar feature_cols de la ventana del mejor modelo (para predictor)
 feature_cols_path = f"feature_cols_win{mejor_window}.pkl"
 with open(feature_cols_path, "wb") as f:
     pickle.dump(features_disponibles_mejor, f)
 print(f"✅ Feature cols guardados: {feature_cols_path}")
 
-# Feature importances global SHAP
 importances_shap = np.abs(shap_values_global).mean(axis=0)
 importances_df = pd.DataFrame({
     "feature": features_disponibles_mejor,
@@ -987,3 +880,93 @@ print(importances_df.head(15).to_string(index=False))
 
 importances_df.to_csv(f"feature_importances_shap_win{mejor_window}.csv", index=False)
 print(f"\n✅ Feature importances guardadas\n")
+
+print("\n" + "="*80)
+print("🔍 XAI AVANZADO: Dirección, Gráficos y Explicación Local")
+print("="*80 + "\n")
+
+# 1. Dirección (correlación feature vs SHAP)
+correlation_list = []
+for feat in features_disponibles_mejor:
+    feat_values = X_test_mejor[feat].values
+    col_idx = list(X_test_mejor.columns).index(feat)
+    shap_col = shap_values_global[:, col_idx]
+
+    if np.std(feat_values) == 0 or np.std(shap_col) == 0:
+        corr = 0
+    else:
+        corr = np.corrcoef(feat_values, shap_col)[0, 1]
+
+    correlation_list.append(corr)
+
+importances_df["shap_direction"] = [
+    correlation_list[features_disponibles_mejor.index(f)]
+    for f in importances_df["feature"]
+]
+importances_df["impacto"] = np.where(
+    importances_df["shap_direction"] > 0,
+    "Positivo (+)",
+    "Negativo (-)"
+)
+
+print("\n📊 Top 10 Features con dirección de impacto:")
+print(importances_df[["feature", "shap_importance", "impacto"]].head(10).to_string(index=False))
+
+csv_advanced_path = f"feature_importances_shap_advanced_win{mejor_window}.csv"
+importances_df.to_csv(csv_advanced_path, index=False)
+print(f"✅ CSV Avanzado guardado: {csv_advanced_path}")
+
+# 2. Summary plot (beeswarm)
+plt.figure(figsize=(12, 10))
+shap.summary_plot(shap_values_global, X_test_mejor, show=False, max_display=15)
+plot_filename = output_dir / f"shap_summary_win{mejor_window}.png"
+plt.savefig(plot_filename, bbox_inches="tight", dpi=300)
+plt.close()
+print(f"✅ Gráfico Summary Plot guardado en: {plot_filename}")
+
+# 3. Dependence plots top 3
+top_3_features = importances_df["feature"].head(3).tolist()
+for feat in top_3_features:
+    plt.figure(figsize=(8, 6))
+    shap.dependence_plot(
+        feat,
+        shap_values_global,
+        X_test_mejor,
+        display_features=X_test_mejor,
+        show=False,
+        interaction_index=None
+    )
+    plt.title(f"Dependencia SHAP: {feat}")
+    plt.tight_layout()
+    dep_filename = output_dir / f"shap_dependence_{feat}_win{mejor_window}.png"
+    plt.savefig(dep_filename, dpi=150)
+    plt.close()
+    print(f"✅ Gráfico Dependencia guardado para: {feat}")
+
+# 4. Explicación local (caso con mayor predicción)
+idx_max_pred = mejor_modelo_mae.predict(X_test_mejor).argmax()
+row_data = X_test_mejor.iloc[idx_max_pred]
+shap_vals_row = shap_values_global[idx_max_pred]
+base_value = explainer_shap.expected_value
+if isinstance(base_value, np.ndarray):
+    base_value = base_value[0]
+
+predicted_value = base_value + shap_vals_row.sum()
+
+print("\n" + "-"*50)
+print(f"🕵️‍♂️ ANÁLISIS DEL CASO CON MAYOR PREDICCIÓN (Índice {idx_max_pred})")
+print("-" * 50)
+print(f"Base Value (Media global): {base_value:.4f}")
+print(f"Predicción Final:          {predicted_value:.4f}")
+print("\nDesglose de contribuciones (Top 5 que más sumaron):")
+
+contributions = pd.DataFrame({
+    "feature": features_disponibles_mejor,
+    "valor_real": row_data.values,
+    "aporte_shap": shap_vals_row
+}).sort_values("aporte_shap", ascending=False)
+
+print(contributions.head(5).to_string(index=False))
+
+print("\nDesglose de contribuciones (Top 3 que restaron):")
+print(contributions.tail(3).sort_values("aporte_shap").to_string(index=False))
