@@ -4,6 +4,7 @@ Solo features conocidas ANTES del partido
 Alias robusto para mapeo fantasy <-> CSV
 FEATURES COMPLETAS IGUAL QUE ENTRENAMIENTO
 """
+from frases import generar_texto_xai
 import shap
 import pickle
 import pandas as pd
@@ -22,6 +23,7 @@ from scrapping.commons import normalizar_equipo
 POS_PORTERO = "PT"
 TEMPORADA_ACTUAL = "25_26"
 
+
 # ============================================================
 # NORMALIZACIONES Y ALIAS
 # ============================================================
@@ -35,6 +37,7 @@ def _norm_text(s: str) -> str:
     s = "".join(c for c in s if unicodedata.category(c) != "Mn")
     s = s.replace("-", " ").replace(".", " ")
     return " ".join(s.split())
+
 
 # ALIAS PORTEROS 25_26: fantasy_norm -> nombre_largo_csv_norm
 ALIAS_PORTEROS_25_26 = {
@@ -73,6 +76,7 @@ ALIAS_PORTEROS_25_26 = {
     },
 }
 
+
 def obtener_nombre_largo_portero(nombre_fantasy: str, equipo_norm: str) -> str:
     """
     Convierte nombre fantasy (ej 'Valles') al nombre largo CSV (ej 'Alvaro Valles')
@@ -80,11 +84,12 @@ def obtener_nombre_largo_portero(nombre_fantasy: str, equipo_norm: str) -> str:
     """
     nombre_norm = _norm_text(nombre_fantasy)
     equipo_norm_n = _norm_text(equipo_norm)
-    
+
     mapa_equipo = ALIAS_PORTEROS_25_26.get(equipo_norm_n, {})
     nombre_largo_norm = mapa_equipo.get(nombre_norm, nombre_norm)
-    
+
     return nombre_largo_norm
+
 
 # ============================================================
 # OBTENER PARTIDOS Y PORTEROS
@@ -96,37 +101,32 @@ def obtener_partidos_y_porteros_desde_fantasy(jornada: int):
     """
     sj = str(jornada)
     fantasy_por_partido = obtener_fantasy_jornada(sj)
-    #print("\n[DEBUG FANTASY] partidos:", list(fantasy_por_partido.keys()))
-    equipos_fantasy = {e for p in fantasy_por_partido.keys() for e in p.split("-")}
-    #print("[DEBUG FANTASY] equipos fantasy:", sorted(equipos_fantasy))
 
     partidos = []
-
     for clave_partido, jugadores in fantasy_por_partido.items():
         porteros_local = []
         porteros_visit = []
-        
+
         local_norm, visit_norm = clave_partido.split("-")
-        
+
         for info in jugadores.values():
             if info.get("posicion") != POS_PORTERO:
                 continue
             equipo = info.get("equipo_norm")
             nombre = info.get("nombre_original")
-            
+
             if equipo == local_norm:
                 porteros_local.append(nombre)
             elif equipo == visit_norm:
                 porteros_visit.append(nombre)
-        
+
         if not porteros_local or not porteros_visit:
             continue
-        
-        partidos.append(
-            (clave_partido, [porteros_local[0], porteros_visit[0]])
-        )
-    
+
+        partidos.append((clave_partido, [porteros_local[0], porteros_visit[0]]))
+
     return partidos
+
 
 # ============================================================
 # CARGAR DATOS HISTÓRICOS
@@ -154,7 +154,7 @@ def cargar_datos_temporada() -> pd.DataFrame:
             break
 
     if csv_path is None:
-        print(f"❌ Error: No se encontró players_with_features_exp3_CORREGIDO.csv")
+        print("❌ Error: No se encontró players_with_features_exp3_CORREGIDO.csv")
         return None
 
     df = pd.read_csv(csv_path)
@@ -168,28 +168,20 @@ def cargar_datos_temporada() -> pd.DataFrame:
 
     df = df.sort_values(sort_cols).reset_index(drop=True)
 
-    # ========================
     # MEDIA HISTÓRICA PF
-    # ========================
     if "puntosFantasy" in df.columns:
         df["pf_media_historica"] = (
             df.groupby("player")["puntosFantasy"]
               .transform(lambda s: s.shift().expanding().mean())
         )
 
-    # ========================
-    # FEATURES PARTIDO
-    # ========================
-    # --- Ajuste apuestas: balancear win/loss ---
-    # --- Ajuste apuestas: balancear win/loss ---
-    df["p_loss_soft"] = np.sqrt(df["p_loss_propio"].clip(0, 1))
+    # FEATURES PARTIDO (match el entrenamiento actual)
     if "p_win_propio" in df.columns:
         df["p_win_minus_loss"] = (
             df["p_win_propio"].clip(0, 1) - df["p_loss_propio"].clip(0, 1)
         )
     else:
         df["p_win_minus_loss"] = 0.0
-
 
     df["bombardeo_partido"] = (
         df["shots_on_target_rival_partido"].clip(lower=0) *
@@ -202,7 +194,6 @@ def cargar_datos_temporada() -> pd.DataFrame:
     ).clip(lower=0)
 
     df["clean_sheet_flag"] = (df["Goles_en_contra"] == 0).astype(int)
-
     df["partido_muy_desequilibrado"] = (df["ah_line_match"].abs() >= 1.5).astype(int)
 
     df["goles_ev_prt"] = (df["PSxG"] - df["Goles_en_contra"]).clip(lower=0)
@@ -212,9 +203,7 @@ def cargar_datos_temporada() -> pd.DataFrame:
         0
     )
 
-    # ========================
     # SAVE% HISTÓRICO (sin leakage)
-    # ========================
     df["paradas_partido"] = df["saves_partido"]
 
     df["shots_on_target_hist"] = (
@@ -238,9 +227,7 @@ def cargar_datos_temporada() -> pd.DataFrame:
     df["xg_rival_x_gc_per90"] = df["xg_last5_mean_rival"] * df["gc_per90_last5"]
     df["gf_rival_last5_x_gc_per90"] = df["gf_last5_mean_rival"] * df["gc_per90_last5"]
 
-    # ========================
     # ROLES / CALIDAD PORTERO
-    # ========================
     df["score_porterias_cero"] = (1 - df["gc_per90_last5"]).clip(lower=0)
     df["score_save_pct"] = df["savepct_hist"]
 
@@ -268,9 +255,7 @@ def cargar_datos_temporada() -> pd.DataFrame:
     df["rol_x_xg_rival_boost"] = df["rol_x_xg_rival"] * (df["ataque_top_rival"].fillna(0) + 1)
     df["ataque_top_rival_x_elite"] = df["ataque_top_rival"].fillna(0) * df["elite_keeper"]
 
-    # ========================
     # RACHAS SIN LEAKAGE
-    # ========================
     def rolling_feat(col, window, agg, new_name):
         df[new_name] = (
             df.groupby("player")[col]
@@ -309,6 +294,7 @@ def cargar_datos_temporada() -> pd.DataFrame:
 
     return df
 
+
 # ============================================================
 # PREDICCIÓN
 # ============================================================
@@ -326,62 +312,40 @@ def predecir_partido(
     """
     temporada = TEMPORADA_ACTUAL
     df = cargar_datos_temporada()
-    
+
     if df is None or len(df) == 0:
         return {
             "error": f"No hay datos para {temporada}",
             "partido": partido,
             "portero": portero,
         }
-    
-    # ============================
+
     # 1) BUSCAR PORTERO CON ALIAS
-    # ============================
-    
     row = None
-    
+
     try:
         local_norm, visit_norm = partido.split("-")
         equipos_posibles = [local_norm, visit_norm]
     except ValueError:
         equipos_posibles = []
-    
+
     if equipos_posibles:
         for equipo_norm in equipos_posibles:
-            # Aplicar alias
             nombre_largo = obtener_nombre_largo_portero(portero, equipo_norm)
             nombre_busqueda_norm = _norm_text(nombre_largo)
-            '''
-            print("\n[DEBUG ALIAS BUSQUEDA]")
-            print("  temporada_objetivo:", temporada)
-            print("  equipo_norm_raw:", equipo_norm)
-            print("  equipo_norm_norm:", _norm_text(equipo_norm))
-            print("  nombre_fantasy:", portero)
-            print("  nombre_largo_alias:", nombre_largo)
-            print("  nombre_busqueda_norm:", nombre_busqueda_norm)
-            '''
-            mask_equipo = df["Equipo_propio"].apply(_norm_text) == _norm_text(equipo_norm)
-            mask_jug = df["player"].apply(_norm_text) == nombre_busqueda_norm
-            mask_temp = df["temporada"] == temporada
-            '''
-            print("  filas mismo equipo:", mask_equipo.sum())
-            print("  filas mismo jugador (todas temps):", mask_jug.sum())
-            print("  filas mismo jugador+equipo (todas temps):", (mask_equipo & mask_jug).sum())
-            print("  filas mismo jugador+equipo+temp:", (mask_equipo & mask_jug & mask_temp).sum())
-                '''
-            # Buscar en df
+
             mask = (
                 (df["temporada"] == temporada)
                 & (df["Equipo_propio"].apply(_norm_text).str.lower() == equipo_norm.lower())
                 & (df["player"].apply(_norm_text) == nombre_busqueda_norm)
                 & (df["posicion"] == "PT")
             )
-            
+
             if mask.sum() > 0:
                 df_portero = df[mask].sort_values("jornada", ascending=False)
                 row = df_portero.iloc[0]
                 break
-    
+
     # Fallback: búsqueda por contains
     if row is None:
         portero_lower = portero.lower().strip()
@@ -389,21 +353,18 @@ def predecir_partido(
             df["player"].str.lower().str.contains(portero_lower, na=False)
             & (df["posicion"] == "PT")
         )
-        
+
         if mask.sum() == 0:
             return {
                 "error": f"Portero '{portero}' no encontrado",
                 "partido": partido,
                 "portero": portero,
             }
-        
+
         df_portero = df[mask].sort_values("jornada", ascending=False)
         row = df_portero.iloc[0]
-    
-    # ============================
-    # 2) PREPARAR FEATURES
-    # ============================
 
+    # 2) PREPARAR FEATURES
     try:
         X = pd.DataFrame(row[feature_cols]).T
         X = X.apply(pd.to_numeric, errors="coerce")
@@ -414,11 +375,8 @@ def predecir_partido(
             "partido": partido,
             "portero": portero,
         }
-    
-    # ============================
+
     # 3) PREDICCIÓN
-    # ============================
-    
     try:
         pred_raw = float(modelo.predict(X)[0])
         pred_redondeada = int(round(pred_raw))
@@ -432,20 +390,17 @@ def predecir_partido(
     # 3bis) EXPLICACIÓN SHAP LOCAL
     try:
         explainer = shap.TreeExplainer(modelo)
-        shap_vals = explainer.shap_values(X)  # shape (1, n_features)
-        shap_vals = shap_vals[0]
+        shap_vals = explainer.shap_values(X)
+        shap_vals = np.array(shap_vals).flatten()
 
-        # Emparejar feature -> valor SHAP
         pares = list(zip(feature_cols, shap_vals))
 
-        # Top 3 que más SUMAN (valores positivos más altos)
         top_pos = sorted(
             [p for p in pares if p[1] > 0],
             key=lambda x: x[1],
             reverse=True
         )[:3]
 
-        # Alguna que reste (la más negativa)
         top_neg = sorted(
             [p for p in pares if p[1] < 0],
             key=lambda x: x[1]
@@ -454,14 +409,13 @@ def predecir_partido(
         explicacion_shap = {
             "top_pos": [{"feature": f, "shap": float(v)} for f, v in top_pos],
             "top_neg": [{"feature": f, "shap": float(v)} for f, v in top_neg],
+            "base_value": float(explainer.expected_value),
         }
+
     except Exception as e:
         explicacion_shap = {"error": str(e)}
-        
-    # ============================
+
     # 4) CONTEXTO
-    # ============================
-    
     contexto = {
         "pf_last5_mean": float(row.get("pf_last5_mean", np.nan)) if pd.notna(row.get("pf_last5_mean")) else None,
         "posicion_propia": int(row.get("posicion_equipo")) if pd.notna(row.get("posicion_equipo")) else None,
@@ -470,7 +424,7 @@ def predecir_partido(
         "xg_last5_mean_rival": row.get("xg_last5_mean_rival"),
         "shots_on_target_ratio_rival": row.get("shots_on_target_ratio_rival"),
     }
-    
+
     return {
         "error": None,
         "partido": partido,
@@ -486,55 +440,52 @@ def predecir_partido(
         "explicacion_shap": explicacion_shap,
     }
 
+
 # ============================================================
 # CARGAR REALES PARA COMPARACIÓN
 # ============================================================
 
 def cargar_reales_partido(jornada: int, partido: str) -> pd.DataFrame | None:
-    """
-    Busca CSV real de una jornada (sin prefix pX_)
-    """
     carpeta = Path("data") / f"temporada_{TEMPORADA_ACTUAL}" / f"jornada_{jornada}"
-    
+
     if not carpeta.exists():
         return None
-    
+
     loc_slug, vis_slug = partido.split("-")
-    
-    # Normalizar nombres (celta -> celta vigo, etc.)
+
     mapping_largo = {
         "celta": "celta vigo",
         "athletic": "athletic club",
         "rayo": "rayo vallecano",
         "betis": "real betis",
     }
-    
+
     loc_csv = mapping_largo.get(loc_slug, loc_slug)
     vis_csv = mapping_largo.get(vis_slug, vis_slug)
-    
+
     patron = f"*{loc_csv}-{vis_csv}.csv"
     candidatos = list(carpeta.glob(patron))
-    
+
     if not candidatos:
         return None
-    
+
     try:
         df = pd.read_csv(candidatos[0])
     except:
         return None
-    
+
     if "posicion" not in df.columns or "player" not in df.columns or "puntosFantasy" not in df.columns:
         return None
-    
+
     df = df[df["posicion"] == "PT"].copy()
-    
     if df.empty:
         return None
-    
+
     df["Portero_norm"] = df["player"].apply(_norm_text)
     df = df[["Portero_norm", "puntosFantasy"]].rename(columns={"puntosFantasy": "Real"})
-    
+
     return df
+
 
 # ============================================================
 # MOSTRAR RESULTADOS
@@ -544,11 +495,11 @@ def mostrar_tabla_por_partido(resultados):
     if not resultados:
         print("\n⚠️ No hay resultados")
         return
-    
+
     print("\n" + "="*100)
     print("📋 TABLA RESUMEN - JORNADA (PRED vs REAL)")
     print("="*100 + "\n")
-    
+
     filas = []
     for r in resultados:
         filas.append({
@@ -557,18 +508,19 @@ def mostrar_tabla_por_partido(resultados):
             "Pred": r["prediccion_redondeada"],
             "Real": r.get("pf_real"),
         })
-    
+
     df_resumen = pd.DataFrame(filas)
     print(df_resumen.to_string(index=False))
-    
+
     df_valid = df_resumen.dropna(subset=["Real"])
     if not df_valid.empty:
         mae = (df_valid["Pred"] - df_valid["Real"]).abs().mean()
         print(f"\n✅ MAE (Error absoluto medio): {mae:.3f}")
     else:
         print("\n⚠️ MAE: no hay valores reales")
-    
+
     print("\n" + "="*100)
+
 
 # ============================================================
 # MAIN
@@ -601,22 +553,25 @@ def predecir_partidos(modelo, feature_cols, jornada=None):
                 if pred.get("error"):
                     print(f"  ❌ {pred['error']}")
                 else:
-                    temporada_pred = pred.get("temporada", "25_26")
                     equipo_norm = pred.get("equipo_portero", "").lower().strip()
                     portero_norm_aliased = obtener_nombre_largo_portero(portero, equipo_norm)
+
                     pf_real = None
                     if df_real is not None:
                         mask = df_real["Portero_norm"].apply(lambda x: portero_norm_aliased in x)
                         df_match = df_real[mask]
                         if not df_match.empty:
                             pf_real = df_match.iloc[0]["Real"]
+
                     if pf_real is not None and not pd.isna(pf_real):
                         dif = int(pred["prediccion_redondeada"] - pf_real)
                     else:
                         pf_real = None
                         dif = None
+
                     pred["pf_real"] = pf_real
                     pred["dif_pred_real"] = dif
+
                     row_orig = pred.get("row_original")
                     if row_orig is not None:
                         pred["equipo_rival"] = row_orig.get("Equipo_rival")
@@ -627,38 +582,37 @@ def predecir_partidos(modelo, feature_cols, jornada=None):
 
                     resultados.append(pred)
 
-                    # 👇 Mostrar SHAP por pantalla
                     exp = pred.get("explicacion_shap", {})
                     if exp and not exp.get("error"):
-                        print("   Motivo del pick:")
-                        for f in exp["top_pos"]:
-                            print(f"      + {f['feature']}: {f['shap']:.2f}")
-                        for f in exp["top_neg"]:
-                            print(f"      - {f['feature']}: {f['shap']:.2f}")
+                        texto_xai = generar_texto_xai(exp)
+                        print(texto_xai)
 
             except Exception as e:
                 print(f"  ❌ Error: {str(e)}")
-    mostrar_tabla_por_partido(resultados)
+
+    return resultados
+
 
 if __name__ == "__main__":
+
     modelos_a_probar = [
-        #"modelos/best_mae_win3_rf_win3_rf_ne200_d14_l5_mf4_mae3.2658_rmse4.0024_r20.0163.pkl",
-        "modelos/best_mae_win3_rf_win3_rf_ne200_d8_l3_mf5_mae3.2658_rmse3.9936_r20.0206.pkl"
+        # Actualiza esta ruta al mejor modelo del último entrenamiento
+        #"modelos/best_mae_win3_xgb_d4_ne200_lr40_mae3.2789_rmse4.0699_r2-0.0172.pkl",
+        "modelos/best_mae_win3_xgb_win3_xgb_d3_ne400_lr25_mae3.2842_rmse4.0272_r20.0041.pkl"
         ]
-    
+
     for modelo_path in modelos_a_probar:
-        print(f"\n{'#'*100}")
+        print("\n" + "#"*100)
         print(f"Probando: {modelo_path}")
-        print(f"{'#'*100}")
-        
+        print("#"*100)
+
         try:
             with open(modelo_path, "rb") as f:
                 modelo = pickle.load(f)
         except Exception as e:
             print(f"❌ Error cargando modelo: {e}")
             continue
-        
-        # Inferir ventana
+
         if "win3" in modelo_path:
             features_path = "feature_cols_win3.pkl"
         elif "win5" in modelo_path:
@@ -666,14 +620,14 @@ if __name__ == "__main__":
         else:
             print("❌ No se puede inferir ventana")
             continue
-        
+
         try:
             with open(features_path, "rb") as f:
                 feature_cols = pickle.load(f)
         except:
             print(f"❌ Error cargando {features_path}")
             continue
-        
+
         for j in range(1, 10):
             print(f"\n===== JORNADA {j} =====\n")
             resultados = predecir_partidos(modelo, feature_cols, jornada=j)

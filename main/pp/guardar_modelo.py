@@ -408,8 +408,61 @@ def guardar_modelo_con_roles(
 # MAIN
 # ============================================================
 
+# ============================================================
+# MAIN
+# ============================================================
+
 if __name__ == "__main__":
+    success, modelo, X = guardar_modelo_con_roles()
+
+    if not success or modelo is None or X is None:
+        print("\n⚠️ No se pudo completar el proceso.\n")
+        sys.exit(1)
+
+    import shap
+    import numpy as np
+
+    print("\n" + "="*80)
+    print("🔍 VALIDACIÓN SHAP - COMPROBANDO QUE EXPLAINER FUNCIONE")
+    print("="*80 + "\n")
+
+    try:
+        explainer_test = shap.TreeExplainer(modelo)
+
+        # Probar con 5 muestras aleatorias
+        sample_idx = np.random.choice(X.shape[0], min(5, X.shape[0]), replace=False)
+        shap_test = explainer_test.shap_values(X.iloc[sample_idx])
+
+        print("✅ SHAP TreeExplainer funciona correctamente")
+        print(f"   Shape SHAP values: {np.array(shap_test).shape}")
+        print(f"   Expected value (baseline): {explainer_test.expected_value:.4f}\n")
+
+    except Exception as e:
+        print(f"⚠️ Error en SHAP: {e}\n")
+
     success = guardar_modelo_con_roles()
+
+    import shap
+    import numpy as np
+
+    print("\n" + "="*80)
+    print("🔍 VALIDACIÓN SHAP - COMPROBANDO QUE EXPLAINER FUNCIONE")
+    print("="*80 + "\n")
+
+    try:
+        explainer_test = shap.TreeExplainer(modelo)
+        
+        # Probar con 5 muestras aleatorias
+        sample_idx = np.random.choice(X.shape[0], min(5, X.shape[0]), replace=False)
+        shap_test = explainer_test.shap_values(X.iloc[sample_idx])
+        
+        print("✅ SHAP TreeExplainer funciona correctamente")
+        print(f"   Shape SHAP values: {np.array(shap_test).shape}")
+        print(f"   Expected value (baseline): {explainer_test.expected_value:.4f}\n")
+        
+    except Exception as e:
+        print(f"⚠️ Error en SHAP: {e}\n")
+
     
     if not success:
         print("\n⚠️ No se pudo completar el proceso.\n")

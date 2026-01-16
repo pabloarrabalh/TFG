@@ -8,7 +8,9 @@ import numpy as np
 from pathlib import Path
 import pickle
 from itertools import product
-
+from sklearn.linear_model import ElasticNet
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
@@ -417,6 +419,19 @@ for depth, n_est, lr in product(
         "learning_rate": lr,
     })
 
+elastic_alphas = [0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5]
+elastic_l1_ratios = [0.0, 0.1, 0.25, 0.5, 0.75, 0.9]
+
+
+elastic_configs = []
+for alpha, l1 in product(elastic_alphas, elastic_l1_ratios):
+    name = f"elastic_a{alpha}_l1{l1}"
+    elastic_configs.append({
+        "name": name,
+        "alpha": alpha,
+        "l1_ratio": l1,
+    })
+    
 # ============================================================
 # BUCLE POR VENTANA + ENTRENAMIENTO RF/XGB
 # ============================================================
@@ -527,6 +542,9 @@ def log_filas_problematicas_porteros(
 resultados_mae = []
 resultados_r2 = []
 
+resultados_mae = []
+resultados_r2 = []
+
 for window in [3, 5]:
     print("\n" + "="*80)
     print(f"ENTRENANDO PARA VENTANA {window} PARTIDOS")
@@ -536,17 +554,16 @@ for window in [3, 5]:
     features_validas = get_features_for_window(window)
     features_disponibles = [f for f in features_validas if f in df.columns]
     print(f"✅ Features válidas ventana {window}: {len(features_disponibles)}")
-    
+
     feature_cols_win3 = [f for f in get_features_for_window(3) if f in df.columns]
     feature_cols_win5 = [f for f in get_features_for_window(5) if f in df.columns]
 
-    # por ejemplo, si tu predictor sólo va a usar win3:
     with open("feature_cols_win3.pkl", "wb") as f:
         pickle.dump(feature_cols_win3, f)
 
     with open("feature_cols_win5.pkl", "wb") as f:
         pickle.dump(feature_cols_win5, f)
-        
+
     log_feats_path = Path(f"features_porteros_win{window}.txt")
 
     all_feats = list(dict.fromkeys(features_validas))  # mantiene orden
@@ -555,7 +572,6 @@ for window in [3, 5]:
 
     with open(log_feats_path, "w", encoding="utf-8") as f:
         f.write(f"VENTANA {window}\n\n")
-
         f.write("✅ FEATURES USADAS (existen en df):\n")
         for feat in available:
             f.write(f"  - {feat}\n")
@@ -563,9 +579,9 @@ for window in [3, 5]:
         f.write("\n❌ FEATURES DESCARTADAS:\n")
         for feat in missing:
             f.write(
-                f"  - {feat} | motivo: columna no presente en players_with_features_exp3_CORREGIDO.csv\n"
+                f"  - {feat} | motivo: columna no presente en "
+                "players_with_features_exp3_CORREGIDO.csv\n"
             )
-
 
     # 2) Subset con target (solo para NaN y entrenamiento)
     df_subset = df[features_disponibles + ["puntosFantasy"]].copy()
@@ -597,10 +613,9 @@ for window in [3, 5]:
     )
     print("NaN antes de imputar:", df_subset[features_disponibles].isna().sum().sum())
 
-    # 4) Dropna UNA sola vez para entrenar
-    # 4) Imputar NaN con 6767 UNA sola vez para entrenar
+    # 4) Imputar NaN con 0 una sola vez para entrenar
     df_filtrado = df_subset.fillna(0)
-    
+
     if len(df_filtrado) < 100:
         print(f"❌ Muy pocas filas para ventana {window}, se omite.")
         continue
@@ -619,7 +634,6 @@ for window in [3, 5]:
 
     print(f"✅ Temporal split ventana {window}:")
     print(f"   Train: {X_train.shape}, Test: {X_test.shape}")
-
 
     # ============================================================
     # RF BASE (POR VENTANA)
@@ -801,6 +815,68 @@ for window in [3, 5]:
             mejor_mae_xgb = mae_test_xgb
             mejor_xgb = modelo_xgb
 
+    # ============================================================
+    # GRID ELASTICNET (POR VENTANA)
+    # ============================================================
+
+    mejor_elastic = None
+    mejor_mae_elastic = np.inf
+
+    print("\n" + "-"*80)
+    print(f"GRID ELASTICNET (PORTEROS) - VENTANA {window}")
+    print("-"*80)
+
+    for cfg in elastic_configs:
+        name_win = f"win{window}_" + cfg["name"]
+        print(f"\n⏳ Entrenando {name_win} (ElasticNet, PT)...")
+
+        modelo_elastic = Pipeline([
+            ("scaler", StandardScaler()),
+            ("reg", ElasticNet(
+                alpha=cfg["alpha"],
+                l1_ratio=cfg["l1_ratio"],
+                random_state=42,
+                max_iter=10000,
+            )),
+        ])
+
+        modelo_elastic.fit(X_train, y_train)
+        y_pred_test_elastic = modelo_elastic.predict(X_test)
+        y_pred_test_elastic_round = np.round(y_pred_test_elastic)
+
+        mae_test_elastic = mean_absolute_error(y_test, y_pred_test_elastic_round)
+        rmse_test_elastic = root_mean_squared_error(y_test, y_pred_test_elastic)
+        r2_test_elastic = r2_score(y_test, y_pred_test_elastic)
+
+        print(
+            f"[ventana {window}] MAE Test {name_win}: {mae_test_elastic:.4f} | "
+            f"RMSE: {rmse_test_elastic:.4f} | R2: {r2_test_elastic:.4f}"
+        )
+
+        resultados_mae.append({
+            "name": name_win,
+            "mae": mae_test_elastic,
+            "rmse": rmse_test_elastic,
+            "r2": r2_test_elastic,
+            "model": modelo_elastic,
+            "tipo": "elastic",
+            "window": window,
+        })
+        resultados_r2.append({
+            "name": name_win,
+            "mae": mae_test_elastic,
+            "rmse": rmse_test_elastic,
+            "r2": r2_test_elastic,
+            "model": modelo_elastic,
+            "tipo": "elastic",
+            "window": window,
+        })
+
+        if mae_test_elastic < mejor_mae_elastic:
+            mejor_mae_elastic = mae_test_elastic
+            mejor_elastic = modelo_elastic
+      
+            
 # ============================================================
 # COMPARATIVA FINAL GLOBAL (PORTEROS)
 # ============================================================
@@ -809,7 +885,7 @@ print("\n" + "="*80)
 print("RESULTADOS MEJORES MODELOS (PORTEROS) - GLOBAL (VENTANAS 3,5)")
 print("="*80)
 
-# Top 3 por MAE (global)# Top 3 por MAE (global)
+# Top 3 por MAE (global)
 top3_mae = sorted(resultados_mae, key=lambda d: d["mae"])[:3]
 
 print("\n" + "#"*80)
@@ -844,3 +920,70 @@ for res in top3_r2:
     )
     with open(filename, "wb") as f:
         pickle.dump(res["model"], f)
+
+# ============================================================
+# EXPLICABILIDAD GLOBAL SHAP (PORTEROS)
+# ============================================================
+
+import shap
+
+print("\n" + "="*80)
+print("🎯 CALCULANDO EXPLAINER SHAP GLOBAL (TreeExplainer)")
+print("="*80 + "\n")
+
+# Usar el MEJOR modelo por MAE (de todos los probados)
+mejor_modelo_mae = top3_mae[0]["model"]
+mejor_window = top3_mae[0]["window"]
+
+print(f"Usando mejor modelo global (ventana {mejor_window}) para SHAP")
+
+# OJO: aquí X_test y features_disponibles son los de la última ventana.
+# Para que cuadre, volvemos a construir X_test para esa ventana.
+
+features_validas_mejor = get_features_for_window(mejor_window)
+features_disponibles_mejor = [f for f in features_validas_mejor if f in df.columns]
+
+df_subset_mejor = df[features_disponibles_mejor + ["puntosFantasy"]].copy()
+df_filtrado_mejor = df_subset_mejor.fillna(0)
+
+X_mejor = df_filtrado_mejor[features_disponibles_mejor].copy()
+y_mejor = df_filtrado_mejor["puntosFantasy"].copy()
+
+split_point_mejor = int(len(X_mejor) * 0.8)
+X_train_mejor = X_mejor.iloc[:split_point_mejor].copy()
+X_test_mejor  = X_mejor.iloc[split_point_mejor:].copy()
+
+print("⏳ Calculando SHAP values para el conjunto de test del mejor modelo...")
+explainer_shap = shap.TreeExplainer(mejor_modelo_mae)
+shap_values_global = explainer_shap.shap_values(X_test_mejor)
+
+# Guardar explainer
+explainer_path = "explainer_shap.pkl"
+with open(explainer_path, "wb") as f:
+    pickle.dump(explainer_shap, f)
+print(f"✅ Explainer guardado: {explainer_path}")
+
+# Guardar SHAP values
+shap_values_path = "shap_values_test.pkl"
+with open(shap_values_path, "wb") as f:
+    pickle.dump(shap_values_global, f)
+print(f"✅ SHAP values guardados: {shap_values_path}")
+
+# Guardar feature_cols de la ventana del mejor modelo (para predictor)
+feature_cols_path = f"feature_cols_win{mejor_window}.pkl"
+with open(feature_cols_path, "wb") as f:
+    pickle.dump(features_disponibles_mejor, f)
+print(f"✅ Feature cols guardados: {feature_cols_path}")
+
+# Feature importances global SHAP
+importances_shap = np.abs(shap_values_global).mean(axis=0)
+importances_df = pd.DataFrame({
+    "feature": features_disponibles_mejor,
+    "shap_importance": importances_shap
+}).sort_values("shap_importance", ascending=False)
+
+print("\n📊 Top 15 features por importancia SHAP:")
+print(importances_df.head(15).to_string(index=False))
+
+importances_df.to_csv(f"feature_importances_shap_win{mejor_window}.csv", index=False)
+print(f"\n✅ Feature importances guardadas\n")

@@ -2,14 +2,12 @@ VENTANA 3
 
 ✅ FEATURES USADAS (existen en df):
   - local
-  - p_loss_soft
   - p_win_minus_loss
   - partido_muy_desequilibrado
   - xg_rival_x_savepct
   - xg_rival_x_gc_per90
   - gf_rival_last5_x_gc_per90
   - score_porterias_cero
-  - score_save_pct
   - rol_x_xg_rival
   - elite_keeper
   - is_top5_porterias_cero
