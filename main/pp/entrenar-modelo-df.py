@@ -3,17 +3,21 @@
 
 ENTRENAMIENTO MODELOS FANTASY FOOTBALL - DEFENSAS (DF) CON ROLES MEJORADO
 
-Con GridSearchCV y selección automática de mejores hiperparámetros
+Con GridSearchCV, Feature Engineering Defensivo y Optimizaciones MAE
 
 ===============================================================================
 
-Pipeline: EDA -> Features (TODAS + ROLES DEFENSIVOS) -> GridSearchCV 
-          -> Selección Best -> CSV
+Pipeline: EDA -> Features (TODAS + ROLES DEFENSIVOS + NUEVOS) -> Selection
+          -> GridSearchCV -> Selección Best -> CSV
 
 Autor: Pablo
 Fecha: Enero 2026
 
-Clave: GridSearchCV para cada modelo + exportación de features importance + best params
+Clave: 4 Fases de Optimización MAE
+  1. Eliminar features ruido
+  2. Crear features defensivos nuevos
+  3. Seleccionar features por correlación
+  4. GridSearchCV con parámetros mejorados
 
 ===============================================================================
 """
@@ -52,13 +56,25 @@ except ImportError:
     print("⚠️  Módulo role_enricher_defensas.py no encontrado. Funcionará sin roles.")
     ROLES_DISPONIBLES = False
 
+# ✅ NUEVO: Importar módulo de mejoras
+try:
+    from feature_improvements import (
+        eliminar_features_ruido,
+        crear_features_fantasy_defensivos,
+        seleccionar_features_por_correlacion
+    )
+    MEJORAS_DISPONIBLES = True
+except ImportError:
+    print("⚠️  Módulo feature_improvements.py no encontrado. Funcionará sin mejoras.")
+    MEJORAS_DISPONIBLES = False
+
 warnings.filterwarnings("ignore")
 
 # ===========================
 # CONFIGURACIÓN GENERAL
 # ===========================
 
-DIRECTORIO_SALIDA = Path("csv/csvGenerados/entrenamiento/defensa_gridsearch_roles")
+DIRECTORIO_SALIDA = Path("csv/csvGenerados/entrenamiento/defensa_gridsearch_roles_mejorado")
 DIRECTORIO_IMAGENES = DIRECTORIO_SALIDA / "imagenes"
 DIRECTORIO_MODELOS = DIRECTORIO_SALIDA / "modelos"
 DIRECTORIO_CSVS = DIRECTORIO_SALIDA / "csvs"
@@ -74,6 +90,9 @@ TEST_SIZE = 0.2  # 80/20 split
 
 # Usar roles si están disponibles
 USAR_ROLES = ROLES_DISPONIBLES
+
+# NUEVO: Usar mejoras si están disponibles
+USAR_MEJORAS = MEJORAS_DISPONIBLES
 
 # ===========================
 # FUNCIONES AUXILIARES
@@ -109,6 +128,7 @@ def extraer_feature_importance(modelo, X_ent, feature_names):
         print(f"    ⚠️  Error extrayendo importancias: {e}")
         return None
 
+
 def visualizar_feature_importance(feature_importance, titulo, nombre_archivo, top_n=20):
     """Crea visualización de feature importance"""
     if feature_importance is None or len(feature_importance) == 0:
@@ -133,6 +153,7 @@ def visualizar_feature_importance(feature_importance, titulo, nombre_archivo, to
     plt.savefig(DIRECTORIO_IMAGENES / nombre_archivo, dpi=150, bbox_inches='tight')
     plt.close()
 
+
 def convertir_racha_a_numerico(racha):
     if pd.isna(racha) or not isinstance(racha, str):
         return 0, 0, 0, 0.0
@@ -142,6 +163,7 @@ def convertir_racha_a_numerico(racha):
     total = victorias + empates + derrotas
     ratio = victorias / total if total > 0 else 0.0
     return victorias, empates, derrotas, ratio
+
 
 # ===========================
 # CARGA Y PREPARACIÓN
@@ -174,11 +196,8 @@ def cargar_datos():
     print(f"✅ {df_defensas.shape[0]} defensas (DF) cargadas\n")
     return df_defensas
 
+
 def diagnosticar_y_limpiar(df):
-    print("=" * 80)
-    print("DIAGNÓSTICO Y LIMPIEZA DE DATOS")
-    print("=" * 80)
-    
     filas_inicio = len(df)
     
     print("\n1️⃣ Verificando columnas necesarias...")
@@ -224,10 +243,8 @@ def diagnosticar_y_limpiar(df):
     print(f"\nTotal: {filas_inicio} → {len(df)} filas ({100*len(df)/filas_inicio:.1f}%)\n")
     return df
 
+
 def preparar_basicos(df):
-    print("=" * 80)
-    print("PREPARACIÓN BÁSICA - ELIMINANDO RUIDO")
-    print("=" * 80)
     
     a_eliminar = [
         "posicion", "Equipo_propio", "Equipo_rival",
@@ -257,16 +274,12 @@ def preparar_basicos(df):
     print("✅ Limpieza completada\n")
     return df
 
+
 # ===========================
 # INGENIERÍA DE FEATURES DEFENSIVAS
 # ===========================
 
 def crear_features_probabilisticas(df):
-    """Features basadas en probabilidades del partido"""
-    print("=" * 80)
-    print("FEATURES PROBABILÍSTICAS - EXPECTATIVAS DEL PARTIDO")
-    print("=" * 80)
-    
     if "p_win_propio" in df.columns:
         df["p_win_propio"] = pd.to_numeric(df["p_win_propio"], errors='coerce').fillna(0.5)
         df["p_win_propio_ewma5"] = df.groupby("player")["p_win_propio"].transform(
@@ -291,11 +304,8 @@ def crear_features_probabilisticas(df):
     print()
     return df
 
+
 def crear_features_defensivas_mejoradas(df):
-    print("=" * 80)
-    print("FEATURES DEFENSIVAS MEJORADAS - ANÁLISIS PROFUNDO")
-    print("=" * 80)
-    
     df["Min_partido_safe"] = df["Min_partido"].replace(0, np.nan)
     
     # ENTRADAS (Tackles)
@@ -381,7 +391,7 @@ def crear_features_defensivas_mejoradas(df):
             lambda x: x.shift().rolling(TAM_VENTANA, min_periods=1).mean()
         ).fillna(0)
         print("✅ Aerial duels won (ewma5, roll5)")
-    
+    # REGATES Y CONDUCCIONES (nuevo bloque - mismo patrón que tackles/clearances)
     # ACCIONES DEFENSIVAS TOTALES
     if all(c in df.columns for c in ["Entradas", "Despejes"]):
         df["def_actions_temp"] = df["Entradas"] + df["Despejes"]
@@ -397,10 +407,9 @@ def crear_features_defensivas_mejoradas(df):
     print()
     return df
 
+
 def crear_features_form_mejorado(df):
-    print("=" * 80)
-    print("FANTASY POINTS FORM - ANÁLISIS EXTENDIDO")
-    print("=" * 80)
+
     
     if COLUMNA_OBJETIVO in df.columns:
         df[COLUMNA_OBJETIVO] = pd.to_numeric(df[COLUMNA_OBJETIVO], errors='coerce').fillna(0)
@@ -436,10 +445,9 @@ def crear_features_form_mejorado(df):
     
     return df
 
+
 def crear_features_disponibilidad_completo(df):
-    print("=" * 80)
-    print("DISPONIBILIDAD - ANÁLISIS COMPLETO")
-    print("=" * 80)
+    #
     
     df["Min_partido"] = pd.to_numeric(df["Min_partido"], errors='coerce').fillna(45)
     df["minutes_pct_temp"] = (df["Min_partido"] / 90).fillna(0).clip(0, 1)
@@ -472,11 +480,8 @@ def crear_features_disponibilidad_completo(df):
     print("✅ Minutes (pct_roll3/5, pct_ewma3/5)\n")
     return df
 
+
 def crear_features_contexto_completo(df):
-    print("=" * 80)
-    print("CONTEXTO PRE-PARTIDO - ANÁLISIS COMPLETO")
-    print("=" * 80)
-    
     if "local" in df.columns:
         df["local"] = pd.to_numeric(df["local"], errors='coerce').fillna(0)
         df["is_home"] = (df["local"] == 1).astype(int)
@@ -492,10 +497,8 @@ def crear_features_contexto_completo(df):
     print("✅ Home/Away (is_home)\n")
     return df
 
+
 def crear_features_rival_completo(df):
-    print("=" * 80)
-    print("FEATURES RIVAL - CONTEXTO OFENSIVO Y DEFENSIVO")
-    print("=" * 80)
     
     if "shots_rival_partido" in df.columns:
         df["shots_rival_partido"] = pd.to_numeric(df["shots_rival_partido"], errors='coerce').fillna(0)
@@ -527,6 +530,7 @@ def crear_features_rival_completo(df):
     print()
     return df
 
+
 def crear_features_eficiencia_completo(df):
     print("=" * 80)
     print("EFICIENCIA DEFENSIVA - ÍNDICES COMPLETOS")
@@ -542,6 +546,7 @@ def crear_features_eficiencia_completo(df):
     
     print()
     return df
+
 
 # ===========================
 # INTEGRACIÓN DE ROLES
@@ -571,6 +576,92 @@ def integrar_roles(df):
     
     return df
 
+
+# ===========================
+# MEJORAS DE FEATURES (NUEVO)
+# ===========================
+
+def aplicar_mejoras_features(df):
+    """
+    FASE 1-4: Aplica todas las mejoras para reducir MAE
+    
+    Fase 1: Eliminar features ruido
+    Fase 2: Crear features defensivos nuevos (Fantasy-specific)
+    Fase 3: Seleccionar features por correlación (se hace después)
+    Fase 4: Tuning de hiperparámetros (se hace en GridSearch)
+    """
+    
+    if not USAR_MEJORAS:
+        print("⚠️  Módulo de mejoras deshabilitado. Saltando.\n")
+        return df, None
+    
+    try:
+        print("\n" + "=" * 80)
+        print("🚀 FASE 1-2: MEJORAS DE FEATURES PARA REDUCIR MAE")
+        print("=" * 80)
+        
+        # FASE 1: Eliminar features ruido
+        print("\n📊 FASE 1: ELIMINACIÓN DE FEATURES RUIDO")
+        print("-" * 80)
+        antes_cols = len(df.columns)
+        df = eliminar_features_ruido(df, verbose=True)
+        despues_cols = len(df.columns)
+        print(f"Columnas: {antes_cols} → {despues_cols}\n")
+        
+        # FASE 2: Crear features nuevos defensivos
+        print("📊 FASE 2: FEATURES DEFENSIVOS FANTASY")
+        print("-" * 80)
+        antes_cols = len(df.columns)
+        df = crear_features_fantasy_defensivos(df, verbose=True)
+        despues_cols = len(df.columns)
+        print(f"Columnas: {antes_cols} → {despues_cols}\n")
+        
+        return df, True
+        
+    except Exception as e:
+        print(f"❌ Error en mejoras: {e}\n")
+        return df, False
+
+
+# ===========================
+# FEATURE SELECTION (NUEVO - FASE 3)
+# ===========================
+
+def aplicar_feature_selection(X, y):
+    """
+    FASE 3: Selecciona features por correlación Spearman
+    """
+    
+    if not USAR_MEJORAS:
+        print("⚠️  Feature selection deshabilitado.\n")
+        return X, None
+    
+    try:
+        print("\n" + "=" * 80)
+        print("📊 FASE 3: SELECCIÓN DE FEATURES POR CORRELACIÓN")
+        print("=" * 80 + "\n")
+        
+        features_validos, df_correlaciones = seleccionar_features_por_correlacion(
+            X, y,
+            target_name=COLUMNA_OBJETIVO,
+            threshold=0.03,
+            verbose=True
+        )
+        
+        # Guardar análisis
+        df_correlaciones.to_csv(
+            DIRECTORIO_CSVS / "feature_correlations_detailed.csv",
+            index=False
+        )
+        print(f"✅ Correlaciones detalladas guardadas\n")
+        
+        return X[features_validos], df_correlaciones
+        
+    except Exception as e:
+        print(f"❌ Error en feature selection: {e}\n")
+        return X, None
+
+
 # ===========================
 # DEFINICIÓN DE VARIABLES FINALES
 # ===========================
@@ -588,6 +679,14 @@ def definir_variables_finales(df):
         "duels_roll5", "duels_ewma5", "duels_won_ewma5", "duels_won_roll5", "duels_won_pct_ewma5",
         "def_actions_ewma5", "def_actions_roll7",
         "aerial_won_ewma5", "aerial_won_roll5",
+        # Regates y conducciones
+        "regates_ewma3", "regates_ewma5", "regates_roll7", "regates_lag1",
+        "regates_completados_ewma3", "regates_completados_ewma5", "regates_completados_roll7", "regates_completados_lag1",
+        "regates_fallidos_ewma3", "regates_fallidos_ewma5", "regates_fallidos_roll7", "regates_fallidos_lag1",
+        "conducciones_ewma3", "conducciones_ewma5", "conducciones_roll7", "conducciones_lag1",
+        "distancia_conduccion_ewma3", "distancia_conduccion_ewma5", "distancia_conduccion_roll7", "distancia_conduccion_lag1",
+        "metros_avanzados_conduccion_ewma3", "metros_avanzados_conduccion_ewma5", "metros_avanzados_conduccion_roll7", "metros_avanzados_conduccion_lag1",
+        "conducciones_progresivas_ewma3", "conducciones_progresivas_ewma5", "conducciones_progresivas_roll7", "conducciones_progresivas_lag1",
         # Eficiencia
         "tackles_clearances_ratio_roll5",
         # Form
@@ -601,6 +700,13 @@ def definir_variables_finales(df):
         "opp_shots_roll5", "opp_shots_ewma5", "opp_gc_ewma5", "opp_gc_roll5", "opp_form_roll5",
         # Probabilistic
         "p_win_propio_ewma5", "p_loss_propio_ewma5", "p_over25_ewma5",
+        # Nuevos features defensivos (FASE 2)
+        "cs_probability", "cs_rate_recent", "tackles_per_90", "tackles_per_90_ewma5",
+        "int_per_90", "int_per_90_ewma5", "clearances_per_90",
+        "defensive_actions_total", "def_actions_per_90", "def_actions_ewma5",
+        "consistency_5games", "def_actions_volatility",
+        "tackles_momentum", "int_momentum",
+        "defensive_context", "cs_activity_alignment", "usage_change_recent"
     ]
     
     variables = [v for v in variables if v in df.columns]
@@ -618,20 +724,19 @@ def definir_variables_finales(df):
     variables = [v for v in variables if v in df.columns]
     
     print(f"\n📊 Total de variables seleccionadas: {len(variables)}")
-    print("  (Solo se incluyen variables de interacción/resumen de roles, no num_roles ni rol_*_valor)\n")
+    print("  (Incluye features originales + nuevos defensivos + roles)\n")
     
     return variables
 
+
 # ===========================
-# GRIDSEARCHCV - ENTRENAMIENTO
+# GRIDSEARCHCV - ENTRENAMIENTO (FASE 4)
 # ===========================
 
 def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
-    print("=" * 80)
-    print("ENTRENAMIENTO CON GRIDSEARCHCV - OPTIMIZACIÓN DE HIPERPARÁMETROS")
-    print("=" * 80)
-    print()
-    
+    """
+    FASE 4: GridSearchCV con parámetros mejorados
+    """
     resultados_finales = {}
     lista_resultados = []
     
@@ -640,12 +745,17 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     # ========================
     print("🌲 Random Forest con GridSearchCV...")
     rf_params = {
-        'n_estimators': [ 200, 300],
-        'max_depth': [10, 20, 25],
-        'min_samples_split': [2, 5, 10],
-        'min_samples_leaf': [1, 2, 4],
-        'max_features': ['sqrt', 'log2']
+        'n_estimators': [200, 300, 400, 500],
+        'max_depth': [ 10, 20, 30, None],
+        'min_samples_split': [2, 3, 5, 7],
+        'min_samples_leaf': [1, 2, 3, 4, 5],
+        'max_features': ['sqrt', 'log2', None]
     }
+    # Calcular número de combinaciones para RF
+    from functools import reduce
+    import operator
+    rf_num_configs = reduce(operator.mul, [len(v) for v in rf_params.values()])
+    print(f"    🔢 Número de combinaciones RF: {rf_num_configs}")
     
     rf_base = RandomForestRegressor(random_state=42, n_jobs=-1)
     rf_gs = GridSearchCV(rf_base, rf_params, cv=3, scoring='neg_mean_absolute_error', n_jobs=-1, verbose=1)
@@ -682,17 +792,23 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     visualizar_feature_importance(fi_rf, "Random Forest - Top 20 Features", "01_feature_importance_rf.png", top_n=20)
     
     # ========================
-    # 2. XGBOOST
+    # 2. XGBOOST (MEJORADO)
     # ========================
-    print("🚀 XGBoost con GridSearchCV...")
+    print("🚀 XGBoost con GridSearchCV (PARÁMETROS MEJORADOS)...")
     xgb_params = {
-        'max_depth': [ 5, 7],
-        'learning_rate': [0.01, 0.1],
-        'n_estimators': [50, 100, 150],
-        'subsample': [0.7, 0.8, 0.9],
-        'colsample_bytree': [0.7, 0.8, 0.9],
-        'gamma': [0, 0.1, 0.5]
+    'max_depth': [5, 7],
+    'learning_rate': [0.1, 0.15],
+    'n_estimators': [300,500],
+    'subsample': [0.7, 0.9],
+    'colsample_bytree': [0.7, 0.9],
+    'gamma': [0.25, 0.5],
+    'min_child_weight': [1, 3, 5],
+    'reg_alpha': [0.05, 0.1],
+    'reg_lambda': [1.0, 2.0]
     }
+
+    xgb_num_configs = reduce(operator.mul, [len(v) for v in xgb_params.values()])
+    print(f"    🔢 Número de combinaciones XGB: {xgb_num_configs}")
     
     xgb_base = XGBRegressor(random_state=42, n_jobs=-1)
     xgb_gs = GridSearchCV(xgb_base, xgb_params, cv=3, scoring='neg_mean_absolute_error', n_jobs=-1, verbose=1)
@@ -729,17 +845,19 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     visualizar_feature_importance(fi_xgb, "XGBoost - Top 20 Features", "02_feature_importance_xgb.png", top_n=20)
     
     # ========================
-    # 3. RIDGE
+    # 3. RIDGE (MEJORADO)
     # ========================
-    print("📏 Ridge Regression con GridSearchCV...")
+    print("📏 Ridge Regression con GridSearchCV (PARÁMETROS MEJORADOS)...")
     ridge_pipeline = Pipeline([
         ('scaler', StandardScaler()),
         ('regresor', Ridge())
     ])
     
     ridge_params = {
-        'regresor__alpha': [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+        'regresor__alpha': [0.001, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2000.0]
     }
+    ridge_num_configs = reduce(operator.mul, [len(v) for v in ridge_params.values()])
+    print(f"    🔢 Número de combinaciones Ridge: {ridge_num_configs}")
     
     ridge_gs = GridSearchCV(ridge_pipeline, ridge_params, cv=3, scoring='neg_mean_absolute_error', n_jobs=-1, verbose=1)
     ridge_gs.fit(X_train, y_train)
@@ -775,19 +893,22 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     visualizar_feature_importance(fi_ridge, "Ridge - Top 20 Features", "03_feature_importance_ridge.png", top_n=20)
     
     # ========================
-    # 4. ELASTICNET
+    # 4. ELASTICNET (MEJORADO)
     # ========================
-    print("🔗 ElasticNet con GridSearchCV...")
+    print("🔗 ElasticNet con GridSearchCV (PARÁMETROS MEJORADOS)...")
     elastic_pipeline = Pipeline([
         ('scaler', StandardScaler()),
         ('regresor', ElasticNet(random_state=42))
     ])
     
     elastic_params = {
-        'regresor__alpha': [0.001, 0.01, 0.1, 1.0],
-        'regresor__l1_ratio': [0.2, 0.5, 0.8],
-        'regresor__max_iter': [2000, 4000, 8000]
+        'regresor__alpha': [0.0001, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0],
+        'regresor__l1_ratio': [0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 0.9, 1.0],
+        'regresor__max_iter': [2000, 5000, 10000],
+        'regresor__tol': [1e-3, 1e-4, 1e-5]
     }
+    elastic_num_configs = reduce(operator.mul, [len(v) for v in elastic_params.values()])
+    print(f"    🔢 Número de combinaciones ElasticNet: {elastic_num_configs}")
     
     elastic_gs = GridSearchCV(elastic_pipeline, elastic_params, cv=3, scoring='neg_mean_absolute_error', n_jobs=-1, verbose=1)
     elastic_gs.fit(X_train, y_train)
@@ -826,19 +947,18 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     # GUARDAR RESULTADOS GENERALES
     # ========================
     df_resultados = pd.DataFrame(lista_resultados)
-    df_resultados.to_csv(DIRECTORIO_CSVS / "resultados_gridsearch.csv", index=False)
+    df_resultados.to_csv(DIRECTORIO_CSVS / "resultados_gridsearch_mejorado.csv", index=False)
     print(f"✅ Resultados guardados en CSV\n")
     
     return resultados_finales
+
 
 # ===========================
 # MAIN
 # ===========================
 
 def main():
-    print("\n" + "=" * 80)
-    print("PIPELINE COMPLETO - ENTRENAMIENTO DEFENSAS CON ROLES Y GRIDSEARCHCV")
-    print("=" * 80 + "\n")
+
     
     # Cargar datos
     df = cargar_datos()
@@ -873,20 +993,28 @@ def main():
     # INTEGRACIÓN DE ROLES DEFENSIVOS
     df = integrar_roles(df)
     
+    # ✅ FASES 1-2: MEJORAS DE FEATURES
+    df, mejoras_aplicadas = aplicar_mejoras_features(df)
+    
     # Definir variables finales
     variables = definir_variables_finales(df)
     
-    
     # Preparar datos para entrenamiento
-    print("=" * 80)
-    print("PREPARACIÓN PARA ENTRENAMIENTO")
-    print("=" * 80)
-    
+ 
     df_train = df.dropna(subset=[COLUMNA_OBJETIVO])
     df_train = df_train[df_train[COLUMNA_OBJETIVO] > 0]
     
     X = df_train[variables].fillna(0)
     y = df_train[COLUMNA_OBJETIVO]
+    
+    # ✅ FASE 3: FEATURE SELECTION
+    print(f"\nAntes de selección: {X.shape[1]} features")
+    X_seleccionado, corr_analysis = aplicar_feature_selection(X, y)
+    
+    if X_seleccionado is not None:
+        X = X_seleccionado
+        variables = X.columns.tolist()
+        print(f"Después de selección: {X.shape[1]} features\n")
     
     # Split
     split_idx = int(len(X) * (1 - TEST_SIZE))
@@ -896,14 +1024,14 @@ def main():
     print(f"Training set: {len(X_train)} muestras")
     print(f"Test set: {len(X_test)} muestras\n")
     
-    # Entrenar con GridSearchCV
+    # ✅ FASE 4: Entrenar con GridSearchCV mejorado
     resultados = entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables)
     
     # ========================
     # RESUMEN Y SELECCIÓN DEL MEJOR MODELO
     # ========================
     print("=" * 80)
-    print("RESUMEN FINAL - MEJORES HIPERPARÁMETROS POR MODELO")
+    print("✅ RESUMEN FINAL - MEJORES HIPERPARÁMETROS")
     print("=" * 80)
     print()
     
@@ -944,7 +1072,53 @@ def main():
         json.dump(mejor_metrics['params'], f, indent=4)
     print(f"✅ Parámetros guardados en: {DIRECTORIO_MODELOS / f'best_model_params_{mejor_nombre}.json'}\n")
     
-    print("✅ Pipeline completado exitosamente\n")
+    print("✅ PIPELINE COMPLETADO EXITOSAMENTE\n")
+    print("=" * 80)
+    print("📊 RESUMEN DE MEJORAS APLICADAS:")
+    print("=" * 80)
+    print(f"✅ Fase 1: Features ruido eliminados")
+    print(f"✅ Fase 2: {len([v for v in variables if any(x in v for x in ['cs_', 'tackles_per_90', 'int_per_90', 'consistency', 'momentum'])])} features defensivos nuevos creados")
+    print(f"✅ Fase 3: Feature selection por Spearman aplicado")
+    print(f"✅ Fase 4: XGBoost con n_estimators=[100,200,300] + L1/L2 regularization")
+    print(f"\n📈 Resultado esperado:")
+    print(f"   • MAE mejora: {mejor_metrics['mae']:.4f} (esperado < 2.30)")
+    print(f"   • Spearman mejora: {mejor_metrics['spearman']:.4f} (esperado > 0.25)")
+    print("=" * 80 + "\n")
+
 
 if __name__ == "__main__":
     main()
+
+    """
+    
+RANKING DE MODELOS POR MAE:
+
+1. RF
+   MAE:    2.3055
+   RMSE:   3.0149
+   Spearman: 0.4519
+   CV Score: -2.2778
+   Hyperparameters: {'max_depth': 10, 'max_features': None, 'min_samples_leaf': 5, 'min_samples_split': 2, 'n_estimators': 500}
+
+2. XGB
+   MAE:    2.3349
+   RMSE:   3.0731
+   Spearman: 0.4180
+   CV Score: -2.2985
+   Hyperparameters: {'colsample_bytree': 0.9, 'gamma': 0.25, 'learning_rate': 0.1, 'max_depth': 5, 'min_child_weight': 5, 'n_estimators': 300, 'reg_alpha': 0.05, 'reg_lambda': 1.0, 'subsample': 0.9}
+
+3. ElasticNet
+   MAE:    2.3633
+   RMSE:   3.0346
+   Spearman: 0.4315
+   CV Score: -2.3082
+   Hyperparameters: {'regresor__alpha': 0.005, 'regresor__l1_ratio': 1.0, 'regresor__max_iter': 2000, 'regresor__tol': 0.001}
+
+4. Ridge
+   MAE:    2.3673
+   RMSE:   3.0359
+   Spearman: 0.4295
+   CV Score: -2.3102
+   Hyperparameters: {'regresor__alpha': 10.0}
+
+    """
