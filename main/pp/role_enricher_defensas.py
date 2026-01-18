@@ -29,8 +29,7 @@ import json
 ROLES_CRITICOS_DEFENSAS = {
     "entradas": 1.3,              # Tackles - muy importante
     "intercepciones": 1.4,        # Interceptions - crítico
-    "despejes": 1.2,              # Clearances - importante
-    "regates_exitosos": 0.8,      # Successful Take-Ons - neutralizar oponentes
+    "despejes": 1.2,              # Clearances - importante      # Successful Take-Ons - neutralizar oponentes
     "minutos": 1.1,               # Minutes - disponibilidad
     "apariciones_suplente": 0.3,  # Substitute Appearances - menos valor
     "amarillas": -0.6,            # Yellow Cards - castigo
