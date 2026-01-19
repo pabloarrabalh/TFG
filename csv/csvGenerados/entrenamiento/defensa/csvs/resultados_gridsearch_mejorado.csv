@@ -1,0 +1,5 @@
+Model,MAE,RMSE,Spearman,Best_Params
+Random Forest,2.3055252826754193,3.0148681504597157,0.4518585741142997,"{'max_depth': 10, 'max_features': None, 'min_samples_leaf': 5, 'min_samples_split': 2, 'n_estimators': 500}"
+XGBoost,2.334897553352888,3.0730751528089826,0.417997132800443,"{'colsample_bytree': 0.9, 'gamma': 0.25, 'learning_rate': 0.1, 'max_depth': 5, 'min_child_weight': 5, 'n_estimators': 300, 'reg_alpha': 0.05, 'reg_lambda': 1.0, 'subsample': 0.9}"
+Ridge,2.3673478353445923,3.0359434576656072,0.42945518250793785,{'regresor__alpha': 10.0}
+ElasticNet,2.3632840575893725,3.0345707995215236,0.43153303787576575,"{'regresor__alpha': 0.005, 'regresor__l1_ratio': 1.0, 'regresor__max_iter': 2000, 'regresor__tol': 0.001}"

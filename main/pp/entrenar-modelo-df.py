@@ -74,7 +74,7 @@ warnings.filterwarnings("ignore")
 # CONFIGURACIÓN GENERAL
 # ===========================
 
-DIRECTORIO_SALIDA = Path("csv/csvGenerados/entrenamiento/defensa_gridsearch_roles_mejorado")
+DIRECTORIO_SALIDA = Path("csv/csvGenerados/entrenamiento/defensa")
 DIRECTORIO_IMAGENES = DIRECTORIO_SALIDA / "imagenes"
 DIRECTORIO_MODELOS = DIRECTORIO_SALIDA / "modelos"
 DIRECTORIO_CSVS = DIRECTORIO_SALIDA / "csvs"
