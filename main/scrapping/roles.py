@@ -3,7 +3,7 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup, Comment
 
-from scrapping.commons import (
+from main.scrapping.commons import (
     normalizar_texto,
     normalizar_equipo_temporada,
     aplicar_alias_jugador_temporada,

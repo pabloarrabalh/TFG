@@ -1,3 +1,6 @@
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 import os
 import re 
 from io import StringIO  
@@ -9,9 +12,9 @@ import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup  
 from rapidfuzz import process as rf_process, fuzz as rf_fuzz  
-from scrapping.commons import * 
-from scrapping.alias import*  
-from scrapping.roles import ROLES_DESTACADOS 
+from main.scrapping.commons import *
+from main.scrapping.alias import *
+from main.scrapping.roles import ROLES_DESTACADOS
 
 logging.basicConfig( 
     level=logging.DEBUG,  
@@ -174,45 +177,70 @@ def rellenar_stats_fila(fila_salida, tablas_por_tipo, clave_fbref, pos_val):
             fila_salida["Porcentaje_paradas"] = pct_paradas  
             fila_salida["PSxG"] = psxg 
 
-
-def obtener_calendario()->dict[str,list[str]]: #[j1:[enlace1],[enlace2]]  , luego no uso los enlaces porque me bloqeuaron pero está hecho
-    ruta_local = "calendario.html"  
-    html = leer_html(ruta_local, logger=logger)  
-    if not html:  
-        return {} 
-
-    soup = BeautifulSoup(html, "lxml")  
-    calendario = {}  
-
-    tabla_calendario = soup.find("table", {"id": re.compile("sched")})  # <div class="table_container tabbed current is_setup" id="div_sched_2025-2026_12_1">
+def obtener_calendario() -> dict[str, list[str]]:
+    ruta_archivo = "main/html/temporada_25_26/calendario.html" 
     
-    if not tabla_calendario:  
-        return {} 
-
-    filas_calendario = tabla_calendario.find_all("tr")  
-    for tr_fila in filas_calendario:  
-        jornada = tr_fila.find("th", {"data-stat": "gameweek"})  
-        report = tr_fila.find("td", {"data-stat": "match_report"}) 
-
-        if report:  
-            enlace = report.find("a")  
-        else:  
-            enlace = None  
-
-        jornada = jornada.get_text().strip()  
-        href = enlace.get("href", "").strip() 
+    with open(ruta_archivo, "r", encoding="utf-8") as f:
+        html = f.read()
+    
+    soup = BeautifulSoup(html, "html.parser")
+    
+    # Encontrar la tabla correcta
+    tabla = soup.find("table", id="sched_2025-2026_12_1")
+    if not tabla:
+        raise ValueError("No se encontró la tabla de calendario")
+    
+    calendario_temp = {}
+    
+    # Iterar sobre las filas (excluyendo header y spacer rows)
+    for fila in tabla.find_all("tr"):
+        # Omitir filas de espaciador
+        if "spacer" in fila.get("class", []):
+            continue
         
-        if not href:  
-            continue 
+        # Obtener todas las celdas
+        celdas = fila.find_all(["th", "td"])
+        if len(celdas) < 9:  # Mínimo de columnas esperadas
+            continue
         
-        url_partido = "https://fbref.com" + href  
-        
-        if jornada not in calendario:  
-            calendario[jornada] = [] 
+        try:
+            # Extraer datos usando data-stat
+            gameweek = fila.find(attrs={"data-stat": "gameweek"})
+            home_team = fila.find(attrs={"data-stat": "home_team"})
+            away_team = fila.find(attrs={"data-stat": "away_team"})
+            score = fila.find(attrs={"data-stat": "score"})
+            date = fila.find(attrs={"data-stat": "date"})
             
-        calendario[jornada].append(url_partido)  
-    return calendario  
-
+            # Verificar que existan datos válidos
+            if not (gameweek and home_team and away_team and score):
+                continue
+            
+            # Extraer texto limpio
+            jornada = int(gameweek.get_text(strip=True))  # ⭐ Convertir a int
+            equipo_local = home_team.get_text(strip=True)
+            equipo_visitante = away_team.get_text(strip=True)
+            
+            # Crear key por jornada si no existe
+            if jornada not in calendario_temp:
+                calendario_temp[jornada] = []
+            
+            partido = f"{equipo_local} vs {equipo_visitante}"
+            calendario_temp[jornada].append(partido)
+        
+        except Exception as e:
+            print(f"Error procesando fila: {e}")
+            continue
+    
+    # ⭐ Ordenar por jornada de menor a mayor
+    calendario = dict(sorted(calendario_temp.items()))
+    
+    import json
+    ruta_json = os.path.join("csv", "csvGenerados", "calendario.json")
+    os.makedirs(os.path.dirname(ruta_json), exist_ok=True)
+    with open(ruta_json, "w", encoding="utf-8") as f_json:
+        json.dump(calendario, f_json, ensure_ascii=False, indent=2)
+    print(f"✅ Calendario guardado en {ruta_json}")
+    return calendario
 
 def obtener_fantasy_jornada(jornada):  
     """
@@ -756,10 +784,13 @@ def procesar_un_partido(jornada: int, idx_partido: int):
 if __name__ == "__main__":
     inicio = time.perf_counter()  
 
+    # Generar y guardar el calendario en JSON
+    obtener_calendario()
+
     #analizar_temporada("23_24", 1, 38)  
-    analizar_temporada("24_25", 12, 14) 
+    #analizar_temporada("24_25", 12, 14) 
     #analizar_temporada("25_26", 1, 17) 
     
     fin = time.perf_counter() 
     duracion = fin - inicio  
-    print(f"\nTiempo total de ejecución: {duracion:.2f} segundos") 
+    print(f"\nTiempo total de ejecución: {duracion:.2f} segundos")
