@@ -216,22 +216,27 @@ def obtener_calendario() -> dict[str, list[str]]:
                 continue
             
             # Extraer texto limpio
-            jornada = int(gameweek.get_text(strip=True))  # ⭐ Convertir a int
-            equipo_local = home_team.get_text(strip=True)
-            equipo_visitante = away_team.get_text(strip=True)
+            jornada = int(gameweek.get_text(strip=True))
+            equipo_local_raw = home_team.get_text(strip=True)
+            equipo_visitante_raw = away_team.get_text(strip=True)
+            
+            # ⭐ NORMALIZAR EQUIPOS
+            equipo_local_norm = normalizar_equipo_temporada(equipo_local_raw)
+            equipo_visitante_norm = normalizar_equipo_temporada(equipo_visitante_raw)
             
             # Crear key por jornada si no existe
             if jornada not in calendario_temp:
                 calendario_temp[jornada] = []
             
-            partido = f"{equipo_local} vs {equipo_visitante}"
+            # ⭐ Usar nombres normalizados en el partido
+            partido = f"{equipo_local_norm} vs {equipo_visitante_norm}"
             calendario_temp[jornada].append(partido)
         
         except Exception as e:
             print(f"Error procesando fila: {e}")
             continue
     
-    # ⭐ Ordenar por jornada de menor a mayor
+    # Ordenar por jornada de menor a mayor
     calendario = dict(sorted(calendario_temp.items()))
     
     import json
