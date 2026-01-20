@@ -21,7 +21,7 @@ from sklearn.preprocessing import StandardScaler
 
 # Importar módulo de roles defensivos
 try:
-    from role_enricher_defensas import *
+    from role_enricher import *
     ROLES_DISPONIBLES = True
 except ImportError:
     print("⚠️  Módulo role_enricher_defensas.py no encontrado. Funcionará sin roles.")

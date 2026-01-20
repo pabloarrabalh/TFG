@@ -533,15 +533,3 @@ def resumen_roles(df: pd.DataFrame, position: str = 'ALL') -> None:
     
     print()
 
-
-if __name__ == "__main__":
-    print("role_enricher.py - Módulo unificado de enriquecimiento de roles")
-    print("\nFunciones disponibles:")
-    print("  - enriquecer_dataframe_con_roles(df, position='ALL', columna_roles='roles', verbose=True)")
-    print("  - crear_features_interaccion_roles(df, position='ALL', columna_objetivo=None, verbose=True)")
-    print("  - resumen_roles(df, position='ALL')")
-    print("\nPosiciones soportadas:")
-    print("  - 'GK': Porteros (Goalkeeper)")
-    print("  - 'DF': Defensas (Defender)")
-    print("  - 'ALL': Todos (usa ROLES_TODOS genérico)")
-    print()

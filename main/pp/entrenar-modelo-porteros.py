@@ -51,11 +51,7 @@ from sklearn.preprocessing import StandardScaler
 
 # Importar módulo de roles de porteros
 try:
-    from role_enricher_gk import (
-        enriquecer_dataframe_con_roles_gk,
-        crear_features_gk_roles,
-        resumen_roles_gk
-    )
+    from role_enricher import *
     ROLES_DISPONIBLES = True
 except ImportError:
     print("⚠️ Módulo role_enricher_gk.py no encontrado. Funcionará sin roles.")

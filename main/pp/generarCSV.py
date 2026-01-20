@@ -108,7 +108,6 @@ def build_all_data():
     return df_players, standings, odds
 
 def process_odds(odds: pd.DataFrame) -> pd.DataFrame:
-    """✅ FIX: procesado seguro de odds"""
     o = odds.rename(columns={"HomeTeam": "home", "AwayTeam": "away"}).copy()
     
     # Conversión numérica segura
