@@ -1,0 +1,32 @@
+{
+  "21": {
+    "matchday": 21,
+    "timestamp": "2026-01-20T12:02:49.615007",
+    "matches": [],
+    "status": "NO_DATA"
+  },
+  "22": {
+    "matchday": 22,
+    "timestamp": "2026-01-20T12:02:51.387273",
+    "matches": [],
+    "status": "NO_DATA"
+  },
+  "23": {
+    "matchday": 23,
+    "timestamp": "2026-01-20T12:02:53.100388",
+    "matches": [],
+    "status": "NO_DATA"
+  },
+  "24": {
+    "matchday": 24,
+    "timestamp": "2026-01-20T12:02:54.797057",
+    "matches": [],
+    "status": "NO_DATA"
+  },
+  "25": {
+    "matchday": 25,
+    "timestamp": "2026-01-20T12:02:56.492939",
+    "matches": [],
+    "status": "NO_DATA"
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "21": {
+    "matchday": 21,
+    "timestamp": "2026-01-20T12:04:20.777677",
+    "matches": [
+      {
+        "HomeTeam": "Levante",
+        "AwayTeam": "Elche CF",
+        "B365H": 2.51,
+        "B365D": 3.38,
+        "B365A": 2.95,
+        "Bookmaker": "pinnacle"
+      },
+      {
+        "HomeTeam": "Rayo Vallecano",
+        "AwayTeam": "CA Osasuna",
+        "B365H": 2.14,
+        "B365D": 3.17,
+        "B365A": 3.99,
+        "Bookmaker": "pinnacle"
+      },
+      {
+        "HomeTeam": "Valencia",
+        "AwayTeam": "Espanyol",
+        "B365H": 2.39,
+        "B365D": 3.39,
+        "B365A": 3.13,
+        "Bookmaker": "pinnacle"
+      },
+      {
+        "HomeTeam": "Sevilla",
+        "AwayTeam": "Athletic Bilbao",
+        "B365H": 2.9,
+        "B365D": 3.0,
+        "B365A": 2.45,
+        "Bookmaker": "pmu_fr"
+      },
+      {
+        "HomeTeam": "Villarreal",
+        "AwayTeam": "Real Madrid",
+        "B365H": 3.1,
+        "B365D": 3.7,
+        "B365A": 2.0,
+        "Bookmaker": "pmu_fr"
+      },
+      {
+        "HomeTeam": "Atlético Madrid",
+        "AwayTeam": "Mallorca",
+        "B365H": 1.19,
+        "B365D": 5.0,
+        "B365A": 9.5,
+        "Bookmaker": "pmu_fr"
+      },
+      {
+        "HomeTeam": "Barcelona",
+        "AwayTeam": "Oviedo",
+        "B365H": 1.05,
+        "B365D": 9.0,
+        "B365A": 18.0,
+        "Bookmaker": "pmu_fr"
+      },
+      {
+        "HomeTeam": "Real Sociedad",
+        "AwayTeam": "Celta Vigo",
+        "B365H": 1.85,
+        "B365D": 3.15,
+        "B365A": 3.5,
+        "Bookmaker": "pmu_fr"
+      },
+      {
+        "HomeTeam": "Alavés",
+        "AwayTeam": "Real Betis",
+        "B365H": 2.8,
+        "B365D": 2.9,
+        "B365A": 2.3,
+        "Bookmaker": "pmu_fr"
+      },
+      {
+        "HomeTeam": "Girona",
+        "AwayTeam": "Getafe",
+        "B365H": 2.13,
+        "B365D": 3.19,
+        "B365A": 3.89,
+        "Bookmaker": "pinnacle"
+      }
+    ]
+  },
+  "22": {
+    "matchday": 22,
+    "timestamp": "2026-01-20T12:04:22.569953",
+    "matches": [
+      {
+        "HomeTeam": "Espanyol",
+        "AwayTeam": "Alavés",
+        "B365H": 1.88,
+        "B365D": 2.95,
+        "B365A": 3.85,
+        "Bookmaker": "parionssport_fr"
+      },
+      {
+        "HomeTeam": "Oviedo",
+        "AwayTeam": "Girona",
+        "B365H": 2.75,
+        "B365D": 3.18,
+        "B365A": 2.83,
+        "Bookmaker": "marathonbet"
+      },
+      {
+        "HomeTeam": "CA Osasuna",
+        "AwayTeam": "Villarreal",
+        "B365H": 3.0,
+        "B365D": 3.3,
+        "B365A": 2.05,
+        "Bookmaker": "parionssport_fr"
+      },
+      {
+        "HomeTeam": "Levante",
+        "AwayTeam": "Atlético Madrid",
+        "B365H": 5.99,
+        "B365D": 4.52,
+        "B365A": 1.59,
+        "Bookmaker": "onexbet"
+      },
+      {
+        "HomeTeam": "Elche CF",
+        "AwayTeam": "Barcelona",
+        "B365H": 5.6,
+        "B365D": 4.75,
+        "B365A": 1.35,
+        "Bookmaker": "parionssport_fr"
+      },
+      {
+        "HomeTeam": "Real Madrid",
+        "AwayTeam": "Rayo Vallecano",
+        "B365H": 1.28,
+        "B365D": 4.95,
+        "B365A": 7.5,
+        "Bookmaker": "betclic_fr"
+      },
+      {
+        "HomeTeam": "Real Betis",
+        "AwayTeam": "Valencia",
+        "B365H": 1.85,
+        "B365D": 3.71,
+        "B365A": 4.88,
+        "Bookmaker": "onexbet"
+      },
+      {
+        "HomeTeam": "Getafe",
+        "AwayTeam": "Celta Vigo",
+        "B365H": 3.02,
+        "B365D": 3.02,
+        "B365A": 2.83,
+        "Bookmaker": "onexbet"
+      },
+      {
+        "HomeTeam": "Athletic Bilbao",
+        "AwayTeam": "Real Sociedad",
+        "B365H": 2.0,
+        "B365D": 3.0,
+        "B365A": 3.35,
+        "Bookmaker": "parionssport_fr"
+      },
+      {
+        "HomeTeam": "Mallorca",
+        "AwayTeam": "Sevilla",
+        "B365H": 2.39,
+        "B365D": 3.44,
+        "B365A": 3.27,
+        "Bookmaker": "onexbet"
+      }
+    ]
+  },
+  "23": {
+    "matchday": 23,
+    "timestamp": "2026-01-20T12:04:24.325923",
+    "matches": [],
+    "status": "NO_DATA"
+  }
+}

@@ -2,7 +2,7 @@ import os
 import re
 import pandas as pd
 from rapidfuzz import fuzz
-
+import fbref
 from commons import *
 from alias import *
 
@@ -22,8 +22,6 @@ def scrapear_puntos_fantasy(path_html: str, codigo_temporada: str):
         return {}
 
     num_jornada = int(m.group(2))
-
-    import fbref
 
     fbref.TEMPORADA_ACTUAL = codigo_temporada
     fbref.CARPETA_HTML, fbref.CARPETA_CSV = fbref._build_rutas_temporada(codigo_temporada)

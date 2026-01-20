@@ -794,7 +794,7 @@ if __name__ == "__main__":
 
     #analizar_temporada("23_24", 1, 38)  
     #analizar_temporada("24_25", 12, 14) 
-    #analizar_temporada("25_26", 1, 17) 
+    analizar_temporada("25_26", 1, 17) 
     
     fin = time.perf_counter() 
     duracion = fin - inicio  
