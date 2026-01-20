@@ -63,7 +63,7 @@ except ImportError:
 
 # ✅ NUEVO: Importar módulo de mejoras para porteros
 try:
-    from feature_improvements_gk import (
+    from feature_improvements import (
         eliminar_features_ruido_gk,
         crear_features_fantasy_gk,
         seleccionar_features_por_correlacion
