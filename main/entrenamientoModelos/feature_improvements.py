@@ -1,33 +1,3 @@
-"""
-MÓDULO UNIFICADO: MEJORAS DE FEATURES PARA REDUCIR MAE
-Autor: AI Assistant para Fantasy Football Analytics
-Fecha: Enero 2026
-
-Propósito: 
-- Eliminar features ruido
-- Crear features específicos para porteros (GK) y defensas (DF)
-- Seleccionar features por correlación Spearman
-- SIN DATA LEAKAGE: todos los features usan .shift() ANTES de rolling/ewma
-
-Uso:
-    from feature_improvements import (
-        eliminar_features_ruido,
-        crear_features_fantasy_gk,
-        crear_features_fantasy_defensivos,
-        seleccionar_features_por_correlacion
-    )
-    
-    # Pipeline para porteros
-    df = eliminar_features_ruido(df, position='GK')
-    df = crear_features_fantasy_gk(df)
-    
-    # Pipeline para defensas
-    df = eliminar_features_ruido(df, position='DF')
-    df = crear_features_fantasy_defensivos(df)
-    
-    # Seleccionar features finales
-    features_validas, df_corr = seleccionar_features_por_correlacion(X, y)
-"""
 
 import numpy as np
 import pandas as pd
@@ -48,19 +18,7 @@ TAM_VENTANA_RECIENTE = 3
 # ============================================================================
 
 def eliminar_features_ruido(df: pd.DataFrame, position: str = 'ALL', verbose: bool = True) -> pd.DataFrame:
-    """
-    Elimina features con importancia = 0 en múltiples modelos.
-    Estos features son colineales o ruido puro.
-    
-    Args:
-        df: DataFrame con features
-        position: 'GK', 'DF' o 'ALL' (aplica ambas listas)
-        verbose: Print de características eliminadas
-        
-    Returns:
-        DataFrame sin features ruido
-    """
-    
+
     # Features identificadas como 0.0000 en 2+ modelos en GridSearch results
     FEATURES_RUIDO_COMUN = [
         'duels_won_pct_ewma5',      # 0 en Random Forest
@@ -71,8 +29,7 @@ def eliminar_features_ruido(df: pd.DataFrame, position: str = 'ALL', verbose: bo
     ]
     
     features_ruido = FEATURES_RUIDO_COMUN.copy()
-    
-    # Mapear por posición si es específico
+
     if position in ['GK', 'ALL']:
         pass  # Los ruidos comunes aplican a GK
     
@@ -107,57 +64,95 @@ def eliminar_features_ruido(df: pd.DataFrame, position: str = 'ALL', verbose: bo
 
 def crear_features_fantasy_gk(df: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
     """
-    Crea features específicos para porteros que predicen puntos Fantasy.
-    
-    IMPORTANTE: Todos los features nuevos usan .shift() ANTES de rolling/ewma
-    para evitar data leakage.
-    
-    Puntuación Fantasy para GK:
-    - Clean sheet: +4 pts
-    - Gol en contra: -1 pt
-    - Paradón: +1 pt
-    - Penalti parado: +5 pts
-    
-    Args:
-        df: DataFrame con datos básicos
-        verbose: Print de features creadas
-        
-    Returns:
-        DataFrame enriquecido sin leakage
+    Features específicos Fantasy para porteros (GK), sin leakage.
+
+    Se refuerzan las señales que mejor han funcionado en los modelos:
+    - Dificultad de fixture (home/away)
+    - Probabilidades de goles (p_over25_ewma5)
+    - Contexto ofensivo del rival (opp_shots_ewma5, opp_gc_ewma5)
+    - PSxG y paradas por 90'
+
+    Se crean:
+    - cs_probability (mejorada)
+    - cs_rate_recent (clean sheets recientes)
+    - cs_expected_points (puntos esperados por CS)
+    - expected_gk_core_points (resumen de puntos esperados GK)
     """
-    
+
     if verbose:
-        print("="*80)
+        print("=" * 80)
         print("INGENIERÍA DE FEATURES PARA PORTEROS (GK) - SIN LEAKAGE")
-        print("="*80)
+        print("=" * 80)
         print()
-    
+
     df = df.copy()
-    
-    # ========================================================================
-    # 1. CLEAN SHEET PROBABILITY & RATE
-    # ========================================================================
-    
-    if "opp_shots_ewma5" in df.columns:
-        df["cs_probability"] = (1 / (1 + df["opp_shots_ewma5"] + 0.1)).fillna(0.5)
-        
-        # Clean sheet rate (últimos 3 partidos)
-        if "Goles_en_contra" in df.columns:
-            cs_temp = (df.groupby("player")["Goles_en_contra"].shift() <= 0).astype(int)
-            df["cs_rate_recent"] = cs_temp.groupby(df["player"]).transform(
-                lambda x: x.rolling(TAM_VENTANA_RECIENTE, min_periods=1).mean()
-            ).fillna(0)
-        
-        if verbose:
-            print("✅ Clean sheet probability & rate")
-    
-    # ========================================================================
-    # 2. EFFICIENCY PER 90 MINUTES (SIN LEAKAGE)
-    # ========================================================================
-    
+
+    # -----------------------------------------------------------------------
+    # 0. Seguridad minutos
+    # -----------------------------------------------------------------------
     df["Min_partido_safe"] = df.get("Min_partido", 1).replace(0, 0.1)
-    
-    # Save per 90
+
+    # -----------------------------------------------------------------------
+    # 1. CLEAN SHEET PROBABILITY MEJORADA
+    # -----------------------------------------------------------------------
+    cs_components = []
+
+    # A) Probabilidad implícita de pocos goles vía mercado (p_over25_ewma5)
+    if "p_over25_ewma5" in df.columns:
+        df["cs_prob_bets"] = (1 - df["p_over25_ewma5"].clip(0, 1)).fillna(0.5)
+        cs_components.append("cs_prob_bets")
+
+    # B) Rival que normalmente marca poco (opp_gc_ewma5 bajo)
+    if "opp_gc_ewma5" in df.columns:
+        df["cs_prob_opp_gc"] = (1 - (df["opp_gc_ewma5"] / 3.0).clip(0, 1)).fillna(0.5)
+        cs_components.append("cs_prob_opp_gc")
+
+    # C) Rival que genera pocos tiros (opp_shots_ewma5 bajo)
+    if "opp_shots_ewma5" in df.columns:
+        df["cs_prob_opp_shots"] = (1.0 / (1.0 + df["opp_shots_ewma5"].clip(lower=0))).fillna(0.5)
+        cs_components.append("cs_prob_opp_shots")
+
+    # D) Efecto de la dificultad de fixture (home/away)
+    if "fixture_difficulty_home" in df.columns and "fixture_difficulty_away" in df.columns and "is_home" in df.columns:
+        df["fixture_difficulty_effect"] = np.where(
+            df["is_home"] == 1,
+            1 - df["fixture_difficulty_home"].clip(0, 1),
+            1 - df["fixture_difficulty_away"].clip(0, 1),
+        )
+        df["fixture_difficulty_effect"] = df["fixture_difficulty_effect"].fillna(0.5)
+        cs_components.append("fixture_difficulty_effect")
+
+    if cs_components:
+        # Ponderación suave de todas las señales disponibles
+        df["cs_probability"] = (
+            0.4 * df.get("cs_prob_bets", 0.5)
+            + 0.2 * df.get("cs_prob_opp_gc", 0.5)
+            + 0.2 * df.get("cs_prob_opp_shots", 0.5)
+            + 0.2 * df.get("fixture_difficulty_effect", 0.5)
+        )
+        df["cs_probability"] = df["cs_probability"].clip(0, 1)
+        # Puntos esperados por CS (4 pts por puerta a cero)
+        df["cs_expected_points"] = 4.0 * df["cs_probability"]
+    else:
+        df["cs_probability"] = 0.5
+        df["cs_expected_points"] = 2.0
+
+    # Clean sheet rate reciente (últimos 3 partidos, sin leakage)
+    if "Goles_en_contra" in df.columns:
+        cs_temp = (df.groupby("player")["Goles_en_contra"].shift() <= 0).astype(int)
+        df["cs_rate_recent"] = cs_temp.groupby(df["player"]).transform(
+            lambda x: x.rolling(TAM_VENTANA_RECIENTE, min_periods=1).mean()
+        ).fillna(0)
+    else:
+        df["cs_rate_recent"] = 0.0
+
+    if verbose:
+        print("✅ Clean sheet probability & rate (mejoradas)")
+        print("✅ cs_expected_points")
+
+    # -----------------------------------------------------------------------
+    # 2. EFICIENCIA PER 90' (paradas y PSxG) - SIN LEAKAGE
+    # -----------------------------------------------------------------------
     if "Porcentaje_paradas" in df.columns:
         df["save_per_90_temp"] = df["Porcentaje_paradas"] / (df["Min_partido_safe"] / 90.0)
         df["save_per_90"] = df.groupby("player")["save_per_90_temp"].transform(
@@ -167,11 +162,7 @@ def crear_features_fantasy_gk(df: pd.DataFrame, verbose: bool = True) -> pd.Data
             lambda x: x.shift().ewm(span=TAM_VENTANA, adjust=False).mean()
         ).fillna(0)
         df = df.drop(columns=["save_per_90_temp"])
-        
-        if verbose:
-            print("✅ Save per 90 (roll, ewma) - Sin leakage")
-    
-    # PSxG per 90
+
     if "PSxG" in df.columns:
         df["psxg_per_90_temp"] = df["PSxG"] / (df["Min_partido_safe"] / 90.0)
         df["psxg_per_90"] = df.groupby("player")["psxg_per_90_temp"].transform(
@@ -181,124 +172,23 @@ def crear_features_fantasy_gk(df: pd.DataFrame, verbose: bool = True) -> pd.Data
             lambda x: x.shift().ewm(span=TAM_VENTANA, adjust=False).mean()
         ).fillna(0)
         df = df.drop(columns=["psxg_per_90_temp"])
-        
-        if verbose:
-            print("✅ PSxG per 90 (roll, ewma) - Sin leakage")
-    
-    # ========================================================================
-    # 3. GK ACTIONS TOTAL (SIN LEAKAGE)
-    # ========================================================================
-    
-    if all(c in df.columns for c in ["Porcentaje_paradas", "DuelosAereosGanados", "Despejes"]):
-        df["gk_actions_temp"] = (
-            df["Porcentaje_paradas"] * 0.5 +
-            df["DuelosAereosGanados"] +
-            df["Despejes"] * 0.3
-        )
-        
-        df["gk_actions_total"] = df.groupby("player")["gk_actions_temp"].transform(
-            lambda x: x.shift().rolling(TAM_VENTANA, min_periods=1).mean()
-        ).fillna(0)
-        
-        df["gk_actions_per_90"] = (df["gk_actions_total"] / (df["Min_partido_safe"] / 90.0)).fillna(0)
-        
-        df["gk_actions_ewma5"] = df.groupby("player")["gk_actions_temp"].transform(
-            lambda x: x.shift().ewm(span=TAM_VENTANA, adjust=False).mean()
-        ).fillna(0)
-        
-        df = df.drop(columns=["gk_actions_temp"])
-        
-        if verbose:
-            print("✅ GK Actions (total, per_90, ewma5) - Sin leakage")
-    
-    # ========================================================================
-    # 4. CONSISTENCY & VOLATILITY (SIN LEAKAGE)
-    # ========================================================================
-    
-    if "puntosFantasy" in df.columns:
-        # Consistency over 5 games
-        pf_std = df.groupby("player")["puntosFantasy"].transform(
-            lambda x: x.shift().rolling(TAM_VENTANA, min_periods=1).std()
-        ).fillna(0)
-        
-        pf_mean = df.groupby("player")["puntosFantasy"].transform(
-            lambda x: x.shift().rolling(TAM_VENTANA, min_periods=1).mean()
-        ).fillna(1)
-        
-        df["consistency_5games"] = 1 / (1 + pf_std / (pf_mean + 1e-6)).fillna(1)
-        df["consistency_5games"] = df["consistency_5games"].replace([np.inf, -np.inf], 1)
-        
-        # GK Actions volatility
-        if "gk_actions_total" in df.columns:
-            gk_std = df.groupby("player")["gk_actions_total"].transform(
-                lambda x: x.shift().rolling(TAM_VENTANA, min_periods=1).std()
-            ).fillna(0)
-            
-            gk_mean = df.groupby("player")["gk_actions_total"].transform(
-                lambda x: x.shift().rolling(TAM_VENTANA, min_periods=1).mean()
-            ).fillna(1)
-            
-            df["gk_actions_volatility"] = (gk_std / (gk_mean + 1e-6)).fillna(0)
-            df["gk_actions_volatility"] = df["gk_actions_volatility"].replace([np.inf, -np.inf], 0)
-        
-        if verbose:
-            print("✅ Consistency & Volatility (5games) - Sin leakage")
-    
-    # ========================================================================
-    # 5. MOMENTUM INDICATORS (SIN LEAKAGE)
-    # ========================================================================
-    
-    if "save_pct_ewma3" in df.columns and "save_pct_ewma5" in df.columns:
-        df["save_momentum"] = (df["save_pct_ewma3"] - df["save_pct_ewma5"]).fillna(0)
-        
-        if verbose:
-            print("✅ Save Momentum (ewma3 - ewma5)")
-    
-    if "psxg_ewma3" in df.columns and "psxg_ewma5" in df.columns:
-        df["psxg_momentum"] = (df["psxg_ewma3"] - df["psxg_ewma5"]).fillna(0)
-        
-        if verbose:
-            print("✅ PSxG Momentum (ewma3 - ewma5)")
-    
-    # ========================================================================
-    # 6. DEFENSIVE CONTEXT (SIN LEAKAGE)
-    # ========================================================================
-    
-    if all(c in df.columns for c in ["opp_shots_ewma5", "opp_gc_ewma5"]):
-        df["defensive_context"] = (
-            df["opp_shots_ewma5"] * 0.6 + df["opp_gc_ewma5"] * 0.4
-        ).fillna(0)
-        
-        if verbose:
-            print("✅ Defensive Context (shots + goals against weighted)")
-    
-    # ========================================================================
-    # 7. CS ACTIVITY ALIGNMENT (SIN LEAKAGE)
-    # ========================================================================
-    
-    if all(c in df.columns for c in ["cs_probability", "gk_actions_per_90"]):
-        df["cs_activity_alignment"] = (
-            df["cs_probability"] * 0.5 + df["gk_actions_per_90"] * 0.5
-        ).fillna(0)
-        
-        if verbose:
-            print("✅ CS Activity Alignment (probability * activity)")
-    
-    # ========================================================================
-    # 8. USAGE CHANGE RECENT (SIN LEAKAGE)
-    # ========================================================================
-    
-    if "minutes_pct_ewma3" in df.columns and "minutes_pct_ewma5" in df.columns:
-        df["usage_change_recent"] = (
-            df["minutes_pct_ewma3"] - df["minutes_pct_ewma5"]
-        ).fillna(0)
-        
-        if verbose:
-            print("✅ Usage Change Recent (ewma3 - ewma5)")
-    
+
     if verbose:
-        print(f"\n✅ Fase 2 completada - Features GK creados\n")
-    
+        print("✅ Save per 90 (roll, ewma) - Sin leakage")
+        print("✅ PSxG per 90 (roll, ewma) - Sin leakage")
+
+    # -----------------------------------------------------------------------
+    # 3. RESUMEN CORE DE PUNTOS ESPERADOS GK
+    # -----------------------------------------------------------------------
+    df["expected_gk_core_points"] = (
+        df.get("cs_expected_points", 0)
+        + 0.4 * df.get("save_per_90_ewma5", 0)
+        - 0.3 * df.get("psxg_per_90_ewma5", 0)
+    )
+
+    if verbose:
+        print("✅ expected_gk_core_points (CS + saves + PSxG)")
+
     return df
 
 
