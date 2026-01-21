@@ -535,10 +535,10 @@ def integrar_roles(df):
         print("=" * 80)
         
         # Enriquecer con roles
-        df = enriquecer_dataframe_con_roles_defensivos(df, columna_roles="roles")
+        df = enriquecer_dataframe_con_roles(df,position="DF", columna_roles="roles")
         
         # Crear features de interacción
-        df = crear_features_defensivas_roles(df, columna_objetivo=COLUMNA_OBJETIVO)
+        df = crear_features_interaccion_roles(df,position="DF", columna_objetivo=COLUMNA_OBJETIVO)
         
         print("✅ Roles defensivos integrados exitosamente\n")
         

@@ -580,10 +580,10 @@ def integrar_roles(df):
         print("=" * 80)
 
         # Enriquecer con roles
-        df = enriquecer_dataframe_con_roles_gk(df, columna_roles="roles")
+        df = enriquecer_dataframe_con_roles(df,position="PT", columna_roles="roles")
 
         # Crear features de interacción
-        df = crear_features_gk_roles(df, columna_objetivo=COLUMNA_OBJETIVO)
+        df = crear_features_interaccion_roles(df,position="PT", columna_objetivo=COLUMNA_OBJETIVO)
 
         print("✅ Roles de porteros integrados exitosamente\n")
 
