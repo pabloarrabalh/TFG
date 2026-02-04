@@ -35,23 +35,8 @@ def crear_scraper_ff():
     return scraper
 
 
-def descargar_html_con_reintentos(
-    url: str,
-    ruta_salida: str,
-    max_intentos: int = 5,
-    backoff_inicial: float = 3.0,
-    backoff_max: float = 30.0,
-    timeout: int = 30,
-    verbose: bool = True,
-):
-    """
-    Descarga una página de FutbolFantasy con varios intentos y backoff exponencial.
+def descargar_html_con_reintentos(url: str,ruta_salida: str,max_intentos: int = 5,backoff_inicial: float = 3.0,backoff_max: float = 30.0,timeout: int = 30,verbose: bool = True,):
 
-    - Usa cloudscraper (evita parte de Cloudflare).
-    - Espera entre intentos: backoff exponencial + jitter.
-    - Crea la carpeta de salida si no existe.
-    - Si ya existe el archivo, no vuelve a descargar.
-    """
     os.makedirs(os.path.dirname(ruta_salida), exist_ok=True)
 
     if os.path.exists(ruta_salida):
@@ -107,11 +92,6 @@ def descargar_html_con_reintentos(
 
 
 def descargar_puntos_temporada(temporada: str, j_ini: int, j_fin: int):
-    """
-    Descarga los puntos de una temporada específica.
-    temporada: string en formato '22_23', '23_24', etc.
-    j_ini, j_fin: jornada inicial y final (sin restricciones)
-    """
     # El año de la URL es el segundo número de la temporada
     try:
         anio_url = int(temporada.split('_')[1])

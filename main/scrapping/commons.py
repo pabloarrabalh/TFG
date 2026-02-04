@@ -8,13 +8,7 @@ import pandas as pd
 from bs4 import NavigableString
 from rapidfuzz import process, fuzz
 
-from .alias import *
-
-
-# ==========================
-# Lectura y rutas
-# ==========================
-
+from main.scrapping.alias import *
 
 def leer_html(ruta: str, logger=None) -> str:
     if not ruta:
@@ -35,9 +29,9 @@ def leer_html(ruta: str, logger=None) -> str:
     return contenido
 
 
-def build_rutas_temporada(temporada: str):
-    carpeta_html = os.path.join("main", "html", f"temporada_{temporada}")
-    carpeta_csv = os.path.join("data", f"temporada_{temporada}")
+def construir_rutas_temporada(codigo_temporada: str):
+    carpeta_html = os.path.join("main", "html", "html", f"temporada_{codigo_temporada}")
+    carpeta_csv = os.path.join("data", f"temporada_{codigo_temporada}")
     os.makedirs(carpeta_html, exist_ok=True)
     os.makedirs(carpeta_csv, exist_ok=True)
     return carpeta_html, carpeta_csv
@@ -54,22 +48,39 @@ def obtener_rutas_jornada(carpeta_html_base: str, carpeta_csv_base: str, jornada
 
 def normalizar_texto(texto):
     texto = str(texto).lower().strip()
-    texto = unicodedata.normalize("NFD", texto)  # Tildes raras
+    texto = unicodedata.normalize("NFD", texto)
     texto = "".join(c for c in texto if unicodedata.category(c) != "Mn")
-
     texto = re.sub(r"[-.]", " ", texto)
     texto = re.sub(r"\s+", " ", texto)
     return texto.strip()
 
 
-def normalizar_equipo(nombre_equipo: str) -> str:
+def normalizar_equipo_temporada(nombre_equipo: str) -> str:
     nombre_norm = normalizar_texto(nombre_equipo)
     return ALIAS_EQUIPOS.get(nombre_norm, nombre_norm)
 
 
-def normalizar_equipo_temporada(nombre: str) -> str:
-    nombre_norm = normalizar_texto(nombre)
-    return ALIAS_EQUIPOS.get(nombre_norm, nombre_norm)
+def limpiar_minuto(nombre: str) -> str:
+    """
+    Limpia un nombre removiendo información de minutos jugados.
+    
+    Args:
+        nombre: Nombre posiblemente con información de minutos
+    
+    Returns:
+        Nombre limpio sin información de minutos
+    """
+    if not nombre:
+        return nombre
+    nombre = nombre.replace("+", "").replace("-", "").strip()
+    nombre = re.sub(r"\s*\d+(?:\+\d+)?'?$", "", nombre).strip()
+    return nombre
+
+
+def nombre_a_mayusculas(nombre_normalizado: str) -> str:
+    partes = str(nombre_normalizado).split()
+    partes_capitalizadas = [p.capitalize() for p in partes]
+    return " ".join(partes_capitalizadas)
 
 
 def normalizar_puntos(valor):
@@ -81,43 +92,31 @@ def normalizar_puntos(valor):
         return 0
 
 
-def limpiar_minuto(nombre):
-    if not nombre:
-        return nombre
-    nombre = nombre.replace("+", "").replace("-", "").strip()
-    nombre = re.sub(r"\s*\d+(?:\+\d+)?'?$", "", nombre).strip()
-    return nombre
-
-
-def extraer_nombre_jugador(td_nombre):
+def extraer_nombre_jugador(elemento_html):
     textos = []
-    for h in td_nombre.children:
-        if isinstance(h, NavigableString):
-            txt = h.strip()
+    for elemento in elemento_html.children:
+        if isinstance(elemento, NavigableString):
+            txt = elemento.strip()
             if txt:
                 textos.append(txt)
     return " ".join(textos)
 
 
-def _convertir_a_numero(valor):
+def to_float(valor):
     if isinstance(valor, pd.Series):
         valor = valor.iloc[0]
     if valor in (None, "", "-"):
         return nan
 
     texto = str(valor).split("\n")[0].replace("%", "").strip()
-    num = pd.to_numeric(texto, errors="coerce")
-    if pd.isna(num):
+    numero = pd.to_numeric(texto, errors="coerce")
+    if pd.isna(numero):
         return nan
-    return float(num)
-
-
-def to_float(valor):
-    return _convertir_a_numero(valor)
+    return float(numero)
 
 
 def to_int(valor):
-    v = _convertir_a_numero(valor)
+    v = to_float(valor)
     if pd.isna(v):
         return nan
     return int(round(v))
@@ -131,48 +130,41 @@ def limpiar_numero(valor):
     s = str(valor).split("\n")[0].replace("%", "").strip()
     if s in ["", "-", "nan", "NaN", "None"]:
         return 0.0
-    num = pd.to_numeric(s, errors="coerce")
-    if pd.isna(num):
+    numero = pd.to_numeric(s, errors="coerce")
+    if pd.isna(numero):
         return 0.0
-    return float(num)
+    return float(numero)
+
+def mapear_posicion(posicion: str) -> str:
+    posicion = (posicion or "MC").upper()
+    return POSICION_MAP.get(posicion, "MC")
 
 
-def formatear_numero(valor):
-    try:
-        f = float(valor)
-        if f.is_integer():
-            return str(int(f))
-        return str(f)
-    except Exception:
-        return str(valor)
+def normalizar_posicion_clave(valor_posicion: str) -> str:
 
-
-def mapear_posicion(pos):
-    pos = (pos or "MC").upper()
-    return POSICION_MAP.get(pos, "MC")
-
-
-def añadir_equipo_y_player_norm(df, col_equipo="Equipo_propio", col_player="player"):
-    df["equipo_norm"] = df[col_equipo].apply(normalizar_equipo)
-    df["player_norm"] = df[col_player].apply(normalizar_texto)
-    return df
-
-
-def normalizar_pos_clave(pos_val: str) -> str:
-    # Para matching dentro del mismo equipo
-    if pos_val == "PT":
+    if valor_posicion == "PT":
         return "PT"
-    if pos_val == "DT":
+    if valor_posicion == "DT":
         return "MDT"
-    if pos_val == "DF":
+    if valor_posicion == "DF":
         return "MDF"
-    if pos_val == "MC":
+    if valor_posicion == "MC":
         return "MC"
-    return pos_val
+    return valor_posicion
 
 
-def es_apellido_conflictivo(nombre_normalizado_html, nombres_normalizados_equipo):
-    partes = nombre_normalizado_html.split()
+def es_apellido_critico(nombre_normalizado: str, nombres_equipo: list) -> bool:
+    """
+    Verifica si un apellido es crítico (duplicado en el equipo).
+    
+    Args:
+        nombre_normalizado: Nombre normalizado del jugador
+        nombres_equipo: Lista de nombres normalizados en el equipo
+    
+    Returns:
+        True si el apellido es crítico y está duplicado
+    """
+    partes = nombre_normalizado.split()
     if len(partes) != 1:
         return False
 
@@ -180,83 +172,92 @@ def es_apellido_conflictivo(nombre_normalizado_html, nombres_normalizados_equipo
     if apellido not in APELLIDOS_CRITICOS:
         return False
 
-    jugadores_con_mismo_apellido = [
-        nombre for nombre in nombres_normalizados_equipo
+    jugadores_mismo_apellido = [
+        nombre for nombre in nombres_equipo
         if nombre.startswith(apellido)
     ]
-    return len(jugadores_con_mismo_apellido) > 1
+    return len(jugadores_mismo_apellido) > 1
 
 
-def obtener_match_nombre(nombre_html_norm, nombres_norm_equipo, equipo_norm=None, score_cutoff=85):
+def obten_coincidencia_nombre(nombre_html_norm, nombres_equipo_norm, equipo_norm=None, umbral_score=85):
     """
-    - Si hay nombre + apellido y el apellido es crítico, intenta match exacto
-      por nombre dentro del equipo.
-    - Si hay solo una palabra y no es apellido crítico, intenta heurísticas de
-      prefix/suffix con un único candidato.
-    - Si no se resuelve, usa process.extractOne con WRatio.
-    - Devuelve (nombre_match, score) o (None, 0) si no se supera el score_cutoff.
+    Obtiene la mejor coincidencia para un nombre usando fuzzy matching.
+    
+    Lógica:
+    - Si hay nombre + apellido crítico: intenta match exacto por nombre
+    - Si hay solo una palabra no crítica: intenta heurísticas de prefix/suffix
+    - Fallback: usa fuzzy matching WRatio
+    
+    Args:
+        nombre_html_norm: Nombre normalizado del HTML
+        nombres_equipo_norm: Lista de nombres normalizados del equipo
+        equipo_norm: Equipo normalizado (opcional)
+        umbral_score: Umbral mínimo de coincidencia (default 85)
+    
+    Returns:
+        Tupla (nombre_coincidencia, score) o (None, 0)
     """
-    if not nombres_norm_equipo:
+    if not nombres_equipo_norm:
         return None, 0
 
     partes = nombre_html_norm.split()
 
-    # Caso nombre + apellido y apellido crítico
+    # Caso: nombre + apellido y apellido crítico
     if len(partes) == 2:
         nombre = partes[0]
         apellido = partes[1]
 
         if apellido in APELLIDOS_CRITICOS:
-            candidatos_nombre = []
-            for nombre_equipo in nombres_norm_equipo:
-                if normalizar_texto(nombre_equipo) == nombre:
-                    candidatos_nombre.append(nombre_equipo)
+            candidatos_nombre = [
+                nombre_eq for nombre_eq in nombres_equipo_norm
+                if normalizar_texto(nombre_eq) == nombre
+            ]
 
             if len(candidatos_nombre) == 1:
                 unico = candidatos_nombre[0]
                 return unico, 100
 
-    # Caso solo una palabra
+    # Caso: solo una palabra no crítica
     if len(partes) == 1:
         palabra = partes[0]
 
         if palabra not in APELLIDOS_CRITICOS:
-            candidatos = []
-            for nombre_equipo in nombres_norm_equipo:
-                if (
-                    nombre_equipo.startswith(palabra)
-                    or nombre_equipo.endswith(palabra)
-                ):
-                    candidatos.append(nombre_equipo)
+            candidatos = [
+                nombre_eq for nombre_eq in nombres_equipo_norm
+                if (nombre_eq.startswith(palabra) or nombre_eq.endswith(palabra))
+            ]
 
             if len(candidatos) == 1:
                 return candidatos[0], 95
 
+    # Fallback: fuzzy matching
     mejor, score, _ = process.extractOne(
         nombre_html_norm,
-        nombres_norm_equipo,
+        nombres_equipo_norm,
         scorer=fuzz.WRatio,
     )
 
-    if mejor and score >= score_cutoff:
+    if mejor and score >= umbral_score:
         return mejor, score
 
     return None, 0
 
 
-def nombre_a_mayus(nombre_norm):
-    partes = str(nombre_norm).split()
-    partes_capitalizadas = [p.capitalize() for p in partes]
-    return " ".join(partes_capitalizadas)
-
-
-def coincide_inicial_apellido(nombre1, nombre2):
+def coincide_inicial_apellido(nombre1: str, nombre2: str) -> bool:
+    """
+    Verifica si dos nombres coinciden por inicial del nombre + apellido completo.
+    
+    Args:
+        nombre1: Primer nombre
+        nombre2: Segundo nombre
+    
+    Returns:
+        True si hay coincidencia por inicial + apellido
+    """
     partes1 = nombre1.split()
     partes2 = nombre2.split()
 
-    if len(partes1) < 2:
-        return False
-    if len(partes2) < 2:
+    if len(partes1) < 2 or len(partes2) < 2:
         return False
 
     apellido1 = partes1[-1]
@@ -265,31 +266,41 @@ def coincide_inicial_apellido(nombre1, nombre2):
     if apellido1 != apellido2:
         return False
 
-    nombre1_pila = partes1[0]
-    nombre2_pila = partes2[0]
+    nombre_pila1 = partes1[0]
+    nombre_pila2 = partes2[0]
 
-    def es_abreviado(n):
-        if len(n) <= 2:
+    def es_abreviado(nombre):
+        if len(nombre) <= 2:
             return True
-        if n.endswith("."):
+        if nombre.endswith("."):
             return True
         return False
 
-    if es_abreviado(nombre1_pila) and es_abreviado(nombre2_pila):
+    if es_abreviado(nombre_pila1) and es_abreviado(nombre_pila2):
         return False
 
-    if es_abreviado(nombre1_pila):
-        return nombre1_pila[0] == nombre2_pila[0]
+    if es_abreviado(nombre_pila1):
+        return nombre_pila1[0] == nombre_pila2[0]
 
-    if es_abreviado(nombre2_pila):
-        return nombre2_pila[0] == nombre1_pila[0]
+    if es_abreviado(nombre_pila2):
+        return nombre_pila2[0] == nombre_pila1[0]
 
-    return nombre1_pila == nombre2_pila
+    return nombre_pila1 == nombre_pila2
 
 
-def normalizar_clave_html(nombre_raw, equipo_norm, jugadores_html):
-    equipo_norm_n = normalizar_equipo(equipo_norm) if equipo_norm else None
-
+def normalizar_clave_html(nombre_raw: str, equipo_norm: str, jugadores_html: dict) -> str:
+    """
+    Normaliza una clave HTML de jugador buscando coincidencias en el diccionario de jugadores.
+    
+    Args:
+        nombre_raw: Nombre bruto del jugador
+        equipo_norm: Equipo normalizado
+        jugadores_html: Diccionario de jugadores HTML disponibles
+    
+    Returns:
+        Clave normalizada encontrada en jugadores_html
+    """
+    equipo_norm_n = normalizar_equipo_temporada(equipo_norm) if equipo_norm else None
     nombre_alias = normalizar_texto(nombre_raw)
     nombre_sin_alias = normalizar_texto(nombre_raw)
 
@@ -301,11 +312,20 @@ def normalizar_clave_html(nombre_raw, equipo_norm, jugadores_html):
 
 
 def aplicar_alias_jugador_temporada(nombre: str, equipo_norm: str, temporada: str) -> str:
+    """
+    Aplica alias de jugador según la temporada y equipo.
+    
+    Args:
+        nombre: Nombre del jugador
+        equipo_norm: Equipo normalizado
+        temporada: Código de temporada
+    
+    Returns:
+        Nombre con alias aplicado o nombre original
+    """
     alias_jug = get_alias_jugadores(temporada)
-
     equipo_norm = normalizar_texto(equipo_norm or "")
     mapa_equipo = alias_jug.get(equipo_norm, {})
-
     nombre_norm = normalizar_texto(nombre)
 
     alias_corto = mapa_equipo.get(nombre_norm)
@@ -314,21 +334,30 @@ def aplicar_alias_jugador_temporada(nombre: str, equipo_norm: str, temporada: st
     return nombre
 
 
-def construir_clave_norm(mejor_norm, equipo_norm, pos_val, jugadores_por_apellido_equipo):
+def construir_clave_normalizacion(mejor_norm: str, equipo_norm: str, valor_posicion: str, 
+                                   jugadores_apellido_equipo: dict) -> tuple:
     """
-    - Obtiene el apellido de mejor_norm y mira en jugadores_por_apellido_equipo
-      cuántos jugadores Fantasy hay para (apellido, equipo).
-    - Si no hay ningún jugador para ese (apellido, equipo), clave_norm = (mejor_norm, equipo_norm).
-    - Si el apellido NO es crítico o no está duplicado, clave_norm = (mejor_norm, equipo_norm).
-    - Si el apellido es crítico y está duplicado, incluye también la posición
-      normalizada: clave_norm = (mejor_norm, equipo_norm, pos_clave).
+    Construye una clave de normalización para un jugador, considerando apellidos críticos.
+    
+    Lógica:
+    - Si no hay duplicados: (nombre_norm, equipo_norm)
+    - Si hay duplicados con apellido crítico: (nombre_norm, equipo_norm, pos_clave)
+    
+    Args:
+        mejor_norm: Nombre normalizado del jugador
+        equipo_norm: Equipo normalizado
+        valor_posicion: Valor de posición
+        jugadores_apellido_equipo: Diccionario de jugadores por (apellido, equipo)
+    
+    Returns:
+        Tupla con la clave de normalización
     """
     if not mejor_norm:
         return None
 
     apellido = mejor_norm.split()[-1]
     clave_ap = (apellido, equipo_norm)
-    lista_fantasy_mismo_ap = jugadores_por_apellido_equipo.get(clave_ap, [])
+    lista_fantasy_mismo_ap = jugadores_apellido_equipo.get(clave_ap, [])
     hay_duplicados = (
         apellido in APELLIDOS_CRITICOS and len(lista_fantasy_mismo_ap) > 1
     )
@@ -337,22 +366,35 @@ def construir_clave_norm(mejor_norm, equipo_norm, pos_val, jugadores_por_apellid
         return (mejor_norm, equipo_norm)
     if not hay_duplicados:
         return (mejor_norm, equipo_norm)
-    pos_clave = normalizar_pos_clave(pos_val)
+    
+    pos_clave = normalizar_posicion_clave(valor_posicion)
     return (mejor_norm, equipo_norm, pos_clave)
 
 
-def construir_fantasy_por_norm(fantasy_partido: dict):
+# =====================================================================
+# Sección 5: Procesamiento de datos de Fantasy
+# =====================================================================
+
+
+def construir_fantasy_por_norm(datos_fantasy_partido: dict):
     """
-    - jugadores_por_apellido_equipo:dict[(apellido, equipo_norm)] 
+    Construye estructuras de datos para normalización de jugadores de Fantasy.
     
-    (nombre_norm, equipo_norm)            si no hay conflicto,
-    (nombre_norm, equipo_norm, pos_clave) si el apellido es crítico y hay duplicados.
+    Retorna:
+    - Diccionario de jugadores por (apellido, equipo)
+    - Diccionario de Fantasy por clave normalizada
+    
+    Args:
+        datos_fantasy_partido: Datos de Fantasy del partido
+    
+    Returns:
+        Tupla (jugadores_por_apellido_equipo, fantasy_por_norm)
     """
     agrupado = defaultdict(list)
-    for clave_ff, info in fantasy_partido.items():
+    for clave_ff, info in datos_fantasy_partido.items():
         nombre_norm = info.get("nombre_norm")
         equipo_norm = info.get("equipo_norm")
-        pos_val = info.get("posicion", "MC")
+        valor_posicion = info.get("posicion", "MC")
 
         if not nombre_norm or not equipo_norm:
             continue
@@ -367,7 +409,7 @@ def construir_fantasy_por_norm(fantasy_partido: dict):
                 "info": info,
                 "min": minutos,
                 "puntos": puntos,
-                "posval": pos_val,
+                "posval": valor_posicion,
             }
         )
 
@@ -398,7 +440,7 @@ def construir_fantasy_por_norm(fantasy_partido: dict):
     for (apellido, equipo_norm), lista_jugadores in jugadores_por_apellido_equipo.items():
         for clave_ff, info in lista_jugadores:
             nombre_norm = info["nombre_norm"]
-            pos_val = info.get("posicion", "MC")
+            valor_posicion = info.get("posicion", "MC")
 
             if apellido not in APELLIDOS_CRITICOS:
                 clave_norm = (nombre_norm, equipo_norm)
@@ -406,7 +448,7 @@ def construir_fantasy_por_norm(fantasy_partido: dict):
                 if len(lista_jugadores) == 1:
                     clave_norm = (nombre_norm, equipo_norm)
                 else:
-                    pos_clave = normalizar_pos_clave(pos_val)
+                    pos_clave = normalizar_posicion_clave(valor_posicion)
                     clave_norm = (nombre_norm, equipo_norm, pos_clave)
 
             if clave_norm not in fantasy_por_norm:
@@ -631,3 +673,15 @@ def imprimir_mal_6767(df_partido, columna="puntosFantasy"):
             f"- {fila['player']} ({fila['Equipo_propio']}) | "
             f"pos: {fila['posicion']} | min: {fila['Min_partido']}"
         )
+
+
+# =====================================================================
+# Sección 6: Alias para compatibilidad con código existente
+# =====================================================================
+
+build_rutas_temporada = construir_rutas_temporada
+normalizar_equipo = normalizar_equipo_temporada
+nombre_a_mayus = nombre_a_mayusculas
+obtener_match_nombre = obten_coincidencia_nombre
+construir_clave_norm = construir_clave_normalizacion
+normalizar_pos_clave = normalizar_posicion_clave

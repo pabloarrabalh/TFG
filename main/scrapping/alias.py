@@ -100,7 +100,7 @@ POSICION_MAP = {
 MAPEO_STATS = {
     "summary": {
         "enteros": {"Min": "Min_partido", "Gls": "Gol_partido", "Ast": "Asist_partido",
-                    "Sh": "Tiros", "Att": "Pases_Totales"},
+                    "Sh": "Tiros", "Att": "Pases_Totales","#":"Dorsal"},
         "decimales": {"xG": "xG_partido", "xAG": "xAG"},
     },
     "defense": {

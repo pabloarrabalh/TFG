@@ -141,7 +141,7 @@ def _parsear_div_leaders(html: str, temporada: str) -> dict:
 
 
 def generar_roles_para_temporada(codigo_temporada: str) -> dict:
-    ruta_html = Path(f"main/html/temporada_{codigo_temporada}/tablas.html")
+    ruta_html = Path(f"main/html/html/temporada_{codigo_temporada}/tablas.html")
     html = ruta_html.read_text(encoding="utf-8")
     return _parsear_div_leaders(html, codigo_temporada)
 
