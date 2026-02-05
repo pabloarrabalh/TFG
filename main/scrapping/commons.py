@@ -334,8 +334,7 @@ def aplicar_alias_jugador_temporada(nombre: str, equipo_norm: str, temporada: st
     return nombre
 
 
-def construir_clave_normalizacion(mejor_norm: str, equipo_norm: str, valor_posicion: str, 
-                                   jugadores_apellido_equipo: dict) -> tuple:
+def construir_clave_normalizacion(mejor_norm: str, equipo_norm: str, valor_posicion: str, jugadores_apellido_equipo: dict) -> tuple:
     """
     Construye una clave de normalización para un jugador, considerando apellidos críticos.
     

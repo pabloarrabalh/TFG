@@ -122,17 +122,17 @@ MAPEO_STATS = {
 }
 
 COLUMNAS_MODELO = [
-    "player", "posicion", "Equipo_propio", "Equipo_rival", "Titular",
+    "Player", "Posicion", "Equipo_propio", "Equipo_rival", "Titular",
     "Min_partido", "Gol_partido", "Asist_partido", "xG_partido", "xAG",
-    "Tiros", "TiroFallado_partido", "TiroPuerta_partido", "Pases_Totales",
-    "Pases_Completados_Pct", "Amarillas", "Rojas", "Goles_en_contra",
-    "Porcentaje_paradas", "PSxG", "puntosFantasy",
-    "Entradas", "Duelos", "DuelosGanados", "DuelosPerdidos",
-    "Bloqueos", "BloqueoTiros", "BloqueoPase", "Despejes",
-    "Regates", "RegatesCompletados", "RegatesFallidos",
-    "Conducciones", "DistanciaConduccion", "MetrosAvanzadosConduccion",
-    "ConduccionesProgresivas", "DuelosAereosGanados",
-    "DuelosAereosPerdidos", "DuelosAereosGanadosPct",
+    "Tiros", "Tiro_fallado_partido", "Tiro_puerta_partido", "Pases_totales",
+    "Pases_completados_pct", "Amarillas", "Rojas", "Goles_en_contra",
+    "Porcentaje_paradas", "PSxG", "Puntos_fantasy",
+    "Entradas", "Duelos", "Duelos_ganados", "Duelos_perdidos",
+    "Bloqueos", "Bloqueo_tiros", "Bloqueo_pase", "Despejes",
+    "Regates", "Regates_completados", "Regates_fallidos",
+    "Conducciones", "Distancia_conduccion", "Metros_avanzados_conduccion",
+    "Conducciones_progresivas", "Duelos_aereos_ganados",
+    "Duelos_aereos_perdidos", "Duelos_aereos_ganados_pct",
 ]
 
 UMBRAL_MATCH = 72.0
