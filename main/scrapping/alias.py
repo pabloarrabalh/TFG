@@ -99,40 +99,41 @@ POSICION_MAP = {
 
 MAPEO_STATS = {
     "summary": {
-        "enteros": {"Min": "Min_partido", "Gls": "Gol_partido", "Ast": "Asist_partido",
-                    "Sh": "Tiros", "Att": "Pases_Totales","#":"Dorsal"},
-        "decimales": {"xG": "xG_partido", "xAG": "xAG"},
+        "enteros": {"Min": "min_partido", "Gls": "gol_partido", "Ast": "asist_partido",
+                    "Sh": "tiros", "Att": "pases_totales","#":"dorsal"},
+        "decimales": {"xG": "xg_partido", "xAG": "xag"},
     },
     "defense": {
-        "enteros": {"Tkl": "Entradas", "Att": "Duelos", "Won": "DuelosGanados",
-                    "Lost": "DuelosPerdidos", "Blocks": "Bloqueos", "Sh": "BloqueoTiros",
-                    "Pass": "BloqueoPase", "Clr": "Despejes"},
+        "enteros": {"Tkl": "entradas", "Att": "duelos", "Won": "duelos_ganados",
+                    "Lost": "duelos_perdidos", "Blocks": "bloqueos", "Sh": "bloqueo_tiros",
+                    "Pass": "bloqueo_pase", "Clr": "despejes"},
         "decimales": {},
     },
     "possession": {
-        "enteros": {"Att": "Regates", "Succ": "RegatesCompletados", "Tkld": "RegatesFallidos",
-                    "Carries": "Conducciones", "PrgC": "ConduccionesProgresivas"},
-        "decimales": {"TotDist": "DistanciaConduccion", "PrgDist": "MetrosAvanzadosConduccion"},
+        "enteros": {"Att": "regates", "Succ": "regates_completados", "Tkld": "regates_fallidos",
+                    "Carries": "conducciones", "PrgC": "conducciones_progresivas"},
+        "decimales": {"TotDist": "distancia_conduccion", "PrgDist": "metros_avanzados_conduccion"},
     },
     "misc": {
-        "enteros": {"CrdY": "Amarillas", "CrdR": "Rojas",
-                    "Won": "DuelosAereosGanados", "Lost": "DuelosAereosPerdidos"},
-        "decimales": {"Won%": "DuelosAereosGanadosPct"},
+        "enteros": {"CrdY": "amarillas", "CrdR": "rojas",
+                    "Won": "duelos_aereos_ganados", "Lost": "duelos_aereos_perdidos"},
+        "decimales": {"Won%": "duelos_aereos_ganados_pct"},
     },
 }
 
 COLUMNAS_MODELO = [
-    "Player", "Posicion", "Equipo_propio", "Equipo_rival", "Titular",
-    "Min_partido", "Gol_partido", "Asist_partido", "xG_partido", "xAG",
-    "Tiros", "Tiro_fallado_partido", "Tiro_puerta_partido", "Pases_totales",
-    "Pases_completados_pct", "Amarillas", "Rojas", "Goles_en_contra",
-    "Porcentaje_paradas", "PSxG", "Puntos_fantasy",
-    "Entradas", "Duelos", "Duelos_ganados", "Duelos_perdidos",
-    "Bloqueos", "Bloqueo_tiros", "Bloqueo_pase", "Despejes",
-    "Regates", "Regates_completados", "Regates_fallidos",
-    "Conducciones", "Distancia_conduccion", "Metros_avanzados_conduccion",
-    "Conducciones_progresivas", "Duelos_aereos_ganados",
-    "Duelos_aereos_perdidos", "Duelos_aereos_ganados_pct",
+    "player", "posicion", "dorsal", "equipo_propio", "equipo_rival", "titular",
+    "min_partido", "gol_partido", "asist_partido", "xg_partido", "xag",
+    "tiros", "tiro_fallado_partido", "tiro_puerta_partido", "pases_totales",
+    "pases_completados_pct", "amarillas", "rojas", "goles_en_contra",
+    "porcentaje_paradas", "psxg", "puntos_fantasy",
+    "entradas", "duelos", "duelos_ganados", "duelos_perdidos",
+    "bloqueos", "bloqueo_tiros", "bloqueo_pase", "despejes",
+    "regates", "regates_completados", "regates_fallidos",
+    "conducciones", "distancia_conduccion", "metros_avanzados_conduccion",
+    "conducciones_progresivas", "duelos_aereos_ganados",
+    "duelos_aereos_perdidos", "duelos_aereos_ganados_pct",
+    "temporada", "jornada", "fecha_partido", "local", "roles",
 ]
 
 UMBRAL_MATCH = 72.0

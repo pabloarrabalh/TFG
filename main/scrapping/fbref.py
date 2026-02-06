@@ -182,9 +182,9 @@ def rellenar_estadisticas_jugador(fila_jugador, estadisticas_por_tipo, clave_jug
         total_tiros = to_int(fila_resumen.get("Sh", 0))
         tiros_puerta = to_int(fila_resumen.get("SoT", 0))
 
-        fila_jugador["TiroFallado_partido"] = max(total_tiros - tiros_puerta, 0)
-        fila_jugador["TiroPuerta_partido"] = tiros_puerta
-        fila_jugador["Pases_Completados_Pct"] = to_float(fila_resumen.get("Cmp%", 0))
+        fila_jugador["tiro_fallado_partido"] = max(total_tiros - tiros_puerta, 0)
+        fila_jugador["tiro_puerta_partido"] = tiros_puerta
+        fila_jugador["pases_completados_pct"] = to_float(fila_resumen.get("Cmp%", 0))
 
     # Procesar estadísticas de portero
     if posicion == "PT":
@@ -200,9 +200,9 @@ def rellenar_estadisticas_jugador(fila_jugador, estadisticas_por_tipo, clave_jug
 
             psxg = to_float(fila_portero.get("PSxG", 0)) if "PSxG" in fila_portero else 0.0
 
-            fila_jugador["Goles_en_contra"] = goles_contra
-            fila_jugador["Porcentaje_paradas"] = porcentaje_paradas
-            fila_jugador["PSxG"] = psxg
+            fila_jugador["goles_en_contra"] = goles_contra
+            fila_jugador["porcentaje_paradas"] = porcentaje_paradas
+            fila_jugador["psxg"] = psxg
 
 
 def obtener_calendario(codigo_temporada: str) -> dict:
@@ -488,13 +488,13 @@ def construir_dataframe_partido(propuestas, estadisticas_por_tipo, mapeo_fbref_f
             fila_nueva["fecha_partido"] = fecha_partido
             fila_nueva["player"] = nombre_jugador
             fila_nueva["posicion"] = posicion
-            fila_nueva["Equipo_propio"] = equipo_norm
-            fila_nueva["Equipo_rival"] = equipo_rival_norm
+            fila_nueva["equipo_propio"] = equipo_norm
+            fila_nueva["equipo_rival"] = equipo_rival_norm
             fila_nueva["local"] = 1 if equipo_norm == local_norm else 0
-            fila_nueva["Titular"] = 1 if nombre_jugador in titulares else 0
-            fila_nueva["Min_partido"] = minutos
-            fila_nueva["Goles_en_contra"] = np.nan
-            fila_nueva["Porcentaje_paradas"] = np.nan
+            fila_nueva["titular"] = 1 if nombre_jugador in titulares else 0
+            fila_nueva["min_partido"] = minutos
+            fila_nueva["goles_en_contra"] = np.nan
+            fila_nueva["porcentaje_paradas"] = np.nan
             fila_nueva["roles"] = []
 
             datos_partido[clave_registro] = fila_nueva
@@ -508,7 +508,7 @@ def construir_dataframe_partido(propuestas, estadisticas_por_tipo, mapeo_fbref_f
             puntos = datos_fantasy.get(clave_fantasy, {}).get("puntos")
 
         if puntos is not None:
-            fila["puntosFantasy"] = puntos
+            fila["puntos_fantasy"] = puntos
 
     return datos_partido
 
@@ -642,13 +642,12 @@ def analizar_temporada(codigo_temporada: str, j_ini: int = 1, j_fin: int = 38):
 if __name__ == "__main__":
     inicio = time.perf_counter()
 
-    # Ejemplos de uso
-    # analizar_temporada("23_24", 1, 38)
-    # analizar_temporada("24_25", 12, 14)
-    analizar_temporada("25_26", 2, 2)
-    #obtener_calendario("23_24")
-    #obtener_calendario("24_25")
-    #obtener_calendario("25_26")
+    analizar_temporada("23_24", 1, 38)
+    analizar_temporada("24_25", 1, 38)
+    analizar_temporada("25_26", 1, 20)
+    obtener_calendario("23_24")
+    obtener_calendario("24_25")
+    obtener_calendario("25_26")
 
     fin = time.perf_counter()
     duracion = fin - inicio

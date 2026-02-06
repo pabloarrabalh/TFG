@@ -469,34 +469,38 @@ def postprocesar_df_partido(df):
 
     - Normaliza nombres de equipos.
     - Pone a 0 las stats de portero en jugadores que no son PT.
-    - Asegura columnas Amarillas/Rojas (int).
+    - Asegura columnas amarillas/rojas (int).
     - Rellena NaNs con 0.
     """
     if df.empty:
         return df
 
-    if "Equipo_propio" in df.columns:
-        df["Equipo_propio"] = df["Equipo_propio"].apply(normalizar_equipo_temporada)
+    if "equipo_propio" in df.columns:
+        df["equipo_propio"] = df["equipo_propio"].apply(normalizar_equipo_temporada)
 
-    if "Equipo_rival" in df.columns:
-        df["Equipo_rival"] = df["Equipo_rival"].apply(normalizar_equipo_temporada)
+    if "equipo_rival" in df.columns:
+        df["equipo_rival"] = df["equipo_rival"].apply(normalizar_equipo_temporada)
 
     if "posicion" in df.columns:
         mask_no_portero = df["posicion"] != "PT"
-        if "Goles_en_contra" in df.columns:
-            df.loc[mask_no_portero, "Goles_en_contra"] = 0.0
-        if "Porcentaje_paradas" in df.columns:
-            df.loc[mask_no_portero, "Porcentaje_paradas"] = 0.0
+        if "goles_en_contra" in df.columns:
+            df.loc[mask_no_portero, "goles_en_contra"] = 0.0
+        if "porcentaje_paradas" in df.columns:
+            df.loc[mask_no_portero, "porcentaje_paradas"] = 0.0
 
-    if "Amarillas" not in df.columns:
-        df["Amarillas"] = 0
-    if "Rojas" not in df.columns:
-        df["Rojas"] = 0
+    if "amarillas" not in df.columns:
+        df["amarillas"] = 0
+    if "rojas" not in df.columns:
+        df["rojas"] = 0
 
-    df["Amarillas"] = df["Amarillas"].fillna(0).astype(int)
-    df["Rojas"] = df["Rojas"].fillna(0).astype(int)
+    df["amarillas"] = df["amarillas"].fillna(0).astype(int)
+    df["rojas"] = df["rojas"].fillna(0).astype(int)
 
     df = df.fillna(0)
+    
+    # Asegurar que solo se guarden las columnas de COLUMNAS_MODELO en ese orden
+    cols_validas = [col for col in COLUMNAS_MODELO if col in df.columns]
+    df = df[cols_validas]
 
     return df
 
@@ -505,9 +509,9 @@ def contar_tarjetas_banquillo(df):
     if df is None or df.empty:
         return pd.DataFrame()
     mask = (
-        (df["Amarillas"].fillna(0) > 0)
-        | (df["Rojas"].fillna(0) > 0)
-    ) & (df["Min_partido"].fillna(0) == 0)
+        (df["amarillas"].fillna(0) > 0)
+        | (df["rojas"].fillna(0) > 0)
+    ) & (df["min_partido"].fillna(0) == 0)
     df_banquillo = df[mask].copy()
     df_banquillo["banquillo"] = True
     return df_banquillo
@@ -517,7 +521,7 @@ def completar_fantasy_sin_match(bd_partido, fantasy_partido, usadas_ff, local_no
     """
     - Usa alias/normalización para detectar equivalencias por inicial + apellido
       con filas ya existentes.
-    - Si encuentra equivalencia, rellena puntosFantasy en la fila ya creada.
+    - Si encuentra equivalencia, rellena puntos_fantasy en la fila ya creada.
     - Si no hay equivalencia y el jugador tiene tarjetas con 0 minutos, crea una
       fila nueva 'fantasy_only' para reflejar esas tarjetas.
     """
@@ -527,7 +531,7 @@ def completar_fantasy_sin_match(bd_partido, fantasy_partido, usadas_ff, local_no
     # 1) Construir el set de claves canónicas presentes en bd_partido
     for _, fila in bd_partido.items():
         nombre_fb = fila["player"]
-        equipo_fb_norm = fila["Equipo_propio"]
+        equipo_fb_norm = fila["equipo_propio"]
         pos_fb = fila["posicion"]
 
         nombre_canonico_fb = normalizar_texto(
@@ -572,15 +576,15 @@ def completar_fantasy_sin_match(bd_partido, fantasy_partido, usadas_ff, local_no
             for fila in bd_partido.values():
                 nombre_canonico_fila = normalizar_texto(
                     aplicar_alias_jugador_temporada(
-                        fila["player"], fila["Equipo_propio"], temporada
+                        fila["player"], fila["equipo_propio"], temporada
                     )
                 )
                 if (
                     nombre_canonico_fila == coincidencia
-                    and fila["Equipo_propio"] == equipo_norm
+                    and fila["equipo_propio"] == equipo_norm
                     and fila["posicion"] == pos_val
                 ):
-                    fila["puntosFantasy"] = info.get("puntos", 6767)
+                    fila["puntos_fantasy"] = info.get("puntos", 6767)
                     break
             continue
 
@@ -608,14 +612,14 @@ def completar_fantasy_sin_match(bd_partido, fantasy_partido, usadas_ff, local_no
         fila["fecha_partido"] = fecha_partido
         fila["player"] = nombre_a_mayus(nombre_canonico_ff)
         fila["posicion"] = pos_val
-        fila["Equipo_propio"] = equipo_norm
-        fila["Equipo_rival"] = equipo_rival_norm
+        fila["equipo_propio"] = equipo_norm
+        fila["equipo_rival"] = equipo_rival_norm
         fila["local"] = 1 if equipo_norm == local_norm else 0
-        fila["Titular"] = 0
-        fila["Min_partido"] = 0
-        fila["puntosFantasy"] = puntos
-        fila["Amarillas"] = amarillas_banquillo
-        fila["Rojas"] = rojas_banquillo
+        fila["titular"] = 0
+        fila["min_partido"] = 0
+        fila["puntos_fantasy"] = puntos
+        fila["amarillas"] = amarillas_banquillo
+        fila["rojas"] = rojas_banquillo
         fila["roles"] = []
 
         bd_partido[clave_registro] = fila
@@ -636,7 +640,7 @@ def asignar_roles_df(df_partido, roles_destacados):
         temporada_fila = fila["temporada"]
         nombre_canonico = normalizar_texto(
             aplicar_alias_jugador_temporada(
-                fila["player"], fila["Equipo_propio"], temporada_fila
+                fila["player"], fila["equipo_propio"], temporada_fila
             )
         )
 
@@ -660,7 +664,7 @@ def asignar_roles_df(df_partido, roles_destacados):
     return df_partido
 
 
-def imprimir_mal_6767(df_partido, columna="puntosFantasy"):
+def imprimir_mal_6767(df_partido, columna="puntos_fantasy"):
     if columna not in df_partido.columns:
         return
     jugadores = df_partido[df_partido[columna] == 6767]
@@ -669,8 +673,8 @@ def imprimir_mal_6767(df_partido, columna="puntosFantasy"):
     print(f"\nJugadores con {columna} = {6767} en este partido:")
     for _, fila in jugadores.iterrows():
         print(
-            f"- {fila['player']} ({fila['Equipo_propio']}) | "
-            f"pos: {fila['posicion']} | min: {fila['Min_partido']}"
+            f"- {fila['player']} ({fila['equipo_propio']}) | "
+            f"pos: {fila['posicion']} | min: {fila['min_partido']}"
         )
 
 

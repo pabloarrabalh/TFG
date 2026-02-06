@@ -1,33 +1,33 @@
-﻿player,posicion,Equipo_propio,Equipo_rival,Titular,Min_partido,Gol_partido,Asist_partido,xG_partido,xAG,Tiros,TiroFallado_partido,TiroPuerta_partido,Pases_Totales,Pases_Completados_Pct,Amarillas,Rojas,Goles_en_contra,Porcentaje_paradas,PSxG,puntosFantasy,Entradas,Duelos,DuelosGanados,DuelosPerdidos,Bloqueos,BloqueoTiros,BloqueoPase,Despejes,Regates,RegatesCompletados,RegatesFallidos,Conducciones,DistanciaConduccion,MetrosAvanzadosConduccion,ConduccionesProgresivas,DuelosAereosGanados,DuelosAereosPerdidos,DuelosAereosGanadosPct,temporada,jornada,fecha_partido,local,roles
-Toni Martínez,DT,alaves,atletico madrid,1,79,0,0,0.0,0.0,2,2,0,13,53.8,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,1,2,0,1,12,39.0,8.0,0,8,5,61.5,25_26,3,30/08/2025,1,[]
-Mariano,DT,alaves,atletico madrid,0,11,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,8,14.0,7.0,0,0,2,0.0,25_26,3,30/08/2025,1,[]
-Jon Guridi,DT,alaves,atletico madrid,1,56,0,0,0.0,0.0,0,0,0,29,93.1,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,0,0,0,25,98.0,38.0,1,1,3,25.0,25_26,3,30/08/2025,1,[]
-Victor Parada,DF,alaves,atletico madrid,0,34,0,0,0.0,0.0,0,0,0,3,33.3,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,1,0,0,0,1,12.0,6.0,0,2,0,100.0,25_26,3,30/08/2025,1,[]
-Carles Aleñá,MC,alaves,atletico madrid,1,90,0,0,0.0,0.1,0,0,0,37,83.8,0,0,0.0,0.0,0.0,6,3,2,0,0,1,0,1,2,1,0,1,34,84.0,14.0,0,0,1,0.0,25_26,3,30/08/2025,1,[]
-Antonio Blanco,MC,alaves,atletico madrid,1,90,0,0,0.0,0.0,1,0,1,45,80.0,0,0,0.0,0.0,0.0,5,5,3,0,0,1,0,1,2,2,1,1,25,76.0,17.0,0,3,0,100.0,25_26,3,30/08/2025,1,"[{'entradas': [8, 42.0]}, {'intercepciones': [2, 27.0]}, {'faltas_cometidas': [6, 28.0]}]"
-Pablo Ibáñez,MC,alaves,atletico madrid,1,78,0,0,0.1,0.0,1,1,0,37,86.5,0,0,0.0,0.0,0.0,3,1,1,0,0,0,0,0,1,2,0,2,27,181.0,79.0,3,0,2,0.0,25_26,3,30/08/2025,1,"[{'faltas_recibidas': [9, 32.0]}]"
-Carlos Benavídez,MC,alaves,atletico madrid,0,10,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,5,16.0,4.0,0,0,0,0.0,25_26,3,30/08/2025,1,[]
-Denis Suárez,MC,alaves,atletico madrid,0,2,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,1,0,0,0,1,14.0,14.0,1,0,1,0.0,25_26,3,30/08/2025,1,[]
-Carlos Vicente,MC,alaves,atletico madrid,1,90,1,0,0.8,0.0,0,0,0,37,89.2,0,0,0.0,0.0,0.0,10,2,4,0,2,1,1,0,0,6,3,2,31,180.0,68.0,2,0,2,0.0,25_26,3,30/08/2025,1,"[{'penaltis_marcados': [2, 3.0]}, {'centros_area': [4, 10.0]}]"
-Moussa Diarra,DF,alaves,atletico madrid,1,57,0,0,0.0,0.0,0,0,0,28,64.3,1,0,0.0,0.0,0.0,0,1,2,0,2,4,0,4,1,3,1,2,18,62.0,23.0,0,0,0,0.0,25_26,3,30/08/2025,1,[]
-Ander Guevara,MC,alaves,atletico madrid,0,33,0,0,0.0,0.0,0,0,0,7,71.4,0,0,0.0,0.0,0.0,1,0,3,0,3,1,0,1,3,2,1,1,5,29.0,12.0,0,2,1,66.7,25_26,3,30/08/2025,1,[]
-Nahuel Tenaglia,DF,alaves,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,35,74.3,0,0,0.0,0.0,0.0,6,1,1,0,1,3,1,2,8,1,0,0,28,135.0,84.0,0,1,4,20.0,25_26,3,30/08/2025,1,"[{'entradas': [3, 96.0]}, {'intercepciones': [7, 47.0]}, {'amarillas': [6, 11.0]}]"
-Facundo Garcés,DF,alaves,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,27,88.9,0,0,0.0,0.0,0.0,6,0,0,0,0,1,1,0,9,0,0,0,20,68.0,10.0,0,2,1,66.7,25_26,3,30/08/2025,1,[]
-Jonny Castro,DF,alaves,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,54,88.9,0,0,0.0,0.0,0.0,4,0,0,0,0,1,0,1,3,0,0,0,42,214.0,127.0,1,1,0,100.0,25_26,3,30/08/2025,1,"[{'intercepciones': [3, 25.0]}]"
-Antonio Sivera,PT,alaves,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,35,51.4,0,0,1.0,83.3,2.3,7,0,0,0,0,0,0,0,1,0,0,0,12,91.0,35.0,0,1,0,100.0,25_26,3,30/08/2025,1,"[{'minutos': [5, 1530.0]}]"
-Julián Álvarez,DT,atletico madrid,alaves,1,87,0,0,0.1,0.0,2,1,1,33,63.6,0,0,0.0,0.0,0.0,4,2,1,0,0,1,0,1,0,2,0,2,21,99.0,37.0,1,0,2,0.0,25_26,3,30/08/2025,0,"[{'goles': [5, 7.0]}, {'penaltis_marcados': [6, 2.0]}, {'tiros_puerta': [9, 16.0]}, {'pases_clave': [4, 36.0]}, {'corners': [6, 51.0]}]"
-Giacomo Raspadori,DT,atletico madrid,alaves,0,3,0,0,0.1,0.0,2,1,1,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,4.0,0.0,0,0,3,0.0,25_26,3,30/08/2025,0,"[{'apariciones_suplente': [9, 10.0]}]"
-Alexander Sørloth,DT,atletico madrid,alaves,1,90,0,0,0.1,0.0,1,0,1,16,56.3,1,0,0.0,0.0,0.0,-1,0,0,0,0,0,0,0,0,0,0,0,10,58.0,29.0,1,5,2,71.4,25_26,3,30/08/2025,0,"[{'rojas': [2, 1.0]}]"
-Thiago Almada,MC,atletico madrid,alaves,1,72,0,0,0.2,0.0,2,1,1,22,81.8,0,0,0.0,0.0,0.0,6,3,2,0,1,1,1,0,0,3,2,1,19,88.0,30.0,1,0,1,0.0,25_26,3,30/08/2025,0,[]
-Antoine Griezmann,MC,atletico madrid,alaves,0,18,0,0,0.2,0.1,1,1,0,28,67.9,0,0,0.0,0.0,0.0,4,0,1,0,1,0,0,0,0,0,0,0,21,76.0,50.0,1,0,0,0.0,25_26,3,30/08/2025,0,"[{'goles': [9, 6.0]}, {'goles_90': [5, 0.8]}, {'apariciones_suplente': [3, 13.0]}]"
-Pablo Barrios,MC,atletico madrid,alaves,1,90,0,0,0.0,0.0,2,2,0,63,82.5,0,0,0.0,0.0,0.0,6,5,2,0,0,2,0,2,1,4,3,1,53,288.0,81.0,3,1,1,50.0,25_26,3,30/08/2025,0,"[{'regates_exitosos': [10, 29.0]}]"
-Johnny Cardoso,MC,atletico madrid,alaves,1,71,0,0,0.0,0.0,0,0,0,31,80.6,1,0,0.0,0.0,0.0,1,2,2,0,1,1,0,1,1,1,0,1,22,70.0,38.0,1,3,3,50.0,25_26,3,30/08/2025,0,"[{'intercepciones': [6, 48.0]}]"
-Matteo Ruggeri,DF,atletico madrid,alaves,0,19,0,0,0.0,0.0,0,0,0,27,88.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,0,2,23,66.0,39.0,1,1,0,100.0,25_26,3,30/08/2025,0,"[{'centros_area': [4, 10.0]}]"
-Giuliano Simeone,MC,atletico madrid,alaves,1,87,1,0,0.1,0.0,1,0,1,39,79.5,0,0,0.0,0.0,0.0,10,3,3,0,1,1,0,1,0,5,3,1,35,137.0,37.0,1,3,1,75.0,25_26,3,30/08/2025,0,"[{'asistencias': [8, 4.0]}]"
-Koke,MC,atletico madrid,alaves,0,3,0,0,0.0,0.2,0,0,0,25,84.0,1,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,19,64.0,38.0,0,0,0,0.0,25_26,3,30/08/2025,0,"[{'pases_completados_pct': [10, 91.5]}]"
-Dávid Hancko,DF,atletico madrid,alaves,1,71,0,0,0.0,0.0,1,1,0,30,60.0,0,0,0.0,0.0,0.0,3,1,3,0,2,0,0,0,1,0,0,0,21,89.0,65.0,2,1,1,50.0,25_26,3,30/08/2025,0,[]
-Conor Gallagher,MC,atletico madrid,alaves,0,19,0,0,0.0,0.0,0,0,0,26,88.5,0,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,0,1,1,0,21,134.0,76.0,2,1,2,33.3,25_26,3,30/08/2025,0,"[{'apariciones_suplente': [1, 14.0]}]"
-Clément Lenglet,DF,atletico madrid,alaves,1,90,0,0,0.0,0.0,1,1,0,84,86.9,0,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,2,1,1,0,67,395.0,328.0,2,3,2,60.0,25_26,3,30/08/2025,0,"[{'rojas': [2, 1.0]}]"
-Robin Le Normand,DF,atletico madrid,alaves,1,90,0,0,0.0,0.0,0,0,0,66,97.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,2,0,0,0,54,274.0,140.0,0,3,3,50.0,25_26,3,30/08/2025,0,"[{'amarillas': [4, 13.0]}]"
-Marcos Llorente,DF,atletico madrid,alaves,1,90,0,0,0.2,0.0,2,1,1,75,82.7,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,2,0,0,0,52,244.0,112.0,3,0,0,0.0,25_26,3,30/08/2025,0,"[{'rojas': [8, 1.0]}]"
-Jan Oblak,PT,atletico madrid,alaves,1,90,0,0,0.0,0.0,0,0,0,34,88.2,0,0,1.0,100.0,0.8,6,0,0,0,0,0,0,0,0,0,0,0,18,74.0,46.0,0,1,0,100.0,25_26,3,30/08/2025,0,"[{'minutos': [5, 1530.0]}, {'porterias_cero': [4, 6.0]}]"
+﻿player,posicion,dorsal,equipo_propio,equipo_rival,titular,min_partido,gol_partido,asist_partido,xg_partido,xag,tiros,tiro_fallado_partido,tiro_puerta_partido,pases_totales,pases_completados_pct,amarillas,rojas,goles_en_contra,porcentaje_paradas,psxg,puntos_fantasy,entradas,duelos,duelos_ganados,duelos_perdidos,bloqueos,bloqueo_tiros,bloqueo_pase,despejes,regates,regates_completados,regates_fallidos,conducciones,distancia_conduccion,metros_avanzados_conduccion,conducciones_progresivas,duelos_aereos_ganados,duelos_aereos_perdidos,duelos_aereos_ganados_pct,temporada,jornada,fecha_partido,local,roles
+Toni Martínez,DT,11,alaves,atletico madrid,1,79,0,0,0.0,0.0,2,2,0,13,53.8,0,0,0.0,0.0,0.0,3,0,1,0,1,0,0,0,1,2,0,1,12,39.0,8.0,0,8,5,61.5,25_26,3,30/08/2025,1,[]
+Mariano,DT,9,alaves,atletico madrid,0,11,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,8,14.0,7.0,0,0,2,0.0,25_26,3,30/08/2025,1,[]
+Jon Guridi,DT,18,alaves,atletico madrid,1,56,0,0,0.0,0.0,0,0,0,29,93.1,0,0,0.0,0.0,0.0,2,0,1,0,1,0,0,0,0,0,0,0,25,98.0,38.0,1,1,3,25.0,25_26,3,30/08/2025,1,[]
+Victor Parada,DF,24,alaves,atletico madrid,0,34,0,0,0.0,0.0,0,0,0,3,33.3,1,0,0.0,0.0,0.0,0,0,0,0,0,0,0,0,1,0,0,0,1,12.0,6.0,0,2,0,100.0,25_26,3,30/08/2025,1,[]
+Carles Aleñá,MC,10,alaves,atletico madrid,1,90,0,0,0.0,0.1,0,0,0,37,83.8,0,0,0.0,0.0,0.0,6,3,2,0,0,1,0,1,2,1,0,1,34,84.0,14.0,0,0,1,0.0,25_26,3,30/08/2025,1,[]
+Antonio Blanco,MC,8,alaves,atletico madrid,1,90,0,0,0.0,0.0,1,0,1,45,80.0,0,0,0.0,0.0,0.0,5,5,3,0,0,1,0,1,2,2,1,1,25,76.0,17.0,0,3,0,100.0,25_26,3,30/08/2025,1,"[{'entradas': [8, 42.0]}, {'intercepciones': [2, 27.0]}, {'faltas_cometidas': [6, 28.0]}]"
+Pablo Ibáñez,MC,19,alaves,atletico madrid,1,78,0,0,0.1,0.0,1,1,0,37,86.5,0,0,0.0,0.0,0.0,3,1,1,0,0,0,0,0,1,2,0,2,27,181.0,79.0,3,0,2,0.0,25_26,3,30/08/2025,1,"[{'faltas_recibidas': [9, 32.0]}]"
+Carlos Benavídez,MC,23,alaves,atletico madrid,0,10,0,0,0.0,0.0,0,0,0,5,80.0,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,5,16.0,4.0,0,0,0,0.0,25_26,3,30/08/2025,1,[]
+Denis Suárez,MC,4,alaves,atletico madrid,0,2,0,0,0.0,0.0,0,0,0,1,0.0,0,0,0.0,0.0,0.0,1,1,0,0,0,0,0,0,1,0,0,0,1,14.0,14.0,1,0,1,0.0,25_26,3,30/08/2025,1,[]
+Carlos Vicente,MC,7,alaves,atletico madrid,1,90,1,0,0.8,0.0,0,0,0,37,89.2,0,0,0.0,0.0,0.0,10,2,4,0,2,1,1,0,0,6,3,2,31,180.0,68.0,2,0,2,0.0,25_26,3,30/08/2025,1,"[{'penaltis_marcados': [2, 3.0]}, {'centros_area': [4, 10.0]}]"
+Moussa Diarra,DF,22,alaves,atletico madrid,1,57,0,0,0.0,0.0,0,0,0,28,64.3,1,0,0.0,0.0,0.0,0,1,2,0,2,4,0,4,1,3,1,2,18,62.0,23.0,0,0,0,0.0,25_26,3,30/08/2025,1,[]
+Ander Guevara,MC,6,alaves,atletico madrid,0,33,0,0,0.0,0.0,0,0,0,7,71.4,0,0,0.0,0.0,0.0,1,0,3,0,3,1,0,1,3,2,1,1,5,29.0,12.0,0,2,1,66.7,25_26,3,30/08/2025,1,[]
+Nahuel Tenaglia,DF,14,alaves,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,35,74.3,0,0,0.0,0.0,0.0,6,1,1,0,1,3,1,2,8,1,0,0,28,135.0,84.0,0,1,4,20.0,25_26,3,30/08/2025,1,"[{'entradas': [3, 96.0]}, {'intercepciones': [7, 47.0]}, {'amarillas': [6, 11.0]}]"
+Facundo Garcés,DF,2,alaves,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,27,88.9,0,0,0.0,0.0,0.0,6,0,0,0,0,1,1,0,9,0,0,0,20,68.0,10.0,0,2,1,66.7,25_26,3,30/08/2025,1,[]
+Jonny Castro,DF,17,alaves,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,54,88.9,0,0,0.0,0.0,0.0,4,0,0,0,0,1,0,1,3,0,0,0,42,214.0,127.0,1,1,0,100.0,25_26,3,30/08/2025,1,"[{'intercepciones': [3, 25.0]}]"
+Antonio Sivera,PT,1,alaves,atletico madrid,1,90,0,0,0.0,0.0,0,0,0,35,51.4,0,0,1.0,83.3,2.3,7,0,0,0,0,0,0,0,1,0,0,0,12,91.0,35.0,0,1,0,100.0,25_26,3,30/08/2025,1,"[{'minutos': [5, 1530.0]}]"
+Julián Álvarez,DT,19,atletico madrid,alaves,1,87,0,0,0.1,0.0,2,1,1,33,63.6,0,0,0.0,0.0,0.0,4,2,1,0,0,1,0,1,0,2,0,2,21,99.0,37.0,1,0,2,0.0,25_26,3,30/08/2025,0,"[{'goles': [5, 7.0]}, {'penaltis_marcados': [6, 2.0]}, {'tiros_puerta': [9, 16.0]}, {'pases_clave': [4, 36.0]}, {'corners': [6, 51.0]}]"
+Giacomo Raspadori,DT,22,atletico madrid,alaves,0,3,0,0,0.1,0.0,2,1,1,3,66.7,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,0,0,0,2,4.0,0.0,0,0,3,0.0,25_26,3,30/08/2025,0,"[{'apariciones_suplente': [9, 10.0]}]"
+Alexander Sørloth,DT,9,atletico madrid,alaves,1,90,0,0,0.1,0.0,1,0,1,16,56.3,1,0,0.0,0.0,0.0,-1,0,0,0,0,0,0,0,0,0,0,0,10,58.0,29.0,1,5,2,71.4,25_26,3,30/08/2025,0,"[{'rojas': [2, 1.0]}]"
+Thiago Almada,MC,11,atletico madrid,alaves,1,72,0,0,0.2,0.0,2,1,1,22,81.8,0,0,0.0,0.0,0.0,6,3,2,0,1,1,1,0,0,3,2,1,19,88.0,30.0,1,0,1,0.0,25_26,3,30/08/2025,0,[]
+Antoine Griezmann,MC,7,atletico madrid,alaves,0,18,0,0,0.2,0.1,1,1,0,28,67.9,0,0,0.0,0.0,0.0,4,0,1,0,1,0,0,0,0,0,0,0,21,76.0,50.0,1,0,0,0.0,25_26,3,30/08/2025,0,"[{'goles': [9, 6.0]}, {'goles_90': [5, 0.8]}, {'apariciones_suplente': [3, 13.0]}]"
+Pablo Barrios,MC,8,atletico madrid,alaves,1,90,0,0,0.0,0.0,2,2,0,63,82.5,0,0,0.0,0.0,0.0,6,5,2,0,0,2,0,2,1,4,3,1,53,288.0,81.0,3,1,1,50.0,25_26,3,30/08/2025,0,"[{'regates_exitosos': [10, 29.0]}]"
+Johnny Cardoso,MC,5,atletico madrid,alaves,1,71,0,0,0.0,0.0,0,0,0,31,80.6,1,0,0.0,0.0,0.0,1,2,2,0,1,1,0,1,1,1,0,1,22,70.0,38.0,1,3,3,50.0,25_26,3,30/08/2025,0,"[{'intercepciones': [6, 48.0]}]"
+Matteo Ruggeri,DF,3,atletico madrid,alaves,0,19,0,0,0.0,0.0,0,0,0,27,88.9,0,0,0.0,0.0,0.0,2,0,0,0,0,0,0,0,0,2,0,2,23,66.0,39.0,1,1,0,100.0,25_26,3,30/08/2025,0,"[{'centros_area': [4, 10.0]}]"
+Giuliano Simeone,MC,20,atletico madrid,alaves,1,87,1,0,0.1,0.0,1,0,1,39,79.5,0,0,0.0,0.0,0.0,10,3,3,0,1,1,0,1,0,5,3,1,35,137.0,37.0,1,3,1,75.0,25_26,3,30/08/2025,0,"[{'asistencias': [8, 4.0]}]"
+Koke,MC,6,atletico madrid,alaves,0,3,0,0,0.0,0.2,0,0,0,25,84.0,1,0,0.0,0.0,0.0,1,0,0,0,0,0,0,0,0,0,0,0,19,64.0,38.0,0,0,0,0.0,25_26,3,30/08/2025,0,"[{'pases_completados_pct': [10, 91.5]}]"
+Dávid Hancko,DF,17,atletico madrid,alaves,1,71,0,0,0.0,0.0,1,1,0,30,60.0,0,0,0.0,0.0,0.0,3,1,3,0,2,0,0,0,1,0,0,0,21,89.0,65.0,2,1,1,50.0,25_26,3,30/08/2025,0,[]
+Conor Gallagher,MC,4,atletico madrid,alaves,0,19,0,0,0.0,0.0,0,0,0,26,88.5,0,0,0.0,0.0,0.0,3,2,1,0,0,0,0,0,0,1,1,0,21,134.0,76.0,2,1,2,33.3,25_26,3,30/08/2025,0,"[{'apariciones_suplente': [1, 14.0]}]"
+Clément Lenglet,DF,15,atletico madrid,alaves,1,90,0,0,0.0,0.0,1,1,0,84,86.9,0,0,0.0,0.0,0.0,4,1,1,0,0,1,0,1,2,1,1,0,67,395.0,328.0,2,3,2,60.0,25_26,3,30/08/2025,0,"[{'rojas': [2, 1.0]}]"
+Robin Le Normand,DF,24,atletico madrid,alaves,1,90,0,0,0.0,0.0,0,0,0,66,97.0,0,0,0.0,0.0,0.0,3,0,0,0,0,0,0,0,2,0,0,0,54,274.0,140.0,0,3,3,50.0,25_26,3,30/08/2025,0,"[{'amarillas': [4, 13.0]}]"
+Marcos Llorente,DF,14,atletico madrid,alaves,1,90,0,0,0.2,0.0,2,1,1,75,82.7,0,0,0.0,0.0,0.0,4,0,0,0,0,0,0,0,2,0,0,0,52,244.0,112.0,3,0,0,0.0,25_26,3,30/08/2025,0,"[{'rojas': [8, 1.0]}]"
+Jan Oblak,PT,13,atletico madrid,alaves,1,90,0,0,0.0,0.0,0,0,0,34,88.2,0,0,1.0,100.0,0.8,6,0,0,0,0,0,0,0,0,0,0,0,18,74.0,46.0,0,1,0,100.0,25_26,3,30/08/2025,0,"[{'minutos': [5, 1530.0]}, {'porterias_cero': [4, 6.0]}]"
