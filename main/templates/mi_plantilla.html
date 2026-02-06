@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+
+{% block title %}LigaMaster - Mi Plantilla{% endblock %}
+
+{% block extra_styles %}
+.pitch-perspective {
+    perspective: 1200px;
+}
+.pitch-board {
+    transform: rotateX(10deg) scale(0.95);
+    transform-style: preserve-3d;
+    box-shadow: 0 50px 70px -20px rgba(0,0,0,0.7);
+}
+.pitch-lines {
+    position: absolute;
+    inset: 20px;
+    border: 2px solid rgba(255,255,255,0.15);
+    pointer-events: none;
+}
+.player-card-3d {
+    transform: rotateX(-10deg) translateZ(0px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+.player-card-3d:hover {
+    transform: rotateX(-10deg) translateZ(30px) scale(1.1);
+    z-index: 50;
+}
+{% endblock %}
+
+{% block content %}
+<div class="p-6 space-y-6 bg-background-dark min-h-full">
+    <!-- Header -->
+    <div class="mb-8">
+        <h2 class="text-3xl font-black text-white mb-2">Mi Plantilla</h2>
+        <p class="text-gray-400 text-lg">Gestiona tu equipo ideal</p>
+    </div>
+
+    <!-- Información del equipo -->
+    <div class="glass-panel rounded-2xl p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-4">
+                <div class="size-16 bg-gradient-to-br from-primary to-blue-500 rounded-2xl flex items-center justify-center">
+                    <span class="text-2xl font-black text-black">MT</span>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-black text-white">Mi Team</h3>
+                    <p class="text-gray-400">Valor total: €450M</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button class="px-4 py-2 bg-primary text-black rounded-xl font-bold hover:bg-primary-dark transition-colors">
+                    Guardar Formación
+                </button>
+                <button class="px-4 py-2 bg-surface-dark border border-border-dark text-white rounded-xl font-bold hover:bg-white/5 transition-colors">
+                    Auto-completar
+                </button>
+            </div>
+        </div>
+        
+        <!-- Estadísticas -->
+        <div class="grid grid-cols-4 gap-4">
+            <div class="text-center">
+                <p class="text-2xl font-black text-primary">87</p>
+                <p class="text-xs text-gray-500 uppercase font-bold tracking-widest">Media</p>
+            </div>
+            <div class="text-center">
+                <p class="text-2xl font-black text-blue-400">11</p>
+                <p class="text-xs text-gray-500 uppercase font-bold tracking-widest">Jugadores</p>
+            </div>
+            <div class="text-center">
+                <p class="text-2xl font-black text-yellow-400">3</p>
+                <p class="text-xs text-gray-500 uppercase font-bold tracking-widest">Posiciones</p>
+            </div>
+            <div class="text-center">
+                <p class="text-2xl font-black text-red-400">€50M</p>
+                <p class="text-xs text-gray-500 uppercase font-bold tracking-widest">Presupuesto</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campo de fútbol -->
+    <div class="pitch-perspective">
+        <div class="pitch-board bg-pitch-pattern rounded-3xl relative min-h-[600px] w-full">
+            <!-- Líneas del campo -->
+            <div class="pitch-lines rounded-2xl">
+                <div class="absolute top-1/2 left-0 right-0 h-0.5 bg-white/15"></div>
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 size-20 border border-white/15 rounded-full"></div>
+                
+                <!-- Área grande superior -->
+                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-40 h-16 border border-white/15 border-t-0"></div>
+                <!-- Área pequeña superior -->
+                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-20 h-8 border border-white/15 border-t-0"></div>
+                
+                <!-- Área grande inferior -->
+                <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-40 h-16 border border-white/15 border-b-0"></div>
+                <!-- Área pequeña inferior -->
+                <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-8 border border-white/15 border-b-0"></div>
+            </div>
+
+            <!-- Jugadores posicionados -->
+            <div class="absolute inset-0 p-8">
+                <!-- Portero -->
+                <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2">
+                    <div class="player-card-3d bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl p-4 text-center shadow-2xl cursor-pointer min-w-[120px]">
+                        <div class="size-12 bg-white/20 rounded-xl mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-lg font-bold text-white">MTS</span>
+                        </div>
+                        <p class="font-bold text-white text-sm mb-1">Ter Stegen</p>
+                        <p class="text-xs text-yellow-200 mb-2">Portero</p>
+                        <div class="flex justify-center">
+                            <span class="bg-white/20 text-white px-2 py-1 rounded text-xs font-bold">89</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Defensas -->
+                <div class="absolute bottom-32 left-0 right-0 flex justify-between items-center px-12">
+                    <div class="player-card-3d bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-4 text-center shadow-2xl cursor-pointer min-w-[120px]">
+                        <div class="size-12 bg-white/20 rounded-xl mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-lg font-bold text-white">JA</span>
+                        </div>
+                        <p class="font-bold text-white text-sm mb-1">Jordi Alba</p>
+                        <p class="text-xs text-blue-200 mb-2">Lateral</p>
+                        <div class="flex justify-center">
+                            <span class="bg-white/20 text-white px-2 py-1 rounded text-xs font-bold">84</span>
+                        </div>
+                    </div>
+                    
+                    <div class="player-card-3d bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-4 text-center shadow-2xl cursor-pointer min-w-[120px]">
+                        <div class="size-12 bg-white/20 rounded-xl mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-lg font-bold text-white">GA</span>
+                        </div>
+                        <p class="font-bold text-white text-sm mb-1">G. Araújo</p>
+                        <p class="text-xs text-blue-200 mb-2">Central</p>
+                        <div class="flex justify-center">
+                            <span class="bg-white/20 text-white px-2 py-1 rounded text-xs font-bold">85</span>
+                        </div>
+                    </div>
+
+                    <div class="player-card-3d bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-4 text-center shadow-2xl cursor-pointer min-w-[120px]">
+                        <div class="size-12 bg-white/20 rounded-xl mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-lg font-bold text-white">RC</span>
+                        </div>
+                        <p class="font-bold text-white text-sm mb-1">R. Christensen</p>
+                        <p class="text-xs text-blue-200 mb-2">Central</p>
+                        <div class="flex justify-center">
+                            <span class="bg-white/20 text-white px-2 py-1 rounded text-xs font-bold">83</span>
+                        </div>
+                    </div>
+
+                    <div class="player-card-3d bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-4 text-center shadow-2xl cursor-pointer min-w-[120px]">
+                        <div class="size-12 bg-white/20 rounded-xl mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-lg font-bold text-white">JC</span>
+                        </div>
+                        <p class="font-bold text-white text-sm mb-1">J. Cancelo</p>
+                        <p class="text-xs text-blue-200 mb-2">Lateral</p>
+                        <div class="flex justify-center">
+                            <span class="bg-white/20 text-white px-2 py-1 rounded text-xs font-bold">86</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Centrocampistas -->
+                <div class="absolute top-1/2 left-0 right-0 transform -translate-y-1/2 flex justify-around items-center px-16">
+                    <div class="player-card-3d bg-gradient-to-br from-green-600 to-teal-600 rounded-2xl p-4 text-center shadow-2xl cursor-pointer min-w-[120px]">
+                        <div class="size-12 bg-white/20 rounded-xl mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-lg font-bold text-white">FDJ</span>
+                        </div>
+                        <p class="font-bold text-white text-sm mb-1">F. de Jong</p>
+                        <p class="text-xs text-green-200 mb-2">Centro</p>
+                        <div class="flex justify-center">
+                            <span class="bg-white/20 text-white px-2 py-1 rounded text-xs font-bold">87</span>
+                        </div>
+                    </div>
+
+                    <div class="player-card-3d bg-gradient-to-br from-green-600 to-teal-600 rounded-2xl p-4 text-center shadow-2xl cursor-pointer min-w-[120px]">
+                        <div class="size-12 bg-white/20 rounded-xl mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-lg font-bold text-white">PG</span>
+                        </div>
+                        <p class="font-bold text-white text-sm mb-1">Pablo Gavira</p>
+                        <p class="text-xs text-green-200 mb-2">Centro</p>
+                        <div class="flex justify-center">
+                            <span class="bg-white/20 text-white px-2 py-1 rounded text-xs font-bold">88</span>
+                        </div>
+                    </div>
+
+                    <div class="player-card-3d bg-gradient-to-br from-green-600 to-teal-600 rounded-2xl p-4 text-center shadow-2xl cursor-pointer min-w-[120px]">
+                        <div class="size-12 bg-white/20 rounded-xl mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-lg font-bold text-white">PW</span>
+                        </div>
+                        <p class="font-bold text-white text-sm mb-1">P. Wanner</p>
+                        <p class="text-xs text-green-200 mb-2">Centro</p>
+                        <div class="flex justify-center">
+                            <span class="bg-white/20 text-white px-2 py-1 rounded text-xs font-bold">85</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delanteros -->
+                <div class="absolute top-16 left-0 right-0 flex justify-around items-center px-24">
+                    <div class="player-card-3d bg-gradient-to-br from-red-600 to-pink-600 rounded-2xl p-4 text-center shadow-2xl cursor-pointer min-w-[120px]">
+                        <div class="size-12 bg-white/20 rounded-xl mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-lg font-bold text-white">LY</span>
+                        </div>
+                        <p class="font-bold text-white text-sm mb-1">Lamine Yamal</p>
+                        <p class="text-xs text-red-200 mb-2">Extremo</p>
+                        <div class="flex justify-center">
+                            <span class="bg-white/20 text-white px-2 py-1 rounded text-xs font-bold">86</span>
+                        </div>
+                    </div>
+
+                    <div class="player-card-3d bg-gradient-to-br from-red-600 to-pink-600 rounded-2xl p-4 text-center shadow-2xl cursor-pointer min-w-[120px]">
+                        <div class="size-12 bg-white/20 rounded-xl mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-lg font-bold text-white">RL</span>
+                        </div>
+                        <p class="font-bold text-white text-sm mb-1">R. Lewandowski</p>
+                        <p class="text-xs text-red-200 mb-2">Delantero</p>
+                        <div class="flex justify-center">
+                            <span class="bg-white/20 text-white px-2 py-1 rounded text-xs font-bold">91</span>
+                        </div>
+                    </div>
+
+                    <div class="player-card-3d bg-gradient-to-br from-red-600 to-pink-600 rounded-2xl p-4 text-center shadow-2xl cursor-pointer min-w-[120px]">
+                        <div class="size-12 bg-white/20 rounded-xl mx-auto mb-2 flex items-center justify-center">
+                            <span class="text-lg font-bold text-white">RR</span>
+                        </div>
+                        <p class="font-bold text-white text-sm mb-1">Raphinha</p>
+                        <p class="text-xs text-red-200 mb-2">Extremo</p>
+                        <div class="flex justify-center">
+                            <span class="bg-white/20 text-white px-2 py-1 rounded text-xs font-bold">84</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel inferior con suplentes y opciones -->
+    <div class="glass-panel rounded-2xl p-6 mt-6">
+        <h3 class="text-xl font-black text-white mb-4">Suplentes</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+            <!-- Ejemplos de suplentes -->
+            <div class="bg-surface-dark border border-border-dark rounded-xl p-3 text-center hover:bg-white/5 cursor-pointer transition-all">
+                <div class="size-10 bg-gradient-to-br from-gray-600 to-gray-800 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <span class="text-sm font-bold text-white">AP</span>
+                </div>
+                <p class="font-bold text-white text-xs mb-1">A. Peña</p>
+                <p class="text-xs text-gray-400">POR</p>
+            </div>
+            
+            <div class="bg-surface-dark border border-border-dark rounded-xl p-3 text-center hover:bg-white/5 cursor-pointer transition-all">
+                <div class="size-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <span class="text-sm font-bold text-white">HF</span>
+                </div>
+                <p class="font-bold text-white text-xs mb-1">Héctor Fort</p>
+                <p class="text-xs text-gray-400">DEF</p>
+            </div>
+
+            <!-- Más suplentes... -->
+            <div class="bg-surface-dark border border-dashed border-border-dark rounded-xl p-3 text-center hover:bg-white/5 cursor-pointer transition-all opacity-50">
+                <div class="size-10 border border-dashed border-gray-600 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-gray-600">add</span>
+                </div>
+                <p class="text-xs text-gray-600">Vacío</p>
+            </div>
+            
+            <div class="bg-surface-dark border border-dashed border-border-dark rounded-xl p-3 text-center hover:bg-white/5 cursor-pointer transition-all opacity-50">
+                <div class="size-10 border border-dashed border-gray-600 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-gray-600">add</span>
+                </div>
+                <p class="text-xs text-gray-600">Vacío</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

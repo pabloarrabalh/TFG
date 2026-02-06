@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>{% block title %}LigaMaster{% endblock %}</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&amp;family=Noto+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#39ff14",
+                        "primary-dark": "#2ccb10",
+                        "background-dark": "#050505", 
+                        "surface-dark": "#121212",
+                        "surface-dark-lighter": "#1e1e1e",
+                        "border-dark": "#262626"
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    backgroundImage: {
+                         'pitch-pattern': "radial-gradient(circle at 50% 50%, #1a4d1a 0%, #081a08 100%)",
+                    }
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        body { font-family: 'Lexend', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        {% block extra_styles %}{% endblock %}
+    </style>
+</head>
+<body class="bg-background-dark text-white overflow-hidden h-screen flex flex-col">
+    <!-- Header -->
+    <header class="flex items-center justify-between px-6 py-4 bg-background-dark border-b border-border-dark z-50">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-3">
+                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-primary/40 shadow-[0_0_15px_rgba(57,255,20,0.3)]" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAVDKCCl7fgNTHnOONH9b1pVo5yZV2mf6YUic_74IV64rXvVTstNYJyDhfzERCgryWq7VFK_hN2_Dsejh3EhPeRWLKvXKsGCOPYdc5OM-GORtOpvH4uL6SPzz9HMGkjta4toRj3aWVbwdoGMfBdO-hJe-_37441iZwZx89FKt2ooiHKMqiSasV59_KOP_JylGCyy7Mh-yDZ4aDbPmA0axXAJ_mlQhE9jJiKzb65zwlpRpXoS3P59RUPRtmcPmVPqiuGGfVZq-0J0nE");'></div>
+                <h1 class="text-white text-2xl font-black tracking-tighter italic uppercase bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">LigaMaster</h1>
+            </div>
+            <div class="relative w-96 hidden md:block group">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="material-symbols-outlined text-gray-500 group-focus-within:text-primary transition-colors">search</span>
+                </div>
+                <input class="block w-full pl-10 pr-3 py-2.5 border border-border-dark rounded-xl bg-surface-dark text-white placeholder-gray-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 text-sm transition-all" placeholder="Buscar jugador, equipo..." type="text"/>
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3 cursor-pointer group">
+                <div class="text-right hidden sm:block">
+                    <p class="text-sm font-bold text-white group-hover:text-primary transition-colors">Usuario</p>
+                    <div class="flex items-center justify-end gap-1">
+                        <span class="size-2 rounded-full bg-primary animate-pulse"></span>
+                        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Online</p>
+                    </div>
+                </div>
+                <div class="bg-center bg-no-repeat bg-cover rounded-xl size-10 ring-1 ring-border-dark group-hover:ring-primary transition-all shadow-lg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAC70CU1jFvEKdFwEkb5HaYb2N7sEvrLP_bpanZ_IO7UJajBBp-fihK-bZFq2E9YthzHSIEIQECiY557a16ZUSNRdS98Zjbp4_Luy29XNlCqZER5s20aaHYFvyTv_7_XqwK5NRNhR0qXJjJGV0emBQO41m_dLTKOqTkZ7oPIDxDZEy13U3f6OW3bpEwz-_zHd0kmeSJVQ7z22yg-3vIFUMgmJqqv5QqtbETSvTlq3ABJcsUEk8erdKaDJseN5ZBHZbOuQMh4bhGd-A");'></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex h-full w-full overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="hidden lg:flex flex-col w-72 h-full bg-surface-dark border-r border-border-dark">
+            <nav class="flex-1 px-4 py-8 space-y-2">
+                <a class="flex items-center gap-4 px-4 py-3.5 rounded-xl {% if active_page == 'menu' %}bg-primary/10 text-primary border border-primary/20 font-bold shadow-[0_0_20px_rgba(57,255,20,0.1)]{% else %}text-gray-400 hover:bg-white/5 hover:text-white font-medium group{% endif %} transition-all" href="{% url 'menu' %}">
+                    <span class="material-symbols-outlined {% if active_page != 'menu' %}group-hover:text-primary{% endif %} transition-colors">home</span>
+                    <span class="text-sm tracking-wide">Inicio</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3.5 rounded-xl {% if active_page == 'mi-plantilla' %}bg-primary/10 text-primary border border-primary/20 font-bold shadow-[0_0_20px_rgba(57,255,20,0.1)]{% else %}text-gray-400 hover:bg-white/5 hover:text-white font-medium group{% endif %} transition-all" href="{% url 'mi_plantilla' %}">
+                    <span class="material-symbols-outlined {% if active_page != 'mi-plantilla' %}group-hover:text-primary{% endif %} transition-colors">groups</span>
+                    <span class="text-sm tracking-wide">Mi Plantilla</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3.5 rounded-xl {% if active_page == 'liga' %}bg-primary/10 text-primary border border-primary/20 font-bold shadow-[0_0_20px_rgba(57,255,20,0.1)]{% else %}text-gray-400 hover:bg-white/5 hover:text-white font-medium group{% endif %} transition-all" href="{% url 'clasificacion' %}">
+                    <span class="material-symbols-outlined {% if active_page != 'liga' %}group-hover:text-primary{% endif %} transition-colors">sports_soccer</span>
+                    <span class="text-sm tracking-wide">Liga</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3.5 rounded-xl {% if active_page == 'equipos' %}bg-primary/10 text-primary border border-primary/20 font-bold shadow-[0_0_20px_rgba(57,255,20,0.1)]{% else %}text-gray-400 hover:bg-white/5 hover:text-white font-medium group{% endif %} transition-all" href="{% url 'clasificacion' %}">
+                    <span class="material-symbols-outlined {% if active_page != 'equipos' %}group-hover:text-primary{% endif %} transition-colors">shield</span>
+                    <span class="text-sm tracking-wide">Equipos</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3.5 rounded-xl {% if active_page == 'estadisticas' %}bg-primary/10 text-primary border border-primary/20 font-bold shadow-[0_0_20px_rgba(57,255,20,0.1)]{% else %}text-gray-400 hover:bg-white/5 hover:text-white font-medium group{% endif %} transition-all" href="{% url 'jugador' %}">
+                    <span class="material-symbols-outlined {% if active_page != 'estadisticas' %}group-hover:text-primary{% endif %} transition-colors">bar_chart</span>
+                    <span class="text-sm tracking-wide">Estadísticas</span>
+                </a>
+                <a class="flex items-center gap-4 px-4 py-3.5 rounded-xl {% if active_page == 'amigos' %}bg-primary/10 text-primary border border-primary/20 font-bold shadow-[0_0_20px_rgba(57,255,20,0.1)]{% else %}text-gray-400 hover:bg-white/5 hover:text-white font-medium group{% endif %} transition-all" href="{% url 'amigos' %}">
+                    <span class="material-symbols-outlined {% if active_page != 'amigos' %}group-hover:text-primary{% endif %} transition-colors">people</span>
+                    <span class="text-sm tracking-wide">Amigos</span>
+                </a>
+            </nav>
+            <div class="p-4 border-t border-border-dark">
+                <button class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-xl transition-all font-medium shadow-lg text-sm">
+                    <span class="material-symbols-outlined">logout</span>
+                    Salir
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 h-full overflow-y-auto scrollbar-hide">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

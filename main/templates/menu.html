@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block title %}LigaMaster - Menu Principal{% endblock %}
+
+{% block content %}
+<div class="p-6 space-y-6 bg-background-dark min-h-full">
+    <!-- Header de Bienvenida -->
+    <div class="mb-8">
+        <h2 class="text-3xl font-black text-white mb-2">¡Bienvenido de vuelta!</h2>
+        <p class="text-gray-400 text-lg">Gestiona tu equipo y sigue la liga</p>
+    </div>
+
+    <!-- Grid principal -->
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 h-full max-w-screen-2xl mx-auto">
+        <!-- Clasificación (Columna izquierda) -->
+        <div class="xl:col-span-4 space-y-6">
+            <!-- Clasificación LaLiga -->
+            <div class="glass-panel rounded-2xl overflow-hidden">
+                <div class="p-6 border-b border-white/10">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-gradient-to-r from-orange-500 to-red-600 rounded-xl p-3">
+                                <span class="material-symbols-outlined text-white text-xl font-bold">emoji_events</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-black text-white">Clasificación</h3>
+                                <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">LaLiga EA Sports</p>
+                            </div>
+                        </div>
+                        <span class="text-xs text-gray-500 font-bold uppercase tracking-widest">J15</span>
+                    </div>
+                </div>
+                <div class="overflow-hidden">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left border-b border-white/10">
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500">#</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500">Equipo</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center">Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Ejemplo de filas - estas serían generadas dinámicamente -->
+                            <tr class="hover:bg-white/5 border-b border-white/5 group transition-colors">
+                                <td class="px-6 py-4 text-sm font-bold text-primary group-hover:text-primary">1</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="size-8 bg-gradient-to-br from-blue-600 to-red-700 rounded-lg flex items-center justify-center">
+                                            <span class="text-xs font-bold text-white">FCB</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-white text-sm">FC Barcelona</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="bg-primary/20 text-primary px-3 py-1.5 rounded-lg text-sm font-bold">37</span>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-white/5 border-b border-white/5 group transition-colors">
+                                <td class="px-6 py-4 text-sm font-bold group-hover:text-primary">2</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="size-8 bg-gradient-to-br from-white to-gray-300 rounded-lg flex items-center justify-center">
+                                            <span class="text-xs font-bold text-black">RMA</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-white text-sm">Real Madrid</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="bg-white/20 text-white px-3 py-1.5 rounded-lg text-sm font-bold">36</span>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-white/5 border-b border-white/5 group transition-colors">
+                                <td class="px-6 py-4 text-sm font-bold group-hover:text-primary">3</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="size-8 bg-gradient-to-br from-red-600 to-white rounded-lg flex items-center justify-center">
+                                            <span class="text-xs font-bold text-white">ATM</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-white text-sm">Atlético Madrid</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="bg-white/20 text-white px-3 py-1.5 rounded-lg text-sm font-bold">32</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-4 border-t border-white/10">
+                    <a href="{% url 'clasificacion' %}" class="flex items-center justify-center gap-2 text-primary hover:text-primary-dark transition-colors font-bold text-sm">
+                        Ver clasificación completa
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido central -->
+        <div class="xl:col-span-8 space-y-6">
+            <!-- Próximos Partidos -->
+            <div class="glass-panel rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-gradient-to-r from-primary to-blue-500 rounded-xl p-3">
+                            <span class="material-symbols-outlined text-white text-xl font-bold">calendar_today</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black text-white">Próximos Partidos</h3>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Jornada 16</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de partidos -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <!-- Ejemplo de partido -->
+                    <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 bg-gradient-to-br from-blue-600 to-red-700 rounded-lg flex items-center justify-center">
+                                    <span class="text-xs font-bold text-white">FCB</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-white text-sm">Barcelona</p>
+                                    <p class="text-xs text-gray-400">Local</p>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs text-gray-400 font-bold">VS</p>
+                                <p class="text-xs text-primary font-bold">21:00</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div>
+                                    <p class="font-bold text-white text-sm text-right">Valencia</p>
+                                    <p class="text-xs text-gray-400 text-right">Visitante</p>
+                                </div>
+                                <div class="size-10 bg-gradient-to-br from-orange-500 to-black rounded-lg flex items-center justify-center">
+                                    <span class="text-xs font-bold text-white">VCF</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Segundo partido -->
+                    <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 bg-gradient-to-br from-white to-gray-300 rounded-lg flex items-center justify-center">
+                                    <span class="text-xs font-bold text-black">RMA</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-white text-sm">Real Madrid</p>
+                                    <p class="text-xs text-gray-400">Local</p>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs text-gray-400 font-bold">VS</p>
+                                <p class="text-xs text-primary font-bold">16:15</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div>
+                                    <p class="font-bold text-white text-sm text-right">Sevilla</p>
+                                    <p class="text-xs text-gray-400 text-right">Visitante</p>
+                                </div>
+                                <div class="size-10 bg-gradient-to-br from-red-600 to-white rounded-lg flex items-center justify-center">
+                                    <span class="text-xs font-bold text-white">SEV</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jugadores Recomendados -->
+            <div class="glass-panel rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-3">
+                            <span class="material-symbols-outlined text-white text-xl font-bold">star</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black text-white">Jugadores Recomendados</h3>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Para tu plantilla</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'mi_plantilla' %}" class="text-sm text-primary hover:text-primary-dark transition-colors font-bold">Ver todos</a>
+                </div>
+
+                <!-- Grid de jugadores -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Ejemplo de jugador -->
+                    <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all group cursor-pointer">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="size-12 bg-gradient-to-br from-primary to-blue-500 rounded-xl flex items-center justify-center">
+                                <span class="text-lg font-bold text-black">LM</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-bold text-white text-sm group-hover:text-primary transition-colors">Lionel Messi</p>
+                                <p class="text-xs text-gray-400">Delantero • Barcelona</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="bg-primary/20 text-primary px-2 py-1 rounded font-bold">94</span>
+                            <span class="text-gray-400">€50M</span>
+                        </div>
+                    </div>
+
+                    <!-- Segundo jugador -->
+                    <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all group cursor-pointer">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="size-12 bg-gradient-to-br from-white to-gray-300 rounded-xl flex items-center justify-center">
+                                <span class="text-lg font-bold text-black">KB</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-bold text-white text-sm group-hover:text-primary transition-colors">Karim Benzema</p>
+                                <p class="text-xs text-gray-400">Delantero • Real Madrid</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="bg-white/20 text-white px-2 py-1 rounded font-bold">91</span>
+                            <span class="text-gray-400">€45M</span>
+                        </div>
+                    </div>
+
+                    <!-- Tercer jugador -->
+                    <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all group cursor-pointer">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="size-12 bg-gradient-to-br from-red-600 to-white rounded-xl flex items-center justify-center">
+                                <span class="text-lg font-bold text-white">JS</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-bold text-white text-sm group-hover:text-primary transition-colors">João Suárez</p>
+                                <p class="text-xs text-gray-400">Centrocampista • Atlético</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="bg-red-500/20 text-red-400 px-2 py-1 rounded font-bold">88</span>
+                            <span class="text-gray-400">€35M</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

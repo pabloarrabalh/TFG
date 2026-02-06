@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}LigaMaster - Estadísticas{% endblock %}
+
+{% block content %}
+<div class="p-6 space-y-6 bg-background-dark min-h-full">
+    <!-- Header -->
+    <div class="mb-8">
+        <h2 class="text-3xl font-black text-white mb-2">Estadísticas de Jugador</h2>
+        <p class="text-gray-400 text-lg">Análisis detallado del rendimiento</p>
+    </div>
+
+    <!-- Información del jugador -->
+    <div class="glass-panel rounded-2xl p-6 mb-6">
+        <div class="flex items-center gap-6 mb-6">
+            <div class="size-20 bg-gradient-to-br from-primary to-blue-500 rounded-2xl flex items-center justify-center">
+                <span class="text-3xl font-black text-black">RL</span>
+            </div>
+            <div>
+                <h3 class="text-3xl font-black text-white mb-2">Robert Lewandowski</h3>
+                <div class="flex items-center gap-4 text-sm mb-2">
+                    <span class="text-primary">Delantero Centro</span>
+                    <span class="text-gray-400">35 años</span>
+                    <span class="text-yellow-400">FC Barcelona</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="bg-primary/20 text-primary px-3 py-1.5 rounded-lg text-sm font-bold">91 Overall</span>
+                    <span class="bg-blue-500/20 text-blue-400 px-3 py-1.5 rounded-lg text-sm font-bold">€45M</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas principales -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center p-4 bg-surface-dark rounded-xl">
+                <p class="text-2xl font-black text-primary mb-1">14</p>
+                <p class="text-xs text-gray-500 uppercase font-bold tracking-widest">Goles</p>
+            </div>
+            <div class="text-center p-4 bg-surface-dark rounded-xl">
+                <p class="text-2xl font-black text-green-400 mb-1">5</p>
+                <p class="text-xs text-gray-500 uppercase font-bold tracking-widest">Asistencias</p>
+            </div>
+            <div class="text-center p-4 bg-surface-dark rounded-xl">
+                <p class="text-2xl font-black text-blue-400 mb-1">15</p>
+                <p class="text-xs text-gray-500 uppercase font-bold tracking-widest">Partidos</p>
+            </div>
+            <div class="text-center p-4 bg-surface-dark rounded-xl">
+                <p class="text-2xl font-black text-yellow-400 mb-1">8.2</p>
+                <p class="text-xs text-gray-500 uppercase font-bold tracking-widest">Rating</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid de estadísticas detalladas -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Estadísticas Ofensivas -->
+        <div class="glass-panel rounded-2xl p-6">
+            <h3 class="text-xl font-black text-white mb-6 flex items-center gap-3">
+                <div class="bg-gradient-to-r from-red-600 to-pink-600 rounded-xl p-2">
+                    <span class="material-symbols-outlined text-white text-lg">sports_soccer</span>
+                </div>
+                Estadísticas Ofensivas
+            </h3>
+            
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-3 bg-surface-dark rounded-xl">
+                    <span class="text-sm text-gray-400">Tiros por partido</span>
+                    <span class="text-sm font-bold text-white">4.2</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-surface-dark rounded-xl">
+                    <span class="text-sm text-gray-400">Tiros a puerta</span>
+                    <span class="text-sm font-bold text-white">2.8</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-surface-dark rounded-xl">
+                    <span class="text-sm text-gray-400">% Efectividad</span>
+                    <span class="text-sm font-bold text-primary">67%</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-surface-dark rounded-xl">
+                    <span class="text-sm text-gray-400">Toques en área</span>
+                    <span class="text-sm font-bold text-white">6.1</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-surface-dark rounded-xl">
+                    <span class="text-sm text-gray-400">Duelos aéreos ganados</span>
+                    <span class="text-sm font-bold text-green-400">78%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas de Juego -->
+        <div class="glass-panel rounded-2xl p-6">
+            <h3 class="text-xl font-black text-white mb-6 flex items-center gap-3">
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-2">
+                    <span class="material-symbols-outlined text-white text-lg">trending_up</span>
+                </div>
+                Estadísticas de Juego
+            </h3>
+            
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-3 bg-surface-dark rounded-xl">
+                    <span class="text-sm text-gray-400">Pases completados</span>
+                    <span class="text-sm font-bold text-white">23.4</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-surface-dark rounded-xl">
+                    <span class="text-sm text-gray-400">% Precisión pases</span>
+                    <span class="text-sm font-bold text-blue-400">84%</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-surface-dark rounded-xl">
+                    <span class="text-sm text-gray-400">Pases clave</span>
+                    <span class="text-sm font-bold text-white">1.2</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-surface-dark rounded-xl">
+                    <span class="text-sm text-gray-400">Regates exitosos</span>
+                    <span class="text-sm font-bold text-yellow-400">1.8</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-surface-dark rounded-xl">
+                    <span class="text-sm text-gray-400">Km recorridos</span>
+                    <span class="text-sm font-bold text-white">9.4</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evolución temporal -->
+    <div class="glass-panel rounded-2xl p-6">
+        <h3 class="text-xl font-black text-white mb-6 flex items-center gap-3">
+            <div class="bg-gradient-to-r from-green-600 to-teal-600 rounded-xl p-2">
+                <span class="material-symbols-outlined text-white text-lg">timeline</span>
+            </div>
+            Evolución de la Temporada (Placeholders)
+        </h3>
+        
+        <!-- Placeholder para gráficos -->
+        <div class="bg-surface-dark border border-dashed border-border-dark rounded-xl p-8 text-center">
+            <span class="material-symbols-outlined text-gray-600 text-4xl mb-4">insert_chart</span>
+            <p class="text-gray-500 text-sm">Aquí se mostrarán gráficos de evolución</p>
+            <p class="text-xs text-gray-600 mt-2">Goles por jornada, rating promedio, etc.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
