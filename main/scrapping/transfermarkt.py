@@ -4,11 +4,13 @@ import time
 import random
 import requests
 from bs4 import BeautifulSoup
+from datetime import datetime
 
-from commons import normalizar_equipo  # para mapear nombres TM -> tus nombres
+from main.scrapping.commons import normalizar_equipo  # para mapear nombres TM -> tus nombres
 
 
 BASE_URL = "https://www.transfermarkt.es/laliga/spieltagtabelle/wettbewerb/ES1"
+MATCHES_BASE_URL = "https://www.transfermarkt.es/laliga/spieltag/wettbewerb/ES1"
 
 
 def parse_tabla_jornada_transfermarkt(html: str, temporada: str, jornada: int):
@@ -202,13 +204,526 @@ def scrapear_rango_jornadas_online(
     print(f"✅ CSV único de temporada generado con racha5partidos: {ruta_csv}")
 
 
+def extraer_fecha_hora_desde_html(fecha_str, hora_str):
+    """
+    Extrae fecha y hora desde strings del HTML de Transfermarkt.
+    
+    Args:
+        fecha_str: Ej. "05/12/2025" (DD/MM/YYYY)
+        hora_str: Ej. "21:00" (HH:MM)
+    
+    Returns:
+        datetime objeto o None si no puede parsear
+    """
+    try:
+        if not fecha_str or not hora_str:
+            return None
+        
+        fecha_str = fecha_str.strip()
+        hora_str = hora_str.strip()
+        
+        # Parsear DD/MM/YYYY HH:MM
+        datetime_str = f"{fecha_str} {hora_str}"
+        return datetime.strptime(datetime_str, "%d/%m/%Y %H:%M")
+    except Exception as e:
+        print(f"❌ Error al parsear fecha/hora: {fecha_str} {hora_str} - {e}")
+        return None
+
+
+def parse_partidos_jornada_transfermarkt(html_content, jornada_num):
+    """
+    Parsea los partidos de una jornada desde el HTML de Transfermarkt.
+    
+    Extrae:
+    - Equipo local, equipo visitante
+    - Resultado (goles local, goles visitante)
+    - Fecha y hora
+    
+    Returns:
+        Lista de dicts con estructura:
+        {
+            'jornada': int,
+            'equipo_local': str,
+            'equipo_visitante': str,
+            'goles_local': int,
+            'goles_visitante': int,
+            'fecha': datetime,
+            'hora': str (HH:MM)
+        }
+    """
+    partidos = []
+    soup = BeautifulSoup(html_content, 'html.parser')
+    
+    # Buscar tabla de partidos
+    tabla_partidos = soup.find('div', class_='responsive-table')
+    if not tabla_partidos:
+        print(f"⚠️ No se encontró tabla de partidos para jornada {jornada_num}")
+        return partidos
+    
+    filas = tabla_partidos.find_all('tr')
+    
+    for fila in filas:
+        try:
+            # Saltar encabezados
+            if fila.find('th'):
+                continue
+            
+            celdas = fila.find_all('td')
+            if len(celdas) < 5:
+                continue
+            
+            # Encontrar celda con fecha (clase "show-for-small")
+            celda_fecha = fila.find('td', class_='show-for-small')
+            if not celda_fecha:
+                continue
+            
+            # Extraer fecha y hora
+            fecha_link = celda_fecha.find('a')
+            if not fecha_link:
+                continue
+            
+            fecha_str = fecha_link.get_text(strip=True)  # "05/12/2025"
+            
+            # Hora está después del link
+            hora_str = None
+            for item in celda_fecha.contents:
+                if isinstance(item, str):
+                    text = item.strip()
+                    if ':' in text and len(text) == 5:  # "21:00"
+                        hora_str = text
+                        break
+            
+            if not hora_str:
+                # Intentar con la siguiente celda
+                continue
+            
+            # Encontrar equipos y resultado
+            # Estructura: [fecha] [equipo_local] [resultado] [equipo_visitante]
+            
+            # Buscar nombre de equipos (están en celdas con clase especial o en spans)
+            equipos = fila.find_all('a', class_='vereinprofil_tooltip')
+            if len(equipos) < 2:
+                continue
+            
+            equipo_local = equipos[0].get_text(strip=True)
+            equipo_visitante = equipos[1].get_text(strip=True)
+            
+            # Resultado
+            resultado_celda = None
+            for celda in celdas:
+                if celda.get_text(strip=True) and ':' in celda.get_text(strip=True):
+                    # Verificar que sea el formato "X:X" (resultado)
+                    texto = celda.get_text(strip=True)
+                    if len(texto) <= 5 and texto.count(':') == 1:
+                        try:
+                            partes = texto.split(':')
+                            goles_local = int(partes[0].strip())
+                            goles_visitante = int(partes[1].strip())
+                            resultado_celda = (goles_local, goles_visitante)
+                            break
+                        except:
+                            continue
+            
+            if not resultado_celda:
+                continue
+            
+            goles_local, goles_visitante = resultado_celda
+            
+            # Convertir fecha
+            fecha_obj = extraer_fecha_hora_desde_html(fecha_str, hora_str)
+            if not fecha_obj:
+                continue
+            
+            # Normalizar nombres de equipos
+            equipo_local_norm = normalizar_equipo(equipo_local)
+            equipo_visitante_norm = normalizar_equipo(equipo_visitante)
+            
+            partidos.append({
+                'jornada': jornada_num,
+                'equipo_local': equipo_local_norm,
+                'equipo_visitante': equipo_visitante_norm,
+                'goles_local': goles_local,
+                'goles_visitante': goles_visitante,
+                'fecha': fecha_obj,
+                'hora': hora_str
+            })
+        
+        except Exception as e:
+            print(f"⚠️ Error procesando fila en jornada {jornada_num}: {e}")
+            continue
+    
+    return partidos
+
+
+def scrapear_partidos_rango_jornadas(
+    codigo_temporada,
+    temporada_transfermarkt,
+    j_ini=1,
+    j_fin=38,
+    carpeta_salida=None,
+    delay_min=1,
+    delay_max=3
+):
+    """
+    Scrapea los partidos (con fecha/hora) de un rango de jornadas de Transfermarkt.
+    
+    Args:
+        codigo_temporada: Ej. "23_24" o "24_25"
+        temporada_transfermarkt: Ej. 2024, 2025 (saison_id)
+        j_ini, j_fin: Rango de jornadas a scrapear
+        carpeta_salida: Carpeta donde guardar CSVs (si None, no guarda)
+        delay_min, delay_max: Delay entre requests (segundos)
+    """
+    
+    ruta_csv = None
+    if carpeta_salida:
+        os.makedirs(carpeta_salida, exist_ok=True)
+        ruta_csv = os.path.join(carpeta_salida, f"partidos_{codigo_temporada}.csv")
+    
+    all_partidos = []
+    header_escrito = False
+    
+    for jornada in range(j_ini, j_fin + 1):
+        try:
+            # URL de la jornada
+            url = f"{MATCHES_BASE_URL}/spieltag/{jornada}/saison_id/{temporada_transfermarkt}"
+            
+            print(f"📥 Descargando partidos de jornada {jornada}...")
+            
+            # Delay aleatorio
+            delay = random.uniform(delay_min, delay_max)
+            time.sleep(delay)
+            
+            # Request
+            response = requests.get(url, timeout=15)
+            response.raise_for_status()
+            
+            # Parsear
+            partidos = parse_partidos_jornada_transfermarkt(response.text, jornada)
+            all_partidos.extend(partidos)
+            
+            print(f"✅ Jornada {jornada}: {len(partidos)} partidos extraídos")
+            
+            # Guardar a CSV si se proporciona carpeta
+            if ruta_csv and partidos:
+                with open(ruta_csv, 'a', newline='', encoding='utf-8') as f:
+                    if not header_escrito:
+                        writer = csv.DictWriter(
+                            f,
+                            fieldnames=['jornada', 'equipo_local', 'equipo_visitante',
+                                       'goles_local', 'goles_visitante', 'fecha', 'hora']
+                        )
+                        writer.writeheader()
+                        header_escrito = True
+                    
+                    # Convertir datetime a string para CSV
+                    for partido in partidos:
+                        partido_copia = partido.copy()
+                        partido_copia['fecha'] = partido['fecha'].isoformat()
+                        writer.writerow(partido_copia)
+        
+        except Exception as e:
+            print(f"❌ Error en jornada {jornada}: {e}")
+            continue
+    
+    if ruta_csv:
+        print(f"\n✅ Partidos guardados en: {ruta_csv}")
+    
+    return all_partidos
+
+
+def extraer_nacionalidad_desde_bandera(img_bandera):
+    """
+    Extrae la nacionalidad desde el atributo 'alt' de la imagen bandera.
+    
+    Args:
+        img_bandera: Tag <img> con la bandera del país
+    
+    Returns:
+        str con el nombre del país o None
+    """
+    if not img_bandera:
+        return None
+    
+    # El atributo 'alt' generalmente contiene el nombre del país
+    nacionalidad = img_bandera.get('alt', '').strip()
+    
+    if nacionalidad:
+        return nacionalidad
+    
+    # Intentar con title
+    nacionalidad = img_bandera.get('title', '').strip()
+    return nacionalidad if nacionalidad else None
+
+
+def obtener_plantilla_equipo(href_equipo, delay_min=1, delay_max=3):
+    """
+    Descarga la página de plantilla de un equipo desde Transfermarkt.
+    
+    Args:
+        href_equipo: URL relativa del equipo (ej: /real-madrid/kader/verein/418)
+        delay_min, delay_max: Delay entre requests (segundos)
+    
+    Returns:
+        HTML content o None si hay error
+    """
+    try:
+        url_completa = f"https://www.transfermarkt.es{href_equipo}/saison/2024"
+        print(f"📥 Descargando plantilla: {url_completa}")
+        
+        delay = random.uniform(delay_min, delay_max)
+        time.sleep(delay)
+        
+        response = requests.get(
+            url_completa,
+            headers={"User-Agent": "Mozilla/5.0"},
+            timeout=15
+        )
+        response.raise_for_status()
+        
+        return response.text
+    
+    except Exception as e:
+        print(f"❌ Error descargando plantilla {href_equipo}: {e}")
+        return None
+
+
+def procesar_plantilla_equipo(html_content, equipo_norm):
+    """
+    Parsea la HTML de plantilla y extrae jugadores con nacionalidad.
+    
+    Args:
+        html_content: Contenido HTML de la página de plantilla
+        equipo_norm: Nombre del equipo normalizado
+    
+    Returns:
+        Lista de dicts con estructura:
+        {
+            'jugador': str,
+            'nacionalidad': str,
+            'posicion': str,
+            'dorsal': int,
+            'edad': int,
+            'equipo': str
+        }
+    """
+    jugadores = []
+    
+    try:
+        soup = BeautifulSoup(html_content, 'lxml')
+        
+        # Buscar tabla principal de plantilla
+        tabla = soup.find('table', class_='items')
+        
+        if not tabla or not tabla.tbody:
+            print(f"⚠️ No se encontró tabla de plantilla para {equipo_norm}")
+            return jugadores
+        
+        filas = tabla.tbody.find_all('tr')
+        print(f"[LOG] Procesando {len(filas)} filas de jugadores para {equipo_norm}")
+        
+        for fila in filas:
+            try:
+                celdas = fila.find_all('td')
+                
+                # Estructura de tabla: dorsal, nombre+pos, foto, nombre, posicion, edad, BANDERA, fecha, mercado
+                # Solo procesar filas principales que tengan 9 celdas (las expansiones rowspan tienen menos)
+                if len(celdas) < 9:
+                    continue
+                
+                # Dorsal (celda 0)
+                try:
+                    dorsal = int(celdas[0].get_text(strip=True))
+                except (ValueError, IndexError):
+                    dorsal = None
+                
+                # Nombre del jugador (celda 3 generalmente tiene el link al jugador)
+                link_jugador = celdas[3].find('a') if len(celdas) > 3 else None
+                if not link_jugador:
+                    # Fallback: intentar en celda 1
+                    link_jugador = celdas[1].find('a')
+                
+                if not link_jugador:
+                    continue
+                
+                nombre_jugador = link_jugador.get_text(strip=True)
+                
+                # Posición (celda 4)
+                posicion = "Desconocida"
+                if len(celdas) > 4:
+                    posicion_texto = celdas[4].get_text(strip=True)
+                    if posicion_texto:
+                        posicion = posicion_texto
+                
+                # Edad (celda 5)
+                edad = None
+                if len(celdas) > 5:
+                    try:
+                        edad_text = celdas[5].get_text(strip=True)
+                        edad = int(edad_text)
+                    except (ValueError, IndexError):
+                        pass
+                
+                # Nacionalidad (celda 6 - buscar imagen con flag)
+                nacionalidad = None
+                if len(celdas) > 6:
+                    img_bandera = celdas[6].find('img')
+                    if img_bandera:
+                        nacionalidad = extraer_nacionalidad_desde_bandera(img_bandera)
+                
+                if nombre_jugador and nacionalidad:
+                    jugadores.append({
+                        'jugador': nombre_jugador,
+                        'nacionalidad': nacionalidad,
+                        'posicion': posicion,
+                        'dorsal': dorsal,
+                        'edad': edad,
+                        'equipo': equipo_norm
+                    })
+            
+            except Exception as e:
+                print(f"⚠️ Error procesando fila de jugador: {e}")
+                continue
+        
+        print(f"✅ Extraído {len(jugadores)} jugadores de {equipo_norm}")
+        return jugadores
+    
+    except Exception as e:
+        print(f"❌ Error procesando plantilla {equipo_norm}: {e}")
+        return []
+
+
+def scrapear_plantillas_temporada(código_equipos_to_href, temporada_codigo, carpeta_salida, delay_min=2, delay_max=5):
+    """
+    Scrapea plantillas de todos los equipos y guarda en CSV.
+    
+    Args:
+        código_equipos_to_href: Dict {nombre_equipo_norm: href_tm}
+        temporada_codigo: Ej. "23_24", "24_25"
+        carpeta_salida: Carpeta donde guardar CSVs
+        delay_min, delay_max: Delay entre requests
+    """
+    os.makedirs(carpeta_salida, exist_ok=True)
+    
+    ruta_csv = os.path.join(carpeta_salida, f"jugadores_nacionalidad_{temporada_codigo}.csv")
+    
+    todos_jugadores = []
+    
+    for idx, (equipo_norm, href) in enumerate(código_equipos_to_href.items(), 1):
+        print(f"\n[{idx}/{len(código_equipos_to_href)}] Procesando {equipo_norm}...")
+        
+        html = obtener_plantilla_equipo(href, delay_min, delay_max)
+        
+        if html:
+            jugadores = procesar_plantilla_equipo(html, equipo_norm)
+            todos_jugadores.extend(jugadores)
+            
+            # Guardar incrementalmente
+            if jugadores:
+                with open(ruta_csv, 'a', newline='', encoding='utf-8-sig') as f:
+                    writer = csv.DictWriter(
+                        f,
+                        fieldnames=['jugador', 'nacionalidad', 'posicion', 'dorsal', 'edad', 'equipo']
+                    )
+                    
+                    # Escribir encabezado solo si es la primera vez
+                    if f.tell() == 0:
+                        writer.writeheader()
+                    
+                    writer.writerows(jugadores)
+        else:
+            print(f"⚠️ No se pudo descargar plantilla de {equipo_norm}")
+    
+    print(f"\n✅ Plantillas guardadas en: {ruta_csv}")
+    print(f"📊 Total jugadores: {len(todos_jugadores)}")
+    
+    return todos_jugadores
+
+
+def extraer_hrefs_equipos_desde_clasificacion(html_clasificacion):
+    """
+    Extrae los hrefs de todos los equipos desde la tabla de clasificación.
+    
+    Args:
+        html_clasificacion: HTML de la página de clasificación
+    
+    Returns:
+        Dict {equipo_norm: href_tm}
+    """
+    equipos_href = {}
+    
+    try:
+        soup = BeautifulSoup(html_clasificacion, 'lxml')
+        tabla = soup.find('table', class_='items')
+        
+        if not tabla or not tabla.tbody:
+            return equipos_href
+        
+        for fila in tabla.tbody.find_all('tr'):
+            tds = fila.find_all('td')
+            
+            if len(tds) < 3:
+                continue
+            
+            # El nombre del equipo suele estar en la celda 2
+            celda_equipo = tds[2]
+            link = celda_equipo.find('a')
+            
+            if link:
+                href = link.get('href', '')
+                equipo_raw = link.get_text(strip=True)
+                equipo_norm = normalizar_equipo(equipo_raw)
+                
+                if href and equipo_norm:
+                    # Convertir href de forma /equipo/spielplan/verein/XXX a /equipo/kader/verein/XXX
+                    # para acceder a la plantilla
+                    href_plantilla = href.replace('/spielplan/', '/kader/')
+                    equipos_href[equipo_norm] = href_plantilla
+                    print(f"  📌 {equipo_norm} -> {href_plantilla}")
+        
+        return equipos_href
+    
+    except Exception as e:
+        print(f"❌ Error extrayendo hrefs de equipos: {e}")
+        return equipos_href
+
+
 if __name__ == "__main__":
-    # ejemplo: scrapear jornadas 1..38 para LaLiga 24/25 (saison_id=2024)
-    carpeta_destino = os.path.join("data", "temporada_25_26")
-    scrapear_rango_jornadas_online(
-        codigo_temporada="25_26",
-        temporada_transfermarkt=2025,  # saison_id de la 23/24
-        j_ini=1,
-        j_fin=18,
-        carpeta_salida=carpeta_destino,
-    )
+    # ============= OPCIÓN 1: Scrapear partidos =============
+    # carpeta_destino = os.path.join("data", "temporada_25_26")
+    # scrapear_rango_jornadas_online(
+    #     codigo_temporada="25_26",
+    #     temporada_transfermarkt=2025,
+    #     j_ini=1,
+    #     j_fin=18,
+    #     carpeta_salida=carpeta_destino,
+    # )
+    
+    # ============= OPCIÓN 2: Scrapear plantillas con nacionalidad =============
+    # Paso 1: Primero necesitas descargar la página de clasificación para obtener los hrefs
+    # print("📥 Descargando clasificación para obtener hrefs de equipos...")
+    # resp = requests.get(
+    #     f"{BASE_URL}?saison_id=2024",
+    #     headers={"User-Agent": "Mozilla/5.0"},
+    #     timeout=15
+    # )
+    # 
+    # if resp.status_code == 200:
+    #     # Extraer hrefs de los equipos
+    #     equipos_href = extraer_hrefs_equipos_desde_clasificacion(resp.text)
+    #     
+    #     # Paso 2: Scrapear plantillas
+    #     carpeta_plantillas = os.path.join("csv", "csvGenerados", "plantillas")
+    #     scrapear_plantillas_temporada(
+    #         código_equipos_to_href=equipos_href,
+    #         temporada_codigo="24_25",
+    #         carpeta_salida=carpeta_plantillas,
+    #         delay_min=2,
+    #         delay_max=5
+    #     )
+    # else:
+    #     print(f"❌ Error descargando clasificación: {resp.status_code}")
+    
+    print("Use scrapear_rango_jornadas_online() para partidos")
+    print("Use scrapear_plantillas_temporada() para nacionalidades de jugadores")
+

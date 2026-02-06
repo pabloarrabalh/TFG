@@ -91,15 +91,14 @@ class HistorialEquiposJugador(models.Model):
     jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE, related_name='historial_equipos')
     equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
     temporada = models.ForeignKey(Temporada, on_delete=models.CASCADE)
-    dorsal = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(99)])
+    dorsal = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(99)])  # 0 = suplente/banquillo
     edad = models.IntegerField(validators=[MinValueValidator(15), MaxValueValidator(50)])
-    fecha_inicio = models.DateField()
-    fecha_fin = models.DateField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'Historial Equipos Jugador'
         verbose_name_plural = 'Historiales Equipos Jugadores'
-        ordering = ['-fecha_inicio']
+        unique_together = ('jugador', 'equipo', 'temporada')
+        ordering = ['temporada', 'equipo']
 
     def __str__(self):
         return f"{self.jugador} - {self.equipo} ({self.temporada})"
@@ -111,8 +110,8 @@ class HistorialEquiposJugador(models.Model):
 class Jornada(models.Model):
     temporada = models.ForeignKey(Temporada, on_delete=models.CASCADE, related_name='jornadas')
     numero_jornada = models.IntegerField(validators=[MinValueValidator(1)])
-    fecha_inicio = models.DateField(null=True, blank=True)
-    fecha_fin = models.DateField(null=True, blank=True)
+    fecha_inicio = models.DateTimeField(null=True, blank=True)
+    fecha_fin = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'Jornada'
@@ -185,29 +184,70 @@ class ClasificacionJornada(models.Model):
 class EstadisticasPartidoJugador(models.Model):
     partido = models.ForeignKey(Partido, on_delete=models.CASCADE, related_name='estadisticas_jugadores')
     jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE, related_name='estadisticas_partidos')
-    minutos_jugados = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(120)])
-    goles = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    asistencias = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    disparos = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    disparos_a_puerta = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    pases_completados = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    
+    # Minutos y estado
+    min_partido = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(120)])
+    titular = models.BooleanField(default=False)
+    
+    # Goles y asistencias
+    gol_partido = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    asist_partido = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    
+    # Expected stats (xG, xAG)
+    xg_partido = models.FloatField(default=0.0, validators=[MinValueValidator(0)])
+    xag = models.FloatField(default=0.0, validators=[MinValueValidator(0)])
+    
+    # Tiros
+    tiros = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    tiro_fallado_partido = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    tiro_puerta_partido = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    
+    # Pases
     pases_totales = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    regates = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    despejes = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    faltas_cometidas = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    tarjetas_amarillas = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(2)])
-    tarjetas_rojas = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(1)])
-    recuperaciones = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    intercepciones = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    pases_completados_pct = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    
+    # Tarjetas
+    amarillas = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(2)])
+    rojas = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(1)])
+    
+    # Estadísticas de portero
+    goles_en_contra = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    porcentaje_paradas = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    psxg = models.FloatField(default=0.0, validators=[MinValueValidator(0)])
+    
+    # Fantasy
+    puntos_fantasy = models.IntegerField(default=0)
+    
+    # Entradas y duelos
     entradas = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    duelos = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     duelos_ganados = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    duelos_totales = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    calificacion_decimal = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(10)])
-    en_alineacion = models.BooleanField(default=True)
-    fue_suplente = models.BooleanField(default=False)
-    minuto_salida = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(120)])
-    minuto_entrada = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(120)])
-    gol_en_propia_puerta = models.BooleanField(default=False)
+    duelos_perdidos = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    
+    # Bloqueos
+    bloqueos = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    bloqueo_tiros = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    bloqueo_pase = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    
+    # Despejes y regates
+    despejes = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    regates = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    regates_completados = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    regates_fallidos = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    
+    # Conducciones
+    conducciones = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    distancia_conduccion = models.FloatField(default=0.0, validators=[MinValueValidator(0)])
+    metros_avanzados_conduccion = models.FloatField(default=0.0, validators=[MinValueValidator(0)])
+    conducciones_progresivas = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    
+    # Duelos aéreos
+    duelos_aereos_ganados = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    duelos_aereos_perdidos = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    duelos_aereos_ganados_pct = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    
+    # Roles destacados (JSON array of role objects)
+    roles = models.JSONField(default=list, blank=True)
 
     class Meta:
         verbose_name = 'Estadísticas Partido Jugador'
@@ -233,7 +273,6 @@ class RendimientoHistoricoJugador(models.Model):
     asistencias_temporada = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     tarjetas_amarillas_total = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     tarjetas_rojas_total = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    promedio_calificacion = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(10)])
     pases_completados_total = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     goles_en_propia_puerta_total = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     updated_at = models.DateTimeField(auto_now=True)
