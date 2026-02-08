@@ -137,3 +137,11 @@ COLUMNAS_MODELO = [
 ]
 
 UMBRAL_MATCH = 72.0
+# Mapeo inverso: códigos fantasy -> posiciones de base de datos
+# Convierte PT/DF/MC/DT a Portero/Defensa/Centrocampista/Delantero
+MAPEO_POSICIONES_INVERSO = {
+    "PT": "Portero",           # Portero
+    "DF": "Defensa",           # Defensa
+    "MC": "Centrocampista",    # Mediocampista/Centrocampista
+    "DT": "Delantero",         # Delantero
+}

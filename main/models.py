@@ -72,7 +72,6 @@ class EquipoTemporada(models.Model):
 class Jugador(models.Model):
     nombre = models.CharField(max_length=150)
     apellido = models.CharField(max_length=150)
-    posicion = models.CharField(max_length=30, choices=Posicion.choices)
     nacionalidad = models.CharField(max_length=100)
 
     class Meta:
@@ -82,6 +81,30 @@ class Jugador(models.Model):
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
+    
+    def get_posicion_mas_frecuente(self):
+        """
+        Calcula la posición más frecuente del jugador en todos sus partidos.
+        
+        Returns:
+            string: La posición más frecuente (Portero, Defensa, Centrocampista, Delantero)
+                   o None si no tiene estadísticas
+        """
+        from django.db.models import Count
+        
+        # Obtener conteo de posiciones en EstadisticasPartidoJugador
+        posiciones = (
+            self.estadisticas_partidos
+            .filter(posicion__isnull=False)
+            .values('posicion')
+            .annotate(count=Count('id'))
+            .order_by('-count')
+            .first()
+        )
+        
+        if posiciones:
+            return posiciones['posicion']
+        return None
 
 
 # ============================================================================
@@ -92,7 +115,7 @@ class HistorialEquiposJugador(models.Model):
     equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
     temporada = models.ForeignKey(Temporada, on_delete=models.CASCADE)
     dorsal = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(99)])  # 0 = suplente/banquillo
-    edad = models.IntegerField(validators=[MinValueValidator(15), MaxValueValidator(50)])
+    posicion_transfermarkt = models.CharField(max_length=30, choices=Posicion.choices, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Historial Equipos Jugador'
@@ -113,7 +136,6 @@ class EquipoJugadorTemporada(models.Model):
     jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE, related_name='equipos_temporada')
     temporada = models.ForeignKey(Temporada, on_delete=models.CASCADE)
     dorsal = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(99)])
-    edad = models.IntegerField(validators=[MinValueValidator(15), MaxValueValidator(50)])
     partidos_jugados = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
     class Meta:
@@ -270,6 +292,9 @@ class EstadisticasPartidoJugador(models.Model):
     
     # Roles destacados (JSON array of role objects)
     roles = models.JSONField(default=list, blank=True)
+    
+    # Posición del jugador en el partido
+    posicion = models.CharField(max_length=30, choices=Posicion.choices, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Estadísticas Partido Jugador'

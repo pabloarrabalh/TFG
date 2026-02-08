@@ -131,10 +131,16 @@ def equipo(request, equipo_nombre=None, temporada=None):
             # Calcular promedio
             promedio_puntos = total_puntos / partidos_jugados if partidos_jugados > 0 else 0
             
+            # Obtener posición más frecuente en esta temporada
+            posicion_frecuente = stats.values('posicion').annotate(
+                count=Count('id')
+            ).order_by('-count').first()
+            
             # Añadir atributos al objeto (datos de EstaTemporada)
             eq_jug_temp.total_puntos_fantasy = total_puntos
             eq_jug_temp.partidos_stats = partidos_jugados
             eq_jug_temp.promedio_puntos_fantasy = round(promedio_puntos, 2)
+            eq_jug_temp.posicion = posicion_frecuente['posicion'] if posicion_frecuente else None
             
             jugadores.append(eq_jug_temp)
     

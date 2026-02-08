@@ -34,6 +34,7 @@ from main.models import (
     ClasificacionJornada, RendimientoHistoricoJugador, EquipoJugadorTemporada
 )
 from django.db.models import Sum, Count, Q
+from main.scrapping.alias import MAPEO_POSICIONES_INVERSO
 
 # Intentar importar rapidfuzz para fuzzy matching
 try:
@@ -161,12 +162,11 @@ def obtener_o_crear_jugador(nombre_completo, posicion_csv):
         nombre = nombre_completo
         apellido = ''
     
-    posicion_db = MAPEO_POSICIONES.get(posicion_csv, 'Centrocampista')
-    
+    # Ya no usamos posicion en el Jugador, se guarda en EstadisticasPartidoJugador
     jugador, created = Jugador.objects.get_or_create(
         nombre=nombre,
         apellido=apellido,
-        defaults={'posicion': posicion_db, 'nacionalidad': ''}
+        defaults={'nacionalidad': ''}
     )
     return jugador
 
@@ -211,6 +211,10 @@ def obtener_o_crear_partido(jornada, equipo_local, equipo_visitante, fecha_parti
 
 def cargar_estadisticas_partido(row, jugador, equipo, partido):
     """Crea EstadisticasPartidoJugador desde una fila del CSV."""
+    # Convertir posición de código (PT/DF/MC/DT) a nombre completo (Portero/Defensa/...)
+    posicion_codigo = row.get('posicion') if pd.notna(row.get('posicion')) else None
+    posicion = MAPEO_POSICIONES_INVERSO.get(posicion_codigo) if posicion_codigo else None
+    
     stats = EstadisticasPartidoJugador(
         partido=partido, jugador=jugador,
         min_partido=int(row['min_partido']) if pd.notna(row['min_partido']) else 0,
@@ -248,6 +252,7 @@ def cargar_estadisticas_partido(row, jugador, equipo, partido):
         duelos_aereos_ganados=int(row['duelos_aereos_ganados']) if pd.notna(row['duelos_aereos_ganados']) else 0,
         duelos_aereos_perdidos=int(row['duelos_aereos_perdidos']) if pd.notna(row['duelos_aereos_perdidos']) else 0,
         duelos_aereos_ganados_pct=float(row['duelos_aereos_ganados_pct']) if pd.notna(row['duelos_aereos_ganados_pct']) else 0.0,
+        posicion=posicion,  # Posición convertida a Portero/Defensa/Centrocampista/Delantero
         roles=[]  # Se llena después con fuzzy matching
     )
     return stats
@@ -339,11 +344,13 @@ def procesar_csv_partido(ruta_csv, temporada):
     try:
         df = pd.read_csv(ruta_csv, encoding='utf-8-sig')
     except Exception as e:
+        print(f"  ❌ Error leyendo CSV {ruta_csv}: {e}")
         return False
     
     if df.empty:
         return False
     
+    contador_stats = 0
     try:
         primera_fila = df.iloc[0]
         jornada_num = int(primera_fila['jornada'])
@@ -373,11 +380,17 @@ def procesar_csv_partido(ruta_csv, temporada):
                 
                 stats = cargar_estadisticas_partido(row, jugador, equipo, partido)
                 stats.save()
+                contador_stats += 1
             except Exception as e:
+                print(f"  ❌ Error procesando fila {idx} en {ruta_csv}: {e}")
                 continue
+        
+        if contador_stats == 0:
+            print(f"  ⚠️  {ruta_csv}: 0 estadísticas guardadas (df tiene {len(df)} filas)")
         
         return True
     except Exception as e:
+        print(f"  ❌ Error procesando partido en {ruta_csv}: {e}")
         return False
 
 def fase_1_cargar_partidos_y_estadisticas():
@@ -739,7 +752,6 @@ def fase_2e_poblar_equipo_jugador_temporada():
                     temporada=temporada,
                     defaults={
                         'dorsal': historial.dorsal,
-                        'edad': historial.edad,
                         'partidos_jugados': partidos_count,
                     }
                 )

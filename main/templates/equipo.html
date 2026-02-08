@@ -78,7 +78,7 @@
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                         {% for jugador in jugadores %}
-                                            {% if jugador.jugador.posicion == 'Portero' %}
+                                            {% if jugador.posicion == 'Portero' %}
                                                 <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
                                                     <div class="flex items-center gap-3 mb-4">
                                                         <div class="bg-yellow-500 text-black px-2 py-1 rounded text-xs font-bold">PT</div>
@@ -89,11 +89,7 @@
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    <div class="grid grid-cols-3 gap-2 mb-3">
-                                                        <div class="text-center">
-                                                            <div class="text-lg font-black text-primary">{{ jugador.edad }}</div>
-                                                            <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">AÑOS</div>
-                                                        </div>
+                                                    <div class="grid grid-cols-2 gap-2 mb-3">
                                                         <div class="text-center">
                                                             <div class="text-lg font-black text-white">{{ jugador.jugador.nacionalidad|truncatechars:3 }}</div>
                                                             <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">NAC.</div>
@@ -129,7 +125,7 @@
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {% for jugador in jugadores %}
-                                    {% if jugador.jugador.posicion == 'Defensa' %}
+                                    {% if jugador.posicion == 'Defensa' %}
                                         <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
                                             <div class="flex items-center gap-3 mb-4">
                                                 <div class="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">DF</div>
@@ -140,11 +136,7 @@
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div class="grid grid-cols-3 gap-2 mb-3">
-                                                <div class="text-center">
-                                                    <div class="text-lg font-black text-primary">{{ jugador.edad }}</div>
-                                                    <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">AÑOS</div>
-                                                </div>
+                                            <div class="grid grid-cols-2 gap-2 mb-3">
                                                 <div class="text-center">
                                                     <div class="text-lg font-black text-white">{{ jugador.jugador.nacionalidad|truncatechars:3 }}</div>
                                                     <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">NAC.</div>
@@ -178,7 +170,7 @@
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {% for jugador in jugadores %}
-                                    {% if jugador.jugador.posicion == 'Centrocampista' %}
+                                    {% if jugador.posicion == 'Centrocampista' %}
                                         <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
                                             <div class="flex items-center gap-3 mb-4">
                                                 <div class="bg-gray-500 text-white px-2 py-1 rounded text-xs font-bold">MC</div>
@@ -189,11 +181,7 @@
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div class="grid grid-cols-3 gap-2 mb-3">
-                                                <div class="text-center">
-                                                    <div class="text-lg font-black text-primary">{{ jugador.edad }}</div>
-                                                    <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">AÑOS</div>
-                                                </div>
+                                            <div class="grid grid-cols-2 gap-2 mb-3">
                                                 <div class="text-center">
                                                     <div class="text-lg font-black text-white">{{ jugador.jugador.nacionalidad|truncatechars:3 }}</div>
                                                     <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">NAC.</div>
@@ -227,7 +215,7 @@
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {% for jugador in jugadores %}
-                                    {% if jugador.jugador.posicion == 'Delantero' %}
+                                    {% if jugador.posicion == 'Delantero' %}
                                         <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
                                             <div class="flex items-center gap-3 mb-4">
                                                 <div class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">DT</div>
@@ -238,11 +226,7 @@
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div class="grid grid-cols-3 gap-2 mb-3">
-                                                <div class="text-center">
-                                                    <div class="text-lg font-black text-primary">{{ jugador.edad }}</div>
-                                                    <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">AÑOS</div>
-                                                </div>
+                                            <div class="grid grid-cols-2 gap-2 mb-3">
                                                 <div class="text-center">
                                                     <div class="text-lg font-black text-white">{{ jugador.jugador.nacionalidad|truncatechars:3 }}</div>
                                                     <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">NAC.</div>
