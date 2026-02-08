@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load team_filters %}
 
 {% block title %}LigaMaster - Clasificación{% endblock %}
 
@@ -18,6 +19,157 @@
 .league-table tr:hover td:first-child {
     @apply text-primary;
 }
+.select-custom {
+    @apply bg-surface-dark border border-border-dark text-white px-4 py-2.5 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all cursor-pointer;
+}
+
+/* Estilos de equipos */
+.team-badge {
+    @apply size-8 rounded-lg flex items-center justify-center border-2 font-bold text-xs;
+}
+
+/* Racha con círculos de colores */
+.racha-circle {
+    @apply inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold text-white mx-0.5;
+}
+.racha-g {
+    @apply bg-green-500;
+}
+.racha-e {
+    @apply bg-yellow-500;
+}
+.racha-p {
+    @apply bg-red-500;
+}
+
+/* Colores y patrones personalizados por equipo */
+.team-real-madrid {
+    @apply bg-white border-white text-black;
+}
+
+.team-barcelona {
+    background: repeating-linear-gradient(90deg, #004687 0 8px, #c60c30 8px 16px);
+    @apply border-blue-600 text-white;
+}
+
+.team-atletico-madrid {
+    background: linear-gradient(90deg, white 25%, red 25%, red 50%, white 50%, white 75%, red 75%, red);
+    background-size: 8px 100%;
+    @apply border-red-600 text-black;
+}
+
+.team-athletic-club {
+    background: linear-gradient(90deg, white 25%, red 25%, red 50%, white 50%, white 75%, red 75%, red);
+    background-size: 8px 100%;
+    @apply border-red-600 text-black;
+}
+
+.team-villarreal {
+    @apply bg-yellow-400 border-yellow-500 text-black;
+}
+
+.team-real-betis {
+    background: linear-gradient(90deg, white 25%, #007749 25%, #007749 50%, white 50%, white 75%, #007749 75%, #007749);
+    background-size: 8px 100%;
+    @apply border-green-700 text-black;
+}
+
+.team-sevilla {
+    @apply bg-red-600 border-red-700 text-white;
+}
+
+.team-rcd-espanyol {
+    background: linear-gradient(90deg, white 25%, #1e88e5 25%, #1e88e5 50%, white 50%, white 75%, #1e88e5 75%, #1e88e5);
+    background-size: 8px 100%;
+    @apply border-blue-600 text-black;
+}
+
+.team-alaves {
+    background: linear-gradient(90deg, white 25%, #1e88e5 25%, #1e88e5 50%, white 50%, white 75%, #1e88e5 75%, #1e88e5);
+    background-size: 8px 100%;
+    @apply border-blue-600 text-black;
+}
+
+.team-elche {
+    background: linear-gradient(0deg, #1bc47d 25%, white 25%, white 50%, #1bc47d 50%, #1bc47d 75%, white 75%, white);
+    background-size: 100% 8px;
+    @apply border-green-500 text-black;
+}
+
+.team-rayo-vallecano {
+    /* Fondo rojo con una franja blanca central más estrecha */
+    background: linear-gradient(90deg, #ed1c24 0%, #ed1c24 40%, white 40% 60%, #ed1c24 60% 100%);
+    @apply border-red-600 text-black;
+}
+
+.team-osasuna {
+    /* Rayas verticales azul y rojo */
+    background: repeating-linear-gradient(90deg, #1e88e5 0 8px, #ed1c24 8px 16px);
+    @apply border-red-600 text-white;
+}
+
+.team-valencia {
+    @apply bg-white border-white text-black;
+}
+
+.team-levante {
+    /* Rayas verticales similares a Barcelona */
+    background: repeating-linear-gradient(90deg, #004687 0 8px, #c60c30 8px 16px);
+    @apply border-blue-600 text-white;
+}
+
+.team-real-mallorca {
+    background: linear-gradient(90deg, #c60c30 25%, black 25%, black 50%, #c60c30 50%, #c60c30 75%, black 75%, black);
+    background-size: 8px 100%;
+    @apply border-red-600 text-white;
+}
+
+.team-celta-vigo {
+    @apply bg-blue-400 border-blue-500 text-white;
+}
+
+.team-real-sociedad {
+    background: linear-gradient(90deg, white 25%, #1e88e5 25%, #1e88e5 50%, white 50%, white 75%, #1e88e5 75%, #1e88e5);
+    background-size: 8px 100%;
+    @apply border-blue-600 text-black;
+}
+
+.team-real-oviedo {
+    @apply bg-blue-900 border-blue-950 text-white;
+}
+
+.team-girona {
+    @apply bg-red-600 border-red-700 text-white;
+}
+
+.team-getafe {
+    @apply bg-blue-600 border-blue-700 text-white;
+}
+
+.team-granada {
+    /* Rojo con múltiples líneas horizontales blancas centradas */
+    background: repeating-linear-gradient(0deg, white 0 3px, #c60c30 3px 12px);
+    @apply border-red-700 text-black;
+}
+
+.team-las-palmas {
+    @apply bg-yellow-400 border-yellow-500 text-black;
+}
+
+.team-cadiz {
+    @apply bg-yellow-300 border-yellow-400 text-black;
+}
+
+.team-almeria {
+    /* Rojo con líneas verticales blancas como Alavés */
+    background: linear-gradient(90deg, white 25%, #c60c30 25%, #c60c30 50%, white 50%, white 75%, #c60c30 75%, #c60c30);
+    background-size: 8px 100%;
+    @apply border-red-700 text-black;
+}
+
+.team-leganes {
+    @apply bg-yellow-400 border-yellow-500 text-black;
+}
 {% endblock %}
 
 {% block content %}
@@ -25,7 +177,40 @@
     <!-- Header -->
     <div class="mb-8">
         <h2 class="text-3xl font-black text-white mb-2">Clasificación</h2>
-        <p class="text-gray-400 text-lg">LaLiga EA Sports 2024/25</p>
+        <p class="text-gray-400 text-lg">LaLiga EA Sports</p>
+    </div>
+
+    <!-- Filtros de Temporada y Jornada -->
+    <div class="glass-panel rounded-2xl p-6 mb-6">
+        <form method="get" id="filter-form" class="flex flex-col md:flex-row gap-4 items-end">
+            <div class="flex-1">
+                <label class="block text-sm font-bold text-white mb-2">Temporada</label>
+                <select name="temporada" class="select-custom w-full" id="temporada-select" onchange="document.getElementById('filter-form').submit()">
+                    {% for temp_item in temporadas_display %}
+                        <option value="{{ temp_item.display }}" {% if temp_item.display == temporada_actual %}selected{% endif %}>
+                            {{ temp_item.display }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="flex-1">
+                <label class="block text-sm font-bold text-white mb-2">Jornada</label>
+                <select name="jornada" class="select-custom w-full" id="jornada-select" onchange="document.getElementById('filter-form').submit()">
+                    {% for jornada in jornadas %}
+                        <option value="{{ jornada.numero_jornada }}" {% if jornada.numero_jornada == jornada_actual %}selected{% endif %}>
+                            Jornada {{ jornada.numero_jornada }}
+                        </option>
+                    {% empty %}
+                        <option value="">No hay jornadas disponibles</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button type="submit" class="bg-primary text-black font-bold px-6 py-2.5 rounded-lg hover:bg-primary-dark transition-all">
+                Filtrar
+            </button>
+        </form>
     </div>
 
     <!-- Información de la jornada -->
@@ -36,280 +221,104 @@
                     <span class="material-symbols-outlined text-black text-2xl font-bold">emoji_events</span>
                 </div>
                 <div>
-                    <h3 class="text-2xl font-black text-white">Jornada 15</h3>
-                    <p class="text-gray-400">Temporada 2024/25</p>
+                    <h3 class="text-2xl font-black text-white">Jornada {{ jornada_actual }}</h3>
+                    <p class="text-gray-400">Temporada {{ temporada_actual }}</p>
                 </div>
-            </div>
-            <div class="text-right">
-                <p class="text-sm font-bold text-white">Próxima Jornada</p>
-                <p class="text-xs text-gray-400">16-17 Diciembre 2024</p>
             </div>
         </div>
     </div>
 
     <!-- Tabla de clasificación -->
     <div class="glass-panel rounded-2xl overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="league-table w-full">
-                <thead>
-                    <tr>
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 w-16">#</th>
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-left">Equipo</th>
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-16">PJ</th>
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-16">G</th>
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-16">E</th>
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-16">P</th>
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-20">GF</th>
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-20">GC</th>
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-20">DG</th>
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-20">Pts</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Champions League (4 primeros) -->
-                    <tr class="group transition-colors border-l-4 border-l-blue-500">
-                        <td class="px-6 py-4 text-sm font-bold text-primary group-hover:text-primary">1</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="size-8 bg-gradient-to-br from-blue-600 to-red-700 rounded-lg flex items-center justify-center">
-                                    <span class="text-xs font-bold text-white">FCB</span>
-                                </div>
-                                <div>
-                                    <a href="{% url 'equipo' 'FC Barcelona' %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">FC Barcelona</a>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-center text-gray-300">15</td>
-                        <td class="px-6 py-4 text-center text-green-400">11</td>
-                        <td class="px-6 py-4 text-center text-yellow-400">4</td>
-                        <td class="px-6 py-4 text-center text-red-400">0</td>
-                        <td class="px-6 py-4 text-center text-gray-300">40</td>
-                        <td class="px-6 py-4 text-center text-gray-300">12</td>
-                        <td class="px-6 py-4 text-center text-primary font-bold">+28</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-primary/20 text-primary px-3 py-1.5 rounded-lg text-sm font-bold">37</span>
-                        </td>
-                    </tr>
+        {% if clasificacion %}
+            <div class="overflow-x-auto">
+                <table class="league-table w-full">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 w-16">#</th>
+                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-left">Equipo</th>
+                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-20">Racha</th>
+                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-16">PJ</th>
+                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-16">G</th>
+                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-16">E</th>
+                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-16">P</th>
+                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-20">GF</th>
+                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-20">GC</th>
+                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-20">DG</th>
+                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center w-20">Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for registro in clasificacion %}
+                            <tr class="group transition-colors border-l-4 {% if registro.posicion <= 4 %}border-l-blue-500{% elif registro.posicion <= 7 %}border-l-orange-500{% elif registro.posicion <= 17 %}border-l-gray-500{% else %}border-l-red-500{% endif %}">
+                                <td class="px-6 py-4 text-sm font-bold text-primary group-hover:text-primary">{{ registro.posicion }}</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="team-badge team-{{ registro.equipo.nombre|normalize_team_name }}">
+                                            <span>{{ registro.iniciales }}</span>
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'equipo_temporada' registro.equipo.nombre temporada_nombre %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">{{ registro.equipo.nombre }}</a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex justify-center gap-1">
+                                        {% for resultado in registro.racha_reciente %}
+                                            {% if resultado == 'W' %}
+                                                <span class="racha-circle racha-g">V</span>
+                                            {% elif resultado == 'D' %}
+                                                <span class="racha-circle racha-e">E</span>
+                                            {% elif resultado == 'L' %}
+                                                <span class="racha-circle racha-p">P</span>
+                                            {% endif %}
+                                        {% empty %}
+                                            <span class="text-gray-400">—</span>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center text-gray-300">{{ registro.partidos_ganados|add:registro.partidos_empatados|add:registro.partidos_perdidos }}</td>
+                                <td class="px-6 py-4 text-center text-green-400">{{ registro.partidos_ganados }}</td>
+                                <td class="px-6 py-4 text-center text-yellow-400">{{ registro.partidos_empatados }}</td>
+                                <td class="px-6 py-4 text-center text-red-400">{{ registro.partidos_perdidos }}</td>
+                                <td class="px-6 py-4 text-center text-gray-300">{{ registro.goles_favor }}</td>
+                                <td class="px-6 py-4 text-center text-gray-300">{{ registro.goles_contra }}</td>
+                                <td class="px-6 py-4 text-center {% if registro.diferencia_goles > 0 %}text-primary{% elif registro.diferencia_goles < 0 %}text-red-400{% else %}text-gray-300{% endif %} font-bold">{% if registro.diferencia_goles > 0 %}+{% endif %}{{ registro.diferencia_goles }}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="{% if registro.posicion <= 4 %}bg-blue-500/20 text-blue-400{% elif registro.posicion <= 7 %}bg-orange-500/20 text-orange-400{% else %}bg-white/20 text-white{% endif %} px-3 py-1.5 rounded-lg text-sm font-bold">{{ registro.puntos }}</span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-                    <tr class="group transition-colors border-l-4 border-l-blue-500">
-                        <td class="px-6 py-4 text-sm font-bold group-hover:text-primary">2</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="size-8 bg-gradient-to-br from-white to-gray-300 rounded-lg flex items-center justify-center">
-                                    <span class="text-xs font-bold text-black">RMA</span>
-                                </div>
-                                <div>
-                                    <a href="{% url 'equipo' 'Real Madrid' %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">Real Madrid</a>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-center text-gray-300">14</td>
-                        <td class="px-6 py-4 text-center text-green-400">11</td>
-                        <td class="px-6 py-4 text-center text-yellow-400">3</td>
-                        <td class="px-6 py-4 text-center text-red-400">0</td>
-                        <td class="px-6 py-4 text-center text-gray-300">25</td>
-                        <td class="px-6 py-4 text-center text-gray-300">11</td>
-                        <td class="px-6 py-4 text-center text-primary font-bold">+14</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-white/20 text-white px-3 py-1.5 rounded-lg text-sm font-bold">36</span>
-                        </td>
-                    </tr>
-
-                    <tr class="group transition-colors border-l-4 border-l-blue-500">
-                        <td class="px-6 py-4 text-sm font-bold group-hover:text-primary">3</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="size-8 bg-gradient-to-br from-red-600 to-white rounded-lg flex items-center justify-center">
-                                    <span class="text-xs font-bold text-white">ATM</span>
-                                </div>
-                                <div>
-                                    <a href="{% url 'equipo' 'Atlético Madrid' %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">Atlético Madrid</a>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-center text-gray-300">15</td>
-                        <td class="px-6 py-4 text-center text-green-400">9</td>
-                        <td class="px-6 py-4 text-center text-yellow-400">5</td>
-                        <td class="px-6 py-4 text-center text-red-400">1</td>
-                        <td class="px-6 py-4 text-center text-gray-300">19</td>
-                        <td class="px-6 py-4 text-center text-gray-300">7</td>
-                        <td class="px-6 py-4 text-center text-primary font-bold">+12</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-sm font-bold">32</span>
-                        </td>
-                    </tr>
-
-                    <tr class="group transition-colors border-l-4 border-l-blue-500">
-                        <td class="px-6 py-4 text-sm font-bold group-hover:text-primary">4</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="size-8 bg-gradient-to-br from-green-600 to-red-600 rounded-lg flex items-center justify-center">
-                                    <span class="text-xs font-bold text-white">BIL</span>
-                                </div>
-                                <div>
-                                    <a href="{% url 'equipo' 'Athletic Bilbao' %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">Athletic Bilbao</a>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-center text-gray-300">15</td>
-                        <td class="px-6 py-4 text-center text-green-400">8</td>
-                        <td class="px-6 py-4 text-center text-yellow-400">5</td>
-                        <td class="px-6 py-4 text-center text-red-400">2</td>
-                        <td class="px-6 py-4 text-center text-gray-300">22</td>
-                        <td class="px-6 py-4 text-center text-gray-300">13</td>
-                        <td class="px-6 py-4 text-center text-green-400 font-bold">+9</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-green-500/20 text-green-400 px-3 py-1.5 rounded-lg text-sm font-bold">29</span>
-                        </td>
-                    </tr>
-
-                    <!-- Europa League (5º-7º) -->
-                    <tr class="group transition-colors border-l-4 border-l-orange-500">
-                        <td class="px-6 py-4 text-sm font-bold group-hover:text-primary">5</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="size-8 bg-gradient-to-br from-purple-600 to-yellow-500 rounded-lg flex items-center justify-center">
-                                    <span class="text-xs font-bold text-white">VIL</span>
-                                </div>
-                                <div>
-                                    <a href="{% url 'equipo' 'Villarreal' %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">Villarreal</a>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-center text-gray-300">14</td>
-                        <td class="px-6 py-4 text-center text-green-400">7</td>
-                        <td class="px-6 py-4 text-center text-yellow-400">4</td>
-                        <td class="px-6 py-4 text-center text-red-400">3</td>
-                        <td class="px-6 py-4 text-center text-gray-300">23</td>
-                        <td class="px-6 py-4 text-center text-gray-300">19</td>
-                        <td class="px-6 py-4 text-center text-green-400 font-bold">+4</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-orange-500/20 text-orange-400 px-3 py-1.5 rounded-lg text-sm font-bold">25</span>
-                        </td>
-                    </tr>
-
-                    <!-- Continuar con más equipos... -->
-                    <tr class="group transition-colors border-l-4 border-l-orange-500">
-                        <td class="px-6 py-4 text-sm font-bold group-hover:text-primary">6</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="size-8 bg-gradient-to-br from-blue-500 to-white rounded-lg flex items-center justify-center">
-                                    <span class="text-xs font-bold text-blue-900">RSO</span>
-                                </div>
-                                <div>
-                                    <a href="{% url 'equipo' 'Real Sociedad' %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">Real Sociedad</a>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-center text-gray-300">14</td>
-                        <td class="px-6 py-4 text-center text-green-400">7</td>
-                        <td class="px-6 py-4 text-center text-yellow-400">3</td>
-                        <td class="px-6 py-4 text-center text-red-400">4</td>
-                        <td class="px-6 py-4 text-center text-gray-300">15</td>
-                        <td class="px-6 py-4 text-center text-gray-300">10</td>
-                        <td class="px-6 py-4 text-center text-green-400 font-bold">+5</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-blue-500/20 text-blue-400 px-3 py-1.5 rounded-lg text-sm font-bold">24</span>
-                        </td>
-                    </tr>
-
-                    <!-- Descenso (3 últimos) -->
-                    <tr class="group transition-colors border-l-4 border-l-red-500">
-                        <td class="px-6 py-4 text-sm font-bold group-hover:text-primary">18</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="size-8 bg-gradient-to-br from-red-600 to-blue-800 rounded-lg flex items-center justify-center">
-                                    <span class="text-xs font-bold text-white">LEV</span>
-                                </div>
-                                <div>
-                                    <a href="{% url 'equipo' 'Levante' %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">Levante</a>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-center text-gray-300">15</td>
-                        <td class="px-6 py-4 text-center text-green-400">3</td>
-                        <td class="px-6 py-4 text-center text-yellow-400">3</td>
-                        <td class="px-6 py-4 text-center text-red-400">9</td>
-                        <td class="px-6 py-4 text-center text-gray-300">12</td>
-                        <td class="px-6 py-4 text-center text-gray-300">28</td>
-                        <td class="px-6 py-4 text-center text-red-400 font-bold">-16</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-sm font-bold">12</span>
-                        </td>
-                    </tr>
-
-                    <tr class="group transition-colors border-l-4 border-l-red-500">
-                        <td class="px-6 py-4 text-sm font-bold group-hover:text-primary">19</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="size-8 bg-gradient-to-br from-red-500 to-white rounded-lg flex items-center justify-center">
-                                    <span class="text-xs font-bold text-red-900">ALM</span>
-                                </div>
-                                <div>
-                                    <a href="{% url 'equipo' 'UD Almería' %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">UD Almería</a>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-center text-gray-300">15</td>
-                        <td class="px-6 py-4 text-center text-green-400">2</td>
-                        <td class="px-6 py-4 text-center text-yellow-400">4</td>
-                        <td class="px-6 py-4 text-center text-red-400">9</td>
-                        <td class="px-6 py-4 text-center text-gray-300">18</td>
-                        <td class="px-6 py-4 text-center text-gray-300">35</td>
-                        <td class="px-6 py-4 text-center text-red-400 font-bold">-17</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-sm font-bold">10</span>
-                        </td>
-                    </tr>
-
-                    <tr class="group transition-colors border-l-4 border-l-red-500">
-                        <td class="px-6 py-4 text-sm font-bold group-hover:text-primary">20</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="size-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
-                                    <span class="text-xs font-bold text-white">VAL</span>
-                                </div>
-                                <div>
-                                    <a href="{% url 'equipo' 'Valencia CF' %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">Valencia CF</a>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-center text-gray-300">14</td>
-                        <td class="px-6 py-4 text-center text-green-400">2</td>
-                        <td class="px-6 py-4 text-center text-yellow-400">3</td>
-                        <td class="px-6 py-4 text-center text-red-400">9</td>
-                        <td class="px-6 py-4 text-center text-gray-300">7</td>
-                        <td class="px-6 py-4 text-center text-gray-300">22</td>
-                        <td class="px-6 py-4 text-center text-red-400 font-bold">-15</td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-sm font-bold">9</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Leyenda -->
-        <div class="p-6 bg-surface-dark-lighter border-t border-border-dark">
-            <div class="flex flex-wrap gap-6 text-xs">
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-4 bg-blue-500 rounded"></div>
-                    <span class="text-gray-400">Champions League</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-4 bg-orange-500 rounded"></div>
-                    <span class="text-gray-400">Europa League</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-4 bg-yellow-500 rounded"></div>
-                    <span class="text-gray-400">Conference League</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-4 bg-red-500 rounded"></div>
-                    <span class="text-gray-400">Descenso</span>
+            <!-- Leyenda -->
+            <div class="p-6 bg-surface-dark-lighter border-t border-border-dark">
+                <div class="flex flex-wrap gap-6 text-xs">
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-blue-500 rounded"></div>
+                        <span class="text-gray-400">Champions League</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-orange-500 rounded"></div>
+                        <span class="text-gray-400">Europa League</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-gray-500 rounded"></div>
+                        <span class="text-gray-400">Resto</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-red-500 rounded"></div>
+                        <span class="text-gray-400">Descenso</span>
+                    </div>
                 </div>
             </div>
-        </div>
+        {% else %}
+            <div class="p-12 text-center">
+                <p class="text-gray-400 text-lg">No hay datos de clasificación disponibles para esta selección.</p>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

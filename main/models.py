@@ -105,6 +105,28 @@ class HistorialEquiposJugador(models.Model):
 
 
 # ============================================================================
+# TABLA: EQUIPO-JUGADOR-TEMPORADA (Plantilla jugada)
+# ============================================================================
+class EquipoJugadorTemporada(models.Model):
+    """Almacena solo jugadores que jugaron al menos un partido en la temporada"""
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='jugadores_temporada')
+    jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE, related_name='equipos_temporada')
+    temporada = models.ForeignKey(Temporada, on_delete=models.CASCADE)
+    dorsal = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(99)])
+    edad = models.IntegerField(validators=[MinValueValidator(15), MaxValueValidator(50)])
+    partidos_jugados = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+
+    class Meta:
+        verbose_name = 'Equipo Jugador Temporada'
+        verbose_name_plural = 'Equipos Jugadores Temporadas'
+        unique_together = ('equipo', 'jugador', 'temporada')
+        ordering = ['temporada', 'equipo', 'jugador__apellido']
+
+    def __str__(self):
+        return f"{self.jugador} - {self.equipo.nombre} ({self.temporada.nombre})"
+
+
+# ============================================================================
 # TABLA: JORNADAS
 # ============================================================================
 class Jornada(models.Model):

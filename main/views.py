@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from .models import (Temporada, Jornada, ClasificacionJornada, Equipo, HistorialEquiposJugador, 
+                     EquipoJugadorTemporada, Partido, EstadisticasPartidoJugador, Jugador)
+from django.db.models import Sum, Count, F, Case, When, FloatField, Q
 
 def menu(request):
     """Vista principal del menú"""
@@ -9,20 +12,158 @@ def mi_plantilla(request):
     return render(request, 'mi_plantilla.html', {'active_page': 'mi-plantilla'})
 
 def clasificacion(request):
-    """Vista de Clasificación de la liga"""
-    return render(request, 'clasificacion.html', {'active_page': 'liga'})
+    """Vista de Clasificación de la liga con filtros por temporada y jornada"""
+    # Obtener parámetros del GET
+    temporada_display = request.GET.get('temporada', '23/24')
+    jornada_num = request.GET.get('jornada', '1')
+    
+    # Convertir formato 23/24 → 23_24 para búsqueda en BD
+    temporada_nombre = temporada_display.replace('/', '_')
+    
+    # Obtener todas las temporadas disponibles
+    temporadas = Temporada.objects.all().order_by('-nombre')
+    
+    # Preparar lista de temporadas con formato display (23/24)
+    temporadas_display = []
+    for temp in temporadas:
+        display_name = temp.nombre.replace('_', '/')
+        temporadas_display.append({
+            'obj': temp,
+            'nombre': temp.nombre,
+            'display': display_name
+        })
+    
+    # Obtener la temporada seleccionada
+    try:
+        temporada = Temporada.objects.get(nombre=temporada_nombre)
+    except Temporada.DoesNotExist:
+        temporada = temporadas.first()
+        temporada_nombre = temporada.nombre if temporada else '23_24'
+        temporada_display = temporada_nombre.replace('_', '/')
+    
+    # Obtener jornadas disponibles para la temporada
+    jornadas = Jornada.objects.filter(temporada=temporada).order_by('numero_jornada')
+    
+    # Obtener la clasificación para la temporada y jornada
+    clasificacion_datos = []
+    jornada_obj = None
+    if jornadas.exists():
+        try:
+            jornada_obj = jornadas.get(numero_jornada=int(jornada_num))
+        except (Jornada.DoesNotExist, ValueError):
+            jornada_obj = jornadas.first()
+            jornada_num = jornada_obj.numero_jornada if jornada_obj else 1
+        
+        if jornada_obj:
+            clasificacion_datos = ClasificacionJornada.objects.filter(
+                temporada=temporada,
+                jornada=jornada_obj
+            ).order_by('posicion', 'equipo__nombre').select_related('equipo')
+            
+            # Agregar iniciales a cada registro para el template
+            for reg in clasificacion_datos:
+                palabras = reg.equipo.nombre.split()
+                reg.iniciales = ''.join([palabra[0].upper() for palabra in palabras])
+    
+    context = {
+        'active_page': 'liga',
+        'temporadas_display': temporadas_display,
+        'temporada_actual': temporada_display,
+        'temporada_nombre': temporada_nombre,
+        'jornadas': jornadas,
+        'jornada_actual': int(jornada_num) if jornadas.exists() else 1,
+        'clasificacion': clasificacion_datos,
+    }
+    
+    return render(request, 'clasificacion.html', context)
 
-def equipo(request, equipo_nombre=None):
-    """Vista de detalles de equipo"""
-    return render(request, 'equipo.html', {
-        'active_page': 'equipos', 
-        'equipo_nombre': equipo_nombre or 'FC Barcelona',
+def equipo(request, equipo_nombre=None, temporada=None):
+    """Vista de detalles de equipo con plantilla de jugadores que jugaron"""
+    # Obtener temporada: GET parameter tiene prioridad, luego URL parameter, luego default
+    temporada_display = request.GET.get('temporada') or temporada or '24/25'
+    temporada_nombre = temporada_display.replace('/', '_')
+    
+    # Obtener todas las temporadas disponibles
+    temporadas = Temporada.objects.all().order_by('-nombre')
+    temporadas_display = []
+    for temp in temporadas:
+        display_name = temp.nombre.replace('_', '/')
+        temporadas_display.append({
+            'nombre': temp.nombre,
+            'display': display_name
+        })
+    
+    # Obtener el equipo
+    equipo = None
+    jugadores = []
+    equipo_display_nombre = equipo_nombre or 'FC Barcelona'
+    
+    try:
+        equipo = Equipo.objects.get(nombre=equipo_display_nombre)
+        
+        # Obtener la temporada
+        try:
+            temp_obj = Temporada.objects.get(nombre=temporada_nombre)
+        except Temporada.DoesNotExist:
+            temp_obj = temporadas.first()
+            temporada_nombre = temp_obj.nombre if temp_obj else '24_25'
+            temporada_display = temporada_nombre.replace('_', '/')
+        
+        # Obtener plantilla del equipo SOLO para la temporada seleccionada
+        # (solo jugadores que jugaron al menos un partido)
+        jugadores_equipo_temp = EquipoJugadorTemporada.objects.filter(
+            equipo=equipo,
+            temporada=temp_obj
+        ).select_related('jugador').order_by('dorsal')
+        
+        # Calcular estadísticas de Fantasy para cada jugador EN ESA TEMPORADA
+        for eq_jug_temp in jugadores_equipo_temp:
+            # Obtener estadísticas del jugador SOLO en esta temporada
+            stats = EstadisticasPartidoJugador.objects.filter(
+                jugador=eq_jug_temp.jugador,
+                partido__jornada__temporada=temp_obj
+            )
+            
+            # Calcular totales
+            total_puntos = stats.aggregate(Sum('puntos_fantasy'))['puntos_fantasy__sum'] or 0
+            partidos_jugados = stats.count()
+            
+            # Calcular promedio
+            promedio_puntos = total_puntos / partidos_jugados if partidos_jugados > 0 else 0
+            
+            # Añadir atributos al objeto (datos de EstaTemporada)
+            eq_jug_temp.total_puntos_fantasy = total_puntos
+            eq_jug_temp.partidos_stats = partidos_jugados
+            eq_jug_temp.promedio_puntos_fantasy = round(promedio_puntos, 2)
+            
+            jugadores.append(eq_jug_temp)
+    
+    except Equipo.DoesNotExist:
+        equipo = None
+        jugadores = []
+    
+    context = {
+        'active_page': 'equipos',
+        'equipo': equipo,
+        'equipo_nombre': equipo_display_nombre,
+        'jugadores': jugadores,
+        'temporadas_display': temporadas_display,
+        'temporada_actual': temporada_display,
+        'temporada_actual_db': temporada_nombre,  # Formato con guion (23_24) para URLs
         'desde_clasificacion': equipo_nombre is not None
-    })
+    }
+    
+    return render(request, 'equipo.html', context)
 
-def jugador(request):
+def jugador(request, jugador_id=None, temporada=None):
     """Vista de estadísticas de jugador"""
-    return render(request, 'jugador.html', {'active_page': 'estadisticas'})
+    # Por ahora, redirigir a template placeholder
+    # Cuando definas el contenido exacto, actualiza esta vista
+    return render(request, 'jugador.html', {
+        'active_page': 'estadisticas',
+        'jugador_id': jugador_id,
+        'temporada': temporada
+    })
 
 def amigos(request):
     """Vista de amigos y comparaciones"""

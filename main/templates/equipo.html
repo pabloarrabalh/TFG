@@ -21,365 +21,258 @@
             <!-- Header del equipo -->
             <div class="bg-pitch-pattern rounded-3xl p-8 mb-6 relative overflow-hidden">
                 <div class="absolute top-4 left-6 bg-primary/10 px-3 py-1 rounded-full border border-primary/30">
-                    <span class="text-xs font-bold text-primary uppercase tracking-widest">1ª División - Temporada 24/25</span>
+                    <span class="text-xs font-bold text-primary uppercase tracking-widest">1ª División - Temporada {{ temporada_actual }}</span>
                 </div>
                 
                 <div class="flex items-center gap-8 mt-8 mb-6">
                     <div class="size-20 bg-gradient-to-br from-blue-600 to-red-700 rounded-2xl flex items-center justify-center shadow-2xl">
-                        <span class="text-3xl font-black text-white">FCB</span>
+                        <span class="text-3xl font-black text-white">{% if equipo %}{{ equipo.nombre|truncatechars:4 }}{% else %}FCB{% endif %}</span>
                     </div>
                     <div>
                         <h1 class="text-6xl font-black text-white mb-2 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                            FC BARCELONA
+                            {{ equipo.nombre|upper|default:"FC BARCELONA" }}
                         </h1>
                         <div class="flex items-center gap-6 text-white/80">
-                            <span>Estadio Olímpico Lluís Companys</span>
+                            <span>{{ equipo.estadio|default:"Estadio Olímpico Lluís Companys" }}</span>
                             <span>•</span>
-                            <span>Hansi Flick</span>
+                            <span>Entrenador</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="absolute top-4 right-6 text-right">
-                    <div class="text-white/60 text-sm uppercase font-bold tracking-widest mb-1">Puntos Totales</div>
-                    <div class="text-4xl font-black text-primary">1,842<span class="text-lg text-white/60">pts</span></div>
+                    <div class="text-white/60 text-sm uppercase font-bold tracking-widest mb-1">Temporada</div>
+                    <div class="text-4xl font-black text-primary">{{ temporada_actual }}<span class="text-lg text-white/60"></span></div>
+                </div>
+            </div>
+
+            <!-- Selector de Temporada (Botones) -->
+            <div class="glass-panel rounded-2xl p-6 mb-6">
+                <label class="block text-sm font-bold text-white mb-4">Selecciona la Temporada</label>
+                <div class="flex gap-3 flex-wrap">
+                    {% for temp_item in temporadas_display %}
+                        <a href="?temporada={{ temp_item.display }}" 
+                           class="px-6 py-3 rounded-lg font-bold transition-all {% if temp_item.display == temporada_actual %}bg-green-500 text-black hover:bg-green-600{% else %}bg-surface-dark border border-border-dark text-white hover:border-primary{% endif %}">
+                            Temporada {{ temp_item.display }}
+                        </a>
+                    {% endfor %}
                 </div>
             </div>
 
             <!-- Plantilla Oficial -->
             <div class="glass-panel rounded-2xl p-6">
                 <h2 class="text-3xl font-black text-white mb-8">
-                    PLANTILLA <span class="text-primary">OFICIAL</span>
+                    PLANTILLA <span class="text-primary">OFICIAL</span> {% if jugadores %}({{ jugadores|length }} jugadores){% else %}(0 jugadores){% endif %}
                 </h2>
 
-                <!-- Controles de vista -->
-                <div class="flex justify-end mb-6 gap-2">
-                    <button class="p-2 bg-primary text-black rounded-lg">
-                        <span class="material-symbols-outlined">grid_view</span>
-                    </button>
-                    <button class="p-2 bg-surface-dark text-white rounded-lg border border-border-dark">
-                        <span class="material-symbols-outlined">list</span>
-                    </button>
-                </div>
+                {% if jugadores %}
+                    <!-- Secciones por posición -->
+                    <div class="space-y-8">
+                        <!-- PORTEROS -->
+                        {% with porteros=jugadores|dictsort:"jugador.nombre" %}
+                            {% if porteros %}
+                                <div>
+                                    <div class="flex items-center gap-3 mb-4">
+                                        <div class="w-4 h-4 bg-yellow-500 rounded-full"></div>
+                                        <h3 class="text-lg font-black text-white uppercase tracking-wider">PORTEROS</h3>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        {% for jugador in jugadores %}
+                                            {% if jugador.jugador.posicion == 'Portero' %}
+                                                <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
+                                                    <div class="flex items-center gap-3 mb-4">
+                                                        <div class="bg-yellow-500 text-black px-2 py-1 rounded text-xs font-bold">PT</div>
+                                                        <div class="flex-1">
+                                                            <a href="{% url 'jugador_temporada' jugador.jugador.id temporada_actual_db %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">{{ jugador.jugador.nombre }} {{ jugador.jugador.apellido }}</a>
+                                                            <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">
+                                                                {% if jugador.dorsal == 0 %}SUPLENTE{% else %}Dorsal: {{ jugador.dorsal }}{% endif %}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="grid grid-cols-3 gap-2 mb-3">
+                                                        <div class="text-center">
+                                                            <div class="text-lg font-black text-primary">{{ jugador.edad }}</div>
+                                                            <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">AÑOS</div>
+                                                        </div>
+                                                        <div class="text-center">
+                                                            <div class="text-lg font-black text-white">{{ jugador.jugador.nacionalidad|truncatechars:3 }}</div>
+                                                            <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">NAC.</div>
+                                                        </div>
+                                                        <div class="text-center">
+                                                            <div class="text-lg font-black text-primary">{{ jugador.partidos_stats }}</div>
+                                                            <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">PJ</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="border-t border-border-dark pt-3 space-y-2">
+                                                        <div class="flex justify-between items-center">
+                                                            <span class="text-xs text-gray-400">Fantasy Total</span>
+                                                            <span class="font-bold text-white">{{ jugador.total_puntos_fantasy }}</span>
+                                                        </div>
+                                                        <div class="flex justify-between items-center">
+                                                            <span class="text-xs text-gray-400">Fantasy Promedio</span>
+                                                            <span class="font-bold text-primary">{{ jugador.promedio_puntos_fantasy }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
 
-                <!-- Secciones por posición -->
-                <div class="space-y-8">
-                    <!-- PORTEROS -->
-                    <div>
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-4 h-4 bg-yellow-500 rounded-full"></div>
-                            <h3 class="text-lg font-black text-white uppercase tracking-wider">PORTEROS</h3>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-yellow-500 text-black px-2 py-1 rounded text-xs font-bold">PT</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold text-white text-sm">M. Ter Stegen</p>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">TITULAR</p>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-primary">154</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">7.1</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</div>
-                                    </div>
-                                </div>
+                        <!-- DEFENSAS -->
+                        <div>
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
+                                <h3 class="text-lg font-black text-white uppercase tracking-wider">DEFENSAS</h3>
                             </div>
-
-                            <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-yellow-500 text-black px-2 py-1 rounded text-xs font-bold">PT</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold text-white text-sm">Iñaki Peña</p>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">SUPLENTE</p>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">45</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">5.6</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- DEFENSAS -->
-                    <div>
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
-                            <h3 class="text-lg font-black text-white uppercase tracking-wider">DEFENSAS</h3>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">DF</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold text-white text-sm">Jules Koundé</p>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</p>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">132</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">6.5</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">DF</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold text-white text-sm">Pau Cubarsí</p>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</p>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">98</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">6.1</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">DF</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold text-white text-sm">A. Balde</p>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</p>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-primary">110</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">6.5</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">DF</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold text-white text-sm">Íñigo Mínez</p>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</p>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">88</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">5.9</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</div>
-                                    </div>
-                                </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {% for jugador in jugadores %}
+                                    {% if jugador.jugador.posicion == 'Defensa' %}
+                                        <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
+                                            <div class="flex items-center gap-3 mb-4">
+                                                <div class="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold">DF</div>
+                                                <div class="flex-1">
+                                                        <a href="{% url 'jugador_temporada' jugador.jugador.id temporada_actual_db %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">{{ jugador.jugador.nombre }} {{ jugador.jugador.apellido }}</a>
+                                                    <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">
+                                                        {% if jugador.dorsal == 0 %}SUPLENTE{% else %}Dorsal: {{ jugador.dorsal }}{% endif %}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="grid grid-cols-3 gap-2 mb-3">
+                                                <div class="text-center">
+                                                    <div class="text-lg font-black text-primary">{{ jugador.edad }}</div>
+                                                    <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">AÑOS</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div class="text-lg font-black text-white">{{ jugador.jugador.nacionalidad|truncatechars:3 }}</div>
+                                                    <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">NAC.</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div class="text-lg font-black text-primary">{{ jugador.partidos_stats }}</div>
+                                                    <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">PJ</div>
+                                                </div>
+                                            </div>
+                                            <div class="border-t border-border-dark pt-3 space-y-2">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-xs text-gray-400">Fantasy Total</span>
+                                                    <span class="font-bold text-white">{{ jugador.total_puntos_fantasy }}</span>
+                                                </div>
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-xs text-gray-400">Fantasy Promedio</span>
+                                                    <span class="font-bold text-primary">{{ jugador.promedio_puntos_fantasy }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
                             </div>
                         </div>
-                    </div>
 
-                    <!-- CENTROCAMPISTAS -->
-                    <div>
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-4 h-4 bg-gray-500 rounded-full"></div>
-                            <h3 class="text-lg font-black text-white uppercase tracking-wider">CENTROCAMPISTAS</h3>
+                        <!-- CENTROCAMPISTAS -->
+                        <div>
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-4 h-4 bg-gray-500 rounded-full"></div>
+                                <h3 class="text-lg font-black text-white uppercase tracking-wider">CENTROCAMPISTAS</h3>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {% for jugador in jugadores %}
+                                    {% if jugador.jugador.posicion == 'Centrocampista' %}
+                                        <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
+                                            <div class="flex items-center gap-3 mb-4">
+                                                <div class="bg-gray-500 text-white px-2 py-1 rounded text-xs font-bold">MC</div>
+                                                <div class="flex-1">
+                                                        <a href="{% url 'jugador_temporada' jugador.jugador.id temporada_actual_db %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">{{ jugador.jugador.nombre }} {{ jugador.jugador.apellido }}</a>
+                                                    <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">
+                                                        {% if jugador.dorsal == 0 %}SUPLENTE{% else %}Dorsal: {{ jugador.dorsal }}{% endif %}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="grid grid-cols-3 gap-2 mb-3">
+                                                <div class="text-center">
+                                                    <div class="text-lg font-black text-primary">{{ jugador.edad }}</div>
+                                                    <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">AÑOS</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div class="text-lg font-black text-white">{{ jugador.jugador.nacionalidad|truncatechars:3 }}</div>
+                                                    <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">NAC.</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div class="text-lg font-black text-primary">{{ jugador.partidos_stats }}</div>
+                                                    <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">PJ</div>
+                                                </div>
+                                            </div>
+                                            <div class="border-t border-border-dark pt-3 space-y-2">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-xs text-gray-400">Fantasy Total</span>
+                                                    <span class="font-bold text-white">{{ jugador.total_puntos_fantasy }}</span>
+                                                </div>
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-xs text-gray-400">Fantasy Promedio</span>
+                                                    <span class="font-bold text-primary">{{ jugador.promedio_puntos_fantasy }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-gray-500 text-white px-2 py-1 rounded text-xs font-bold">MC</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold text-white text-sm">Dani Olmo</p>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</p>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-primary">145</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">7.2</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-gray-500 text-white px-2 py-1 rounded text-xs font-bold">MC</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold text-white text-sm">Pedri</p>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</p>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">120</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">6.8</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</div>
-                                    </div>
-                                </div>
+                        <!-- DELANTEROS -->
+                        <div>
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-4 h-4 bg-red-500 rounded-full"></div>
+                                <h3 class="text-lg font-black text-white uppercase tracking-wider">DELANTEROS</h3>
                             </div>
-
-                            <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-gray-500 text-white px-2 py-1 rounded text-xs font-bold">MC</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold text-white text-sm">Marc Casadó</p>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</p>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">95</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">6.0</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-gray-500 text-white px-2 py-1 rounded text-xs font-bold">MC</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold text-white text-sm">Gavi</p>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</p>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">70</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">5.5</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</div>
-                                    </div>
-                                </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {% for jugador in jugadores %}
+                                    {% if jugador.jugador.posicion == 'Delantero' %}
+                                        <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
+                                            <div class="flex items-center gap-3 mb-4">
+                                                <div class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">DT</div>
+                                                <div class="flex-1">
+                                                        <a href="{% url 'jugador_temporada' jugador.jugador.id temporada_actual_db %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">{{ jugador.jugador.nombre }} {{ jugador.jugador.apellido }}</a>
+                                                    <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">
+                                                        {% if jugador.dorsal == 0 %}SUPLENTE{% else %}Dorsal: {{ jugador.dorsal }}{% endif %}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="grid grid-cols-3 gap-2 mb-3">
+                                                <div class="text-center">
+                                                    <div class="text-lg font-black text-primary">{{ jugador.edad }}</div>
+                                                    <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">AÑOS</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div class="text-lg font-black text-white">{{ jugador.jugador.nacionalidad|truncatechars:3 }}</div>
+                                                    <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">NAC.</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div class="text-lg font-black text-primary">{{ jugador.partidos_stats }}</div>
+                                                    <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">PJ</div>
+                                                </div>
+                                            </div>
+                                            <div class="border-t border-border-dark pt-3 space-y-2">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-xs text-gray-400">Fantasy Total</span>
+                                                    <span class="font-bold text-white">{{ jugador.total_puntos_fantasy }}</span>
+                                                </div>
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-xs text-gray-400">Fantasy Promedio</span>
+                                                    <span class="font-bold text-primary">{{ jugador.promedio_puntos_fantasy }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
-
-                    <!-- DELANTEROS -->
-                    <div>
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-4 h-4 bg-red-500 rounded-full"></div>
-                            <h3 class="text-lg font-black text-white uppercase tracking-wider">DELANTEROS</h3>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">DT</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold text-white text-sm">R. Lewandowski</p>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</p>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-primary">210</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">8.2</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">DT</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold text-white text-sm">Lamine Yamal</p>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</p>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-primary">195</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">7.9</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">DT</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold text-white text-sm">Raphinha</p>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</p>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-primary">175</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">7.4</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">DT</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold text-white text-sm">Ferran Torres</p>
-                                        <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</p>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">105</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">TOTAL</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-2xl font-black text-white">6.2</div>
-                                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest">MEDIA</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                {% else %}
+                    <div class="p-12 text-center">
+                        <p class="text-gray-400 text-lg">No hay datos de plantilla disponibles para este equipo en esta temporada.</p>
                     </div>
-                </div>
+                {% endif %}
             </div>
         </div>
 

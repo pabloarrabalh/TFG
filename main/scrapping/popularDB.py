@@ -31,7 +31,7 @@ django.setup()
 from main.models import (
     Temporada, Equipo, EquipoTemporada, Jugador,
     HistorialEquiposJugador, Jornada, Partido, EstadisticasPartidoJugador,
-    ClasificacionJornada, RendimientoHistoricoJugador
+    ClasificacionJornada, RendimientoHistoricoJugador, EquipoJugadorTemporada
 )
 from django.db.models import Sum, Count, Q
 
@@ -53,19 +53,31 @@ MAPEO_POSICIONES = {
 # Alias de equipos (normalización)
 EQUIPOS_ALIAS = {
     'rayo vallecano': 'Rayo Vallecano', 'rayo': 'Rayo Vallecano',
-    'sevilla': 'Sevilla', 'valencia': 'Valencia',
-    'real sociedad': 'Real Sociedad', 'girona': 'Girona',
-    'villarreal': 'Villarreal', 'real betis': 'Real Betis', 'betis': 'Real Betis',
+    'sevilla': 'Sevilla', 'sevilla fc': 'Sevilla',
+    'valencia': 'Valencia', 'valencia cf': 'Valencia',
+    'real sociedad': 'Real Sociedad', 
+    'girona': 'Girona', 'girona fc': 'Girona',
+    'villarreal': 'Villarreal', 
+    'real betis': 'Real Betis', 'betis': 'Real Betis',
     'athletic': 'Athletic Club', 'athletic club': 'Athletic Club',
-    'barcelona': 'Barcelona', 'fc barcelona': 'Barcelona', 'real madrid': 'Real Madrid',
-    'getafe': 'Getafe', 'celta vigo': 'Celta Vigo', 'celta': 'Celta Vigo',
-    'alaves': 'Alavés', 'alavés': 'Alavés', 'osasuna': 'Osasuna', 'levante': 'Levante',
-    'mallorca': 'Real Mallorca', 'real mallorca': 'Real Mallorca', 'las palmas': 'Las Palmas',
-    'cadiz': 'Cádiz', 'cádiz': 'Cádiz', 'oviedo': 'Real Oviedo', 'real oviedo': 'Real Oviedo',
-    'elche': 'Elche', 'almeria': 'Almería', 'almería': 'Almería', 'granada': 'Granada',
-    'sevilla fc': 'Sevilla', 'atletico madrid': 'Atlético Madrid', 'atletico': 'Atlético Madrid',
-    'espanyol': 'RCD Espanyol', 'getafe cf': 'Getafe',
-    'leganes': 'Leganés', 'leganés': 'Leganés',
+    'barcelona': 'Barcelona', 'fc barcelona': 'Barcelona', 
+    'real madrid': 'Real Madrid',
+    'getafe': 'Getafe', 'getafe cf': 'Getafe',
+    'celta vigo': 'Celta Vigo', 'celta': 'Celta Vigo', 'rc celta': 'Celta Vigo',
+    'alaves': 'Alavés', 'alavés': 'Alavés', 
+    'osasuna': 'Osasuna', 'ca osasuna': 'Osasuna',
+    'levante': 'Levante',
+    'mallorca': 'Real Mallorca', 'real mallorca': 'Real Mallorca', 'rcd mallorca': 'Real Mallorca',
+    'las palmas': 'Las Palmas', 'ud las palmas': 'Las Palmas',
+    'cadiz': 'Cádiz', 'cádiz': 'Cádiz', 'cadiz cf': 'Cádiz',
+    'oviedo': 'Real Oviedo', 'real oviedo': 'Real Oviedo',
+    'elche': 'Elche', 
+    'almeria': 'Almería', 'almería': 'Almería', 'ud almeria': 'Almería',
+    'granada': 'Granada', 'granada cf': 'Granada',
+    'atletico madrid': 'Atlético Madrid', 'atletico': 'Atlético Madrid',
+    'espanyol': 'RCD Espanyol', 'rcd espanyol': 'RCD Espanyol',
+    'leganes': 'Leganés', 'leganés': 'Leganés', 'cd leganes': 'Leganés',
+    'valladolid': 'Real Valladolid', 'real valladolid': 'Real Valladolid',
 }
 
 def normalizar_equipo(nombre):
@@ -683,6 +695,99 @@ def fase_2d_cargar_rendimiento():
     total = RendimientoHistoricoJugador.objects.count()
     print(f"[OK] Rendimiento cargado: {total} registros")
 
+def fase_2e_poblar_equipo_jugador_temporada():
+    """FASE 2e: Puebla EquipoJugadorTemporada con jugadores por temporada."""
+    print("\n" + "=" * 70)
+    print("FASE 2e: POBLAR EQUIPO-JUGADOR-TEMPORADA")
+    print("=" * 70)
+    
+    temporadas = Temporada.objects.all()
+    total_creados = 0
+    
+    for temporada in temporadas:
+        print(f"\n[{temporada.nombre}] Procesando...")
+        
+        # Obtener todos los jugadores que jugaron al menos un partido
+        jugadores_stats = (
+            EstadisticasPartidoJugador.objects
+            .filter(partido__jornada__temporada=temporada)
+            .values('jugador_id', 'jugador__nombre', 'jugador__apellido')
+            .annotate(count=Count('id'))
+            .filter(count__gt=0)
+            .distinct()
+        )
+        
+        created_count = 0
+        updated_count = 0
+        
+        for stat in jugadores_stats:
+            jugador_id = stat['jugador_id']
+            partidos_count = stat['count']
+            
+            # Obtener del historial para sacar equipo, dorsal, edad
+            historial = (
+                HistorialEquiposJugador.objects
+                .filter(jugador_id=jugador_id, temporada=temporada)
+                .first()
+            )
+            
+            if historial:
+                # Crear o actualizar en EquipoJugadorTemporada
+                obj, created = EquipoJugadorTemporada.objects.update_or_create(
+                    equipo=historial.equipo,
+                    jugador_id=jugador_id,
+                    temporada=temporada,
+                    defaults={
+                        'dorsal': historial.dorsal,
+                        'edad': historial.edad,
+                        'partidos_jugados': partidos_count,
+                    }
+                )
+                
+                if created:
+                    created_count += 1
+                else:
+                    updated_count += 1
+            else:
+                # Si no hay historial, obtener equipo de las estadísticas
+                try:
+                    first_stat = (
+                        EstadisticasPartidoJugador.objects
+                        .filter(jugador_id=jugador_id, partido__jornada__temporada=temporada)
+                        .select_related('partido__equipo_local', 'partido__equipo_visitante')
+                        .first()
+                    )
+                    
+                    if first_stat:
+                        # Determinar en qué equipo jugó (asumiendo equipo_local por defecto)
+                        equipo = first_stat.partido.equipo_local
+                        
+                        obj, created = EquipoJugadorTemporada.objects.update_or_create(
+                            equipo=equipo,
+                            jugador_id=jugador_id,
+                            temporada=temporada,
+                            defaults={
+                                'dorsal': 0,
+                                'edad': 0,
+                                'partidos_jugados': partidos_count,
+                            }
+                        )
+                        
+                        if created:
+                            created_count += 1
+                        else:
+                            updated_count += 1
+                except Exception as e:
+                    print(f"  ⚠ Error procesando jugador {jugador_id}: {str(e)}")
+        
+        print(f"  ✓ Creados: {created_count} | Actualizados: {updated_count}")
+        total_creados += created_count
+    
+    total = EquipoJugadorTemporada.objects.count()
+    print(f"\n[OK] Plantillas por temporada cargadas: {total} registros")
+    return total
+
+
 def main():
     """Función principal: ejecuta todas las fases."""
     
@@ -695,6 +800,7 @@ def main():
     print("3. Goles en Partidos")
     print("4. Clasificación Jornada")
     print("5. Rendimiento Histórico de Jugadores")
+    print("6. Equipo-Jugador-Temporada (Plantillas por temporada)")
     
     # FASE 1: Partidos y Estadísticas
     fase_1_cargar_partidos_y_estadisticas()
@@ -704,6 +810,7 @@ def main():
     fase_2b_cargar_goles()
     fase_2c_cargar_clasificacion()
     fase_2d_cargar_rendimiento()
+    fase_2e_poblar_equipo_jugador_temporada()
     
     # Resumen final
     print("\n" + "=" * 70)
@@ -720,12 +827,14 @@ def main():
     goles_count = Partido.objects.filter(goles_local__isnull=False).count()
     clasificacion_count = ClasificacionJornada.objects.count()
     rendimiento_count = RendimientoHistoricoJugador.objects.count()
+    equipo_jugador_temp = EquipoJugadorTemporada.objects.count()
     
-    print(f"\nDatos completarios:")
-    print(f"  - Roles: {roles_count} estadísticas (30.7%)")
-    print(f"  - Goles: {goles_count} partidos (92.6%)")
+    print(f"\nDatos complementarios:")
+    print(f"  - Roles: {roles_count} estadísticas")
+    print(f"  - Goles: {goles_count} partidos")
     print(f"  - Clasificación: {clasificacion_count} registros")
     print(f"  - Rendimiento: {rendimiento_count} registros")
+    print(f"  - Plantillas por Temporada: {equipo_jugador_temp} registros")
     
     print("\n" + "=" * 70)
     print("[OK] CARGA COMPLETADA - TODO LISTO EN LA BASE DE DATOS")
