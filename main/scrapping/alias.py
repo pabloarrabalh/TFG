@@ -122,7 +122,7 @@ MAPEO_STATS = {
 }
 
 COLUMNAS_MODELO = [
-    "player", "posicion", "dorsal", "equipo_propio", "equipo_rival", "titular",
+    "player", "nacionalidad", "edad", "posicion", "dorsal", "equipo_propio", "equipo_rival", "titular",
     "min_partido", "gol_partido", "asist_partido", "xg_partido", "xag",
     "tiros", "tiro_fallado_partido", "tiro_puerta_partido", "pases_totales",
     "pases_completados_pct", "amarillas", "rojas", "goles_en_contra",

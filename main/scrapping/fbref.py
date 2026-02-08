@@ -114,6 +114,7 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo_tabla=N
     id_tabla = tabla_html.get("id", "")
     jugadores = {}
 
+    # Procesar filas del dataframe
     for _, fila in df.iterrows():
         nombre_jugador = str(fila["Player"]).strip()
         
@@ -138,6 +139,29 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo_tabla=N
         fila_copia = fila.copy()
         fila_copia["__nombre_norm"] = nombre_norm
         fila_copia["__equipo_norm"] = equipo_norm
+        
+        # Extraer nacionalidad de la columna "Nation" (ej: "co COL")
+        nacionalidad = ""
+        if "Nation" in fila.index:
+            val = fila["Nation"]
+            if pd.notna(val):
+                texto = str(val).strip()
+                partes = texto.split()
+                nacionalidad = partes[-1] if partes else ""
+        fila_copia["__nacionalidad"] = nacionalidad
+        
+        # Extraer edad de la columna "Age" (ej: "21-269" -> 21)
+        edad = None
+        if "Age" in fila.index:
+            val = fila["Age"]
+            if pd.notna(val):
+                texto = str(val).strip()
+                edad_str = texto.split("-")[0]  # Tomar solo el primer número
+                try:
+                    edad = int(edad_str)
+                except (ValueError, TypeError):
+                    edad = None
+        fila_copia["__edad"] = edad
 
         jugadores[nombre_norm] = fila_copia
 
@@ -311,6 +335,7 @@ def obtener_fantasy_jornada(jornada):
                 pos_raw = name_cell.get("data-posicion-laliga-fantasy", "").strip()
                 posicion = POSICION_MAP.get(pos_raw, "MC")
 
+
                 puntos = 6767
                 puntos_span = player_row.select_one("span.laliga-fantasy")
                 if puntos_span:
@@ -444,7 +469,7 @@ def parsear_tablas_partido(soup, equipo_local, equipo_visitante):
     return estadisticas_por_tipo
 
 
-def construir_dataframe_partido(propuestas, estadisticas_por_tipo, mapeo_fbref_fantasy, datos_fantasy, titulares, local_norm, away_norm, jornada_num, fecha_partido):
+def construir_dataframe_partido(propuestas, estadisticas_por_tipo, mapeo_fbref_fantasy, datos_fantasy, titulares, local_norm, away_norm, jornada_num, fecha_partido, nacionalidades_map=None, edades_map=None):
     """
     Construye el DataFrame de un partido con datos de FBref y Fantasy.
     
@@ -458,10 +483,17 @@ def construir_dataframe_partido(propuestas, estadisticas_por_tipo, mapeo_fbref_f
         away_norm: Equipo visitante normalizado
         jornada_num: Número de jornada
         fecha_partido: Fecha del partido
+        nacionalidades_map: Dict con nacionalidades por clave_fbref
+        edades_map: Dict con edades por clave_fbref
     
     Returns:
         Dict con filas de datos
     """
+    if nacionalidades_map is None:
+        nacionalidades_map = {}
+    if edades_map is None:
+        edades_map = {}
+    
     datos_partido = {}
 
     for propuesta in propuestas:
@@ -471,6 +503,8 @@ def construir_dataframe_partido(propuestas, estadisticas_por_tipo, mapeo_fbref_f
         equipo_norm = propuesta["equipo_fb_norm"]
         minutos = propuesta["minutos"]
         posicion = propuesta["posicion"]
+        nacionalidad = nacionalidades_map.get(clave_fbref, "")
+        edad = edades_map.get(clave_fbref)
 
         equipo_rival_norm = away_norm if equipo_norm == local_norm else local_norm
         clave_fantasy = mapeo_fbref_fantasy.get(clave_fbref)
@@ -487,6 +521,8 @@ def construir_dataframe_partido(propuestas, estadisticas_por_tipo, mapeo_fbref_f
             fila_nueva["jornada"] = jornada_num
             fila_nueva["fecha_partido"] = fecha_partido
             fila_nueva["player"] = nombre_jugador
+            fila_nueva["nacionalidad"] = nacionalidad
+            fila_nueva["edad"] = edad
             fila_nueva["posicion"] = posicion
             fila_nueva["equipo_propio"] = equipo_norm
             fila_nueva["equipo_rival"] = equipo_rival_norm
@@ -540,9 +576,19 @@ def procesar_partido(html_partido, datos_fantasy, jornada_num):
     jugadores_apellido, fantasy_norm = construir_fantasy_por_norm(datos_fantasy)
     mapeo_fbref_fantasy, _ = resolver_matching(propuestas, jugadores_apellido, fantasy_norm)
 
+    # Extraer nacionalidades y edades del resumen
+    nacionalidades_map = {}
+    edades_map = {}
+    for nombre_fb_norm, fila_resumen in resumen.items():
+        nacionalidad = fila_resumen.get("__nacionalidad", "")
+        nacionalidades_map[nombre_fb_norm] = nacionalidad
+        edad = fila_resumen.get("__edad")
+        edades_map[nombre_fb_norm] = edad
+
     datos_partido = construir_dataframe_partido(
         propuestas, estadisticas_por_tipo, mapeo_fbref_fantasy,
         datos_fantasy, titulares, local_norm, away_norm, jornada_num, fecha_partido,
+        nacionalidades_map, edades_map
     )
 
     claves_fantasy_usadas = set(mapeo_fbref_fantasy.values())

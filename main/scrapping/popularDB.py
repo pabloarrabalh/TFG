@@ -152,8 +152,8 @@ def obtener_o_crear_jornada(temporada, numero_jornada):
     )
     return jornada
 
-def obtener_o_crear_jugador(nombre_completo, posicion_csv):
-    """Obtiene o crea un Jugador."""
+def obtener_o_crear_jugador(nombre_completo, posicion_csv, nacionalidad=''):
+    """Obtiene o crea un Jugador con nacionalidad."""
     partes = nombre_completo.strip().split()
     if len(partes) >= 2:
         nombre = ' '.join(partes[:-1])
@@ -166,8 +166,14 @@ def obtener_o_crear_jugador(nombre_completo, posicion_csv):
     jugador, created = Jugador.objects.get_or_create(
         nombre=nombre,
         apellido=apellido,
-        defaults={'nacionalidad': ''}
+        defaults={'nacionalidad': nacionalidad}
     )
+    
+    # Actualizar nacionalidad si el jugador ya existía y tiene una nueva
+    if not created and nacionalidad and jugador.nacionalidad != nacionalidad:
+        jugador.nacionalidad = nacionalidad
+        jugador.save(update_fields=['nacionalidad'])
+    
     return jugador
 
 def obtener_o_crear_historial(jugador, equipo, temporada, dorsal):
@@ -215,8 +221,12 @@ def cargar_estadisticas_partido(row, jugador, equipo, partido):
     posicion_codigo = row.get('posicion') if pd.notna(row.get('posicion')) else None
     posicion = MAPEO_POSICIONES_INVERSO.get(posicion_codigo) if posicion_codigo else None
     
+    # Obtener nacionalidad del CSV (puede ser vacío)
+    nacionalidad = row.get('nacionalidad', '') if pd.notna(row.get('nacionalidad')) else ''
+    
     stats = EstadisticasPartidoJugador(
         partido=partido, jugador=jugador,
+        nacionalidad=nacionalidad,  # Agregar nacionalidad
         min_partido=int(row['min_partido']) if pd.notna(row['min_partido']) else 0,
         titular=bool(row['titular']) if pd.notna(row['titular']) else False,
         gol_partido=int(row['gol_partido']) if pd.notna(row['gol_partido']) else 0,
@@ -370,12 +380,13 @@ def procesar_csv_partido(ruta_csv, temporada):
             try:
                 nombre_jugador = row['player']
                 posicion = row['posicion']
+                nacionalidad = row.get('nacionalidad', '')  # Obtener nacionalidad del CSV
                 equipo_nombre = row['equipo_propio']
                 dorsal = row['dorsal']
                 
                 equipo = obtener_o_crear_equipo(equipo_nombre)
                 obtener_o_crear_equipo_temporada(equipo, temporada)
-                jugador = obtener_o_crear_jugador(nombre_jugador, posicion)
+                jugador = obtener_o_crear_jugador(nombre_jugador, posicion, nacionalidad)  # Pasar nacionalidad
                 obtener_o_crear_historial(jugador, equipo, temporada, dorsal)
                 
                 stats = cargar_estadisticas_partido(row, jugador, equipo, partido)
