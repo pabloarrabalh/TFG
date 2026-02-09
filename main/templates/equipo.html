@@ -15,80 +15,222 @@
 
 /* Estilos de equipos */
 .team-badge {
-    @apply size-32 rounded-lg flex items-center justify-center border-2 font-bold text-4xl;
+    width: 128px;
+    height: 128px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid;
+    font-weight: 900;
+    font-size: 2.25rem;
 }
 
-/* Colores y patrones personalizados por equipo */
-.team-real-madrid {
-    @apply bg-white border-white text-black;
+/* Racha con círculos de colores (igual que clasificacion.html) */
+.racha-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: white;
+    margin: 0 2px;
+}
+.racha-g {
+    background-color: rgb(34, 197, 94);
+}
+.racha-e {
+    background-color: rgb(234, 179, 8);
+}
+.racha-p {
+    background-color: rgb(239, 68, 68);
 }
 
+/* Real Madrid */
+.team-real-madrid,
+.team-madrid {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    color: #000000;
+}
+
+/* Barcelona */
 .team-barcelona {
     background: repeating-linear-gradient(90deg, #004687 0 8px, #c60c30 8px 16px);
-    @apply border-blue-600 text-white;
+    border-color: #1e40af;
+    color: #ffffff;
 }
 
-.team-atletico-madrid {
+/* Atlético Madrid */
+.team-atletico-madrid,
+.team-atletico {
     background: linear-gradient(90deg, white 25%, red 25%, red 50%, white 50%, white 75%, red 75%, red);
     background-size: 8px 100%;
-    @apply border-red-600 text-black;
+    border-color: #dc2626;
+    color: #000000;
 }
 
-.team-athletic-club {
+/* Athletic Club */
+.team-athletic-club,
+.team-athletic {
     background: linear-gradient(90deg, white 25%, red 25%, red 50%, white 50%, white 75%, red 75%, red);
     background-size: 8px 100%;
-    @apply border-red-600 text-black;
+    border-color: #dc2626;
+    color: #000000;
 }
 
+/* Villarreal */
 .team-villarreal {
-    @apply bg-yellow-400 border-yellow-500 text-black;
+    background-color: #facc15;
+    border-color: #eab308;
+    color: #000000;
 }
 
-.team-real-betis {
+/* Real Betis */
+.team-real-betis,
+.team-betis {
     background: linear-gradient(90deg, white 25%, #007749 25%, #007749 50%, white 50%, white 75%, #007749 75%, #007749);
     background-size: 8px 100%;
-    @apply border-green-700 text-black;
+    border-color: #15803d;
+    color: #000000;
 }
 
+/* Sevilla */
 .team-sevilla {
-    @apply bg-red-600 border-red-700 text-white;
+    background-color: #dc2626;
+    border-color: #b91c1c;
+    color: #ffffff;
 }
 
-.team-rcd-espanyol {
+/* RCD Espanyol */
+.team-rcd-espanyol,
+.team-espanyol {
     background: linear-gradient(90deg, white 25%, #1e88e5 25%, #1e88e5 50%, white 50%, white 75%, #1e88e5 75%, #1e88e5);
     background-size: 8px 100%;
-    @apply border-blue-600 text-black;
+    border-color: #1e40af;
+    color: #000000;
 }
 
-.team-alaves {
+/* Alavés */
+.team-alaves,
+.team-alavés {
     background: linear-gradient(90deg, white 25%, #1e88e5 25%, #1e88e5 50%, white 50%, white 75%, #1e88e5 75%, #1e88e5);
     background-size: 8px 100%;
-    @apply border-blue-600 text-black;
+    border-color: #1e40af;
+    color: #000000;
 }
 
+/* Elche */
 .team-elche {
     background: linear-gradient(0deg, #1bc47d 25%, white 25%, white 50%, #1bc47d 50%, #1bc47d 75%, white 75%, white);
     background-size: 100% 8px;
-    @apply border-green-500 text-black;
+    border-color: #16a34a;
+    color: #000000;
 }
 
-.team-rayo-vallecano {
+/* Rayo Vallecano */
+.team-rayo-vallecano,
+.team-rayo {
     background: linear-gradient(90deg, #ed1c24 0%, #ed1c24 40%, white 40% 60%, #ed1c24 60% 100%);
-    @apply border-red-600 text-black;
+    border-color: #dc2626;
+    color: #000000;
 }
 
+/* Osasuna */
 .team-osasuna {
     background: repeating-linear-gradient(90deg, #1e88e5 0 8px, #ed1c24 8px 16px);
-    @apply border-red-600 text-white;
+    border-color: #dc2626;
+    color: #ffffff;
 }
 
+/* Valencia */
 .team-valencia {
-    @apply bg-white border-white text-black;
+    background-color: #ffffff;
+    border-color: #ffffff;
+    color: #000000;
 }
 
+/* Levante */
 .team-levante {
     background: repeating-linear-gradient(90deg, #004687 0 8px, #c60c30 8px 16px);
-    @apply border-blue-600 text-white;
+    border-color: #1e40af;
+    color: #ffffff;
+}
+
+/* Real Sociedad */
+.team-real-sociedad,
+.team-sociedad {
+    background-color: #1e40af;
+    border-color: #1e3a8a;
+    color: #ffffff;
+}
+
+/* Real Mallorca */
+.team-real-mallorca,
+.team-mallorca {
+    background-color: #eab308;
+    border-color: #ca8a04;
+    color: #dc2626;
+    font-weight: 900;
+}
+
+/* Real Oviedo */
+.team-real-oviedo,
+.team-oviedo {
+    background-color: #1e40af;
+    border-color: #1e3a8a;
+    color: #ffffff;
+}
+
+/* Real Valladolid */
+.team-real-valladolid,
+.team-valladolid {
+    background-color: #ffffff;
+    border-color: #d4af37;
+    color: #000000;
+}
+
+/* Girona */
+.team-girona,
+.team-fc-girona {
+    background: linear-gradient(90deg, #ff0000 0%, #ff0000 50%, #ffffff 50%, #ffffff 100%);
+    border-color: #dc2626;
+    color: #ffffff;
+}
+
+/* Getafe */
+.team-getafe,
+.team-cf-getafe {
+    background: linear-gradient(90deg, #1e40af 0%, #1e40af 50%, #ffffff 50%, #ffffff 100%);
+    border-color: #1e40af;
+    color: #ffffff;
+}
+
+/* UD Las Palmas */
+.team-ud-las-palmas,
+.team-las-palmas {
+    background: repeating-linear-gradient(90deg, #ffd700 0 8px, #0066cc 8px 16px);
+    border-color: #cc0000;
+    color: #ffffff;
+}
+
+/* Cádiz */
+.team-cadiz,
+.team-cádiz {
+    background: linear-gradient(90deg, #ffde00 0%, #ffde00 50%, #0066cc 50%, #0066cc 100%);
+    border-color: #0066cc;
+    color: #000000;
+}
+
+/* Granada */
+.team-granada,
+.team-cf-granada {
+    background: repeating-linear-gradient(90deg, #ff0000 0 8px, white 8px 16px);
+    border-color: #dc2626;
+    color: #ffffff;
 }
 {% endblock %}
 
@@ -135,13 +277,91 @@
                                 </span>
                             {% endif %}
                         </div>
+                        
+                        <!-- Racha Actual debajo del estadio -->
+                        {% if racha_actual %}
+                        <div class="flex items-center gap-2 mt-4">
+                            {% for resultado in racha_actual %}
+                            <div class="w-6 h-6 rounded text-xs font-bold text-white flex items-center justify-center
+                                {% if resultado == 'V' %}bg-green-500{% elif resultado == 'E' %}bg-yellow-500{% else %}bg-red-500{% endif %}">
+                                {{ resultado }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 
-                <!-- Arriba a la derecha: Temporada display -->
+                <!-- Arriba a la derecha: Temporada display y Selector de Jornada -->
                 <div class="absolute top-4 right-6 text-right">
                     <div class="text-white/60 text-sm uppercase font-bold tracking-widest mb-1">Temporada</div>
-                    <div class="text-4xl font-black text-primary">{{ temporada_actual|format_temporada }}<span class="text-lg text-white/60"></span></div>
+                    <div class="text-4xl font-black text-primary mb-4">{{ temporada_actual|format_temporada }}<span class="text-lg text-white/60"></span></div>
+                    
+                    <!-- Selector de Jornada con flechas -->
+                    {% if jornadas_disponibles %}
+                    <div class="flex items-center gap-2 justify-end">
+                        <button id="jornada-prev" onclick="cambiarJornada(-1)" class="w-8 h-8 rounded-lg bg-surface-dark border border-border-dark text-primary hover:border-primary hover:bg-surface-dark/80 transition-all flex items-center justify-center font-bold text-sm">
+                            <span class="material-symbols-outlined text-lg">chevron_left</span>
+                        </button>
+                        
+                        <div class="relative">
+                            <button onclick="toggleJornadaDropdown()" class="px-3 py-1 rounded-lg bg-primary text-black font-bold hover:bg-primary/90 transition-all text-sm flex items-center gap-1">
+                                J. {{ jornada_actual }}
+                                <span class="material-symbols-outlined text-sm">expand_more</span>
+                            </button>
+                            
+                            <!-- Dropdown de jornadas -->
+                            <div id="jornada-dropdown" class="hidden absolute top-full mt-1 right-0 bg-surface-dark border border-border-dark rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto min-w-32">
+                                {% for jornada in jornadas_disponibles %}
+                                <a href="?jornada={{ jornada.numero }}" 
+                                   class="block px-3 py-1 text-xs text-white hover:bg-primary/20 transition-colors {% if jornada.numero == jornada_actual %}bg-primary/30 font-bold{% endif %}">
+                                    Jornada {{ jornada.numero }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <button id="jornada-next" onclick="cambiarJornada(1)" class="w-8 h-8 rounded-lg bg-surface-dark border border-border-dark text-primary hover:border-primary hover:bg-surface-dark/80 transition-all flex items-center justify-center font-bold text-sm">
+                            <span class="material-symbols-outlined text-lg">chevron_right</span>
+                        </button>
+                    </div>
+                    
+                    <script>
+                        function cambiarJornada(delta) {
+                            const jornada_actual = {{ jornada_actual }};
+                            const jornada_min = {{ jornada_min }};
+                            const jornada_max = {{ jornada_max }};
+                            
+                            let nueva_jornada = jornada_actual + delta;
+                            
+                            // Limitar entre min y max
+                            if (nueva_jornada < jornada_min) nueva_jornada = jornada_min;
+                            if (nueva_jornada > jornada_max) nueva_jornada = jornada_max;
+                            
+                            // Actualizar URL con nueva jornada
+                            const params = new URLSearchParams(window.location.search);
+                            params.set('jornada', nueva_jornada);
+                            window.location.href = window.location.pathname + '?' + params.toString();
+                        }
+                        
+                        function toggleJornadaDropdown() {
+                            const dropdown = document.getElementById('jornada-dropdown');
+                            dropdown.classList.toggle('hidden');
+                        }
+                        
+                        // Cerrar dropdown al clickear fuera
+                        document.addEventListener('click', function(event) {
+                            const dropdown = document.getElementById('jornada-dropdown');
+                            const button = event.target.closest('button');
+                            if (button && button.textContent.includes('J.')) {
+                                return; // Clickeó el botón, no cerrar
+                            }
+                            if (!event.target.closest('#jornada-dropdown') && !event.target.closest('button')) {
+                                dropdown.classList.add('hidden');
+                            }
+                        });
+                    </script>
+                    {% endif %}
                 </div>
             </div>
 
@@ -385,91 +605,163 @@
 
         <!-- Panel lateral derecho -->
         <div class="xl:col-span-3">
-            <!-- Próximo encuentro - Solo para temporada 25/26 -->
-            {% if temporada_actual|format_temporada == '25/26' %}
+            <!-- Mensaje si el equipo no estuvo en esta temporada -->
+            {% if equipo and not jugadores %}
+            <div class="glass-panel rounded-2xl p-6 mb-6 bg-red-500/10 border-red-500/30">
+                <div class="text-center">
+                    <svg class="w-12 h-12 text-red-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h3 class="text-lg font-bold text-red-500 mb-2">Equipo no disponible</h3>
+                    <p class="text-gray-400 text-sm">{{ equipo.nombre }} no participó en Primera División durante la temporada {{ temporada_actual|format_temporada }}</p>
+                </div>
+            </div>
+            {% else %}
+            
+            <!-- Próximo encuentro (todas las temporadas) -->
             <div class="glass-panel rounded-2xl p-6 mb-6">
                 <div class="flex items-center gap-3 mb-4">
                     <span class="material-symbols-outlined text-primary">calendar_today</span>
                     <h3 class="text-lg font-bold text-white uppercase tracking-wider">PRÓXIMO ENCUENTRO</h3>
                 </div>
                 
-                <div class="text-center p-6 bg-surface-dark rounded-2xl">
-                    <div class="size-20 bg-gradient-to-br from-blue-500 to-teal-600 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-                        <span class="text-2xl font-black text-white">CEL</span>
+                {% if proximo_partido and rival_info %}
+                <div class="text-center p-6 bg-surface-dark rounded-2xl space-y-4">
+                    <!-- Indicador de estadio -->
+                    <div class="flex items-center justify-center gap-2 text-primary text-lg">
+                        <span class="text-2xl">📍</span>
+                        <span class="font-bold">{{ rival_info.estadio_partido }}</span>
                     </div>
-                    <div class="mb-2">
-                        <span class="text-xs text-gray-400 uppercase font-bold tracking-widest">VISITANTE</span>
+                    
+                    <!-- Rival Badge con colores del equipo -->
+                    <div class="flex flex-col items-center gap-2 mb-2">
+                        <div class="team-badge team-{{ rival_info.nombre_normalizado }}">
+                            <span>{{ rival_info.iniciales }}</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-white text-center">{{ rival_info.nombre }}</h4>
                     </div>
-                    <h4 class="text-xl font-black text-white mb-4">Celta de Vigo</h4>
-                    <div class="text-primary font-bold">DOMINGO, 21:00</div>
+                    
+                    <!-- Racha del rival (círculos igual que en clasificación) -->
+                    {% if rival_info.racha %}
+                    <div class="mt-2 text-center">
+                        <div class="text-xs text-gray-400 mb-2">Racha último 6 partidos</div>
+                        <div class="flex justify-center">
+                            {% for resultado in rival_info.racha %}
+                                {% if resultado == 'V' %}
+                                    <span class="racha-circle racha-g">V</span>
+                                {% elif resultado == 'E' %}
+                                    <span class="racha-circle racha-e">E</span>
+                                {% elif resultado == 'P' %}
+                                    <span class="racha-circle racha-p">P</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Fecha y hora con día de la semana -->
+                    {% if proximo_partido.fecha_partido %}
+                        <div class="text-primary font-bold">
+                            {{ proximo_partido.fecha_partido|format_fecha_partido }}
+                        </div>
+                    {% else %}
+                        <div class="text-gray-400">Horario por confirmar</div>
+                    {% endif %}
+                    
+                    <!-- Comparativa dentro del panel del rival -->
+                    {% if proximo_partido and rival_info %}
+                    <div class="border-t border-border-dark pt-4 mt-4 space-y-2">
+                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest mb-2">Comparativa</div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-400">Goles a favor</span>
+                            <div class="flex items-center gap-1">
+                                <span class="text-primary font-bold">{{ goles_equipo_favor }}</span>
+                                <span class="text-gray-400">-</span>
+                                <span class="text-white font-bold">{{ rival_info.goles_favor }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-400">Goles en contra</span>
+                            <div class="flex items-center gap-1">
+                                <span class="text-green-400 font-bold">{{ goles_equipo_contra }}</span>
+                                <span class="text-gray-400">-</span>
+                                <span class="text-white font-bold">{{ rival_info.goles_contra }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Botón Ver Análisis dentro del panel -->
+                    <div class="border-t border-border-dark pt-4 mt-4">
+                        <button onclick="openAnalysisModal()" class="w-full bg-primary hover:bg-primary-dark text-black px-4 py-2 rounded-lg font-bold uppercase tracking-wider transition-all text-sm flex items-center justify-center gap-2">
+                            VER ANÁLISIS
+                            <span class="material-symbols-outlined text-base">arrow_forward</span>
+                        </button>
+                    </div>
                 </div>
+                {% else %}
+                <div class="text-center p-6 bg-surface-dark rounded-2xl">
+                    <p class="text-gray-400 text-sm">No hay próximo partido disponible</p>
+                </div>
+                {% endif %}
             </div>
-            {% else %}
+            
+            {% endif %}
+
+            <!-- Top 3 Máximos Goleadores (Fantasy) -->
+            {% if top_3_puntos and jugadores %}
             <div class="glass-panel rounded-2xl p-6 mb-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="material-symbols-outlined text-primary">calendar_today</span>
-                    <h3 class="text-lg font-bold text-white uppercase tracking-wider">PRÓXIMO ENCUENTRO</h3>
+                    <span class="material-symbols-outlined text-primary">star</span>
+                    <h3 class="text-lg font-bold text-white uppercase tracking-wider">TOP 3 FANTASY</h3>
                 </div>
-                <div class="text-center p-6 bg-surface-dark rounded-2xl">
-                    <p class="text-gray-400 italic text-sm">Análisis de rival solo disponible para la temporada actual (25/26)</p>
+                
+                <div class="space-y-2">
+                    {% for jugador in top_3_puntos %}
+                    <div class="flex items-center justify-between bg-surface-dark rounded-lg p-3 hover:bg-opacity-80 transition">
+                        <div class="flex items-center gap-3 flex-1">
+                            <div class="text-xs font-bold text-primary bg-primary/20 w-6 h-6 rounded flex items-center justify-center">
+                                {{ forloop.counter }}
+                            </div>
+                            <a href="{% url 'jugador_temporada' jugador.jugador.id temporada_actual_db %}" class="font-bold text-white text-xs hover:text-primary transition-colors cursor-pointer flex-1 line-clamp-2">{{ jugador.jugador.nombre }} {{ jugador.jugador.apellido }}</a>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-black text-primary">{{ jugador.total_puntos_fantasy }}</div>
+                            <div class="text-xs text-gray-400">pts</div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
             {% endif %}
 
-            <!-- Comparativa -->
+            <!-- Top 3 Más Minutos -->
+            {% if top_3_minutos and jugadores %}
             <div class="glass-panel rounded-2xl p-6 mb-6">
-                <h3 class="text-lg font-bold text-white uppercase tracking-wider mb-4">COMPARATIVA</h3>
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-primary">schedule</span>
+                    <h3 class="text-lg font-bold text-white uppercase tracking-wider">TOP 3 MINUTOS</h3>
+                </div>
                 
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-400">Goles a favor</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-primary font-bold">42</span>
-                            <span class="text-xs text-gray-400">vs</span>
-                            <span class="text-white font-bold">28</span>
+                <div class="space-y-2">
+                    {% for jugador in top_3_minutos %}
+                    <div class="flex items-center justify-between bg-surface-dark rounded-lg p-3 hover:bg-opacity-80 transition">
+                        <div class="flex items-center gap-3 flex-1">
+                            <div class="text-xs font-bold text-primary bg-primary/20 w-6 h-6 rounded flex items-center justify-center">
+                                {{ forloop.counter }}
+                            </div>
+                            <a href="{% url 'jugador_temporada' jugador.jugador.id temporada_actual_db %}" class="font-bold text-white text-xs hover:text-primary transition-colors cursor-pointer flex-1 line-clamp-2">{{ jugador.jugador.nombre }} {{ jugador.jugador.apellido }}</a>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-black text-primary">{{ jugador.total_minutos }}</div>
+                            <div class="text-xs text-gray-400">min</div>
                         </div>
                     </div>
-                    
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-400">Goles en contra</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-green-400 font-bold">18</span>
-                            <span class="text-xs text-gray-400">vs</span>
-                            <span class="text-white font-bold">24</span>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
-
-            <!-- Botón de análisis -->
-            <div class="text-center">
-                <button class="bg-primary hover:bg-primary-dark text-black px-6 py-3 rounded-xl font-bold uppercase tracking-wider transition-all shadow-lg hover:shadow-[0_0_20px_rgba(57,255,20,0.3)] flex items-center gap-2 mx-auto">
-                    VER ANÁLISIS
-                    <span class="material-symbols-outlined">arrow_forward</span>
-                </button>
-            </div>
-
-            <!-- Racha actual -->
-            <div class="glass-panel rounded-2xl p-6 mt-6">
-                <h3 class="text-lg font-bold text-white uppercase tracking-wider mb-4">RACHA ACTUAL</h3>
-                <div class="flex gap-2">
-                    <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center">
-                        <span class="text-xs font-bold text-white">V</span>
-                    </div>
-                    <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center">
-                        <span class="text-xs font-bold text-white">V</span>
-                    </div>
-                    <div class="w-8 h-8 bg-yellow-500 rounded flex items-center justify-center">
-                        <span class="text-xs font-bold text-white">E</span>
-                    </div>
-                    <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center">
-                        <span class="text-xs font-bold text-white">V</span>
-                    </div>
-                    <div class="w-8 h-8 bg-green-500 rounded flex items-center justify-center">
-                        <span class="text-xs font-bold text-white">V</span>
-                    </div>
-                </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -514,6 +806,73 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderFlag(container, url) {
         container.innerHTML = `<img src="${url}" class="h-4 w-6 object-cover rounded-sm shadow-sm" alt="flag">`;
     }
+
+    // Modal de análisis
+    function openAnalysisModal() {
+        const modal = document.getElementById('analysisModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    }
+
+    function closeAnalysisModal() {
+        const modal = document.getElementById('analysisModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    // Cerrar modal al clickear fuera
+    const modal = document.getElementById('analysisModal');
+    if (modal) {
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                closeAnalysisModal();
+            }
+        });
+    }
 });
 </script>
+
+<!-- Modal de Análisis -->
+<div id="analysisModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-surface-dark border border-border-dark rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <!-- Header del Modal -->
+        <div class="flex items-center justify-between p-6 border-b border-border-dark sticky top-0 bg-surface-dark">
+            <h2 class="text-2xl font-black text-white">ANÁLISIS DEL PRÓXIMO ENCUENTRO</h2>
+            <button onclick="closeAnalysisModal()" class="text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">close</span>
+            </button>
+        </div>
+        
+        <!-- Contenido del Modal -->
+        <div class="p-6 space-y-4">
+            <div class="bg-primary/10 border border-primary/30 rounded-lg p-4">
+                <p class="text-gray-300 text-center">Contenido de análisis del partido próximo estará disponible pronto...</p>
+            </div>
+            
+            <!-- Dummy Content -->
+            <div class="space-y-4">
+                <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark/50 h-24 flex items-center justify-center">
+                    <p class="text-gray-500 italic">Espacio reservado para análisis táctico</p>
+                </div>
+                <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark/50 h-24 flex items-center justify-center">
+                    <p class="text-gray-500 italic">Espacio reservado para estadísticas comparativas</p>
+                </div>
+                <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark/50 h-24 flex items-center justify-center">
+                    <p class="text-gray-500 italic">Espacio reservado para datos del rival</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer del Modal -->
+        <div class="p-6 border-t border-border-dark bg-surface-dark sticky bottom-0 flex justify-end gap-3">
+            <button onclick="closeAnalysisModal()" class="px-6 py-2 rounded-lg border border-border-dark text-white hover:bg-white/5 transition-all font-bold">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
 {% endblock %}

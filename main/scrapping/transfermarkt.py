@@ -414,25 +414,26 @@ def parse_partidos_jornada_transfermarkt(html_content, jornada_num):
     return partidos
 
 
-def scrapear_partidos_rango_jornadas(
-    codigo_temporada,
-    temporada_transfermarkt,
-    j_ini=1,
-    j_fin=38,
-    carpeta_salida=None,
-    delay_min=1,
-    delay_max=3
-):
-    """
-    Scrapea los partidos (con fecha/hora) de un rango de jornadas de Transfermarkt.
-    
-    Args:
-        codigo_temporada: Ej. "23_24" o "24_25"
-        temporada_transfermarkt: Ej. 2024, 2025 (saison_id)
-        j_ini, j_fin: Rango de jornadas a scrapear
-        carpeta_salida: Carpeta donde guardar CSVs (si None, no guarda)
-        delay_min, delay_max: Delay entre requests (segundos)
-    """
+# DEPRECATED: No se usa en el proyecto actual
+# def scrapear_partidos_rango_jornadas(
+#     codigo_temporada,
+#     temporada_transfermarkt,
+#     j_ini=1,
+#     j_fin=38,
+#     carpeta_salida=None,
+#     delay_min=1,
+#     delay_max=3
+# ):
+#     """
+#     Scrapea los partidos (con fecha/hora) de un rango de jornadas de Transfermarkt.
+#     
+#     Args:
+#         codigo_temporada: Ej. "23_24" o "24_25"
+#         temporada_transfermarkt: Ej. 2024, 2025 (saison_id)
+#         j_ini, j_fin: Rango de jornadas a scrapear
+#         carpeta_salida: Carpeta donde guardar CSVs (si None, no guarda)
+#         delay_min, delay_max: Delay entre requests (segundos)
+#     """
     
     ruta_csv = None
     if carpeta_salida:
@@ -670,7 +671,7 @@ def procesar_plantilla_equipo(html_content, equipo_norm):
 def scrapear_plantillas_temporada(código_equipos_to_href, temporada_codigo, carpeta_salida, saison_id=2024, delay_min=2, delay_max=5):
     """
     Scrapea plantillas de todos los equipos, extrae datos de jugadores y estadios,
-    guarda jugadores en CSV y actualiza estadios en BD.
+    actualiza estadios en BD.
     
     Args:
         código_equipos_to_href: Dict {nombre_equipo_norm: href_tm}
@@ -679,11 +680,7 @@ def scrapear_plantillas_temporada(código_equipos_to_href, temporada_codigo, car
         saison_id: ID de la temporada en Transfermarkt (2023, 2024, 2025, etc.)
         delay_min, delay_max: Delay entre requests
     """
-    os.makedirs(carpeta_salida, exist_ok=True)
     
-    ruta_csv = os.path.join(carpeta_salida, f"jugadores_nacionalidad_{temporada_codigo}.csv")
-    
-    todos_jugadores = []
     estadios_actualizados = []
     
     for idx, (equipo_norm, href) in enumerate(código_equipos_to_href.items(), 1):
@@ -692,9 +689,8 @@ def scrapear_plantillas_temporada(código_equipos_to_href, temporada_codigo, car
         html = obtener_plantilla_equipo(href, saison_id=saison_id, delay_min=delay_min, delay_max=delay_max)
         
         if html:
-            # Ahora procesar_plantilla_equipo retorna tupla (jugadores, estadio)
+            # Procesar_plantilla_equipo retorna tupla (jugadores, estadio)
             jugadores, estadio = procesar_plantilla_equipo(html, equipo_norm)
-            todos_jugadores.extend(jugadores)
             
             # ========== GUARDAR ESTADIO EN BD ==========
             if estadio:
@@ -718,32 +714,24 @@ def scrapear_plantillas_temporada(código_equipos_to_href, temporada_codigo, car
             else:
                 print(f"⚠️ No se extrajo estadio para {equipo_norm}")
             
-            # ========== GUARDAR JUGADORES EN CSV ==========
-            # Guardar incrementalmente
-            if jugadores:
-                with open(ruta_csv, 'a', newline='', encoding='utf-8-sig') as f:
-                    writer = csv.DictWriter(
-                        f,
-                        fieldnames=['jugador', 'nacionalidad', 'posicion', 'dorsal', 'edad', 'equipo']
-                    )
-                    
-                    # Escribir encabezado solo si es la primera vez
-                    if f.tell() == 0:
-                        writer.writeheader()
-                    
-                    writer.writerows(jugadores)
+            # CSV DE JUGADORES DESHABILITADO - No se usa en el proyecto
+            # if jugadores:
+            #     with open(ruta_csv, 'a', newline='', encoding='utf-8-sig') as f:
+            #         writer = csv.DictWriter(
+            #             f,
+            #             fieldnames=['jugador', 'nacionalidad', 'posicion', 'dorsal', 'edad', 'equipo']
+            #         )
+            #         if f.tell() == 0:
+            #             writer.writeheader()
+            #         writer.writerows(jugadores)
         else:
             print(f"⚠️ No se pudo descargar plantilla de {equipo_norm}")
     
-    print(f"\n✅ Plantillas guardadas en: {ruta_csv}")
-    print(f"📊 Total jugadores: {len(todos_jugadores)}")
-    print(f"🏟️ Total estadios actualizados: {len(estadios_actualizados)}")
+    print(f"\n🏟️ Total estadios actualizados: {len(estadios_actualizados)}")
     if estadios_actualizados:
         print("   Equipos con estadios actualizados:")
         for equipo, stadium in estadios_actualizados:
             print(f"   - {equipo}: {stadium}")
-    
-    return todos_jugadores
 
 
 
@@ -831,6 +819,6 @@ if __name__ == "__main__":
     # else:
     #     print(f"❌ Error descargando clasificación: {resp.status_code}")
     
-    print("Use scrapear_rango_jornadas_online() para partidos")
-    print("Use scrapear_plantillas_temporada() para nacionalidades de jugadores")
+    print("Use scrapear_rango_jornadas_online() para descargar clasificación")
+    print("Nota: Generar CSVs de partidos y nacionalidades está DEPRECATED")
 

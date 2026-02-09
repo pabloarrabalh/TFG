@@ -260,13 +260,61 @@ def obtener_calendario(codigo_temporada: str) -> dict:
             home_cell = row.find(attrs={"data-stat": "home_team"})
             away_cell = row.find(attrs={"data-stat": "away_team"})
             score_cell = row.find(attrs={"data-stat": "score"})
+            
+            # Extraer fecha y hora
+            date_cell = row.find(attrs={"data-stat": "date"})
 
-            if not (round_cell and home_cell and away_cell and score_cell):
+            if not (round_cell and home_cell and away_cell):
                 continue
 
             round_num = int(round_cell.get_text(strip=True))
             home_name = home_cell.get_text(strip=True)
             away_name = away_cell.get_text(strip=True)
+            
+            # Extraer fecha del atributo csk en formato YYYYMMDD
+            fecha_str = ""
+            hora_str = ""
+            if date_cell:
+                fecha_csk = date_cell.get("csk", "")
+                if fecha_csk:
+                    try:
+                        # Convertir YYYYMMDD a dd/mm/yyyy
+                        fecha_obj = datetime.strptime(fecha_csk, "%Y%m%d")
+                        fecha_str = fecha_obj.strftime("%d/%m/%Y")
+                    except:
+                        fecha_str = ""
+            
+            # Extraer hora del span venuetime
+            time_span = row.find("span", class_="venuetime")
+            if time_span:
+                hora_text = time_span.get("data-venue-time", "")
+                if hora_text and hora_text.lower() not in ['', 'nan', 'tbd']:
+                    hora_str = hora_text
+
+            # Extraer resultado si el partido ya se jugó
+            resultado = None
+            if score_cell:
+                score_text = score_cell.get_text(strip=True)
+                # Si tiene formato "X–Y" o "X-Y", es que se jugó
+                if score_text and '–' in score_text:
+                    partes = score_text.split('–')
+                    if len(partes) == 2:
+                        try:
+                            goles_local = int(partes[0].strip())
+                            goles_visitante = int(partes[1].strip())
+                            resultado = f"{goles_local}-{goles_visitante}"
+                        except:
+                            pass
+                elif score_text and '-' in score_text and score_text != '–':
+                    # Alternativa con guion normal
+                    partes = score_text.split('-')
+                    if len(partes) == 2:
+                        try:
+                            goles_local = int(partes[0].strip())
+                            goles_visitante = int(partes[1].strip())
+                            resultado = f"{goles_local}-{goles_visitante}"
+                        except:
+                            pass
 
             home_norm = normalizar_equipo_temporada(home_name)
             away_norm = normalizar_equipo_temporada(away_name)
@@ -274,8 +322,18 @@ def obtener_calendario(codigo_temporada: str) -> dict:
             if round_num not in matches_by_round:
                 matches_by_round[round_num] = []
 
-            match_str = f"{home_norm} vs {away_norm}"
-            matches_by_round[round_num].append(match_str)
+            # Crear diccionario con fecha, hora y resultado
+            match_info = {
+                "match": f"{home_norm} vs {away_norm}",
+                "fecha": fecha_str,
+                "hora": hora_str
+            }
+            
+            # Agregar resultado si el partido ya se jugó
+            if resultado:
+                match_info["resultado"] = resultado
+            
+            matches_by_round[round_num].append(match_info)
 
         except Exception as e:
             logger.warning(f"Error procesando fila de calendario: {e}")
@@ -397,6 +455,7 @@ def obtener_nombres_equipos(html_partido) -> tuple:
 
 
 def obtener_fecha_partido(html_partido):
+    """Extrae solo la fecha del HTML del partido (sin hora)."""
     soup = BeautifulSoup(html_partido, "lxml")
     scorebox = soup.find("div", class_="scorebox_meta")
 
@@ -408,6 +467,7 @@ def obtener_fecha_partido(html_partido):
         return None
 
     fecha_raw = time_span.get("data-venue-date")
+    
     if not fecha_raw:
         return None
 
@@ -685,12 +745,27 @@ def analizar_temporada(codigo_temporada: str, j_ini: int = 1, j_fin: int = 38):
     procesar_rango_jornadas(jornada_inicio=1, jornada_fin=38)
 
 
+def scrappear_calendario_para_bd():
+    """Función para scrappear calendarios con resultados (usada por popularDB)."""
+    logger.info("\n" + "=" * 70)
+    logger.info("FBREF: SCRAPPEAR CALENDARIO CON RESULTADOS")
+    logger.info("=" * 70)
+    
+    for temporada in ["23_24", "24_25", "25_26"]:
+        try:
+            logger.info(f"\n[{temporada}] Extrayendo calendario y resultados...")
+            obtener_calendario(temporada)
+        except Exception as e:
+            logger.error(f"❌ Error en la temporada {temporada}: {e}")
+            continue
+
+
 if __name__ == "__main__":
     inicio = time.perf_counter()
 
-    analizar_temporada("23_24", 1, 38)
-    analizar_temporada("24_25", 1, 38)
-    analizar_temporada("25_26", 1, 20)
+    #analizar_temporada("23_24", 1, 38)
+    #analizar_temporada("24_25", 1, 38)
+    #analizar_temporada("25_26", 1, 20)
     obtener_calendario("23_24")
     obtener_calendario("24_25")
     obtener_calendario("25_26")

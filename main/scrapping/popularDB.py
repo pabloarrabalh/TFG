@@ -34,13 +34,17 @@ django.setup()
 from main.models import (
     Temporada, Equipo, EquipoTemporada, Jugador,
     HistorialEquiposJugador, Jornada, Partido, EstadisticasPartidoJugador,
-    ClasificacionJornada, RendimientoHistoricoJugador, EquipoJugadorTemporada
+    ClasificacionJornada, RendimientoHistoricoJugador, EquipoJugadorTemporada,
+    Calendario
 )
 from django.db.models import Sum, Count, Q
 from main.scrapping.alias import MAPEO_POSICIONES_INVERSO
+from main.scrapping.fbref import scrappear_calendario_para_bd
 from main.scrapping.transfermarkt import (
-    scrapear_plantillas_temporada,
-    extraer_hrefs_equipos_desde_clasificacion
+    extraer_hrefs_equipos_desde_clasificacion,
+    obtener_plantilla_equipo,
+    procesar_plantilla_equipo,
+    mapear_equipo_tm_a_bd,
 )
 
 # Intentar importar rapidfuzz para fuzzy matching
@@ -222,7 +226,7 @@ def obtener_o_crear_partido(jornada, equipo_local, equipo_visitante, fecha_parti
     return partido
 
 def cargar_estadisticas_partido(row, jugador, equipo, partido):
-    """Crea EstadisticasPartidoJugador desde una fila del CSV."""
+    """Crea o actualiza EstadisticasPartidoJugador desde una fila del CSV."""
     # Convertir posición de código (PT/DF/MC/DT) a nombre completo (Portero/Defensa/...)
     posicion_codigo = row.get('posicion') if pd.notna(row.get('posicion')) else None
     posicion = MAPEO_POSICIONES_INVERSO.get(posicion_codigo) if posicion_codigo else None
@@ -238,47 +242,50 @@ def cargar_estadisticas_partido(row, jugador, equipo, partido):
         except (ValueError, TypeError):
             edad = None
     
-    stats = EstadisticasPartidoJugador(
-        partido=partido, jugador=jugador,
-        nacionalidad=nacionalidad,  # Agregar nacionalidad
-        edad=edad,  # Agregar edad
-        min_partido=int(row['min_partido']) if pd.notna(row['min_partido']) else 0,
-        titular=bool(row['titular']) if pd.notna(row['titular']) else False,
-        gol_partido=int(row['gol_partido']) if pd.notna(row['gol_partido']) else 0,
-        asist_partido=int(row['asist_partido']) if pd.notna(row['asist_partido']) else 0,
-        xg_partido=float(row['xg_partido']) if pd.notna(row['xg_partido']) else 0.0,
-        xag=float(row['xag']) if pd.notna(row['xag']) else 0.0,
-        tiros=int(row['tiros']) if pd.notna(row['tiros']) else 0,
-        tiro_fallado_partido=int(row['tiro_fallado_partido']) if pd.notna(row['tiro_fallado_partido']) else 0,
-        tiro_puerta_partido=int(row['tiro_puerta_partido']) if pd.notna(row['tiro_puerta_partido']) else 0,
-        pases_totales=int(row['pases_totales']) if pd.notna(row['pases_totales']) else 0,
-        pases_completados_pct=float(row['pases_completados_pct']) if pd.notna(row['pases_completados_pct']) else 0.0,
-        amarillas=int(row['amarillas']) if pd.notna(row['amarillas']) else 0,
-        rojas=int(row['rojas']) if pd.notna(row['rojas']) else 0,
-        goles_en_contra=int(row['goles_en_contra']) if pd.notna(row['goles_en_contra']) else 0,
-        porcentaje_paradas=float(row['porcentaje_paradas']) if pd.notna(row['porcentaje_paradas']) else 0.0,
-        psxg=float(row['psxg']) if pd.notna(row['psxg']) else 0.0,
-        puntos_fantasy=int(row['puntos_fantasy']) if pd.notna(row['puntos_fantasy']) else 0,
-        entradas=int(row['entradas']) if pd.notna(row['entradas']) else 0,
-        duelos=int(row['duelos']) if pd.notna(row['duelos']) else 0,
-        duelos_ganados=int(row['duelos_ganados']) if pd.notna(row['duelos_ganados']) else 0,
-        duelos_perdidos=int(row['duelos_perdidos']) if pd.notna(row['duelos_perdidos']) else 0,
-        bloqueos=int(row['bloqueos']) if pd.notna(row['bloqueos']) else 0,
-        bloqueo_tiros=int(row['bloqueo_tiros']) if pd.notna(row['bloqueo_tiros']) else 0,
-        bloqueo_pase=int(row['bloqueo_pase']) if pd.notna(row['bloqueo_pase']) else 0,
-        despejes=int(row['despejes']) if pd.notna(row['despejes']) else 0,
-        regates=int(row['regates']) if pd.notna(row['regates']) else 0,
-        regates_completados=int(row['regates_completados']) if pd.notna(row['regates_completados']) else 0,
-        regates_fallidos=int(row['regates_fallidos']) if pd.notna(row['regates_fallidos']) else 0,
-        conducciones=int(row['conducciones']) if pd.notna(row['conducciones']) else 0,
-        distancia_conduccion=float(row['distancia_conduccion']) if pd.notna(row['distancia_conduccion']) else 0.0,
-        metros_avanzados_conduccion=float(row['metros_avanzados_conduccion']) if pd.notna(row['metros_avanzados_conduccion']) else 0.0,
-        conducciones_progresivas=int(row['conducciones_progresivas']) if pd.notna(row['conducciones_progresivas']) else 0,
-        duelos_aereos_ganados=int(row['duelos_aereos_ganados']) if pd.notna(row['duelos_aereos_ganados']) else 0,
-        duelos_aereos_perdidos=int(row['duelos_aereos_perdidos']) if pd.notna(row['duelos_aereos_perdidos']) else 0,
-        duelos_aereos_ganados_pct=float(row['duelos_aereos_ganados_pct']) if pd.notna(row['duelos_aereos_ganados_pct']) else 0.0,
-        posicion=posicion,  # Posición convertida a Portero/Defensa/Centrocampista/Delantero
-        roles=[]  # Se llena después con fuzzy matching
+    stats, created = EstadisticasPartidoJugador.objects.update_or_create(
+        partido=partido,
+        jugador=jugador,
+        defaults={
+            'nacionalidad': nacionalidad,
+            'edad': edad,
+            'min_partido': int(row['min_partido']) if pd.notna(row['min_partido']) else 0,
+            'titular': bool(row['titular']) if pd.notna(row['titular']) else False,
+            'gol_partido': int(row['gol_partido']) if pd.notna(row['gol_partido']) else 0,
+            'asist_partido': int(row['asist_partido']) if pd.notna(row['asist_partido']) else 0,
+            'xg_partido': float(row['xg_partido']) if pd.notna(row['xg_partido']) else 0.0,
+            'xag': float(row['xag']) if pd.notna(row['xag']) else 0.0,
+            'tiros': int(row['tiros']) if pd.notna(row['tiros']) else 0,
+            'tiro_fallado_partido': int(row['tiro_fallado_partido']) if pd.notna(row['tiro_fallado_partido']) else 0,
+            'tiro_puerta_partido': int(row['tiro_puerta_partido']) if pd.notna(row['tiro_puerta_partido']) else 0,
+            'pases_totales': int(row['pases_totales']) if pd.notna(row['pases_totales']) else 0,
+            'pases_completados_pct': float(row['pases_completados_pct']) if pd.notna(row['pases_completados_pct']) else 0.0,
+            'amarillas': int(row['amarillas']) if pd.notna(row['amarillas']) else 0,
+            'rojas': int(row['rojas']) if pd.notna(row['rojas']) else 0,
+            'goles_en_contra': int(row['goles_en_contra']) if pd.notna(row['goles_en_contra']) else 0,
+            'porcentaje_paradas': float(row['porcentaje_paradas']) if pd.notna(row['porcentaje_paradas']) else 0.0,
+            'psxg': float(row['psxg']) if pd.notna(row['psxg']) else 0.0,
+            'puntos_fantasy': int(row['puntos_fantasy']) if pd.notna(row['puntos_fantasy']) else 0,
+            'entradas': int(row['entradas']) if pd.notna(row['entradas']) else 0,
+            'duelos': int(row['duelos']) if pd.notna(row['duelos']) else 0,
+            'duelos_ganados': int(row['duelos_ganados']) if pd.notna(row['duelos_ganados']) else 0,
+            'duelos_perdidos': int(row['duelos_perdidos']) if pd.notna(row['duelos_perdidos']) else 0,
+            'bloqueos': int(row['bloqueos']) if pd.notna(row['bloqueos']) else 0,
+            'bloqueo_tiros': int(row['bloqueo_tiros']) if pd.notna(row['bloqueo_tiros']) else 0,
+            'bloqueo_pase': int(row['bloqueo_pase']) if pd.notna(row['bloqueo_pase']) else 0,
+            'despejes': int(row['despejes']) if pd.notna(row['despejes']) else 0,
+            'regates': int(row['regates']) if pd.notna(row['regates']) else 0,
+            'regates_completados': int(row['regates_completados']) if pd.notna(row['regates_completados']) else 0,
+            'regates_fallidos': int(row['regates_fallidos']) if pd.notna(row['regates_fallidos']) else 0,
+            'conducciones': int(row['conducciones']) if pd.notna(row['conducciones']) else 0,
+            'distancia_conduccion': float(row['distancia_conduccion']) if pd.notna(row['distancia_conduccion']) else 0.0,
+            'metros_avanzados_conduccion': float(row['metros_avanzados_conduccion']) if pd.notna(row['metros_avanzados_conduccion']) else 0.0,
+            'conducciones_progresivas': int(row['conducciones_progresivas']) if pd.notna(row['conducciones_progresivas']) else 0,
+            'duelos_aereos_ganados': int(row['duelos_aereos_ganados']) if pd.notna(row['duelos_aereos_ganados']) else 0,
+            'duelos_aereos_perdidos': int(row['duelos_aereos_perdidos']) if pd.notna(row['duelos_aereos_perdidos']) else 0,
+            'duelos_aereos_ganados_pct': float(row['duelos_aereos_ganados_pct']) if pd.notna(row['duelos_aereos_ganados_pct']) else 0.0,
+            'posicion': posicion,
+            'roles': []
+        }
     )
     return stats
 
@@ -405,26 +412,62 @@ def procesar_csv_partido(ruta_csv, temporada):
                 obtener_o_crear_historial(jugador, equipo, temporada, dorsal)
                 
                 stats = cargar_estadisticas_partido(row, jugador, equipo, partido)
-                stats.save()
                 contador_stats += 1
             except Exception as e:
                 print(f"  ❌ Error procesando fila {idx} en {ruta_csv}: {e}")
                 continue
         
         if contador_stats == 0:
-            print(f"  ⚠️  {ruta_csv}: 0 estadísticas guardadas (df tiene {len(df)} filas)")
+            print(f"  [WARN] {ruta_csv}: 0 estadísticas guardadas (df tiene {len(df)} filas)")
         
         return True
     except Exception as e:
-        print(f"  ❌ Error procesando partido en {ruta_csv}: {e}")
+        print(f"  [ERROR] Error procesando partido en {ruta_csv}: {e}")
         return False
+
+
+def fase_0a_crear_todas_las_jornadas():
+    """
+    FASE 0a: Crea TODAS las jornadas (1-38) para cada temporada.
+    Se ejecuta PRIMERO para que existan las jornadas aunque no haya partidos jugados aún.
+    Esto permite luego asignar el calendario completo a la BD.
+    """
+    print("\n" + "=" * 70)
+    print("FASE 0a: CREAR TODAS LAS JORNADAS (1-38 POR TEMPORADA)")
+    print("=" * 70)
+    
+    temporadas_to_create = [
+        ('23_24', 'Temporada 23/24'),
+        ('24_25', 'Temporada 24/25'),
+        ('25_26', 'Temporada 25/26'),
+    ]
+    
+    for temp_codigo, temp_nombre in temporadas_to_create:
+        # Obtener o crear la temporada
+        temporada, created = Temporada.objects.get_or_create(nombre=temp_codigo)
+        
+        # Crear jornadas 1-38
+        created_count = 0
+        for num_jornada in range(1, 39):
+            jornada, was_created = Jornada.objects.get_or_create(
+                temporada=temporada,
+                numero_jornada=num_jornada,
+                defaults={'fecha_inicio': None, 'fecha_fin': None}
+            )
+            if was_created:
+                created_count += 1
+        
+        print(f"  ✓ {temp_codigo}: {created_count} jornadas creadas ({38 - created_count} ya existían)")
+    
+    total_jornadas = Jornada.objects.count()
+    print(f"\n[OK] Total jornadas en BD: {total_jornadas}")
 
 
 def fase_0_scrapear_plantillas_y_estadios():
     """
     FASE 0: Scrapea plantillas desde Transfermarkt para MÚLTIPLES TEMPORADAS
     y actualiza estadios en BD para cada una.
-    Se ejecuta ANTES de cargar otros datos para asegurar que todos los equipos
+    Se ejecuta DESPUÉS de crear las jornadas para asegurar que todos los equipos
     tienen estadios actualizados en el modelo Equipo.
     """
     print("\n" + "=" * 70)
@@ -442,9 +485,9 @@ def fase_0_scrapear_plantillas_y_estadios():
     
     try:
         for temporada_display, saison_id, temporada_codigo in temporadas_to_scrap:
-            print(f"\n{'─' * 70}")
+            print(f"\n{'-' * 70}")
             print(f"Scrapando Transfermarkt Temporada {temporada_display} (saison_id={saison_id})")
-            print(f"{'─' * 70}")
+            print(f"{'-' * 70}")
             
             # Paso 1: Descargar clasificación para obtener hrefs de todos los equipos
             print(f"\n[0.1] Descargando clasificación de La Liga {temporada_display}...")
@@ -459,12 +502,12 @@ def fase_0_scrapear_plantillas_y_estadios():
                 )
                 
                 if resp.status_code != 200:
-                    print(f"⚠️  Error descargando clasificación: Status {resp.status_code}")
+                    print(f"[WARN] Error descargando clasificación: Status {resp.status_code}")
                     continue
                 
-                print("✅ Clasificación descargada correctamente")
+                print("[OK] Clasificación descargada correctamente")
             except Exception as e:
-                print(f"⚠️  Error descargando clasificación: {e}")
+                print(f"[WARN] Error descargando clasificación: {e}")
                 continue
             
             # Paso 2: Extraer hrefs de todos los equipos
@@ -472,30 +515,31 @@ def fase_0_scrapear_plantillas_y_estadios():
             equipos_href = extraer_hrefs_equipos_desde_clasificacion(resp.text)
             
             if not equipos_href:
-                print("⚠️  No se encontraron equipos en la clasificación")
+                print("[WARN] No se encontraron equipos en la clasificación")
                 continue
             
-            print(f"✅ Se encontraron {len(equipos_href)} equipos")
+            print(f"[OK] Se encontraron {len(equipos_href)} equipos")
             
             # Paso 3: Scrapear plantillas para esta temporada
-            print(f"\n[0.3] Scrapendo plantillas para {temporada_display}...")
-            print("⏳ Esto puede tomar varios minutos (hay delay entre requests)...\n")
+            # Actualizar estadios directamente desde los equipos descargados
+            # Sin generar CSVs de nacionalidad que no se usan
+            print(f"\n[0.3] Actualizando estadios desde Transfermarkt para {temporada_display}...")
             
-            carpeta_plantillas = os.path.join("csv", "csvGenerados", "plantillas")
+            for idx, (equipo_norm, href) in enumerate(equipos_href.items(), 1):
+                try:
+                    html = obtener_plantilla_equipo(href, saison_id=saison_id, delay_min=1, delay_max=2)
+                    if html:
+                        _, estadio = procesar_plantilla_equipo(html, equipo_norm)
+                        if estadio:
+                            equipo_bd_nombre = mapear_equipo_tm_a_bd(equipo_norm)
+                            equipo_obj = Equipo.objects.filter(nombre=equipo_bd_nombre).first()
+                            if equipo_obj and equipo_obj.estadio != estadio:
+                                equipo_obj.estadio = estadio
+                                equipo_obj.save()
+                except Exception:
+                    pass
             
-            # scrapear_plantillas_temporada ahora incluye saison_id
-            todos_jugadores = scrapear_plantillas_temporada(
-                código_equipos_to_href=equipos_href,
-                temporada_codigo=temporada_codigo,
-                carpeta_salida=carpeta_plantillas,
-                saison_id=saison_id,
-                delay_min=2,
-                delay_max=5
-            )
-            
-            # Mostrar resumen temporal
             print(f"\n✓ Temporada {temporada_display} completada")
-            print(f"  - Jugadores extraídos: {len(todos_jugadores)}")
         
         # Mostrar resumen final de cobertura de estadios
         print("\n" + "=" * 70)
@@ -510,14 +554,14 @@ def fase_0_scrapear_plantillas_y_estadios():
         print(f"   • Con estadio: {equipos_con_estadio}")
         print(f"   • Cobertura: {100*equipos_con_estadio/equipos_total:.1f}%")
         
-        print("\n✅ Fase 0 completada exitosamente")
+        print("\n[OK] Fase 0 completada exitosamente")
         return True
         
     except Exception as e:
-        print(f"❌ Error en Fase 0: {e}")
+        print(f"[ERROR] Error en Fase 0: {e}")
         import traceback
         traceback.print_exc()
-        print("\n⚠️  Fase 0 falló - continuando sin actualizar estadios")
+        print("\n[WARN] Fase 0 falló - continuando sin actualizar estadios")
         return False
 
 
@@ -606,7 +650,7 @@ def actualizar_fechas_jornadas():
             jornada.save()
             jornadas_actualizadas += 1
     
-    print(f"  ✅ {jornadas_actualizadas} jornadas actualizadas")
+    print(f"  [OK] {jornadas_actualizadas} jornadas actualizadas")
 
 # ============================================================================
 # FUNCIONES DE CARGA (FASE 2: Roles, Goles, Clasificación, Rendimiento)
@@ -688,36 +732,17 @@ def fase_2_cargar_roles():
     print(f"\n[OK] Roles cargados: {con_roles} estadísticas")
 
 def fase_2b_cargar_goles():
-    """FASE 2b: Carga goles en partidos."""
+    """FASE 2b: Carga goles en partidos - DESHABILITADO.
+    Los datos de goles en EstadisticasPartidoJugador vienen inflados/duplicados.
+    Mejor dejar los goles vacíos hasta tener fuente confiable (API o web scraping directo).
+    """
     print("\n" + "=" * 70)
-    print("FASE 2b: CARGAR GOLES EN PARTIDOS")
+    print("FASE 2b: CARGAR GOLES EN PARTIDOS - DESHABILITADO")
     print("=" * 70)
-    
-    partidos_sin_goles = Partido.objects.filter(goles_local__isnull=True, goles_visitante__isnull=True)
-    actualizados = 0
-    
-    for partido in partidos_sin_goles:
-        try:
-            goles_local = EstadisticasPartidoJugador.objects.filter(
-                partido=partido,
-                jugador__historial_equipos__equipo=partido.equipo_local
-            ).aggregate(total=Sum('gol_partido'))['total'] or 0
-            
-            goles_visitante = EstadisticasPartidoJugador.objects.filter(
-                partido=partido,
-                jugador__historial_equipos__equipo=partido.equipo_visitante
-            ).aggregate(total=Sum('gol_partido'))['total'] or 0
-            
-            if goles_local > 0 or goles_visitante > 0:
-                partido.goles_local = int(goles_local)
-                partido.goles_visitante = int(goles_visitante)
-                partido.save()
-                actualizados += 1
-        except Exception:
-            continue
-    
+    print("[SKIP] Cálculo de goles deshabilitado - datos inflados en CSVs origen")
+    print("[INFO] Los goles permanecerán NULL hasta tener fuente primaria confiable")
     con_goles = Partido.objects.filter(goles_local__isnull=False).count()
-    print(f"[OK] Goles cargados: {con_goles} partidos")
+    print(f"[OK] Partidos con goles oficiales: {con_goles}")
 
 def fase_2c_cargar_clasificacion():
     """FASE 2c: Carga clasificación jornada."""
@@ -946,6 +971,7 @@ def main():
     print("CARGA COMPLETA UNIFICADA DE TODOS LOS DATOS")
     print("=" * 70)
     print("\nEste script carga TODO en una sola ejecución:")
+    print("0a. Crear todas las jornadas (1-38) para cada temporada")
     print("0. Scrapea plantillas desde Transfermarkt y actualiza estadios")
     print("1. Partidos y Estadísticas (45 campos)")
     print("2. Roles con fuzzy matching")
@@ -953,8 +979,13 @@ def main():
     print("4. Clasificación Jornada")
     print("5. Rendimiento Histórico de Jugadores")
     print("6. Equipo-Jugador-Temporada (Plantillas por temporada)")
+    print("7. FBREF: Scrappear Calendario y Resultados")
+    print("8. Cargar Calendario")
     
-    # FASE 0: Scrapear plantillas y actualizar estadios (PRIMERO)
+    # FASE 0a: Crear todas las jornadas PRIMERO (CRÍTICO)
+    fase_0a_crear_todas_las_jornadas()
+    
+    # FASE 0: Scrapear plantillas y actualizar estadios
     fase_0_scrapear_plantillas_y_estadios()
     
     # FASE 1: Partidos y Estadísticas
@@ -966,6 +997,14 @@ def main():
     fase_2c_cargar_clasificacion()
     fase_2d_cargar_rendimiento()
     fase_2e_poblar_equipo_jugador_temporada()
+    fase_2f_completar_estadios()  # Fallback de estadios faltantes
+    
+    # FASE FBREF: Scrappear calendario desde FBREF con resultados
+    scrappear_calendario_para_bd()
+    
+    # FASE 3: Cargar Calendario base y Goles desde JSON
+    fase_3_cargar_calendario()
+    fase_2g_cargar_goles_desde_calendario()
     
     # Resumen final
     print("\n" + "=" * 70)
@@ -983,6 +1022,7 @@ def main():
     clasificacion_count = ClasificacionJornada.objects.count()
     rendimiento_count = RendimientoHistoricoJugador.objects.count()
     equipo_jugador_temp = EquipoJugadorTemporada.objects.count()
+    calendario_count = Calendario.objects.count()
     
     # Revisar cobertura de estadios
     equipos_con_estadio = Equipo.objects.exclude(estadio__exact='').count()
@@ -994,11 +1034,308 @@ def main():
     print(f"  - Clasificación: {clasificacion_count} registros")
     print(f"  - Rendimiento: {rendimiento_count} registros")
     print(f"  - Plantillas por Temporada: {equipo_jugador_temp} registros")
+    print(f"  - Calendario: {calendario_count} partidos")
     print(f"  - Estadios: {equipos_con_estadio}/{equipos_total} equipos ({100*equipos_con_estadio/equipos_total:.1f}%)")
     
     print("\n" + "=" * 70)
     print("[OK] CARGA COMPLETADA - TODO LISTO EN LA BASE DE DATOS")
     print("=" * 70)
+
+
+def fase_2f_completar_estadios():
+    """FASE 2F: Completa estadios faltantes como fallback."""
+    print("\n" + "=" * 70)
+    print("FASE 2F: COMPLETAR ESTADIOS FALTANTES")
+    print("=" * 70)
+    
+    # Mapeo manual de equipos -> estadios
+    estadios_fallback = {
+        'Real Valladolid': 'José Zorrilla',
+        'Granada': 'Nuevo Estadio de Los Cármenes',
+        'Cádiz': 'Estadio Ramón Blance',
+        'UD Las Palmas': 'Estadio de Gran Canaria',
+        'Levante': 'Estadio Ciutat de Valencia',
+        'Almería': 'Estadio Power Horse Stadium',
+        'Real Oviedo': 'Estadio Carlos Tartiere',
+        'Girona': 'Estadi Municipal de Montilivi',
+        'Getafe': 'Coliseum Alfonso Pérez',
+        'Rayo Vallecano': 'Estadio de Vallecas',
+        'Barcelona': 'Spotify Camp Nou',
+        'Real Madrid': 'Santiago Bernabéu',
+        'Atlético Madrid': 'Riyadh Air Metropolitano',
+        'Valencia': 'Estadio de Mestalla',
+        'Real Sociedad': 'Reale Arena',
+        'Athletic Club': 'San Mamés',
+        'Villarreal': 'La Cerámica',
+        'Real Betis': 'Benito Villamarín',
+        'Sevilla': 'Ramón Sánchez-Pizjuán',
+        'Osasuna': 'El Sadar',
+        'Celta Vigo': 'Balaídos',
+        'RCD Mallorca': 'Estadi de Son Moix',
+        'Elche': 'Estadio Martínez Valero',
+        'RCD Espanyol': 'Estadio Cornellà-El Prat',
+        'Alavés': 'Estadio de Mendizorrotza',
+        'CA Osasuna': 'El Sadar',
+    }
+    
+    equipos_sin_estadio = []
+    equipos_actualizados = []
+    
+    for equipo in Equipo.objects.all():
+        if not equipo.estadio or equipo.estadio.strip() == '':
+            # Buscar en el mapeo
+            if equipo.nombre in estadios_fallback:
+                equipo.estadio = estadios_fallback[equipo.nombre]
+                equipo.save()
+                equipos_actualizados.append((equipo.nombre, equipo.estadio))
+                print(f"  [OK] {equipo.nombre} -> {equipo.estadio}")
+            else:
+                equipos_sin_estadio.append(equipo.nombre)
+    
+    print(f"\n📊 Resultado:")
+    print(f"  - Estadios completados: {len(equipos_actualizados)}")
+    print(f"  - Aún sin estadio: {len(equipos_sin_estadio)}")
+    
+    if equipos_sin_estadio:
+        print(f"  Equipos sin estadio: {', '.join(equipos_sin_estadio)}")
+
+
+def fase_3_cargar_calendario():
+    """FASE 3: Carga el calendario desde JSON a la tabla Calendario en BD."""
+    from main.models import Calendario
+    from datetime import datetime as dt
+    
+    print("\n" + "=" * 70)
+    print("FASE 3: CARGAR CALENDARIO")
+    print("=" * 70)
+    
+    temporadas_map = {
+        'temporada_23_24': '23_24',
+        'temporada_24_25': '24_25',
+        'temporada_25_26': '25_26',
+    }
+    
+    cwd = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    csv_dir = os.path.join(cwd, 'csv', 'csvGenerados')
+    
+    total_cargados = 0
+    equipos_no_encontrados = set()
+    
+    for temp_dir, temp_codigo in temporadas_map.items():
+        json_path = os.path.join(csv_dir, f'calendario_{temp_codigo}.json')
+        
+        if not os.path.exists(json_path):
+            print(f"  [WARN] No encontrado: {json_path}")
+            continue
+        
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                calendario_dict = json.load(f)
+            
+            temporada = Temporada.objects.get(nombre=temp_codigo)
+            print(f"\n[{temp_codigo}] Cargando {len(calendario_dict)} jornadas...\n")
+            
+            for jornada_num_str, matches in calendario_dict.items():
+                try:
+                    jornada_num = int(jornada_num_str)
+                    jornada = Jornada.objects.get(temporada=temporada, numero_jornada=jornada_num)
+                    
+                    partidos_jornada = 0
+                    
+                    for match_info in matches:
+                        try:
+                            match_str = match_info.get('match', '')
+                            fecha_str = match_info.get('fecha', '')
+                            hora_str = match_info.get('hora', '')
+                            
+                            if not match_str:
+                                continue
+                            
+                            # Parsear match: "equipo1 vs equipo2"
+                            if ' vs ' not in match_str.lower():
+                                continue
+                            
+                            partes = match_str.lower().split(' vs ')
+                            if len(partes) != 2:
+                                continue
+                            
+                            equipo_local_nombre = normalizar_equipo(partes[0].strip())
+                            equipo_visitante_nombre = normalizar_equipo(partes[1].strip())
+                            
+                            # Buscar equipos (robusto)
+                            equipo_local = None
+                            equipo_visitante = None
+                            
+                            try:
+                                equipo_local = Equipo.objects.get(nombre=equipo_local_nombre)
+                            except Equipo.DoesNotExist:
+                                equipos_no_encontrados.add(f"{equipo_local_nombre} (local)")
+                                continue
+                            
+                            try:
+                                equipo_visitante = Equipo.objects.get(nombre=equipo_visitante_nombre)
+                            except Equipo.DoesNotExist:
+                                equipos_no_encontrados.add(f"{equipo_visitante_nombre} (visitante)")
+                                continue
+                            
+                            # Parsear fecha (dd/mm/yyyy)
+                            try:
+                                fecha = dt.strptime(fecha_str, '%d/%m/%Y').date()
+                            except:
+                                fecha = dt.now().date()
+                            
+                            # Parsear hora (HH:MM)
+                            hora = None
+                            if hora_str and hora_str.strip():
+                                try:
+                                    hora = dt.strptime(hora_str, '%H:%M').time()
+                                except:
+                                    hora = None
+                            
+                            # Crear o actualizar en tabla Calendario
+                            cal, created = Calendario.objects.update_or_create(
+                                jornada=jornada,
+                                equipo_local=equipo_local,
+                                equipo_visitante=equipo_visitante,
+                                defaults={
+                                    'fecha': fecha,
+                                    'hora': hora,
+                                    'match_str': match_str,
+                                }
+                            )
+                            
+                            if created:
+                                total_cargados += 1
+                            
+                            partidos_jornada += 1
+                        except Exception as e:
+                            continue
+                    
+                    if partidos_jornada > 0:
+                        print(f"  ✅ Jornada {jornada_num}: {partidos_jornada} partidos cargados")
+                    else:
+                        print(f"  ⚠️  Jornada {jornada_num}: Sin partidos cargados")
+                except Exception as e:
+                    print(f"  ❌ Error en jornada {jornada_num_str}: {e}")
+                    continue
+        except Exception as e:
+            print(f"  ❌ Error procesando {json_path}: {e}")
+            continue
+    
+    if equipos_no_encontrados:
+        print(f"\n⚠️  Equipos no encontrados en BD (partidos ignorados):")
+        for equipo in sorted(equipos_no_encontrados):
+            print(f"   - {equipo}")
+    
+    total_calendario = Calendario.objects.count()
+    print(f"\n[OK] Calendario cargado: {total_calendario} partidos en BD")
+    return total_calendario
+
+
+def fase_2g_cargar_goles_desde_calendario():
+    """FASE 2c: Carga goles desde los calendarios JSON de FBREF."""
+    print("\n" + "=" * 70)
+    print("FASE 2c: CARGAR GOLES DESDE CALENDARIO")
+    print("=" * 70)
+    
+    temporadas = ['23_24', '24_25', '25_26']
+    total_actualizado = 0
+    total_procesados = 0
+    
+    for cod_temporada in temporadas:
+        print(f"\n[{cod_temporada}] Procesando resultados...")
+        
+        # Obtener la temporada
+        try:
+            temporada = Temporada.objects.get(nombre=cod_temporada)
+        except Temporada.DoesNotExist:
+            print(f"  ❌ Temporada no encontrada: {cod_temporada}")
+            continue
+        
+        json_path = os.path.join("csv", "csvGenerados", f"calendario_{cod_temporada}.json")
+        
+        if not os.path.exists(json_path):
+            print(f"  ⚠️  Archivo no encontrado: {json_path}")
+            continue
+        
+        try:
+            with open(json_path, "r", encoding="utf-8") as f:
+                calendario = json.load(f)
+            
+            for jornada_str, partidos in calendario.items():
+                jornada_num = int(jornada_str)
+                
+                try:
+                    jornada = Jornada.objects.get(numero_jornada=jornada_num, temporada=temporada)
+                except Jornada.DoesNotExist:
+                    continue
+                
+                for match in partidos:
+                    if "resultado" not in match:
+                        # Partido no jugado aún
+                        continue
+                    
+                    total_procesados += 1
+                    
+                    try:
+                        match_str = match.get("match", "")
+                        resultado = match.get("resultado", "")
+                        
+                        # Parsear resultado "X-Y"
+                        partes = resultado.split("-")
+                        if len(partes) != 2:
+                            continue
+                        
+                        try:
+                            goles_local = int(partes[0].strip())
+                            goles_visitante = int(partes[1].strip())
+                        except ValueError:
+                            continue
+                        
+                        # Parsear nombres de equipos
+                        equipos = match_str.lower().split(" vs ")
+                        if len(equipos) != 2:
+                            continue
+                        
+                        equipo_local_nombre = normalizar_equipo(equipos[0].strip())
+                        equipo_visitante_nombre = normalizar_equipo(equipos[1].strip())
+                        
+                        # Buscar equipos
+                        try:
+                            equipo_local = Equipo.objects.get(nombre=equipo_local_nombre)
+                        except Equipo.DoesNotExist:
+                            continue
+                        
+                        try:
+                            equipo_visitante = Equipo.objects.get(nombre=equipo_visitante_nombre)
+                        except Equipo.DoesNotExist:
+                            continue
+                        
+                        # Buscar el partido
+                        partido = Partido.objects.filter(
+                            jornada=jornada,
+                            equipo_local=equipo_local,
+                            equipo_visitante=equipo_visitante
+                        ).first()
+                        
+                        if partido:
+                            # Actualizar goles
+                            partido.goles_local = goles_local
+                            partido.goles_visitante = goles_visitante
+                            partido.jugado = True
+                            partido.save()
+                            total_actualizado += 1
+                    
+                    except Exception as e:
+                        continue
+        
+        except Exception as e:
+            print(f"  ❌ Error procesando {json_path}: {e}")
+            continue
+    
+    total_partidos = Partido.objects.exclude(goles_local__isnull=True).count()
+    print(f"\n[OK] Goles cargados: {total_actualizado} partidos actualizados (de {total_procesados} procesados)")
+    print(f"Total partidos con goles en BD: {total_partidos}")
 
 
 if __name__ == '__main__':

@@ -312,6 +312,29 @@ class EstadisticasPartidoJugador(models.Model):
 
 
 # ============================================================================
+# TABLA: CALENDARIO
+# ============================================================================
+class Calendario(models.Model):
+    """Almacena los datos del calendario de la temporada para consultas rápidas"""
+    jornada = models.ForeignKey(Jornada, on_delete=models.CASCADE, related_name='calendario_matches')
+    equipo_local = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='calendario_local')
+    equipo_visitante = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='calendario_visitante')
+    fecha = models.DateField()
+    hora = models.TimeField(null=True, blank=True)
+    match_str = models.CharField(max_length=100, blank=True, default='')  # e.g., "girona vs rayo"
+
+    class Meta:
+        verbose_name = 'Calendario'
+        verbose_name_plural = 'Calendarios'
+        unique_together = ('jornada', 'equipo_local', 'equipo_visitante')
+        ordering = ['jornada', 'fecha']
+
+    def __str__(self):
+        hora_str = self.hora.strftime('%H:%M') if self.hora else 'TBD'
+        return f"{self.match_str} - {self.fecha} {hora_str}"
+
+
+# ============================================================================
 # TABLA: RENDIMIENTO HISTÓRICO DE JUGADORES
 # ============================================================================
 class RendimientoHistoricoJugador(models.Model):

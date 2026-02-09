@@ -19,6 +19,28 @@
 .league-table tr:hover td:first-child {
     @apply text-primary;
 }
+
+/* Estilos para tabla de partidos */
+.match-table td {
+    @apply px-6 py-3 text-sm border-b border-white/5 align-middle;
+}
+
+.match-table tr:hover {
+    @apply bg-white/5;
+}
+
+.match-score {
+    @apply text-2xl font-black;
+}
+
+.match-score.played {
+    @apply text-primary;
+}
+
+.match-score.pending {
+    @apply text-gray-500;
+}
+
 .select-custom {
     @apply bg-surface-dark border border-border-dark text-white px-4 py-2.5 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all cursor-pointer;
 }
@@ -42,23 +64,32 @@
     @apply bg-red-500;
 }
 
+/* Equipo seleccionado o resaltado */
+.team-highlighted {
+    @apply bg-yellow-500/20 text-yellow-400 font-bold px-3 py-2 rounded-lg;
+}
+
 /* Colores y patrones personalizados por equipo */
-.team-real-madrid {
+.team-real-madrid,
+.team-madrid {
     @apply bg-white border-white text-black;
 }
 
-.team-barcelona {
+.team-barcelona,
+.team-fc-barcelona {
     background: repeating-linear-gradient(90deg, #004687 0 8px, #c60c30 8px 16px);
     @apply border-blue-600 text-white;
 }
 
-.team-atletico-madrid {
+.team-atletico-madrid,
+.team-atletico {
     background: linear-gradient(90deg, white 25%, red 25%, red 50%, white 50%, white 75%, red 75%, red);
     background-size: 8px 100%;
     @apply border-red-600 text-black;
 }
 
-.team-athletic-club {
+.team-athletic-club,
+.team-athletic {
     background: linear-gradient(90deg, white 25%, red 25%, red 50%, white 50%, white 75%, red 75%, red);
     background-size: 8px 100%;
     @apply border-red-600 text-black;
@@ -68,7 +99,8 @@
     @apply bg-yellow-400 border-yellow-500 text-black;
 }
 
-.team-real-betis {
+.team-real-betis,
+.team-betis {
     background: linear-gradient(90deg, white 25%, #007749 25%, #007749 50%, white 50%, white 75%, #007749 75%, #007749);
     background-size: 8px 100%;
     @apply border-green-700 text-black;
@@ -78,37 +110,40 @@
     @apply bg-red-600 border-red-700 text-white;
 }
 
-.team-rcd-espanyol {
+.team-rcd-espanyol,
+.team-espanyol {
     background: linear-gradient(90deg, white 25%, #1e88e5 25%, #1e88e5 50%, white 50%, white 75%, #1e88e5 75%, #1e88e5);
     background-size: 8px 100%;
     @apply border-blue-600 text-black;
 }
 
-.team-alaves {
+.team-alaves,
+.team-alavés {
     background: linear-gradient(90deg, white 25%, #1e88e5 25%, #1e88e5 50%, white 50%, white 75%, #1e88e5 75%, #1e88e5);
     background-size: 8px 100%;
     @apply border-blue-600 text-black;
 }
 
 .team-elche {
-    background: linear-gradient(0deg, #1bc47d 25%, white 25%, white 50%, #1bc47d 50%, #1bc47d 75%, white 75%, white);
-    background-size: 100% 8px;
-    @apply border-green-500 text-black;
+    @apply bg-green-500 border-green-600 text-black;
 }
 
-.team-rayo-vallecano {
+.team-rayo-vallecano,
+.team-rayo {
     /* Fondo rojo con una franja blanca central más estrecha */
     background: linear-gradient(90deg, #ed1c24 0%, #ed1c24 40%, white 40% 60%, #ed1c24 60% 100%);
     @apply border-red-600 text-black;
 }
 
-.team-osasuna {
+.team-osasuna,
+.team-ca-osasuna {
     /* Rayas verticales azul y rojo */
     background: repeating-linear-gradient(90deg, #1e88e5 0 8px, #ed1c24 8px 16px);
     @apply border-red-600 text-white;
 }
 
-.team-valencia {
+.team-valencia,
+.team-cf-valencia {
     @apply bg-white border-white text-black;
 }
 
@@ -118,53 +153,68 @@
     @apply border-blue-600 text-white;
 }
 
-.team-real-mallorca {
+.team-real-mallorca,
+.team-mallorca {
     background: linear-gradient(90deg, #c60c30 25%, black 25%, black 50%, #c60c30 50%, #c60c30 75%, black 75%, black);
     background-size: 8px 100%;
     @apply border-red-600 text-white;
 }
 
-.team-celta-vigo {
+.team-celta-vigo,
+.team-celta {
     @apply bg-blue-400 border-blue-500 text-white;
 }
 
-.team-real-sociedad {
+.team-real-sociedad,
+.team-sociedad {
     background: linear-gradient(90deg, white 25%, #1e88e5 25%, #1e88e5 50%, white 50%, white 75%, #1e88e5 75%, #1e88e5);
     background-size: 8px 100%;
     @apply border-blue-600 text-black;
 }
 
-.team-real-oviedo {
+.team-real-oviedo,
+.team-oviedo {
     @apply bg-blue-900 border-blue-950 text-white;
 }
 
-.team-girona {
+.team-girona,
+.team-fc-girona {
     @apply bg-red-600 border-red-700 text-white;
 }
 
-.team-getafe {
+.team-getafe,
+.team-cf-getafe {
     @apply bg-blue-600 border-blue-700 text-white;
 }
 
-.team-granada {
+.team-granada,
+.team-cf-granada {
     /* Rojo con múltiples líneas horizontales blancas centradas */
     background: repeating-linear-gradient(0deg, white 0 3px, #c60c30 3px 12px);
     @apply border-red-700 text-black;
 }
 
-.team-las-palmas {
+.team-las-palmas,
+.team-ud-las-palmas {
     @apply bg-yellow-400 border-yellow-500 text-black;
 }
 
-.team-cadiz {
+.team-cadiz,
+.team-cádiz {
     @apply bg-yellow-300 border-yellow-400 text-black;
 }
 
-.team-almeria {
+.team-almeria,
+.team-almería {
     /* Rojo con líneas verticales blancas como Alavés */
     background: linear-gradient(90deg, white 25%, #c60c30 25%, #c60c30 50%, white 50%, white 75%, #c60c30 75%, #c60c30);
     background-size: 8px 100%;
     @apply border-red-700 text-black;
+}
+
+.team-real-valladolid,
+.team-valladolid {
+    @apply bg-white border-yellow-400 text-black;
 }
 
 .team-leganes {
@@ -182,41 +232,63 @@
 
     <!-- Filtros de Temporada y Jornada -->
     <div class="glass-panel rounded-2xl p-6 mb-6">
-        <form method="get" id="filter-form" class="flex flex-col md:flex-row gap-4 items-end">
-            <div class="flex-1">
-                <label class="block text-sm font-bold text-white mb-2">Temporada</label>
-                <select name="temporada" class="select-custom w-full" id="temporada-select" onchange="document.getElementById('filter-form').submit()">
-                    {% for temp_item in temporadas_display %}
-                        <option value="{{ temp_item.display }}" {% if temp_item.display == temporada_actual %}selected{% endif %}>
-                            {{ temp_item.display }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <div class="flex-1">
-                <label class="block text-sm font-bold text-white mb-2">Jornada</label>
-                <select name="jornada" class="select-custom w-full" id="jornada-select" onchange="document.getElementById('filter-form').submit()">
-                    {% for jornada in jornadas %}
-                        <option value="{{ jornada.numero_jornada }}" {% if jornada.numero_jornada == jornada_actual %}selected{% endif %}>
-                            Jornada {{ jornada.numero_jornada }}
-                        </option>
-                    {% empty %}
-                        <option value="">No hay jornadas disponibles</option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <button type="submit" class="bg-primary text-black font-bold px-6 py-2.5 rounded-lg hover:bg-primary-dark transition-all">
-                Filtrar
-            </button>
-        </form>
+        <div class="flex items-center gap-2 cursor-pointer mb-4" onclick="toggleFiltros()">
+            <span id="filtros-chevron" class="material-symbols-outlined text-white transition-transform">expand_more</span>
+            <h3 class="text-lg font-bold text-white">Filtros</h3>
+        </div>
+        
+        <div id="filtros-content">
+            <form method="get" id="filter-form" class="flex flex-col md:flex-row gap-4 items-end">
+                <div class="flex-1">
+                    <label class="block text-sm font-bold text-white mb-2">Temporada</label>
+                    <select name="temporada" class="select-custom w-full" id="temporada-select" onchange="document.getElementById('filter-form').submit()">
+                        {% for temp_item in temporadas_display %}
+                            <option value="{{ temp_item.display }}" {% if temp_item.display == temporada_actual %}selected{% endif %}>
+                                {{ temp_item.display }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="flex-1">
+                    <label class="block text-sm font-bold text-white mb-2">Jornada</label>
+                    <select name="jornada" class="select-custom w-full" id="jornada-select" onchange="resetEquipoFilter(); document.getElementById('filter-form').submit()">
+                        {% for jornada in jornadas %}
+                            <option value="{{ jornada.numero_jornada }}" {% if jornada.numero_jornada == jornada_actual %}selected{% endif %}>
+                                Jornada {{ jornada.numero_jornada }}
+                            </option>
+                        {% empty %}
+                            <option value="">No hay jornadas disponibles</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="flex-1">
+                    <label class="block text-sm font-bold text-white mb-2">Equipo</label>
+                    <select name="equipo" class="select-custom w-full" id="equipo-select" onchange="document.getElementById('filter-form').submit()">
+                        <option value="">Todos los equipos</option>
+                        <option value="" disabled>━━━━━━━━━━━━━━━━━━━━</option>
+                        <option value="" disabled style="background-color: #1e293b; color: #fbbf24;">TODO: Favoritos</option>
+                        <option value="" disabled>━━━━━━━━━━━━━━━━━━━━</option>
+                        {% for equipo in equipos_disponibles %}
+                            <option value="{{ equipo.nombre }}" {% if equipo.nombre == equipo_seleccionado %}selected{% endif %}>
+                                {{ equipo.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <button type="submit" class="bg-primary text-black font-bold px-6 py-2.5 rounded-lg hover:bg-primary-dark transition-all">
+                    Filtrar
+                </button>
+            </form>
+        </div>
     </div>
 
-    <!-- Información de la jornada -->
+    <!-- Información de la jornada + Tabla de partidos -->
     <div class="glass-panel rounded-2xl p-6 mb-6">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
+        <div class="mb-6">
+            <div class="flex items-center gap-4 mb-6">
                 <div class="bg-gradient-to-r from-primary to-blue-500 rounded-2xl p-4">
                     <span class="material-symbols-outlined text-black text-2xl font-bold">emoji_events</span>
                 </div>
@@ -226,12 +298,161 @@
                 </div>
             </div>
         </div>
+
+        <!-- Tabla de partidos dentro del panel -->
+        {% if partidos_jornada %}
+        <div class="border-t border-border-dark pt-6" id="partidos-section">
+            <div class="flex items-center gap-2 cursor-pointer mb-4" onclick="togglePartidos()">
+                <span id="partidos-chevron" class="material-symbols-outlined text-white transition-transform">expand_more</span>
+                <h4 class="text-lg font-bold text-white">Partidos</h4>
+            </div>
+            <div id="partidos-content" class="overflow-x-auto">
+                <table class="match-table w-full text-sm">
+                    <tbody>
+                        {% for partido in partidos_jornada %}
+                        <tr class="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer" 
+                            onclick="toggleSucesos({{ forloop.counter }})"
+                            id="partido-{{ forloop.counter }}">
+                            <td class="px-0 py-3 font-bold text-white w-32"><span {% if equipo_seleccionado == partido.local %}class="text-yellow-400"{% endif %}>{{ partido.local }}</span></td>
+                            <td class="px-4 py-3 text-center font-black w-20">
+                                {% if partido.jugado %}
+                                    <span class="text-primary text-xl">{{ partido.goles_local }}-{{ partido.goles_visitante }}</span>
+                                {% else %}
+                                    <span class="text-gray-500">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-0 py-3 font-bold text-white w-32 text-right"><span {% if equipo_seleccionado == partido.visitante %}class="text-yellow-400"{% endif %}>{{ partido.visitante }}</span></td>
+                            <td class="px-4 py-3 text-gray-400 text-xs w-40">
+                                {% if partido.fecha %}
+                                    <div>{{ partido.fecha|date:"d/m" }} 
+                                    {% if partido.hora %}
+                                        {{ partido.hora|time:"H:i" }}
+                                    {% else %}
+                                        <span class="text-gray-500">por definir</span>
+                                    {% endif %}
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        
+                        <!-- Fila desplegable de sucesos -->
+                        {% if partido.jugado %}
+                        <tr class="sucesos-row hidden" id="sucesos-{{ forloop.counter }}">
+                            <td colspan="5" class="px-4 py-4">
+                                <div class="bg-surface-dark rounded-lg p-6 border border-border-dark">
+                                    <div class="grid grid-cols-2 gap-6">
+                                        <!-- Lado Local -->
+                                        <div>
+                                            <h5 class="text-base font-black text-white mb-4 pb-2 border-b border-primary">{{ partido.local }}</h5>
+                                            {% if partido.sucesos.goles_local or partido.sucesos.amarillas_local or partido.sucesos.rojas_local %}
+                                                <!-- Goles -->
+                                                {% if partido.sucesos.goles_local %}
+                                                <div class="mb-3 pb-3 border-b border-border-dark">
+                                                    <p class="text-xs font-bold text-green-400 mb-2 uppercase tracking-wider">Goles</p>
+                                                    <ul class="text-sm text-white space-y-1">
+                                                        {% for suceso in partido.sucesos.goles_local %}
+                                                        <li class="text-green-300 font-semibold"><span class="text-gray-500 mr-2">Minuto {{ suceso.minuto }}'</span>{{ suceso.nombre }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                                {% endif %}
+                                                
+                                                <!-- Amarillas -->
+                                                {% if partido.sucesos.amarillas_local %}
+                                                <div class="mb-3 pb-3 border-b border-border-dark">
+                                                    <p class="text-xs font-bold text-yellow-400 mb-2 uppercase tracking-wider">Amarillas</p>
+                                                    <ul class="text-sm text-white space-y-1">
+                                                        {% for suceso in partido.sucesos.amarillas_local %}
+                                                        <li class="text-yellow-300 font-semibold"><span class="text-gray-500 mr-2">Minuto {{ suceso.minuto }}'</span>{{ suceso.nombre }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                                {% endif %}
+                                                
+                                                <!-- Rojas -->
+                                                {% if partido.sucesos.rojas_local %}
+                                                <div>
+                                                    <p class="text-xs font-bold text-red-400 mb-2 uppercase tracking-wider">Rojas</p>
+                                                    <ul class="text-sm text-white space-y-1">
+                                                        {% for suceso in partido.sucesos.rojas_local %}
+                                                        <li class="text-red-300 font-semibold"><span class="text-gray-500 mr-2">Minuto {{ suceso.minuto }}'</span>{{ suceso.nombre }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                                {% endif %}
+                                            {% else %}
+                                                <p class="text-sm text-gray-500 italic">Sin sucesos registrados</p>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Lado Visitante -->
+                                        <div>
+                                            <h5 class="text-base font-black text-white mb-4 pb-2 border-b border-primary">{{ partido.visitante }}</h5>
+                                            {% if partido.sucesos.goles_visitante or partido.sucesos.amarillas_visitante or partido.sucesos.rojas_visitante %}
+                                                <!-- Goles -->
+                                                {% if partido.sucesos.goles_visitante %}
+                                                <div class="mb-3 pb-3 border-b border-border-dark">
+                                                    <p class="text-xs font-bold text-green-400 mb-2 uppercase tracking-wider">Goles</p>
+                                                    <ul class="text-sm text-white space-y-1">
+                                                        {% for suceso in partido.sucesos.goles_visitante %}
+                                                        <li class="text-green-300 font-semibold"><span class="text-gray-500 mr-2">Minuto {{ suceso.minuto }}'</span>{{ suceso.nombre }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                                {% endif %}
+                                                
+                                                <!-- Amarillas -->
+                                                {% if partido.sucesos.amarillas_visitante %}
+                                                <div class="mb-3 pb-3 border-b border-border-dark">
+                                                    <p class="text-xs font-bold text-yellow-400 mb-2 uppercase tracking-wider">Amarillas</p>
+                                                    <ul class="text-sm text-white space-y-1">
+                                                        {% for suceso in partido.sucesos.amarillas_visitante %}
+                                                        <li class="text-yellow-300 font-semibold"><span class="text-gray-500 mr-2">Minuto {{ suceso.minuto }}'</span>{{ suceso.nombre }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                                {% endif %}
+                                                
+                                                <!-- Rojas -->
+                                                {% if partido.sucesos.rojas_visitante %}
+                                                <div>
+                                                    <p class="text-xs font-bold text-red-400 mb-2 uppercase tracking-wider">Rojas</p>
+                                                    <ul class="text-sm text-white space-y-1">
+                                                        {% for suceso in partido.sucesos.rojas_visitante %}
+                                                        <li class="text-red-300 font-semibold"><span class="text-gray-500 mr-2">Minuto {{ suceso.minuto }}'</span>{{ suceso.nombre }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                                {% endif %}
+                                            {% else %}
+                                                <p class="text-sm text-gray-500 italic">Sin sucesos registrados</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
-    <!-- Tabla de clasificación -->
+    <!-- Tabla de clasificación o mensaje de jornada futura -->
     <div class="glass-panel rounded-2xl overflow-hidden">
-        {% if clasificacion %}
-            <div class="overflow-x-auto">
+        {% if clasificacion or equipo_seleccionado %}
+            <!-- Título desplegable de clasificación -->
+            <div class="px-6 py-4 border-b border-border-dark flex items-center gap-2 cursor-pointer bg-surface-dark hover:bg-surface-dark-lighter transition-colors" 
+                 onclick="toggleClasificacion()"
+                 id="clasificacion-header">
+                <span id="clasificacion-chevron" class="material-symbols-outlined text-white transition-transform">expand_more</span>
+                <h4 class="text-lg font-bold text-white">Clasificación</h4>
+            </div>
+            
+            <div id="clasificacion-content" class="overflow-x-auto">
                 <table class="league-table w-full">
                     <thead>
                         <tr>
@@ -250,7 +471,7 @@
                     </thead>
                     <tbody>
                         {% for registro in clasificacion %}
-                            <tr class="group transition-colors border-l-4 {% if registro.posicion <= 4 %}border-l-blue-500{% elif registro.posicion <= 7 %}border-l-orange-500{% elif registro.posicion <= 17 %}border-l-gray-500{% else %}border-l-red-500{% endif %}">
+                            <tr class="group transition-colors border-l-4 {% if equipo_seleccionado == registro.equipo.nombre %}bg-yellow-500/10 border-l-yellow-500{% elif registro.posicion <= 4 %}border-l-blue-500{% elif registro.posicion <= 7 %}border-l-orange-500{% elif registro.posicion <= 17 %}border-l-gray-500{% else %}border-l-red-500{% endif %}">
                                 <td class="px-6 py-4 text-sm font-bold text-primary group-hover:text-primary">{{ registro.posicion }}</td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
@@ -258,26 +479,59 @@
                                             <span>{{ registro.iniciales }}</span>
                                         </div>
                                         <div>
-                                            <a href="{% url 'equipo_temporada' registro.equipo.nombre temporada_nombre %}" class="font-bold text-white text-sm hover:text-primary transition-colors cursor-pointer">{{ registro.equipo.nombre }}</a>
+                                            <a href="{% url 'equipo_temporada' registro.equipo.nombre temporada_nombre %}" class="font-bold text-sm hover:text-primary transition-colors cursor-pointer {% if equipo_seleccionado == registro.equipo.nombre %}text-yellow-400{% else %}text-white{% endif %}">{{ registro.equipo.nombre }}</a>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex justify-center gap-1">
-                                        {% for resultado in registro.racha_reciente %}
-                                            {% if resultado == 'W' %}
-                                                <span class="racha-circle racha-g">V</span>
-                                            {% elif resultado == 'D' %}
-                                                <span class="racha-circle racha-e">E</span>
-                                            {% elif resultado == 'L' %}
-                                                <span class="racha-circle racha-p">P</span>
+                                        {% for detalle in registro.racha_detalles %}
+                                            {% if detalle.resultado == 'V' %}
+                                                <div class="relative inline-block racha-item">
+                                                    <span class="racha-circle racha-g cursor-help">V</span>
+                                                    <div class="racha-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 pointer-events-none z-20 transition-opacity duration-200">
+                                                        {{ detalle.titulo }}
+                                                    </div>
+                                                </div>
+                                            {% elif detalle.resultado == 'D' %}
+                                                <div class="relative inline-block racha-item">
+                                                    <span class="racha-circle racha-e cursor-help">E</span>
+                                                    <div class="racha-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 pointer-events-none z-20 transition-opacity duration-200">
+                                                        {{ detalle.titulo }}
+                                                    </div>
+                                                </div>
+                                            {% elif detalle.resultado == 'L' %}
+                                                <div class="relative inline-block racha-item">
+                                                    <span class="racha-circle racha-p cursor-help">P</span>
+                                                    <div class="racha-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 pointer-events-none z-20 transition-opacity duration-200">
+                                                        {{ detalle.titulo }}
+                                                    </div>
+                                                </div>
+                                            {% elif detalle.resultado == '?' %}
+                                                <div class="relative inline-block racha-item">
+                                                    <span class="racha-circle bg-gray-500 border-gray-600 text-white cursor-help">?</span>
+                                                    <div class="racha-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 pointer-events-none z-20 transition-opacity duration-200">
+                                                        {{ detalle.titulo }}
+                                                    </div>
+                                                </div>
                                             {% endif %}
                                         {% empty %}
                                             <span class="text-gray-400">—</span>
                                         {% endfor %}
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-center text-gray-300">{{ registro.partidos_ganados|add:registro.partidos_empatados|add:registro.partidos_perdidos }}</td>
+                                <td class="px-6 py-4 text-center text-gray-300">
+                                    {% with total_pj=registro.partidos_ganados|add:registro.partidos_empatados|add:registro.partidos_perdidos %}
+                                        <div class="flex items-center justify-center gap-2">
+                                            <span>{{ total_pj }}</span>
+                                            {% if registro.diferencia_jornada > 0 %}
+                                                <span class="text-gray-300 text-xs font-bold">(+{{ registro.diferencia_jornada }})</span>
+                                            {% elif registro.diferencia_jornada < 0 %}
+                                                <span class="text-gray-300 text-xs font-bold">({{ registro.diferencia_jornada }})</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endwith %}
+                                </td>
                                 <td class="px-6 py-4 text-center text-green-400">{{ registro.partidos_ganados }}</td>
                                 <td class="px-6 py-4 text-center text-yellow-400">{{ registro.partidos_empatados }}</td>
                                 <td class="px-6 py-4 text-center text-red-400">{{ registro.partidos_perdidos }}</td>
@@ -316,9 +570,85 @@
             </div>
         {% else %}
             <div class="p-12 text-center">
-                <p class="text-gray-400 text-lg">No hay datos de clasificación disponibles para esta selección.</p>
+                <div class="mb-4">
+                    <span class="material-symbols-outlined text-4xl text-gray-500">schedule</span>
+                </div>
+                <p class="text-gray-400 text-lg mb-2">No hay datos de clasificación disponibles.</p>
+                <p class="text-gray-500 text-sm">Quizás estés viendo una jornada en el futuro. Consulta el calendario de próximos partidos arriba.</p>
             </div>
         {% endif %}
     </div>
 </div>
+
+<script>
+function toggleSucesos(matchIndex) {
+    const row = document.getElementById('sucesos-' + matchIndex);
+    if (row) {
+        row.classList.toggle('hidden');
+    }
+}
+
+function togglePartidos() {
+    const content = document.getElementById('partidos-content');
+    const chevron = document.getElementById('partidos-chevron');
+    if (content) {
+        content.classList.toggle('hidden');
+        // Cambiar el ícono de expand_more a unfold_less y viceversa
+        if (chevron.textContent === 'expand_more') {
+            chevron.textContent = 'unfold_less';
+        } else {
+            chevron.textContent = 'expand_more';
+        }
+    }
+}
+
+function toggleClasificacion() {
+    const content = document.getElementById('clasificacion-content');
+    const chevron = document.getElementById('clasificacion-chevron');
+    if (content) {
+        content.classList.toggle('hidden');
+        // Cambiar el ícono de expand_more a unfold_less y viceversa
+        if (chevron.textContent === 'expand_more') {
+            chevron.textContent = 'unfold_less';
+        } else {
+            chevron.textContent = 'expand_more';
+        }
+    }
+}
+
+function toggleFiltros() {
+    const content = document.getElementById('filtros-content');
+    const chevron = document.getElementById('filtros-chevron');
+    if (content) {
+        content.classList.toggle('hidden');
+        // Cambiar el ícono de expand_more a unfold_less y viceversa
+        if (chevron.textContent === 'expand_more') {
+            chevron.textContent = 'unfold_less';
+        } else {
+            chevron.textContent = 'expand_more';
+        }
+    }
+}
+
+// Manejar tooltips de la racha
+document.querySelectorAll('.racha-item').forEach(item => {
+    const tooltip = item.querySelector('.racha-tooltip');
+    
+    item.addEventListener('mouseenter', () => {
+        tooltip.style.opacity = '1';
+    });
+    
+    item.addEventListener('mouseleave', () => {
+        tooltip.style.opacity = '0';
+    });
+});
+
+// Resetear filtro de equipo cuando cambias jornada
+function resetEquipoFilter() {
+    const equipoSelect = document.getElementById('equipo-select');
+    if (equipoSelect) {
+        equipoSelect.value = '';
+    }
+}
+</script>
 {% endblock %}

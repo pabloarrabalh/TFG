@@ -1,458 +1,2149 @@
 {
   "1": [
-    "girona vs rayo",
-    "villarreal vs oviedo",
-    "mallorca vs barcelona",
-    "alaves vs levante",
-    "valencia vs real sociedad",
-    "celta vs getafe",
-    "athletic vs sevilla",
-    "espanyol vs atletico madrid",
-    "elche vs betis",
-    "real madrid vs osasuna"
+    {
+      "match": "girona vs rayo",
+      "fecha": "15/08/2025",
+      "hora": "19:00",
+      "resultado": "1-3"
+    },
+    {
+      "match": "villarreal vs oviedo",
+      "fecha": "15/08/2025",
+      "hora": "21:30",
+      "resultado": "2-0"
+    },
+    {
+      "match": "mallorca vs barcelona",
+      "fecha": "16/08/2025",
+      "hora": "19:30",
+      "resultado": "0-3"
+    },
+    {
+      "match": "alaves vs levante",
+      "fecha": "16/08/2025",
+      "hora": "21:30",
+      "resultado": "2-1"
+    },
+    {
+      "match": "valencia vs real sociedad",
+      "fecha": "16/08/2025",
+      "hora": "21:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "celta vs getafe",
+      "fecha": "17/08/2025",
+      "hora": "17:00",
+      "resultado": "0-2"
+    },
+    {
+      "match": "athletic vs sevilla",
+      "fecha": "17/08/2025",
+      "hora": "19:30",
+      "resultado": "3-2"
+    },
+    {
+      "match": "espanyol vs atletico madrid",
+      "fecha": "17/08/2025",
+      "hora": "21:30",
+      "resultado": "2-1"
+    },
+    {
+      "match": "elche vs betis",
+      "fecha": "18/08/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "real madrid vs osasuna",
+      "fecha": "19/08/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    }
   ],
   "2": [
-    "betis vs alaves",
-    "mallorca vs celta",
-    "atletico madrid vs elche",
-    "levante vs barcelona",
-    "osasuna vs valencia",
-    "villarreal vs girona",
-    "real sociedad vs espanyol",
-    "oviedo vs real madrid",
-    "athletic vs rayo",
-    "sevilla vs getafe"
+    {
+      "match": "betis vs alaves",
+      "fecha": "22/08/2025",
+      "hora": "21:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "mallorca vs celta",
+      "fecha": "23/08/2025",
+      "hora": "17:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "atletico madrid vs elche",
+      "fecha": "23/08/2025",
+      "hora": "19:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "levante vs barcelona",
+      "fecha": "23/08/2025",
+      "hora": "21:30",
+      "resultado": "2-3"
+    },
+    {
+      "match": "osasuna vs valencia",
+      "fecha": "24/08/2025",
+      "hora": "17:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "villarreal vs girona",
+      "fecha": "24/08/2025",
+      "hora": "19:30",
+      "resultado": "5-0"
+    },
+    {
+      "match": "real sociedad vs espanyol",
+      "fecha": "24/08/2025",
+      "hora": "19:30",
+      "resultado": "2-2"
+    },
+    {
+      "match": "oviedo vs real madrid",
+      "fecha": "24/08/2025",
+      "hora": "21:30",
+      "resultado": "0-3"
+    },
+    {
+      "match": "athletic vs rayo",
+      "fecha": "25/08/2025",
+      "hora": "19:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "sevilla vs getafe",
+      "fecha": "25/08/2025",
+      "hora": "21:30",
+      "resultado": "1-2"
+    }
   ],
   "3": [
-    "elche vs levante",
-    "valencia vs getafe",
-    "alaves vs atletico madrid",
-    "oviedo vs real sociedad",
-    "girona vs sevilla",
-    "real madrid vs mallorca",
-    "celta vs villarreal",
-    "betis vs athletic",
-    "espanyol vs osasuna",
-    "rayo vs barcelona"
+    {
+      "match": "elche vs levante",
+      "fecha": "29/08/2025",
+      "hora": "19:30",
+      "resultado": "2-0"
+    },
+    {
+      "match": "valencia vs getafe",
+      "fecha": "29/08/2025",
+      "hora": "21:30",
+      "resultado": "3-0"
+    },
+    {
+      "match": "alaves vs atletico madrid",
+      "fecha": "30/08/2025",
+      "hora": "17:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "oviedo vs real sociedad",
+      "fecha": "30/08/2025",
+      "hora": "19:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "girona vs sevilla",
+      "fecha": "30/08/2025",
+      "hora": "19:30",
+      "resultado": "0-2"
+    },
+    {
+      "match": "real madrid vs mallorca",
+      "fecha": "30/08/2025",
+      "hora": "21:30",
+      "resultado": "2-1"
+    },
+    {
+      "match": "celta vs villarreal",
+      "fecha": "31/08/2025",
+      "hora": "17:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "betis vs athletic",
+      "fecha": "31/08/2025",
+      "hora": "19:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "espanyol vs osasuna",
+      "fecha": "31/08/2025",
+      "hora": "19:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "rayo vs barcelona",
+      "fecha": "31/08/2025",
+      "hora": "21:30",
+      "resultado": "1-1"
+    }
   ],
   "4": [
-    "sevilla vs elche",
-    "getafe vs oviedo",
-    "real sociedad vs real madrid",
-    "athletic vs alaves",
-    "atletico madrid vs villarreal",
-    "celta vs girona",
-    "levante vs betis",
-    "osasuna vs rayo",
-    "barcelona vs valencia",
-    "espanyol vs mallorca"
+    {
+      "match": "sevilla vs elche",
+      "fecha": "12/09/2025",
+      "hora": "21:00",
+      "resultado": "2-2"
+    },
+    {
+      "match": "getafe vs oviedo",
+      "fecha": "13/09/2025",
+      "hora": "14:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "real sociedad vs real madrid",
+      "fecha": "13/09/2025",
+      "hora": "16:15",
+      "resultado": "1-2"
+    },
+    {
+      "match": "athletic vs alaves",
+      "fecha": "13/09/2025",
+      "hora": "18:30",
+      "resultado": "0-1"
+    },
+    {
+      "match": "atletico madrid vs villarreal",
+      "fecha": "13/09/2025",
+      "hora": "21:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "celta vs girona",
+      "fecha": "14/09/2025",
+      "hora": "14:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "levante vs betis",
+      "fecha": "14/09/2025",
+      "hora": "16:15",
+      "resultado": "2-2"
+    },
+    {
+      "match": "osasuna vs rayo",
+      "fecha": "14/09/2025",
+      "hora": "18:30",
+      "resultado": "2-0"
+    },
+    {
+      "match": "barcelona vs valencia",
+      "fecha": "14/09/2025",
+      "hora": "21:00",
+      "resultado": "6-0"
+    },
+    {
+      "match": "espanyol vs mallorca",
+      "fecha": "15/09/2025",
+      "hora": "21:00",
+      "resultado": "3-2"
+    }
   ],
   "5": [
-    "betis vs real sociedad",
-    "girona vs levante",
-    "real madrid vs espanyol",
-    "alaves vs sevilla",
-    "villarreal vs osasuna",
-    "valencia vs athletic",
-    "rayo vs celta",
-    "mallorca vs atletico madrid",
-    "elche vs oviedo",
-    "barcelona vs getafe"
+    {
+      "match": "betis vs real sociedad",
+      "fecha": "19/09/2025",
+      "hora": "21:00",
+      "resultado": "3-1"
+    },
+    {
+      "match": "girona vs levante",
+      "fecha": "20/09/2025",
+      "hora": "14:00",
+      "resultado": "0-4"
+    },
+    {
+      "match": "real madrid vs espanyol",
+      "fecha": "20/09/2025",
+      "hora": "16:15",
+      "resultado": "2-0"
+    },
+    {
+      "match": "alaves vs sevilla",
+      "fecha": "20/09/2025",
+      "hora": "18:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "villarreal vs osasuna",
+      "fecha": "20/09/2025",
+      "hora": "18:30",
+      "resultado": "2-1"
+    },
+    {
+      "match": "valencia vs athletic",
+      "fecha": "20/09/2025",
+      "hora": "21:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "rayo vs celta",
+      "fecha": "21/09/2025",
+      "hora": "14:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "mallorca vs atletico madrid",
+      "fecha": "21/09/2025",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "elche vs oviedo",
+      "fecha": "21/09/2025",
+      "hora": "18:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "barcelona vs getafe",
+      "fecha": "21/09/2025",
+      "hora": "21:00",
+      "resultado": "3-0"
+    }
   ],
   "6": [
-    "celta vs betis",
-    "espanyol vs valencia",
-    "athletic vs girona",
-    "sevilla vs villarreal",
-    "levante vs real madrid",
-    "getafe vs alaves",
-    "atletico madrid vs rayo",
-    "real sociedad vs mallorca",
-    "osasuna vs elche",
-    "oviedo vs barcelona"
+    {
+      "match": "celta vs betis",
+      "fecha": "27/08/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "espanyol vs valencia",
+      "fecha": "23/09/2025",
+      "hora": "19:00",
+      "resultado": "2-2"
+    },
+    {
+      "match": "athletic vs girona",
+      "fecha": "23/09/2025",
+      "hora": "19:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "sevilla vs villarreal",
+      "fecha": "23/09/2025",
+      "hora": "21:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "levante vs real madrid",
+      "fecha": "23/09/2025",
+      "hora": "21:30",
+      "resultado": "1-4"
+    },
+    {
+      "match": "getafe vs alaves",
+      "fecha": "24/09/2025",
+      "hora": "19:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "atletico madrid vs rayo",
+      "fecha": "24/09/2025",
+      "hora": "21:30",
+      "resultado": "3-2"
+    },
+    {
+      "match": "real sociedad vs mallorca",
+      "fecha": "24/09/2025",
+      "hora": "21:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "osasuna vs elche",
+      "fecha": "25/09/2025",
+      "hora": "19:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "oviedo vs barcelona",
+      "fecha": "25/09/2025",
+      "hora": "21:30",
+      "resultado": "1-3"
+    }
   ],
   "7": [
-    "girona vs espanyol",
-    "getafe vs levante",
-    "atletico madrid vs real madrid",
-    "mallorca vs alaves",
-    "villarreal vs athletic",
-    "rayo vs sevilla",
-    "elche vs celta",
-    "barcelona vs real sociedad",
-    "betis vs osasuna",
-    "valencia vs oviedo"
+    {
+      "match": "girona vs espanyol",
+      "fecha": "26/09/2025",
+      "hora": "21:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "getafe vs levante",
+      "fecha": "27/09/2025",
+      "hora": "14:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "atletico madrid vs real madrid",
+      "fecha": "27/09/2025",
+      "hora": "16:15",
+      "resultado": "5-2"
+    },
+    {
+      "match": "mallorca vs alaves",
+      "fecha": "27/09/2025",
+      "hora": "18:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "villarreal vs athletic",
+      "fecha": "27/09/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "rayo vs sevilla",
+      "fecha": "28/09/2025",
+      "hora": "14:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "elche vs celta",
+      "fecha": "28/09/2025",
+      "hora": "16:15",
+      "resultado": "2-1"
+    },
+    {
+      "match": "barcelona vs real sociedad",
+      "fecha": "28/09/2025",
+      "hora": "18:30",
+      "resultado": "2-1"
+    },
+    {
+      "match": "betis vs osasuna",
+      "fecha": "28/09/2025",
+      "hora": "21:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "valencia vs oviedo",
+      "fecha": "30/09/2025",
+      "hora": "20:00",
+      "resultado": "1-2"
+    }
   ],
   "8": [
-    "osasuna vs getafe",
-    "oviedo vs levante",
-    "girona vs valencia",
-    "athletic vs mallorca",
-    "real madrid vs villarreal",
-    "alaves vs elche",
-    "sevilla vs barcelona",
-    "espanyol vs betis",
-    "real sociedad vs rayo",
-    "celta vs atletico madrid"
+    {
+      "match": "osasuna vs getafe",
+      "fecha": "03/10/2025",
+      "hora": "21:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "oviedo vs levante",
+      "fecha": "04/10/2025",
+      "hora": "14:00",
+      "resultado": "0-2"
+    },
+    {
+      "match": "girona vs valencia",
+      "fecha": "04/10/2025",
+      "hora": "16:15",
+      "resultado": "2-1"
+    },
+    {
+      "match": "athletic vs mallorca",
+      "fecha": "04/10/2025",
+      "hora": "18:30",
+      "resultado": "2-1"
+    },
+    {
+      "match": "real madrid vs villarreal",
+      "fecha": "04/10/2025",
+      "hora": "21:00",
+      "resultado": "3-1"
+    },
+    {
+      "match": "alaves vs elche",
+      "fecha": "05/10/2025",
+      "hora": "14:00",
+      "resultado": "3-1"
+    },
+    {
+      "match": "sevilla vs barcelona",
+      "fecha": "05/10/2025",
+      "hora": "16:15",
+      "resultado": "4-1"
+    },
+    {
+      "match": "espanyol vs betis",
+      "fecha": "05/10/2025",
+      "hora": "18:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "real sociedad vs rayo",
+      "fecha": "05/10/2025",
+      "hora": "18:30",
+      "resultado": "0-1"
+    },
+    {
+      "match": "celta vs atletico madrid",
+      "fecha": "05/10/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    }
   ],
   "9": [
-    "oviedo vs espanyol",
-    "sevilla vs mallorca",
-    "barcelona vs girona",
-    "villarreal vs betis",
-    "atletico madrid vs osasuna",
-    "elche vs athletic",
-    "celta vs real sociedad",
-    "levante vs rayo",
-    "getafe vs real madrid",
-    "alaves vs valencia"
+    {
+      "match": "oviedo vs espanyol",
+      "fecha": "17/10/2025",
+      "hora": "21:00",
+      "resultado": "0-2"
+    },
+    {
+      "match": "sevilla vs mallorca",
+      "fecha": "18/10/2025",
+      "hora": "14:00",
+      "resultado": "1-3"
+    },
+    {
+      "match": "barcelona vs girona",
+      "fecha": "18/10/2025",
+      "hora": "16:15",
+      "resultado": "2-1"
+    },
+    {
+      "match": "villarreal vs betis",
+      "fecha": "18/10/2025",
+      "hora": "18:30",
+      "resultado": "2-2"
+    },
+    {
+      "match": "atletico madrid vs osasuna",
+      "fecha": "18/10/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "elche vs athletic",
+      "fecha": "19/10/2025",
+      "hora": "14:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "celta vs real sociedad",
+      "fecha": "19/10/2025",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "levante vs rayo",
+      "fecha": "19/10/2025",
+      "hora": "18:30",
+      "resultado": "0-3"
+    },
+    {
+      "match": "getafe vs real madrid",
+      "fecha": "19/10/2025",
+      "hora": "21:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "alaves vs valencia",
+      "fecha": "20/10/2025",
+      "hora": "21:00",
+      "resultado": "0-0"
+    }
   ],
   "10": [
-    "real sociedad vs sevilla",
-    "girona vs oviedo",
-    "espanyol vs elche",
-    "athletic vs getafe",
-    "valencia vs villarreal",
-    "mallorca vs levante",
-    "real madrid vs barcelona",
-    "osasuna vs celta",
-    "rayo vs alaves",
-    "betis vs atletico madrid"
+    {
+      "match": "real sociedad vs sevilla",
+      "fecha": "24/10/2025",
+      "hora": "21:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "girona vs oviedo",
+      "fecha": "25/10/2025",
+      "hora": "14:00",
+      "resultado": "3-3"
+    },
+    {
+      "match": "espanyol vs elche",
+      "fecha": "25/10/2025",
+      "hora": "16:15",
+      "resultado": "1-0"
+    },
+    {
+      "match": "athletic vs getafe",
+      "fecha": "25/10/2025",
+      "hora": "18:30",
+      "resultado": "0-1"
+    },
+    {
+      "match": "valencia vs villarreal",
+      "fecha": "25/10/2025",
+      "hora": "21:00",
+      "resultado": "0-2"
+    },
+    {
+      "match": "mallorca vs levante",
+      "fecha": "26/10/2025",
+      "hora": "14:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "real madrid vs barcelona",
+      "fecha": "26/10/2025",
+      "hora": "16:15",
+      "resultado": "2-1"
+    },
+    {
+      "match": "osasuna vs celta",
+      "fecha": "26/10/2025",
+      "hora": "18:30",
+      "resultado": "2-3"
+    },
+    {
+      "match": "rayo vs alaves",
+      "fecha": "26/10/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "betis vs atletico madrid",
+      "fecha": "27/10/2025",
+      "hora": "21:00",
+      "resultado": "0-2"
+    }
   ],
   "11": [
-    "getafe vs girona",
-    "villarreal vs rayo",
-    "atletico madrid vs sevilla",
-    "real sociedad vs athletic",
-    "real madrid vs valencia",
-    "levante vs celta",
-    "alaves vs espanyol",
-    "barcelona vs elche",
-    "betis vs mallorca",
-    "oviedo vs osasuna"
+    {
+      "match": "getafe vs girona",
+      "fecha": "31/10/2025",
+      "hora": "21:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "villarreal vs rayo",
+      "fecha": "01/11/2025",
+      "hora": "14:00",
+      "resultado": "4-0"
+    },
+    {
+      "match": "atletico madrid vs sevilla",
+      "fecha": "01/11/2025",
+      "hora": "16:15",
+      "resultado": "3-0"
+    },
+    {
+      "match": "real sociedad vs athletic",
+      "fecha": "01/11/2025",
+      "hora": "18:30",
+      "resultado": "3-2"
+    },
+    {
+      "match": "real madrid vs valencia",
+      "fecha": "01/11/2025",
+      "hora": "21:00",
+      "resultado": "4-0"
+    },
+    {
+      "match": "levante vs celta",
+      "fecha": "02/11/2025",
+      "hora": "14:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "alaves vs espanyol",
+      "fecha": "02/11/2025",
+      "hora": "16:15",
+      "resultado": "2-1"
+    },
+    {
+      "match": "barcelona vs elche",
+      "fecha": "02/11/2025",
+      "hora": "18:30",
+      "resultado": "3-1"
+    },
+    {
+      "match": "betis vs mallorca",
+      "fecha": "02/11/2025",
+      "hora": "21:00",
+      "resultado": "3-0"
+    },
+    {
+      "match": "oviedo vs osasuna",
+      "fecha": "03/11/2025",
+      "hora": "21:00",
+      "resultado": "0-0"
+    }
   ],
   "12": [
-    "elche vs real sociedad",
-    "girona vs alaves",
-    "sevilla vs osasuna",
-    "atletico madrid vs levante",
-    "espanyol vs villarreal",
-    "athletic vs oviedo",
-    "rayo vs real madrid",
-    "valencia vs betis",
-    "mallorca vs getafe",
-    "celta vs barcelona"
+    {
+      "match": "elche vs real sociedad",
+      "fecha": "07/11/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "girona vs alaves",
+      "fecha": "08/11/2025",
+      "hora": "14:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "sevilla vs osasuna",
+      "fecha": "08/11/2025",
+      "hora": "16:15",
+      "resultado": "1-0"
+    },
+    {
+      "match": "atletico madrid vs levante",
+      "fecha": "08/11/2025",
+      "hora": "18:30",
+      "resultado": "3-1"
+    },
+    {
+      "match": "espanyol vs villarreal",
+      "fecha": "08/11/2025",
+      "hora": "21:00",
+      "resultado": "0-2"
+    },
+    {
+      "match": "athletic vs oviedo",
+      "fecha": "09/11/2025",
+      "hora": "14:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "rayo vs real madrid",
+      "fecha": "09/11/2025",
+      "hora": "16:15",
+      "resultado": "0-0"
+    },
+    {
+      "match": "valencia vs betis",
+      "fecha": "09/11/2025",
+      "hora": "18:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "mallorca vs getafe",
+      "fecha": "09/11/2025",
+      "hora": "18:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "celta vs barcelona",
+      "fecha": "09/11/2025",
+      "hora": "21:00",
+      "resultado": "2-4"
+    }
   ],
   "13": [
-    "valencia vs levante",
-    "alaves vs celta",
-    "barcelona vs athletic",
-    "osasuna vs real sociedad",
-    "villarreal vs mallorca",
-    "oviedo vs rayo",
-    "betis vs girona",
-    "getafe vs atletico madrid",
-    "elche vs real madrid",
-    "espanyol vs sevilla"
+    {
+      "match": "valencia vs levante",
+      "fecha": "21/11/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "alaves vs celta",
+      "fecha": "22/11/2025",
+      "hora": "14:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "barcelona vs athletic",
+      "fecha": "22/11/2025",
+      "hora": "16:15",
+      "resultado": "4-0"
+    },
+    {
+      "match": "osasuna vs real sociedad",
+      "fecha": "22/11/2025",
+      "hora": "18:30",
+      "resultado": "1-3"
+    },
+    {
+      "match": "villarreal vs mallorca",
+      "fecha": "22/11/2025",
+      "hora": "21:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "oviedo vs rayo",
+      "fecha": "23/11/2025",
+      "hora": "14:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "betis vs girona",
+      "fecha": "23/11/2025",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "getafe vs atletico madrid",
+      "fecha": "23/11/2025",
+      "hora": "18:30",
+      "resultado": "0-1"
+    },
+    {
+      "match": "elche vs real madrid",
+      "fecha": "23/11/2025",
+      "hora": "21:00",
+      "resultado": "2-2"
+    },
+    {
+      "match": "espanyol vs sevilla",
+      "fecha": "24/11/2025",
+      "hora": "21:00",
+      "resultado": "2-1"
+    }
   ],
   "14": [
-    "getafe vs elche",
-    "mallorca vs osasuna",
-    "barcelona vs alaves",
-    "levante vs athletic",
-    "atletico madrid vs oviedo",
-    "real sociedad vs villarreal",
-    "sevilla vs betis",
-    "celta vs espanyol",
-    "girona vs real madrid",
-    "rayo vs valencia"
+    {
+      "match": "getafe vs elche",
+      "fecha": "28/11/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "mallorca vs osasuna",
+      "fecha": "29/11/2025",
+      "hora": "14:00",
+      "resultado": "2-2"
+    },
+    {
+      "match": "barcelona vs alaves",
+      "fecha": "29/11/2025",
+      "hora": "16:15",
+      "resultado": "3-1"
+    },
+    {
+      "match": "levante vs athletic",
+      "fecha": "29/11/2025",
+      "hora": "18:30",
+      "resultado": "0-2"
+    },
+    {
+      "match": "atletico madrid vs oviedo",
+      "fecha": "29/11/2025",
+      "hora": "21:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "real sociedad vs villarreal",
+      "fecha": "30/11/2025",
+      "hora": "14:00",
+      "resultado": "2-3"
+    },
+    {
+      "match": "sevilla vs betis",
+      "fecha": "30/11/2025",
+      "hora": "16:15",
+      "resultado": "0-2"
+    },
+    {
+      "match": "celta vs espanyol",
+      "fecha": "30/11/2025",
+      "hora": "18:30",
+      "resultado": "0-1"
+    },
+    {
+      "match": "girona vs real madrid",
+      "fecha": "30/11/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "rayo vs valencia",
+      "fecha": "01/12/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    }
   ],
   "15": [
-    "oviedo vs mallorca",
-    "villarreal vs getafe",
-    "alaves vs real sociedad",
-    "betis vs barcelona",
-    "athletic vs atletico madrid",
-    "elche vs girona",
-    "valencia vs sevilla",
-    "espanyol vs rayo",
-    "real madrid vs celta",
-    "osasuna vs levante"
+    {
+      "match": "oviedo vs mallorca",
+      "fecha": "05/12/2025",
+      "hora": "21:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "villarreal vs getafe",
+      "fecha": "06/12/2025",
+      "hora": "14:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "alaves vs real sociedad",
+      "fecha": "06/12/2025",
+      "hora": "16:15",
+      "resultado": "1-0"
+    },
+    {
+      "match": "betis vs barcelona",
+      "fecha": "06/12/2025",
+      "hora": "18:30",
+      "resultado": "3-5"
+    },
+    {
+      "match": "athletic vs atletico madrid",
+      "fecha": "06/12/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "elche vs girona",
+      "fecha": "07/12/2025",
+      "hora": "14:00",
+      "resultado": "3-0"
+    },
+    {
+      "match": "valencia vs sevilla",
+      "fecha": "07/12/2025",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "espanyol vs rayo",
+      "fecha": "07/12/2025",
+      "hora": "18:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "real madrid vs celta",
+      "fecha": "07/12/2025",
+      "hora": "21:00",
+      "resultado": "0-2"
+    },
+    {
+      "match": "osasuna vs levante",
+      "fecha": "08/12/2025",
+      "hora": "21:00",
+      "resultado": "2-0"
+    }
   ],
   "16": [
-    "real sociedad vs girona",
-    "atletico madrid vs valencia",
-    "mallorca vs elche",
-    "barcelona vs osasuna",
-    "getafe vs espanyol",
-    "sevilla vs oviedo",
-    "celta vs athletic",
-    "levante vs villarreal",
-    "alaves vs real madrid",
-    "rayo vs betis"
+    {
+      "match": "real sociedad vs girona",
+      "fecha": "12/12/2025",
+      "hora": "21:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "atletico madrid vs valencia",
+      "fecha": "13/12/2025",
+      "hora": "14:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "mallorca vs elche",
+      "fecha": "13/12/2025",
+      "hora": "16:15",
+      "resultado": "3-1"
+    },
+    {
+      "match": "barcelona vs osasuna",
+      "fecha": "13/12/2025",
+      "hora": "18:30",
+      "resultado": "2-0"
+    },
+    {
+      "match": "getafe vs espanyol",
+      "fecha": "13/12/2025",
+      "hora": "21:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "sevilla vs oviedo",
+      "fecha": "14/12/2025",
+      "hora": "14:00",
+      "resultado": "4-0"
+    },
+    {
+      "match": "celta vs athletic",
+      "fecha": "14/12/2025",
+      "hora": "16:15",
+      "resultado": "2-0"
+    },
+    {
+      "match": "levante vs villarreal",
+      "fecha": "14/12/2025",
+      "hora": "18:30"
+    },
+    {
+      "match": "alaves vs real madrid",
+      "fecha": "14/12/2025",
+      "hora": "21:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "rayo vs betis",
+      "fecha": "15/12/2025",
+      "hora": "21:00",
+      "resultado": "0-0"
+    }
   ],
   "17": [
-    "valencia vs mallorca",
-    "oviedo vs celta",
-    "levante vs real sociedad",
-    "osasuna vs alaves",
-    "real madrid vs sevilla",
-    "girona vs atletico madrid",
-    "villarreal vs barcelona",
-    "elche vs rayo",
-    "betis vs getafe",
-    "athletic vs espanyol"
+    {
+      "match": "valencia vs mallorca",
+      "fecha": "19/12/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "oviedo vs celta",
+      "fecha": "20/12/2025",
+      "hora": "14:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "levante vs real sociedad",
+      "fecha": "20/12/2025",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "osasuna vs alaves",
+      "fecha": "20/12/2025",
+      "hora": "18:30",
+      "resultado": "3-0"
+    },
+    {
+      "match": "real madrid vs sevilla",
+      "fecha": "20/12/2025",
+      "hora": "21:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "girona vs atletico madrid",
+      "fecha": "21/12/2025",
+      "hora": "14:00",
+      "resultado": "0-3"
+    },
+    {
+      "match": "villarreal vs barcelona",
+      "fecha": "21/12/2025",
+      "hora": "16:15",
+      "resultado": "0-2"
+    },
+    {
+      "match": "elche vs rayo",
+      "fecha": "21/12/2025",
+      "hora": "18:30",
+      "resultado": "4-0"
+    },
+    {
+      "match": "betis vs getafe",
+      "fecha": "21/12/2025",
+      "hora": "21:00",
+      "resultado": "4-0"
+    },
+    {
+      "match": "athletic vs espanyol",
+      "fecha": "22/12/2025",
+      "hora": "21:00",
+      "resultado": "1-2"
+    }
   ],
   "18": [
-    "rayo vs getafe",
-    "celta vs valencia",
-    "osasuna vs athletic",
-    "elche vs villarreal",
-    "espanyol vs barcelona",
-    "sevilla vs levante",
-    "real madrid vs betis",
-    "mallorca vs girona",
-    "alaves vs oviedo",
-    "real sociedad vs atletico madrid"
+    {
+      "match": "rayo vs getafe",
+      "fecha": "02/01/2026",
+      "hora": "21:00"
+    },
+    {
+      "match": "celta vs valencia",
+      "fecha": "03/01/2026",
+      "hora": "14:00"
+    },
+    {
+      "match": "osasuna vs athletic",
+      "fecha": "03/01/2026",
+      "hora": "16:15"
+    },
+    {
+      "match": "elche vs villarreal",
+      "fecha": "03/01/2026",
+      "hora": "18:30"
+    },
+    {
+      "match": "espanyol vs barcelona",
+      "fecha": "03/01/2026",
+      "hora": "21:00"
+    },
+    {
+      "match": "sevilla vs levante",
+      "fecha": "04/01/2026",
+      "hora": "14:00"
+    },
+    {
+      "match": "real madrid vs betis",
+      "fecha": "04/01/2026",
+      "hora": "16:15"
+    },
+    {
+      "match": "mallorca vs girona",
+      "fecha": "04/01/2026",
+      "hora": "18:30"
+    },
+    {
+      "match": "alaves vs oviedo",
+      "fecha": "04/01/2026",
+      "hora": "18:30"
+    },
+    {
+      "match": "real sociedad vs atletico madrid",
+      "fecha": "04/01/2026",
+      "hora": "21:00"
+    }
   ],
   "19": [
-    "barcelona vs atletico madrid",
-    "athletic vs real madrid",
-    "getafe vs real sociedad",
-    "oviedo vs betis",
-    "villarreal vs alaves",
-    "girona vs osasuna",
-    "valencia vs elche",
-    "rayo vs mallorca",
-    "levante vs espanyol",
-    "sevilla vs celta"
+    {
+      "match": "barcelona vs atletico madrid",
+      "fecha": "02/12/2025",
+      "hora": "21:00",
+      "resultado": "3-1"
+    },
+    {
+      "match": "athletic vs real madrid",
+      "fecha": "03/12/2025",
+      "hora": "19:00",
+      "resultado": "0-3"
+    },
+    {
+      "match": "getafe vs real sociedad",
+      "fecha": "09/01/2026",
+      "hora": "21:00"
+    },
+    {
+      "match": "oviedo vs betis",
+      "fecha": "10/01/2026",
+      "hora": "14:00"
+    },
+    {
+      "match": "villarreal vs alaves",
+      "fecha": "10/01/2026",
+      "hora": "16:15"
+    },
+    {
+      "match": "girona vs osasuna",
+      "fecha": "10/01/2026",
+      "hora": "18:30"
+    },
+    {
+      "match": "valencia vs elche",
+      "fecha": "10/01/2026",
+      "hora": "21:00"
+    },
+    {
+      "match": "rayo vs mallorca",
+      "fecha": "11/01/2026",
+      "hora": "14:00"
+    },
+    {
+      "match": "levante vs espanyol",
+      "fecha": "11/01/2026",
+      "hora": "16:15"
+    },
+    {
+      "match": "sevilla vs celta",
+      "fecha": "12/01/2026",
+      "hora": "21:00"
+    }
   ],
   "20": [
-    "espanyol vs girona",
-    "real madrid vs levante",
-    "mallorca vs athletic",
-    "osasuna vs oviedo",
-    "betis vs villarreal",
-    "getafe vs valencia",
-    "atletico madrid vs alaves",
-    "celta vs rayo",
-    "real sociedad vs barcelona",
-    "elche vs sevilla"
+    {
+      "match": "espanyol vs girona",
+      "fecha": "16/01/2026",
+      "hora": "21:00"
+    },
+    {
+      "match": "real madrid vs levante",
+      "fecha": "17/01/2026",
+      "hora": "14:00"
+    },
+    {
+      "match": "mallorca vs athletic",
+      "fecha": "17/01/2026",
+      "hora": "16:15"
+    },
+    {
+      "match": "osasuna vs oviedo",
+      "fecha": "17/01/2026",
+      "hora": "18:30"
+    },
+    {
+      "match": "betis vs villarreal",
+      "fecha": "17/01/2026",
+      "hora": "21:00"
+    },
+    {
+      "match": "getafe vs valencia",
+      "fecha": "18/01/2026",
+      "hora": "14:00"
+    },
+    {
+      "match": "atletico madrid vs alaves",
+      "fecha": "18/01/2026",
+      "hora": "16:15"
+    },
+    {
+      "match": "celta vs rayo",
+      "fecha": "18/01/2026",
+      "hora": "18:30"
+    },
+    {
+      "match": "real sociedad vs barcelona",
+      "fecha": "18/01/2026",
+      "hora": "21:00"
+    },
+    {
+      "match": "elche vs sevilla",
+      "fecha": "19/01/2026",
+      "hora": "21:00"
+    }
   ],
   "21": [
-    "alaves vs betis",
-    "rayo vs osasuna",
-    "barcelona vs oviedo",
-    "levante vs elche",
-    "villarreal vs real madrid",
-    "sevilla vs athletic",
-    "atletico madrid vs mallorca",
-    "girona vs getafe",
-    "valencia vs espanyol",
-    "real sociedad vs celta"
+    {
+      "match": "alaves vs betis",
+      "fecha": "25/01/2026",
+      "hora": ""
+    },
+    {
+      "match": "rayo vs osasuna",
+      "fecha": "25/01/2026",
+      "hora": ""
+    },
+    {
+      "match": "barcelona vs oviedo",
+      "fecha": "25/01/2026",
+      "hora": ""
+    },
+    {
+      "match": "levante vs elche",
+      "fecha": "25/01/2026",
+      "hora": ""
+    },
+    {
+      "match": "villarreal vs real madrid",
+      "fecha": "25/01/2026",
+      "hora": ""
+    },
+    {
+      "match": "sevilla vs athletic",
+      "fecha": "25/01/2026",
+      "hora": ""
+    },
+    {
+      "match": "atletico madrid vs mallorca",
+      "fecha": "25/01/2026",
+      "hora": ""
+    },
+    {
+      "match": "girona vs getafe",
+      "fecha": "25/01/2026",
+      "hora": ""
+    },
+    {
+      "match": "valencia vs espanyol",
+      "fecha": "25/01/2026",
+      "hora": ""
+    },
+    {
+      "match": "real sociedad vs celta",
+      "fecha": "25/01/2026",
+      "hora": ""
+    }
   ],
   "22": [
-    "betis vs valencia",
-    "osasuna vs villarreal",
-    "mallorca vs sevilla",
-    "oviedo vs girona",
-    "levante vs atletico madrid",
-    "elche vs barcelona",
-    "athletic vs real sociedad",
-    "espanyol vs alaves",
-    "getafe vs celta",
-    "real madrid vs rayo"
+    {
+      "match": "betis vs valencia",
+      "fecha": "01/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "osasuna vs villarreal",
+      "fecha": "01/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "mallorca vs sevilla",
+      "fecha": "01/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "oviedo vs girona",
+      "fecha": "01/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "levante vs atletico madrid",
+      "fecha": "01/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "elche vs barcelona",
+      "fecha": "01/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "athletic vs real sociedad",
+      "fecha": "01/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "espanyol vs alaves",
+      "fecha": "01/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "getafe vs celta",
+      "fecha": "01/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "real madrid vs rayo",
+      "fecha": "01/02/2026",
+      "hora": ""
+    }
   ],
   "23": [
-    "athletic vs levante",
-    "rayo vs oviedo",
-    "celta vs osasuna",
-    "alaves vs getafe",
-    "real sociedad vs elche",
-    "villarreal vs espanyol",
-    "atletico madrid vs betis",
-    "barcelona vs mallorca",
-    "sevilla vs girona",
-    "valencia vs real madrid"
+    {
+      "match": "athletic vs levante",
+      "fecha": "08/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "rayo vs oviedo",
+      "fecha": "08/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "celta vs osasuna",
+      "fecha": "08/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "alaves vs getafe",
+      "fecha": "08/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "real sociedad vs elche",
+      "fecha": "08/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "villarreal vs espanyol",
+      "fecha": "08/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "atletico madrid vs betis",
+      "fecha": "08/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "barcelona vs mallorca",
+      "fecha": "08/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "sevilla vs girona",
+      "fecha": "08/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "valencia vs real madrid",
+      "fecha": "08/02/2026",
+      "hora": ""
+    }
   ],
   "24": [
-    "sevilla vs alaves",
-    "girona vs barcelona",
-    "espanyol vs celta",
-    "levante vs valencia",
-    "mallorca vs betis",
-    "elche vs osasuna",
-    "getafe vs villarreal",
-    "real madrid vs real sociedad",
-    "oviedo vs athletic",
-    "rayo vs atletico madrid"
+    {
+      "match": "sevilla vs alaves",
+      "fecha": "15/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "girona vs barcelona",
+      "fecha": "15/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "espanyol vs celta",
+      "fecha": "15/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "levante vs valencia",
+      "fecha": "15/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "mallorca vs betis",
+      "fecha": "15/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "elche vs osasuna",
+      "fecha": "15/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "getafe vs villarreal",
+      "fecha": "15/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "real madrid vs real sociedad",
+      "fecha": "15/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "oviedo vs athletic",
+      "fecha": "15/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "rayo vs atletico madrid",
+      "fecha": "15/02/2026",
+      "hora": ""
+    }
   ],
   "25": [
-    "alaves vs girona",
-    "athletic vs elche",
-    "getafe vs sevilla",
-    "villarreal vs valencia",
-    "real sociedad vs oviedo",
-    "celta vs mallorca",
-    "atletico madrid vs espanyol",
-    "barcelona vs levante",
-    "osasuna vs real madrid",
-    "betis vs rayo"
+    {
+      "match": "alaves vs girona",
+      "fecha": "22/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "athletic vs elche",
+      "fecha": "22/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "getafe vs sevilla",
+      "fecha": "22/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "villarreal vs valencia",
+      "fecha": "22/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "real sociedad vs oviedo",
+      "fecha": "22/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "celta vs mallorca",
+      "fecha": "22/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "atletico madrid vs espanyol",
+      "fecha": "22/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "barcelona vs levante",
+      "fecha": "22/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "osasuna vs real madrid",
+      "fecha": "22/02/2026",
+      "hora": ""
+    },
+    {
+      "match": "betis vs rayo",
+      "fecha": "22/02/2026",
+      "hora": ""
+    }
   ],
   "26": [
-    "girona vs celta",
-    "real madrid vs getafe",
-    "rayo vs athletic",
-    "elche vs espanyol",
-    "barcelona vs villarreal",
-    "levante vs alaves",
-    "mallorca vs real sociedad",
-    "betis vs sevilla",
-    "valencia vs osasuna",
-    "oviedo vs atletico madrid"
+    {
+      "match": "girona vs celta",
+      "fecha": "01/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "real madrid vs getafe",
+      "fecha": "01/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "rayo vs athletic",
+      "fecha": "01/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "elche vs espanyol",
+      "fecha": "01/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "barcelona vs villarreal",
+      "fecha": "01/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "levante vs alaves",
+      "fecha": "01/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "mallorca vs real sociedad",
+      "fecha": "01/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "betis vs sevilla",
+      "fecha": "01/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "valencia vs osasuna",
+      "fecha": "01/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "oviedo vs atletico madrid",
+      "fecha": "01/03/2026",
+      "hora": ""
+    }
   ],
   "27": [
-    "espanyol vs oviedo",
-    "athletic vs barcelona",
-    "sevilla vs rayo",
-    "villarreal vs elche",
-    "levante vs girona",
-    "getafe vs betis",
-    "celta vs real madrid",
-    "osasuna vs mallorca",
-    "atletico madrid vs real sociedad",
-    "valencia vs alaves"
+    {
+      "match": "espanyol vs oviedo",
+      "fecha": "08/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "athletic vs barcelona",
+      "fecha": "08/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "sevilla vs rayo",
+      "fecha": "08/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "villarreal vs elche",
+      "fecha": "08/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "levante vs girona",
+      "fecha": "08/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "getafe vs betis",
+      "fecha": "08/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "celta vs real madrid",
+      "fecha": "08/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "osasuna vs mallorca",
+      "fecha": "08/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "atletico madrid vs real sociedad",
+      "fecha": "08/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "valencia vs alaves",
+      "fecha": "08/03/2026",
+      "hora": ""
+    }
   ],
   "28": [
-    "girona vs athletic",
-    "alaves vs villarreal",
-    "mallorca vs espanyol",
-    "barcelona vs sevilla",
-    "oviedo vs valencia",
-    "atletico madrid vs getafe",
-    "real madrid vs elche",
-    "rayo vs levante",
-    "betis vs celta",
-    "real sociedad vs osasuna"
+    {
+      "match": "girona vs athletic",
+      "fecha": "15/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "alaves vs villarreal",
+      "fecha": "15/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "mallorca vs espanyol",
+      "fecha": "15/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "barcelona vs sevilla",
+      "fecha": "15/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "oviedo vs valencia",
+      "fecha": "15/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "atletico madrid vs getafe",
+      "fecha": "15/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "real madrid vs elche",
+      "fecha": "15/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "rayo vs levante",
+      "fecha": "15/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "betis vs celta",
+      "fecha": "15/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "real sociedad vs osasuna",
+      "fecha": "15/03/2026",
+      "hora": ""
+    }
   ],
   "29": [
-    "levante vs oviedo",
-    "barcelona vs rayo",
-    "sevilla vs valencia",
-    "osasuna vs girona",
-    "villarreal vs real sociedad",
-    "espanyol vs getafe",
-    "athletic vs betis",
-    "celta vs alaves",
-    "elche vs mallorca",
-    "real madrid vs atletico madrid"
+    {
+      "match": "levante vs oviedo",
+      "fecha": "22/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "barcelona vs rayo",
+      "fecha": "22/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "sevilla vs valencia",
+      "fecha": "22/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "osasuna vs girona",
+      "fecha": "22/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "villarreal vs real sociedad",
+      "fecha": "22/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "espanyol vs getafe",
+      "fecha": "22/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "athletic vs betis",
+      "fecha": "22/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "celta vs alaves",
+      "fecha": "22/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "elche vs mallorca",
+      "fecha": "22/03/2026",
+      "hora": ""
+    },
+    {
+      "match": "real madrid vs atletico madrid",
+      "fecha": "22/03/2026",
+      "hora": ""
+    }
   ],
   "30": [
-    "real sociedad vs levante",
-    "mallorca vs real madrid",
-    "atletico madrid vs barcelona",
-    "valencia vs celta",
-    "oviedo vs sevilla",
-    "rayo vs elche",
-    "getafe vs athletic",
-    "girona vs villarreal",
-    "alaves vs osasuna",
-    "betis vs espanyol"
+    {
+      "match": "real sociedad vs levante",
+      "fecha": "05/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "mallorca vs real madrid",
+      "fecha": "05/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "atletico madrid vs barcelona",
+      "fecha": "05/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "valencia vs celta",
+      "fecha": "05/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "oviedo vs sevilla",
+      "fecha": "05/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "rayo vs elche",
+      "fecha": "05/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "getafe vs athletic",
+      "fecha": "05/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "girona vs villarreal",
+      "fecha": "05/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "alaves vs osasuna",
+      "fecha": "05/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "betis vs espanyol",
+      "fecha": "05/04/2026",
+      "hora": ""
+    }
   ],
   "31": [
-    "athletic vs villarreal",
-    "real sociedad vs alaves",
-    "mallorca vs rayo",
-    "celta vs oviedo",
-    "elche vs valencia",
-    "levante vs getafe",
-    "osasuna vs betis",
-    "real madrid vs girona",
-    "sevilla vs atletico madrid",
-    "barcelona vs espanyol"
+    {
+      "match": "athletic vs villarreal",
+      "fecha": "12/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "real sociedad vs alaves",
+      "fecha": "12/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "mallorca vs rayo",
+      "fecha": "12/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "celta vs oviedo",
+      "fecha": "12/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "elche vs valencia",
+      "fecha": "12/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "levante vs getafe",
+      "fecha": "12/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "osasuna vs betis",
+      "fecha": "12/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "real madrid vs girona",
+      "fecha": "12/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "sevilla vs atletico madrid",
+      "fecha": "12/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "barcelona vs espanyol",
+      "fecha": "12/04/2026",
+      "hora": ""
+    }
   ],
   "32": [
-    "alaves vs mallorca",
-    "villarreal vs celta",
-    "betis vs real madrid",
-    "rayo vs real sociedad",
-    "valencia vs girona",
-    "espanyol vs levante",
-    "oviedo vs elche",
-    "getafe vs barcelona",
-    "atletico madrid vs athletic",
-    "osasuna vs sevilla"
+    {
+      "match": "alaves vs mallorca",
+      "fecha": "19/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "villarreal vs celta",
+      "fecha": "19/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "betis vs real madrid",
+      "fecha": "19/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "rayo vs real sociedad",
+      "fecha": "19/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "valencia vs girona",
+      "fecha": "19/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "espanyol vs levante",
+      "fecha": "19/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "oviedo vs elche",
+      "fecha": "19/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "getafe vs barcelona",
+      "fecha": "19/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "atletico madrid vs athletic",
+      "fecha": "19/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "osasuna vs sevilla",
+      "fecha": "19/04/2026",
+      "hora": ""
+    }
   ],
   "33": [
-    "real madrid vs alaves",
-    "girona vs betis",
-    "mallorca vs valencia",
-    "real sociedad vs getafe",
-    "levante vs sevilla",
-    "athletic vs osasuna",
-    "rayo vs espanyol",
-    "oviedo vs villarreal",
-    "elche vs atletico madrid",
-    "barcelona vs celta"
+    {
+      "match": "real madrid vs alaves",
+      "fecha": "22/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "girona vs betis",
+      "fecha": "22/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "mallorca vs valencia",
+      "fecha": "22/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "real sociedad vs getafe",
+      "fecha": "22/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "levante vs sevilla",
+      "fecha": "22/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "athletic vs osasuna",
+      "fecha": "22/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "rayo vs espanyol",
+      "fecha": "22/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "oviedo vs villarreal",
+      "fecha": "22/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "elche vs atletico madrid",
+      "fecha": "22/04/2026",
+      "hora": ""
+    },
+    {
+      "match": "barcelona vs celta",
+      "fecha": "22/04/2026",
+      "hora": ""
+    }
   ],
   "34": [
-    "betis vs oviedo",
-    "espanyol vs real madrid",
-    "getafe vs rayo",
-    "sevilla vs real sociedad",
-    "alaves vs athletic",
-    "villarreal vs levante",
-    "girona vs mallorca",
-    "valencia vs atletico madrid",
-    "celta vs elche",
-    "osasuna vs barcelona"
+    {
+      "match": "betis vs oviedo",
+      "fecha": "03/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "espanyol vs real madrid",
+      "fecha": "03/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "getafe vs rayo",
+      "fecha": "03/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "sevilla vs real sociedad",
+      "fecha": "03/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "alaves vs athletic",
+      "fecha": "03/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "villarreal vs levante",
+      "fecha": "03/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "girona vs mallorca",
+      "fecha": "03/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "valencia vs atletico madrid",
+      "fecha": "03/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "celta vs elche",
+      "fecha": "03/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "osasuna vs barcelona",
+      "fecha": "03/05/2026",
+      "hora": ""
+    }
   ],
   "35": [
-    "elche vs alaves",
-    "atletico madrid vs celta",
-    "sevilla vs espanyol",
-    "mallorca vs villarreal",
-    "athletic vs valencia",
-    "levante vs osasuna",
-    "barcelona vs real madrid",
-    "rayo vs girona",
-    "oviedo vs getafe",
-    "real sociedad vs betis"
+    {
+      "match": "elche vs alaves",
+      "fecha": "10/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "atletico madrid vs celta",
+      "fecha": "10/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "sevilla vs espanyol",
+      "fecha": "10/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "mallorca vs villarreal",
+      "fecha": "10/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "athletic vs valencia",
+      "fecha": "10/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "levante vs osasuna",
+      "fecha": "10/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "barcelona vs real madrid",
+      "fecha": "10/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "rayo vs girona",
+      "fecha": "10/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "oviedo vs getafe",
+      "fecha": "10/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "real sociedad vs betis",
+      "fecha": "10/05/2026",
+      "hora": ""
+    }
   ],
   "36": [
-    "espanyol vs athletic",
-    "alaves vs barcelona",
-    "celta vs levante",
-    "girona vs real sociedad",
-    "valencia vs rayo",
-    "villarreal vs sevilla",
-    "getafe vs mallorca",
-    "osasuna vs atletico madrid",
-    "real madrid vs oviedo",
-    "betis vs elche"
+    {
+      "match": "espanyol vs athletic",
+      "fecha": "13/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "alaves vs barcelona",
+      "fecha": "13/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "celta vs levante",
+      "fecha": "13/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "girona vs real sociedad",
+      "fecha": "13/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "valencia vs rayo",
+      "fecha": "13/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "villarreal vs sevilla",
+      "fecha": "13/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "getafe vs mallorca",
+      "fecha": "13/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "osasuna vs atletico madrid",
+      "fecha": "13/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "real madrid vs oviedo",
+      "fecha": "13/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "betis vs elche",
+      "fecha": "13/05/2026",
+      "hora": ""
+    }
   ],
   "37": [
-    "real sociedad vs valencia",
-    "oviedo vs alaves",
-    "athletic vs celta",
-    "rayo vs villarreal",
-    "barcelona vs betis",
-    "sevilla vs real madrid",
-    "elche vs getafe",
-    "atletico madrid vs girona",
-    "osasuna vs espanyol",
-    "levante vs mallorca"
+    {
+      "match": "real sociedad vs valencia",
+      "fecha": "17/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "oviedo vs alaves",
+      "fecha": "17/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "athletic vs celta",
+      "fecha": "17/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "rayo vs villarreal",
+      "fecha": "17/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "barcelona vs betis",
+      "fecha": "17/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "sevilla vs real madrid",
+      "fecha": "17/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "elche vs getafe",
+      "fecha": "17/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "atletico madrid vs girona",
+      "fecha": "17/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "osasuna vs espanyol",
+      "fecha": "17/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "levante vs mallorca",
+      "fecha": "17/05/2026",
+      "hora": ""
+    }
   ],
   "38": [
-    "betis vs levante",
-    "villarreal vs atletico madrid",
-    "mallorca vs oviedo",
-    "girona vs elche",
-    "valencia vs barcelona",
-    "espanyol vs real sociedad",
-    "getafe vs osasuna",
-    "real madrid vs athletic",
-    "alaves vs rayo",
-    "celta vs sevilla"
+    {
+      "match": "betis vs levante",
+      "fecha": "24/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "villarreal vs atletico madrid",
+      "fecha": "24/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "mallorca vs oviedo",
+      "fecha": "24/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "girona vs elche",
+      "fecha": "24/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "valencia vs barcelona",
+      "fecha": "24/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "espanyol vs real sociedad",
+      "fecha": "24/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "getafe vs osasuna",
+      "fecha": "24/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "real madrid vs athletic",
+      "fecha": "24/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "alaves vs rayo",
+      "fecha": "24/05/2026",
+      "hora": ""
+    },
+    {
+      "match": "celta vs sevilla",
+      "fecha": "24/05/2026",
+      "hora": ""
+    }
   ]
 }

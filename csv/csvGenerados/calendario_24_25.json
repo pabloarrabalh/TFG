@@ -1,458 +1,2358 @@
 {
   "1": [
-    "athletic vs getafe",
-    "betis vs girona",
-    "celta vs alaves",
-    "las palmas vs sevilla",
-    "osasuna vs leganes",
-    "valencia vs barcelona",
-    "real sociedad vs rayo",
-    "mallorca vs real madrid",
-    "valladolid vs espanyol",
-    "villarreal vs atletico madrid"
+    {
+      "match": "athletic vs getafe",
+      "fecha": "15/08/2024",
+      "hora": "19:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "betis vs girona",
+      "fecha": "15/08/2024",
+      "hora": "21:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "celta vs alaves",
+      "fecha": "16/08/2024",
+      "hora": "19:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "las palmas vs sevilla",
+      "fecha": "16/08/2024",
+      "hora": "20:30",
+      "resultado": "2-2"
+    },
+    {
+      "match": "osasuna vs leganes",
+      "fecha": "17/08/2024",
+      "hora": "19:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "valencia vs barcelona",
+      "fecha": "17/08/2024",
+      "hora": "21:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "real sociedad vs rayo",
+      "fecha": "18/08/2024",
+      "hora": "19:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "mallorca vs real madrid",
+      "fecha": "18/08/2024",
+      "hora": "21:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "valladolid vs espanyol",
+      "fecha": "19/08/2024",
+      "hora": "19:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "villarreal vs atletico madrid",
+      "fecha": "19/08/2024",
+      "hora": "21:30",
+      "resultado": "2-2"
+    }
   ],
   "2": [
-    "celta vs valencia",
-    "sevilla vs villarreal",
-    "osasuna vs mallorca",
-    "barcelona vs athletic",
-    "getafe vs rayo",
-    "espanyol vs real sociedad",
-    "real madrid vs valladolid",
-    "leganes vs las palmas",
-    "alaves vs betis",
-    "atletico madrid vs girona"
+    {
+      "match": "celta vs valencia",
+      "fecha": "23/08/2024",
+      "hora": "19:00",
+      "resultado": "3-1"
+    },
+    {
+      "match": "sevilla vs villarreal",
+      "fecha": "23/08/2024",
+      "hora": "21:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "osasuna vs mallorca",
+      "fecha": "24/08/2024",
+      "hora": "17:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "barcelona vs athletic",
+      "fecha": "24/08/2024",
+      "hora": "19:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "getafe vs rayo",
+      "fecha": "24/08/2024",
+      "hora": "21:30",
+      "resultado": "0-0"
+    },
+    {
+      "match": "espanyol vs real sociedad",
+      "fecha": "24/08/2024",
+      "hora": "21:30",
+      "resultado": "0-1"
+    },
+    {
+      "match": "real madrid vs valladolid",
+      "fecha": "25/08/2024",
+      "hora": "17:00",
+      "resultado": "3-0"
+    },
+    {
+      "match": "leganes vs las palmas",
+      "fecha": "25/08/2024",
+      "hora": "19:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "alaves vs betis",
+      "fecha": "25/08/2024",
+      "hora": "19:15",
+      "resultado": "0-0"
+    },
+    {
+      "match": "atletico madrid vs girona",
+      "fecha": "25/08/2024",
+      "hora": "21:30",
+      "resultado": "3-0"
+    }
   ],
   "3": [
-    "villarreal vs celta",
-    "mallorca vs sevilla",
-    "rayo vs barcelona",
-    "athletic vs valencia",
-    "valladolid vs leganes",
-    "atletico madrid vs espanyol",
-    "real sociedad vs alaves",
-    "girona vs osasuna",
-    "las palmas vs real madrid",
-    "betis vs getafe"
+    {
+      "match": "villarreal vs celta",
+      "fecha": "26/08/2024",
+      "hora": "21:30",
+      "resultado": "4-3"
+    },
+    {
+      "match": "mallorca vs sevilla",
+      "fecha": "27/08/2024",
+      "hora": "19:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "rayo vs barcelona",
+      "fecha": "27/08/2024",
+      "hora": "21:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "athletic vs valencia",
+      "fecha": "28/08/2024",
+      "hora": "19:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "valladolid vs leganes",
+      "fecha": "28/08/2024",
+      "hora": "19:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "atletico madrid vs espanyol",
+      "fecha": "28/08/2024",
+      "hora": "21:30",
+      "resultado": "0-0"
+    },
+    {
+      "match": "real sociedad vs alaves",
+      "fecha": "28/08/2024",
+      "hora": "21:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "girona vs osasuna",
+      "fecha": "29/08/2024",
+      "hora": "19:00",
+      "resultado": "4-0"
+    },
+    {
+      "match": "las palmas vs real madrid",
+      "fecha": "29/08/2024",
+      "hora": "20:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "betis vs getafe",
+      "fecha": "18/09/2024",
+      "hora": "19:00",
+      "resultado": "2-1"
+    }
   ],
   "4": [
-    "barcelona vs valladolid",
-    "athletic vs atletico madrid",
-    "espanyol vs rayo",
-    "valencia vs villarreal",
-    "leganes vs mallorca",
-    "alaves vs las palmas",
-    "osasuna vs celta",
-    "sevilla vs girona",
-    "getafe vs real sociedad",
-    "real madrid vs betis"
+    {
+      "match": "barcelona vs valladolid",
+      "fecha": "31/08/2024",
+      "hora": "17:00",
+      "resultado": "7-0"
+    },
+    {
+      "match": "athletic vs atletico madrid",
+      "fecha": "31/08/2024",
+      "hora": "19:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "espanyol vs rayo",
+      "fecha": "31/08/2024",
+      "hora": "19:15",
+      "resultado": "2-1"
+    },
+    {
+      "match": "valencia vs villarreal",
+      "fecha": "31/08/2024",
+      "hora": "21:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "leganes vs mallorca",
+      "fecha": "31/08/2024",
+      "hora": "21:30",
+      "resultado": "0-1"
+    },
+    {
+      "match": "alaves vs las palmas",
+      "fecha": "01/09/2024",
+      "hora": "17:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "osasuna vs celta",
+      "fecha": "01/09/2024",
+      "hora": "17:00",
+      "resultado": "3-2"
+    },
+    {
+      "match": "sevilla vs girona",
+      "fecha": "01/09/2024",
+      "hora": "19:00",
+      "resultado": "0-2"
+    },
+    {
+      "match": "getafe vs real sociedad",
+      "fecha": "01/09/2024",
+      "hora": "19:15",
+      "resultado": "0-0"
+    },
+    {
+      "match": "real madrid vs betis",
+      "fecha": "01/09/2024",
+      "hora": "21:30",
+      "resultado": "2-0"
+    }
   ],
   "5": [
-    "betis vs leganes",
-    "mallorca vs villarreal",
-    "espanyol vs alaves",
-    "sevilla vs getafe",
-    "real sociedad vs real madrid",
-    "celta vs valladolid",
-    "girona vs barcelona",
-    "las palmas vs athletic",
-    "atletico madrid vs valencia",
-    "rayo vs osasuna"
+    {
+      "match": "betis vs leganes",
+      "fecha": "13/09/2024",
+      "hora": "21:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "mallorca vs villarreal",
+      "fecha": "14/09/2024",
+      "hora": "14:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "espanyol vs alaves",
+      "fecha": "14/09/2024",
+      "hora": "16:15",
+      "resultado": "3-2"
+    },
+    {
+      "match": "sevilla vs getafe",
+      "fecha": "14/09/2024",
+      "hora": "18:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "real sociedad vs real madrid",
+      "fecha": "14/09/2024",
+      "hora": "21:00",
+      "resultado": "0-2"
+    },
+    {
+      "match": "celta vs valladolid",
+      "fecha": "15/09/2024",
+      "hora": "14:00",
+      "resultado": "3-1"
+    },
+    {
+      "match": "girona vs barcelona",
+      "fecha": "15/09/2024",
+      "hora": "16:15",
+      "resultado": "1-4"
+    },
+    {
+      "match": "las palmas vs athletic",
+      "fecha": "15/09/2024",
+      "hora": "17:30",
+      "resultado": "2-3"
+    },
+    {
+      "match": "atletico madrid vs valencia",
+      "fecha": "15/09/2024",
+      "hora": "21:00",
+      "resultado": "3-0"
+    },
+    {
+      "match": "rayo vs osasuna",
+      "fecha": "16/09/2024",
+      "hora": "21:00",
+      "resultado": "3-1"
+    }
   ],
   "6": [
-    "alaves vs sevilla",
-    "valladolid vs real sociedad",
-    "osasuna vs las palmas",
-    "valencia vs girona",
-    "real madrid vs espanyol",
-    "getafe vs leganes",
-    "athletic vs celta",
-    "villarreal vs barcelona",
-    "rayo vs atletico madrid",
-    "betis vs mallorca"
+    {
+      "match": "alaves vs sevilla",
+      "fecha": "20/09/2024",
+      "hora": "21:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "valladolid vs real sociedad",
+      "fecha": "21/09/2024",
+      "hora": "14:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "osasuna vs las palmas",
+      "fecha": "21/09/2024",
+      "hora": "16:15",
+      "resultado": "2-1"
+    },
+    {
+      "match": "valencia vs girona",
+      "fecha": "21/09/2024",
+      "hora": "18:30",
+      "resultado": "2-0"
+    },
+    {
+      "match": "real madrid vs espanyol",
+      "fecha": "21/09/2024",
+      "hora": "21:00",
+      "resultado": "4-1"
+    },
+    {
+      "match": "getafe vs leganes",
+      "fecha": "22/09/2024",
+      "hora": "14:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "athletic vs celta",
+      "fecha": "22/09/2024",
+      "hora": "16:15",
+      "resultado": "3-1"
+    },
+    {
+      "match": "villarreal vs barcelona",
+      "fecha": "22/09/2024",
+      "hora": "18:30",
+      "resultado": "1-5"
+    },
+    {
+      "match": "rayo vs atletico madrid",
+      "fecha": "22/09/2024",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "betis vs mallorca",
+      "fecha": "23/09/2024",
+      "hora": "21:00",
+      "resultado": "1-2"
+    }
   ],
   "7": [
-    "mallorca vs real sociedad",
-    "leganes vs athletic",
-    "sevilla vs valladolid",
-    "valencia vs osasuna",
-    "real madrid vs alaves",
-    "girona vs rayo",
-    "barcelona vs getafe",
-    "las palmas vs betis",
-    "espanyol vs villarreal",
-    "celta vs atletico madrid"
+    {
+      "match": "mallorca vs real sociedad",
+      "fecha": "17/09/2024",
+      "hora": "19:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "leganes vs athletic",
+      "fecha": "19/09/2024",
+      "hora": "19:00",
+      "resultado": "0-2"
+    },
+    {
+      "match": "sevilla vs valladolid",
+      "fecha": "24/09/2024",
+      "hora": "19:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "valencia vs osasuna",
+      "fecha": "24/09/2024",
+      "hora": "19:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "real madrid vs alaves",
+      "fecha": "24/09/2024",
+      "hora": "21:00",
+      "resultado": "3-2"
+    },
+    {
+      "match": "girona vs rayo",
+      "fecha": "25/09/2024",
+      "hora": "19:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "barcelona vs getafe",
+      "fecha": "25/09/2024",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "las palmas vs betis",
+      "fecha": "26/09/2024",
+      "hora": "18:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "espanyol vs villarreal",
+      "fecha": "26/09/2024",
+      "hora": "19:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "celta vs atletico madrid",
+      "fecha": "26/09/2024",
+      "hora": "21:00",
+      "resultado": "0-1"
+    }
   ],
   "8": [
-    "valladolid vs mallorca",
-    "getafe vs alaves",
-    "rayo vs leganes",
-    "real sociedad vs valencia",
-    "osasuna vs barcelona",
-    "celta vs girona",
-    "athletic vs sevilla",
-    "betis vs espanyol",
-    "atletico madrid vs real madrid",
-    "villarreal vs las palmas"
+    {
+      "match": "valladolid vs mallorca",
+      "fecha": "27/09/2024",
+      "hora": "21:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "getafe vs alaves",
+      "fecha": "28/09/2024",
+      "hora": "14:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "rayo vs leganes",
+      "fecha": "28/09/2024",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "real sociedad vs valencia",
+      "fecha": "28/09/2024",
+      "hora": "18:30",
+      "resultado": "3-0"
+    },
+    {
+      "match": "osasuna vs barcelona",
+      "fecha": "28/09/2024",
+      "hora": "21:00",
+      "resultado": "4-2"
+    },
+    {
+      "match": "celta vs girona",
+      "fecha": "29/09/2024",
+      "hora": "14:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "athletic vs sevilla",
+      "fecha": "29/09/2024",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "betis vs espanyol",
+      "fecha": "29/09/2024",
+      "hora": "18:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "atletico madrid vs real madrid",
+      "fecha": "29/09/2024",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "villarreal vs las palmas",
+      "fecha": "30/09/2024",
+      "hora": "21:00",
+      "resultado": "3-1"
+    }
   ],
   "9": [
-    "leganes vs valencia",
-    "espanyol vs mallorca",
-    "getafe vs osasuna",
-    "las palmas vs celta",
-    "valladolid vs rayo",
-    "real madrid vs villarreal",
-    "girona vs athletic",
-    "alaves vs barcelona",
-    "sevilla vs betis",
-    "real sociedad vs atletico madrid"
+    {
+      "match": "leganes vs valencia",
+      "fecha": "04/10/2024",
+      "hora": "21:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "espanyol vs mallorca",
+      "fecha": "05/10/2024",
+      "hora": "14:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "getafe vs osasuna",
+      "fecha": "05/10/2024",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "las palmas vs celta",
+      "fecha": "05/10/2024",
+      "hora": "17:30",
+      "resultado": "0-1"
+    },
+    {
+      "match": "valladolid vs rayo",
+      "fecha": "05/10/2024",
+      "hora": "18:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "real madrid vs villarreal",
+      "fecha": "05/10/2024",
+      "hora": "21:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "girona vs athletic",
+      "fecha": "06/10/2024",
+      "hora": "14:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "alaves vs barcelona",
+      "fecha": "06/10/2024",
+      "hora": "16:15",
+      "resultado": "0-3"
+    },
+    {
+      "match": "sevilla vs betis",
+      "fecha": "06/10/2024",
+      "hora": "18:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "real sociedad vs atletico madrid",
+      "fecha": "06/10/2024",
+      "hora": "21:00",
+      "resultado": "1-1"
+    }
   ],
   "10": [
-    "alaves vs valladolid",
-    "athletic vs espanyol",
-    "osasuna vs betis",
-    "girona vs real sociedad",
-    "celta vs real madrid",
-    "mallorca vs rayo",
-    "atletico madrid vs leganes",
-    "villarreal vs getafe",
-    "barcelona vs sevilla",
-    "valencia vs las palmas"
+    {
+      "match": "alaves vs valladolid",
+      "fecha": "18/10/2024",
+      "hora": "21:00",
+      "resultado": "2-3"
+    },
+    {
+      "match": "athletic vs espanyol",
+      "fecha": "19/10/2024",
+      "hora": "14:00",
+      "resultado": "4-1"
+    },
+    {
+      "match": "osasuna vs betis",
+      "fecha": "19/10/2024",
+      "hora": "16:15",
+      "resultado": "1-2"
+    },
+    {
+      "match": "girona vs real sociedad",
+      "fecha": "19/10/2024",
+      "hora": "18:30",
+      "resultado": "0-1"
+    },
+    {
+      "match": "celta vs real madrid",
+      "fecha": "19/10/2024",
+      "hora": "21:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "mallorca vs rayo",
+      "fecha": "20/10/2024",
+      "hora": "14:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "atletico madrid vs leganes",
+      "fecha": "20/10/2024",
+      "hora": "16:15",
+      "resultado": "3-1"
+    },
+    {
+      "match": "villarreal vs getafe",
+      "fecha": "20/10/2024",
+      "hora": "18:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "barcelona vs sevilla",
+      "fecha": "20/10/2024",
+      "hora": "21:00",
+      "resultado": "5-1"
+    },
+    {
+      "match": "valencia vs las palmas",
+      "fecha": "21/10/2024",
+      "hora": "21:00",
+      "resultado": "2-3"
+    }
   ],
   "11": [
-    "espanyol vs sevilla",
-    "valladolid vs villarreal",
-    "rayo vs alaves",
-    "las palmas vs girona",
-    "real madrid vs barcelona",
-    "leganes vs celta",
-    "getafe vs valencia",
-    "betis vs atletico madrid",
-    "real sociedad vs osasuna",
-    "mallorca vs athletic"
+    {
+      "match": "espanyol vs sevilla",
+      "fecha": "25/10/2024",
+      "hora": "21:00",
+      "resultado": "0-2"
+    },
+    {
+      "match": "valladolid vs villarreal",
+      "fecha": "26/10/2024",
+      "hora": "14:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "rayo vs alaves",
+      "fecha": "26/10/2024",
+      "hora": "16:15",
+      "resultado": "1-0"
+    },
+    {
+      "match": "las palmas vs girona",
+      "fecha": "26/10/2024",
+      "hora": "17:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "real madrid vs barcelona",
+      "fecha": "26/10/2024",
+      "hora": "21:00",
+      "resultado": "0-4"
+    },
+    {
+      "match": "leganes vs celta",
+      "fecha": "27/10/2024",
+      "hora": "14:00",
+      "resultado": "3-0"
+    },
+    {
+      "match": "getafe vs valencia",
+      "fecha": "27/10/2024",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "betis vs atletico madrid",
+      "fecha": "27/10/2024",
+      "hora": "18:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "real sociedad vs osasuna",
+      "fecha": "27/10/2024",
+      "hora": "21:00",
+      "resultado": "0-2"
+    },
+    {
+      "match": "mallorca vs athletic",
+      "fecha": "28/10/2024",
+      "hora": "21:00",
+      "resultado": "0-0"
+    }
   ],
   "12": [
-    "alaves vs mallorca",
-    "osasuna vs valladolid",
-    "girona vs leganes",
-    "atletico madrid vs las palmas",
-    "barcelona vs espanyol",
-    "sevilla vs real sociedad",
-    "athletic vs betis",
-    "celta vs getafe",
-    "villarreal vs rayo",
-    "valencia vs real madrid"
+    {
+      "match": "alaves vs mallorca",
+      "fecha": "01/11/2024",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "osasuna vs valladolid",
+      "fecha": "02/11/2024",
+      "hora": "14:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "girona vs leganes",
+      "fecha": "02/11/2024",
+      "hora": "16:15",
+      "resultado": "4-3"
+    },
+    {
+      "match": "atletico madrid vs las palmas",
+      "fecha": "03/11/2024",
+      "hora": "14:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "barcelona vs espanyol",
+      "fecha": "03/11/2024",
+      "hora": "16:15",
+      "resultado": "3-1"
+    },
+    {
+      "match": "sevilla vs real sociedad",
+      "fecha": "03/11/2024",
+      "hora": "18:30",
+      "resultado": "0-2"
+    },
+    {
+      "match": "athletic vs betis",
+      "fecha": "03/11/2024",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "celta vs getafe",
+      "fecha": "04/11/2024",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "villarreal vs rayo",
+      "fecha": "18/12/2024",
+      "hora": "21:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "valencia vs real madrid",
+      "fecha": "03/01/2025",
+      "hora": "21:00",
+      "resultado": "1-2"
+    }
   ],
   "13": [
-    "rayo vs las palmas",
-    "real madrid vs osasuna",
-    "villarreal vs alaves",
-    "leganes vs sevilla",
-    "betis vs celta",
-    "mallorca vs atletico madrid",
-    "valladolid vs athletic",
-    "getafe vs girona",
-    "real sociedad vs barcelona",
-    "espanyol vs valencia"
+    {
+      "match": "rayo vs las palmas",
+      "fecha": "08/11/2024",
+      "hora": "21:00",
+      "resultado": "1-3"
+    },
+    {
+      "match": "real madrid vs osasuna",
+      "fecha": "09/11/2024",
+      "hora": "14:00",
+      "resultado": "4-0"
+    },
+    {
+      "match": "villarreal vs alaves",
+      "fecha": "09/11/2024",
+      "hora": "16:15",
+      "resultado": "3-0"
+    },
+    {
+      "match": "leganes vs sevilla",
+      "fecha": "09/11/2024",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "betis vs celta",
+      "fecha": "10/11/2024",
+      "hora": "14:00",
+      "resultado": "2-2"
+    },
+    {
+      "match": "mallorca vs atletico madrid",
+      "fecha": "10/11/2024",
+      "hora": "16:15",
+      "resultado": "0-1"
+    },
+    {
+      "match": "valladolid vs athletic",
+      "fecha": "10/11/2024",
+      "hora": "18:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "getafe vs girona",
+      "fecha": "10/11/2024",
+      "hora": "18:30",
+      "resultado": "0-1"
+    },
+    {
+      "match": "real sociedad vs barcelona",
+      "fecha": "10/11/2024",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "espanyol vs valencia",
+      "fecha": "18/12/2024",
+      "hora": "21:30",
+      "resultado": "1-1"
+    }
   ],
   "14": [
-    "getafe vs valladolid",
-    "valencia vs betis",
-    "atletico madrid vs alaves",
-    "las palmas vs mallorca",
-    "girona vs espanyol",
-    "celta vs barcelona",
-    "osasuna vs villarreal",
-    "sevilla vs rayo",
-    "leganes vs real madrid",
-    "athletic vs real sociedad"
+    {
+      "match": "getafe vs valladolid",
+      "fecha": "22/11/2024",
+      "hora": "21:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "valencia vs betis",
+      "fecha": "23/11/2024",
+      "hora": "14:00",
+      "resultado": "4-2"
+    },
+    {
+      "match": "atletico madrid vs alaves",
+      "fecha": "23/11/2024",
+      "hora": "16:15",
+      "resultado": "2-1"
+    },
+    {
+      "match": "las palmas vs mallorca",
+      "fecha": "23/11/2024",
+      "hora": "17:30",
+      "resultado": "2-3"
+    },
+    {
+      "match": "girona vs espanyol",
+      "fecha": "23/11/2024",
+      "hora": "18:30",
+      "resultado": "4-1"
+    },
+    {
+      "match": "celta vs barcelona",
+      "fecha": "23/11/2024",
+      "hora": "21:00",
+      "resultado": "2-2"
+    },
+    {
+      "match": "osasuna vs villarreal",
+      "fecha": "24/11/2024",
+      "hora": "14:00",
+      "resultado": "2-2"
+    },
+    {
+      "match": "sevilla vs rayo",
+      "fecha": "24/11/2024",
+      "hora": "16:15",
+      "resultado": "1-0"
+    },
+    {
+      "match": "leganes vs real madrid",
+      "fecha": "24/11/2024",
+      "hora": "18:30",
+      "resultado": "0-3"
+    },
+    {
+      "match": "athletic vs real sociedad",
+      "fecha": "24/11/2024",
+      "hora": "21:00",
+      "resultado": "1-0"
+    }
   ],
   "15": [
-    "mallorca vs valencia",
-    "barcelona vs las palmas",
-    "alaves vs leganes",
-    "espanyol vs celta",
-    "valladolid vs atletico madrid",
-    "villarreal vs girona",
-    "real madrid vs getafe",
-    "rayo vs athletic",
-    "real sociedad vs betis",
-    "sevilla vs osasuna"
+    {
+      "match": "mallorca vs valencia",
+      "fecha": "29/11/2024",
+      "hora": "21:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "barcelona vs las palmas",
+      "fecha": "30/11/2024",
+      "hora": "14:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "alaves vs leganes",
+      "fecha": "30/11/2024",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "espanyol vs celta",
+      "fecha": "30/11/2024",
+      "hora": "18:30",
+      "resultado": "3-1"
+    },
+    {
+      "match": "valladolid vs atletico madrid",
+      "fecha": "30/11/2024",
+      "hora": "21:00",
+      "resultado": "0-5"
+    },
+    {
+      "match": "villarreal vs girona",
+      "fecha": "01/12/2024",
+      "hora": "14:00",
+      "resultado": "2-2"
+    },
+    {
+      "match": "real madrid vs getafe",
+      "fecha": "01/12/2024",
+      "hora": "16:15",
+      "resultado": "2-0"
+    },
+    {
+      "match": "rayo vs athletic",
+      "fecha": "01/12/2024",
+      "hora": "18:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "real sociedad vs betis",
+      "fecha": "01/12/2024",
+      "hora": "21:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "sevilla vs osasuna",
+      "fecha": "02/12/2024",
+      "hora": "21:00",
+      "resultado": "1-1"
+    }
   ],
   "16": [
-    "celta vs mallorca",
-    "las palmas vs valladolid",
-    "betis vs barcelona",
-    "valencia vs rayo",
-    "girona vs real madrid",
-    "leganes vs real sociedad",
-    "athletic vs villarreal",
-    "osasuna vs alaves",
-    "atletico madrid vs sevilla",
-    "getafe vs espanyol"
+    {
+      "match": "celta vs mallorca",
+      "fecha": "06/12/2024",
+      "hora": "21:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "las palmas vs valladolid",
+      "fecha": "07/12/2024",
+      "hora": "13:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "betis vs barcelona",
+      "fecha": "07/12/2024",
+      "hora": "16:15",
+      "resultado": "2-2"
+    },
+    {
+      "match": "valencia vs rayo",
+      "fecha": "07/12/2024",
+      "hora": "18:30",
+      "resultado": "0-1"
+    },
+    {
+      "match": "girona vs real madrid",
+      "fecha": "07/12/2024",
+      "hora": "21:00",
+      "resultado": "0-3"
+    },
+    {
+      "match": "leganes vs real sociedad",
+      "fecha": "08/12/2024",
+      "hora": "14:00",
+      "resultado": "0-3"
+    },
+    {
+      "match": "athletic vs villarreal",
+      "fecha": "08/12/2024",
+      "hora": "16:15",
+      "resultado": "2-0"
+    },
+    {
+      "match": "osasuna vs alaves",
+      "fecha": "08/12/2024",
+      "hora": "18:30",
+      "resultado": "2-2"
+    },
+    {
+      "match": "atletico madrid vs sevilla",
+      "fecha": "08/12/2024",
+      "hora": "21:00",
+      "resultado": "4-3"
+    },
+    {
+      "match": "getafe vs espanyol",
+      "fecha": "09/12/2024",
+      "hora": "21:00",
+      "resultado": "1-0"
+    }
   ],
   "17": [
-    "valladolid vs valencia",
-    "espanyol vs osasuna",
-    "mallorca vs girona",
-    "sevilla vs celta",
-    "rayo vs real madrid",
-    "atletico madrid vs getafe",
-    "alaves vs athletic",
-    "real sociedad vs las palmas",
-    "villarreal vs betis",
-    "barcelona vs leganes"
+    {
+      "match": "valladolid vs valencia",
+      "fecha": "13/12/2024",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "espanyol vs osasuna",
+      "fecha": "14/12/2024",
+      "hora": "14:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "mallorca vs girona",
+      "fecha": "14/12/2024",
+      "hora": "16:15",
+      "resultado": "2-1"
+    },
+    {
+      "match": "sevilla vs celta",
+      "fecha": "14/12/2024",
+      "hora": "18:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "rayo vs real madrid",
+      "fecha": "14/12/2024",
+      "hora": "21:00",
+      "resultado": "3-3"
+    },
+    {
+      "match": "atletico madrid vs getafe",
+      "fecha": "15/12/2024",
+      "hora": "14:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "alaves vs athletic",
+      "fecha": "15/12/2024",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "real sociedad vs las palmas",
+      "fecha": "15/12/2024",
+      "hora": "18:30",
+      "resultado": "0-0"
+    },
+    {
+      "match": "villarreal vs betis",
+      "fecha": "15/12/2024",
+      "hora": "18:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "barcelona vs leganes",
+      "fecha": "15/12/2024",
+      "hora": "21:00",
+      "resultado": "0-1"
+    }
   ],
   "18": [
-    "girona vs valladolid",
-    "getafe vs mallorca",
-    "celta vs real sociedad",
-    "osasuna vs athletic",
-    "barcelona vs atletico madrid",
-    "valencia vs alaves",
-    "real madrid vs sevilla",
-    "las palmas vs espanyol",
-    "leganes vs villarreal",
-    "betis vs rayo"
+    {
+      "match": "girona vs valladolid",
+      "fecha": "20/12/2024",
+      "hora": "21:00",
+      "resultado": "3-0"
+    },
+    {
+      "match": "getafe vs mallorca",
+      "fecha": "21/12/2024",
+      "hora": "14:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "celta vs real sociedad",
+      "fecha": "21/12/2024",
+      "hora": "16:15",
+      "resultado": "2-0"
+    },
+    {
+      "match": "osasuna vs athletic",
+      "fecha": "21/12/2024",
+      "hora": "18:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "barcelona vs atletico madrid",
+      "fecha": "21/12/2024",
+      "hora": "21:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "valencia vs alaves",
+      "fecha": "22/12/2024",
+      "hora": "14:00",
+      "resultado": "2-2"
+    },
+    {
+      "match": "real madrid vs sevilla",
+      "fecha": "22/12/2024",
+      "hora": "16:15",
+      "resultado": "4-2"
+    },
+    {
+      "match": "las palmas vs espanyol",
+      "fecha": "22/12/2024",
+      "hora": "17:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "leganes vs villarreal",
+      "fecha": "22/12/2024",
+      "hora": "18:30",
+      "resultado": "2-5"
+    },
+    {
+      "match": "betis vs rayo",
+      "fecha": "22/12/2024",
+      "hora": "21:00",
+      "resultado": "1-1"
+    }
   ],
   "19": [
-    "mallorca vs barcelona",
-    "athletic vs real madrid",
-    "rayo vs celta",
-    "alaves vs girona",
-    "valladolid vs betis",
-    "espanyol vs leganes",
-    "sevilla vs valencia",
-    "las palmas vs getafe",
-    "atletico madrid vs osasuna",
-    "real sociedad vs villarreal"
+    {
+      "match": "mallorca vs barcelona",
+      "fecha": "03/12/2024",
+      "hora": "19:00",
+      "resultado": "1-5"
+    },
+    {
+      "match": "athletic vs real madrid",
+      "fecha": "04/12/2024",
+      "hora": "21:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "rayo vs celta",
+      "fecha": "10/01/2025",
+      "hora": "21:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "alaves vs girona",
+      "fecha": "11/01/2025",
+      "hora": "14:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "valladolid vs betis",
+      "fecha": "11/01/2025",
+      "hora": "16:15",
+      "resultado": "1-0"
+    },
+    {
+      "match": "espanyol vs leganes",
+      "fecha": "11/01/2025",
+      "hora": "18:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "sevilla vs valencia",
+      "fecha": "11/01/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "las palmas vs getafe",
+      "fecha": "12/01/2025",
+      "hora": "13:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "atletico madrid vs osasuna",
+      "fecha": "12/01/2025",
+      "hora": "16:15",
+      "resultado": "1-0"
+    },
+    {
+      "match": "real sociedad vs villarreal",
+      "fecha": "13/01/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    }
   ],
   "20": [
-    "espanyol vs valladolid",
-    "girona vs sevilla",
-    "leganes vs atletico madrid",
-    "betis vs alaves",
-    "getafe vs barcelona",
-    "celta vs athletic",
-    "real madrid vs las palmas",
-    "osasuna vs rayo",
-    "valencia vs real sociedad",
-    "villarreal vs mallorca"
+    {
+      "match": "espanyol vs valladolid",
+      "fecha": "17/01/2025",
+      "hora": "21:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "girona vs sevilla",
+      "fecha": "18/01/2025",
+      "hora": "14:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "leganes vs atletico madrid",
+      "fecha": "18/01/2025",
+      "hora": "16:15",
+      "resultado": "1-0"
+    },
+    {
+      "match": "betis vs alaves",
+      "fecha": "18/01/2025",
+      "hora": "18:30",
+      "resultado": "1-3"
+    },
+    {
+      "match": "getafe vs barcelona",
+      "fecha": "18/01/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "celta vs athletic",
+      "fecha": "19/01/2025",
+      "hora": "14:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "real madrid vs las palmas",
+      "fecha": "19/01/2025",
+      "hora": "16:15",
+      "resultado": "4-1"
+    },
+    {
+      "match": "osasuna vs rayo",
+      "fecha": "19/01/2025",
+      "hora": "18:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "valencia vs real sociedad",
+      "fecha": "19/01/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "villarreal vs mallorca",
+      "fecha": "20/01/2025",
+      "hora": "21:00",
+      "resultado": "4-0"
+    }
   ],
   "21": [
-    "las palmas vs osasuna",
-    "mallorca vs betis",
-    "atletico madrid vs villarreal",
-    "sevilla vs espanyol",
-    "valladolid vs real madrid",
-    "rayo vs girona",
-    "real sociedad vs getafe",
-    "athletic vs leganes",
-    "barcelona vs valencia",
-    "alaves vs celta"
+    {
+      "match": "las palmas vs osasuna",
+      "fecha": "24/01/2025",
+      "hora": "20:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "mallorca vs betis",
+      "fecha": "25/01/2025",
+      "hora": "14:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "atletico madrid vs villarreal",
+      "fecha": "25/01/2025",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "sevilla vs espanyol",
+      "fecha": "25/01/2025",
+      "hora": "18:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "valladolid vs real madrid",
+      "fecha": "25/01/2025",
+      "hora": "21:00",
+      "resultado": "0-3"
+    },
+    {
+      "match": "rayo vs girona",
+      "fecha": "26/01/2025",
+      "hora": "14:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "real sociedad vs getafe",
+      "fecha": "26/01/2025",
+      "hora": "16:15",
+      "resultado": "0-3"
+    },
+    {
+      "match": "athletic vs leganes",
+      "fecha": "26/01/2025",
+      "hora": "18:30",
+      "resultado": "0-0"
+    },
+    {
+      "match": "barcelona vs valencia",
+      "fecha": "26/01/2025",
+      "hora": "21:00",
+      "resultado": "7-1"
+    },
+    {
+      "match": "alaves vs celta",
+      "fecha": "27/01/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    }
   ],
   "22": [
-    "leganes vs rayo",
-    "getafe vs sevilla",
-    "villarreal vs valladolid",
-    "atletico madrid vs mallorca",
-    "espanyol vs real madrid",
-    "barcelona vs alaves",
-    "valencia vs celta",
-    "osasuna vs real sociedad",
-    "betis vs athletic",
-    "girona vs las palmas"
+    {
+      "match": "leganes vs rayo",
+      "fecha": "31/01/2025",
+      "hora": "21:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "getafe vs sevilla",
+      "fecha": "01/02/2025",
+      "hora": "14:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "villarreal vs valladolid",
+      "fecha": "01/02/2025",
+      "hora": "16:15",
+      "resultado": "5-1"
+    },
+    {
+      "match": "atletico madrid vs mallorca",
+      "fecha": "01/02/2025",
+      "hora": "18:30",
+      "resultado": "2-0"
+    },
+    {
+      "match": "espanyol vs real madrid",
+      "fecha": "01/02/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "barcelona vs alaves",
+      "fecha": "02/02/2025",
+      "hora": "14:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "valencia vs celta",
+      "fecha": "02/02/2025",
+      "hora": "16:15",
+      "resultado": "2-1"
+    },
+    {
+      "match": "osasuna vs real sociedad",
+      "fecha": "02/02/2025",
+      "hora": "18:30",
+      "resultado": "2-1"
+    },
+    {
+      "match": "betis vs athletic",
+      "fecha": "02/02/2025",
+      "hora": "21:00",
+      "resultado": "2-2"
+    },
+    {
+      "match": "girona vs las palmas",
+      "fecha": "03/02/2025",
+      "hora": "21:00",
+      "resultado": "2-1"
+    }
   ],
   "23": [
-    "rayo vs valladolid",
-    "celta vs betis",
-    "athletic vs girona",
-    "las palmas vs villarreal",
-    "real madrid vs atletico madrid",
-    "alaves vs getafe",
-    "valencia vs leganes",
-    "real sociedad vs espanyol",
-    "sevilla vs barcelona",
-    "mallorca vs osasuna"
+    {
+      "match": "rayo vs valladolid",
+      "fecha": "07/02/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "celta vs betis",
+      "fecha": "08/02/2025",
+      "hora": "14:00",
+      "resultado": "3-2"
+    },
+    {
+      "match": "athletic vs girona",
+      "fecha": "08/02/2025",
+      "hora": "16:15",
+      "resultado": "3-0"
+    },
+    {
+      "match": "las palmas vs villarreal",
+      "fecha": "08/02/2025",
+      "hora": "17:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "real madrid vs atletico madrid",
+      "fecha": "08/02/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "alaves vs getafe",
+      "fecha": "09/02/2025",
+      "hora": "14:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "valencia vs leganes",
+      "fecha": "09/02/2025",
+      "hora": "16:15",
+      "resultado": "2-0"
+    },
+    {
+      "match": "real sociedad vs espanyol",
+      "fecha": "09/02/2025",
+      "hora": "18:30",
+      "resultado": "2-1"
+    },
+    {
+      "match": "sevilla vs barcelona",
+      "fecha": "09/02/2025",
+      "hora": "21:00",
+      "resultado": "1-4"
+    },
+    {
+      "match": "mallorca vs osasuna",
+      "fecha": "10/02/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    }
   ],
   "24": [
-    "girona vs getafe",
-    "leganes vs alaves",
-    "osasuna vs real madrid",
-    "atletico madrid vs celta",
-    "villarreal vs valencia",
-    "espanyol vs athletic",
-    "valladolid vs sevilla",
-    "mallorca vs las palmas",
-    "betis vs real sociedad",
-    "barcelona vs rayo"
+    {
+      "match": "girona vs getafe",
+      "fecha": "14/02/2025",
+      "hora": "21:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "leganes vs alaves",
+      "fecha": "15/02/2025",
+      "hora": "14:00",
+      "resultado": "3-3"
+    },
+    {
+      "match": "osasuna vs real madrid",
+      "fecha": "15/02/2025",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "atletico madrid vs celta",
+      "fecha": "15/02/2025",
+      "hora": "18:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "villarreal vs valencia",
+      "fecha": "15/02/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "espanyol vs athletic",
+      "fecha": "16/02/2025",
+      "hora": "14:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "valladolid vs sevilla",
+      "fecha": "16/02/2025",
+      "hora": "16:15",
+      "resultado": "0-4"
+    },
+    {
+      "match": "mallorca vs las palmas",
+      "fecha": "16/02/2025",
+      "hora": "18:30",
+      "resultado": "3-1"
+    },
+    {
+      "match": "betis vs real sociedad",
+      "fecha": "16/02/2025",
+      "hora": "21:00",
+      "resultado": "3-0"
+    },
+    {
+      "match": "barcelona vs rayo",
+      "fecha": "17/02/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    }
   ],
   "25": [
-    "celta vs osasuna",
-    "alaves vs espanyol",
-    "rayo vs villarreal",
-    "valencia vs atletico madrid",
-    "las palmas vs barcelona",
-    "athletic vs valladolid",
-    "real madrid vs girona",
-    "getafe vs betis",
-    "real sociedad vs leganes",
-    "sevilla vs mallorca"
+    {
+      "match": "celta vs osasuna",
+      "fecha": "21/02/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "alaves vs espanyol",
+      "fecha": "22/02/2025",
+      "hora": "14:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "rayo vs villarreal",
+      "fecha": "22/02/2025",
+      "hora": "16:15",
+      "resultado": "0-1"
+    },
+    {
+      "match": "valencia vs atletico madrid",
+      "fecha": "22/02/2025",
+      "hora": "18:30",
+      "resultado": "0-3"
+    },
+    {
+      "match": "las palmas vs barcelona",
+      "fecha": "22/02/2025",
+      "hora": "20:00",
+      "resultado": "0-2"
+    },
+    {
+      "match": "athletic vs valladolid",
+      "fecha": "23/02/2025",
+      "hora": "14:00",
+      "resultado": "7-1"
+    },
+    {
+      "match": "real madrid vs girona",
+      "fecha": "23/02/2025",
+      "hora": "16:15",
+      "resultado": "2-0"
+    },
+    {
+      "match": "getafe vs betis",
+      "fecha": "23/02/2025",
+      "hora": "18:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "real sociedad vs leganes",
+      "fecha": "23/02/2025",
+      "hora": "21:00",
+      "resultado": "3-0"
+    },
+    {
+      "match": "sevilla vs mallorca",
+      "fecha": "24/02/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    }
   ],
   "26": [
-    "valladolid vs las palmas",
-    "girona vs celta",
-    "rayo vs sevilla",
-    "betis vs real madrid",
-    "atletico madrid vs athletic",
-    "leganes vs getafe",
-    "barcelona vs real sociedad",
-    "mallorca vs alaves",
-    "osasuna vs valencia",
-    "villarreal vs espanyol"
+    {
+      "match": "valladolid vs las palmas",
+      "fecha": "28/02/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "girona vs celta",
+      "fecha": "01/03/2025",
+      "hora": "14:00",
+      "resultado": "2-2"
+    },
+    {
+      "match": "rayo vs sevilla",
+      "fecha": "01/03/2025",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "betis vs real madrid",
+      "fecha": "01/03/2025",
+      "hora": "18:30",
+      "resultado": "2-1"
+    },
+    {
+      "match": "atletico madrid vs athletic",
+      "fecha": "01/03/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "leganes vs getafe",
+      "fecha": "02/03/2025",
+      "hora": "14:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "barcelona vs real sociedad",
+      "fecha": "02/03/2025",
+      "hora": "16:15",
+      "resultado": "4-0"
+    },
+    {
+      "match": "mallorca vs alaves",
+      "fecha": "02/03/2025",
+      "hora": "18:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "osasuna vs valencia",
+      "fecha": "02/03/2025",
+      "hora": "21:00",
+      "resultado": "3-3"
+    },
+    {
+      "match": "villarreal vs espanyol",
+      "fecha": "27/04/2025",
+      "hora": "16:15",
+      "resultado": "1-0"
+    }
   ],
   "27": [
-    "celta vs leganes",
-    "alaves vs villarreal",
-    "valencia vs valladolid",
-    "getafe vs atletico madrid",
-    "real madrid vs rayo",
-    "betis vs las palmas",
-    "athletic vs mallorca",
-    "real sociedad vs sevilla",
-    "espanyol vs girona",
-    "barcelona vs osasuna"
+    {
+      "match": "celta vs leganes",
+      "fecha": "08/03/2025",
+      "hora": "14:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "alaves vs villarreal",
+      "fecha": "08/03/2025",
+      "hora": "16:15",
+      "resultado": "1-0"
+    },
+    {
+      "match": "valencia vs valladolid",
+      "fecha": "08/03/2025",
+      "hora": "18:30",
+      "resultado": "2-1"
+    },
+    {
+      "match": "getafe vs atletico madrid",
+      "fecha": "09/03/2025",
+      "hora": "14:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "real madrid vs rayo",
+      "fecha": "09/03/2025",
+      "hora": "16:15",
+      "resultado": "2-1"
+    },
+    {
+      "match": "betis vs las palmas",
+      "fecha": "09/03/2025",
+      "hora": "18:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "athletic vs mallorca",
+      "fecha": "09/03/2025",
+      "hora": "18:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "real sociedad vs sevilla",
+      "fecha": "09/03/2025",
+      "hora": "21:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "espanyol vs girona",
+      "fecha": "10/03/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "barcelona vs osasuna",
+      "fecha": "27/03/2025",
+      "hora": "21:00",
+      "resultado": "3-0"
+    }
   ],
   "28": [
-    "las palmas vs alaves",
-    "valladolid vs celta",
-    "mallorca vs espanyol",
-    "villarreal vs real madrid",
-    "girona vs valencia",
-    "leganes vs betis",
-    "sevilla vs athletic",
-    "osasuna vs getafe",
-    "rayo vs real sociedad",
-    "atletico madrid vs barcelona"
+    {
+      "match": "las palmas vs alaves",
+      "fecha": "14/03/2025",
+      "hora": "20:00",
+      "resultado": "2-2"
+    },
+    {
+      "match": "valladolid vs celta",
+      "fecha": "15/03/2025",
+      "hora": "14:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "mallorca vs espanyol",
+      "fecha": "15/03/2025",
+      "hora": "16:15",
+      "resultado": "2-1"
+    },
+    {
+      "match": "villarreal vs real madrid",
+      "fecha": "15/03/2025",
+      "hora": "18:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "girona vs valencia",
+      "fecha": "15/03/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "leganes vs betis",
+      "fecha": "16/03/2025",
+      "hora": "14:00",
+      "resultado": "2-3"
+    },
+    {
+      "match": "sevilla vs athletic",
+      "fecha": "16/03/2025",
+      "hora": "16:15",
+      "resultado": "0-1"
+    },
+    {
+      "match": "osasuna vs getafe",
+      "fecha": "16/03/2025",
+      "hora": "18:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "rayo vs real sociedad",
+      "fecha": "16/03/2025",
+      "hora": "18:30",
+      "resultado": "2-2"
+    },
+    {
+      "match": "atletico madrid vs barcelona",
+      "fecha": "16/03/2025",
+      "hora": "21:00",
+      "resultado": "2-4"
+    }
   ],
   "29": [
-    "real sociedad vs valladolid",
-    "espanyol vs atletico madrid",
-    "alaves vs rayo",
-    "real madrid vs leganes",
-    "getafe vs villarreal",
-    "barcelona vs girona",
-    "valencia vs mallorca",
-    "athletic vs osasuna",
-    "betis vs sevilla",
-    "celta vs las palmas"
+    {
+      "match": "real sociedad vs valladolid",
+      "fecha": "29/03/2025",
+      "hora": "14:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "espanyol vs atletico madrid",
+      "fecha": "29/03/2025",
+      "hora": "16:15",
+      "resultado": "1-1"
+    },
+    {
+      "match": "alaves vs rayo",
+      "fecha": "29/03/2025",
+      "hora": "18:30",
+      "resultado": "0-2"
+    },
+    {
+      "match": "real madrid vs leganes",
+      "fecha": "29/03/2025",
+      "hora": "21:00",
+      "resultado": "3-2"
+    },
+    {
+      "match": "getafe vs villarreal",
+      "fecha": "30/03/2025",
+      "hora": "14:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "barcelona vs girona",
+      "fecha": "30/03/2025",
+      "hora": "16:15",
+      "resultado": "4-1"
+    },
+    {
+      "match": "valencia vs mallorca",
+      "fecha": "30/03/2025",
+      "hora": "18:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "athletic vs osasuna",
+      "fecha": "30/03/2025",
+      "hora": "18:30",
+      "resultado": "0-0"
+    },
+    {
+      "match": "betis vs sevilla",
+      "fecha": "30/03/2025",
+      "hora": "21:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "celta vs las palmas",
+      "fecha": "31/03/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    }
   ],
   "30": [
-    "rayo vs espanyol",
-    "girona vs alaves",
-    "real madrid vs valencia",
-    "mallorca vs celta",
-    "barcelona vs betis",
-    "las palmas vs real sociedad",
-    "sevilla vs atletico madrid",
-    "valladolid vs getafe",
-    "villarreal vs athletic",
-    "leganes vs osasuna"
+    {
+      "match": "rayo vs espanyol",
+      "fecha": "04/04/2025",
+      "hora": "21:00",
+      "resultado": "0-4"
+    },
+    {
+      "match": "girona vs alaves",
+      "fecha": "05/04/2025",
+      "hora": "14:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "real madrid vs valencia",
+      "fecha": "05/04/2025",
+      "hora": "16:15",
+      "resultado": "1-2"
+    },
+    {
+      "match": "mallorca vs celta",
+      "fecha": "05/04/2025",
+      "hora": "18:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "barcelona vs betis",
+      "fecha": "05/04/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "las palmas vs real sociedad",
+      "fecha": "06/04/2025",
+      "hora": "13:00",
+      "resultado": "1-3"
+    },
+    {
+      "match": "sevilla vs atletico madrid",
+      "fecha": "06/04/2025",
+      "hora": "16:15",
+      "resultado": "1-2"
+    },
+    {
+      "match": "valladolid vs getafe",
+      "fecha": "06/04/2025",
+      "hora": "18:30",
+      "resultado": "0-4"
+    },
+    {
+      "match": "villarreal vs athletic",
+      "fecha": "06/04/2025",
+      "hora": "21:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "leganes vs osasuna",
+      "fecha": "07/04/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    }
   ],
   "31": [
-    "valencia vs sevilla",
-    "real sociedad vs mallorca",
-    "getafe vs las palmas",
-    "celta vs espanyol",
-    "leganes vs barcelona",
-    "osasuna vs girona",
-    "alaves vs real madrid",
-    "betis vs villarreal",
-    "athletic vs rayo",
-    "atletico madrid vs valladolid"
+    {
+      "match": "valencia vs sevilla",
+      "fecha": "11/04/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "real sociedad vs mallorca",
+      "fecha": "12/04/2025",
+      "hora": "14:00",
+      "resultado": "0-2"
+    },
+    {
+      "match": "getafe vs las palmas",
+      "fecha": "12/04/2025",
+      "hora": "16:15",
+      "resultado": "1-3"
+    },
+    {
+      "match": "celta vs espanyol",
+      "fecha": "12/04/2025",
+      "hora": "18:30",
+      "resultado": "0-2"
+    },
+    {
+      "match": "leganes vs barcelona",
+      "fecha": "12/04/2025",
+      "hora": "21:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "osasuna vs girona",
+      "fecha": "13/04/2025",
+      "hora": "14:00",
+      "resultado": "2-1"
+    },
+    {
+      "match": "alaves vs real madrid",
+      "fecha": "13/04/2025",
+      "hora": "16:15",
+      "resultado": "0-1"
+    },
+    {
+      "match": "betis vs villarreal",
+      "fecha": "13/04/2025",
+      "hora": "18:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "athletic vs rayo",
+      "fecha": "13/04/2025",
+      "hora": "21:00",
+      "resultado": "3-1"
+    },
+    {
+      "match": "atletico madrid vs valladolid",
+      "fecha": "14/04/2025",
+      "hora": "21:00",
+      "resultado": "4-2"
+    }
   ],
   "32": [
-    "espanyol vs getafe",
-    "rayo vs valencia",
-    "barcelona vs celta",
-    "mallorca vs leganes",
-    "las palmas vs atletico madrid",
-    "valladolid vs osasuna",
-    "villarreal vs real sociedad",
-    "sevilla vs alaves",
-    "real madrid vs athletic",
-    "girona vs betis"
+    {
+      "match": "espanyol vs getafe",
+      "fecha": "18/04/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "rayo vs valencia",
+      "fecha": "19/04/2025",
+      "hora": "14:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "barcelona vs celta",
+      "fecha": "19/04/2025",
+      "hora": "16:15",
+      "resultado": "4-3"
+    },
+    {
+      "match": "mallorca vs leganes",
+      "fecha": "19/04/2025",
+      "hora": "18:30",
+      "resultado": "0-0"
+    },
+    {
+      "match": "las palmas vs atletico madrid",
+      "fecha": "19/04/2025",
+      "hora": "20:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "valladolid vs osasuna",
+      "fecha": "20/04/2025",
+      "hora": "14:00",
+      "resultado": "2-3"
+    },
+    {
+      "match": "villarreal vs real sociedad",
+      "fecha": "20/04/2025",
+      "hora": "16:15",
+      "resultado": "2-2"
+    },
+    {
+      "match": "sevilla vs alaves",
+      "fecha": "20/04/2025",
+      "hora": "18:30",
+      "resultado": "1-1"
+    },
+    {
+      "match": "real madrid vs athletic",
+      "fecha": "20/04/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "girona vs betis",
+      "fecha": "21/04/2025",
+      "hora": "21:00",
+      "resultado": "1-3"
+    }
   ],
   "33": [
-    "valencia vs espanyol",
-    "barcelona vs mallorca",
-    "celta vs villarreal",
-    "athletic vs las palmas",
-    "alaves vs real sociedad",
-    "getafe vs real madrid",
-    "osasuna vs sevilla",
-    "leganes vs girona",
-    "atletico madrid vs rayo",
-    "betis vs valladolid"
+    {
+      "match": "valencia vs espanyol",
+      "fecha": "22/04/2025",
+      "hora": "19:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "barcelona vs mallorca",
+      "fecha": "22/04/2025",
+      "hora": "21:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "celta vs villarreal",
+      "fecha": "23/04/2025",
+      "hora": "19:00",
+      "resultado": "3-0"
+    },
+    {
+      "match": "athletic vs las palmas",
+      "fecha": "23/04/2025",
+      "hora": "19:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "alaves vs real sociedad",
+      "fecha": "23/04/2025",
+      "hora": "21:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "getafe vs real madrid",
+      "fecha": "23/04/2025",
+      "hora": "21:30",
+      "resultado": "0-1"
+    },
+    {
+      "match": "osasuna vs sevilla",
+      "fecha": "24/04/2025",
+      "hora": "19:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "leganes vs girona",
+      "fecha": "24/04/2025",
+      "hora": "19:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "atletico madrid vs rayo",
+      "fecha": "24/04/2025",
+      "hora": "21:30",
+      "resultado": "3-0"
+    },
+    {
+      "match": "betis vs valladolid",
+      "fecha": "24/04/2025",
+      "hora": "21:30",
+      "resultado": "5-1"
+    }
   ],
   "34": [
-    "rayo vs getafe",
-    "alaves vs atletico madrid",
-    "villarreal vs osasuna",
-    "las palmas vs valencia",
-    "valladolid vs barcelona",
-    "real madrid vs celta",
-    "sevilla vs leganes",
-    "espanyol vs betis",
-    "real sociedad vs athletic",
-    "girona vs mallorca"
+    {
+      "match": "rayo vs getafe",
+      "fecha": "02/05/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "alaves vs atletico madrid",
+      "fecha": "03/05/2025",
+      "hora": "14:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "villarreal vs osasuna",
+      "fecha": "03/05/2025",
+      "hora": "16:15",
+      "resultado": "4-2"
+    },
+    {
+      "match": "las palmas vs valencia",
+      "fecha": "03/05/2025",
+      "hora": "17:30",
+      "resultado": "2-3"
+    },
+    {
+      "match": "valladolid vs barcelona",
+      "fecha": "03/05/2025",
+      "hora": "21:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "real madrid vs celta",
+      "fecha": "04/05/2025",
+      "hora": "14:00",
+      "resultado": "3-2"
+    },
+    {
+      "match": "sevilla vs leganes",
+      "fecha": "04/05/2025",
+      "hora": "16:15",
+      "resultado": "2-2"
+    },
+    {
+      "match": "espanyol vs betis",
+      "fecha": "04/05/2025",
+      "hora": "18:30",
+      "resultado": "1-2"
+    },
+    {
+      "match": "real sociedad vs athletic",
+      "fecha": "04/05/2025",
+      "hora": "21:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "girona vs mallorca",
+      "fecha": "05/05/2025",
+      "hora": "21:00",
+      "resultado": "1-0"
+    }
   ],
   "35": [
-    "las palmas vs rayo",
-    "valencia vs getafe",
-    "celta vs sevilla",
-    "mallorca vs valladolid",
-    "girona vs villarreal",
-    "atletico madrid vs real sociedad",
-    "leganes vs espanyol",
-    "barcelona vs real madrid",
-    "athletic vs alaves",
-    "betis vs osasuna"
+    {
+      "match": "las palmas vs rayo",
+      "fecha": "09/05/2025",
+      "hora": "20:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "valencia vs getafe",
+      "fecha": "10/05/2025",
+      "hora": "14:00",
+      "resultado": "3-0"
+    },
+    {
+      "match": "celta vs sevilla",
+      "fecha": "10/05/2025",
+      "hora": "16:15",
+      "resultado": "3-2"
+    },
+    {
+      "match": "mallorca vs valladolid",
+      "fecha": "10/05/2025",
+      "hora": "18:30",
+      "resultado": "2-1"
+    },
+    {
+      "match": "girona vs villarreal",
+      "fecha": "10/05/2025",
+      "hora": "18:30",
+      "resultado": "0-1"
+    },
+    {
+      "match": "atletico madrid vs real sociedad",
+      "fecha": "10/05/2025",
+      "hora": "21:00",
+      "resultado": "4-0"
+    },
+    {
+      "match": "leganes vs espanyol",
+      "fecha": "11/05/2025",
+      "hora": "14:00",
+      "resultado": "3-2"
+    },
+    {
+      "match": "barcelona vs real madrid",
+      "fecha": "11/05/2025",
+      "hora": "16:15",
+      "resultado": "4-3"
+    },
+    {
+      "match": "athletic vs alaves",
+      "fecha": "11/05/2025",
+      "hora": "18:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "betis vs osasuna",
+      "fecha": "11/05/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    }
   ],
   "36": [
-    "valladolid vs girona",
-    "real sociedad vs celta",
-    "sevilla vs las palmas",
-    "alaves vs valencia",
-    "villarreal vs leganes",
-    "real madrid vs mallorca",
-    "rayo vs betis",
-    "osasuna vs atletico madrid",
-    "getafe vs athletic",
-    "espanyol vs barcelona"
+    {
+      "match": "valladolid vs girona",
+      "fecha": "13/05/2025",
+      "hora": "19:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "real sociedad vs celta",
+      "fecha": "13/05/2025",
+      "hora": "20:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "sevilla vs las palmas",
+      "fecha": "13/05/2025",
+      "hora": "21:30",
+      "resultado": "1-0"
+    },
+    {
+      "match": "alaves vs valencia",
+      "fecha": "14/05/2025",
+      "hora": "19:00",
+      "resultado": "1-0"
+    },
+    {
+      "match": "villarreal vs leganes",
+      "fecha": "14/05/2025",
+      "hora": "19:00",
+      "resultado": "3-0"
+    },
+    {
+      "match": "real madrid vs mallorca",
+      "fecha": "14/05/2025",
+      "hora": "21:30",
+      "resultado": "2-1"
+    },
+    {
+      "match": "rayo vs betis",
+      "fecha": "15/05/2025",
+      "hora": "19:00",
+      "resultado": "2-2"
+    },
+    {
+      "match": "osasuna vs atletico madrid",
+      "fecha": "15/05/2025",
+      "hora": "19:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "getafe vs athletic",
+      "fecha": "15/05/2025",
+      "hora": "21:30",
+      "resultado": "0-2"
+    },
+    {
+      "match": "espanyol vs barcelona",
+      "fecha": "15/05/2025",
+      "hora": "21:30",
+      "resultado": "0-2"
+    }
   ],
   "37": [
-    "las palmas vs leganes",
-    "mallorca vs getafe",
-    "valencia vs athletic",
-    "atletico madrid vs betis",
-    "osasuna vs espanyol",
-    "barcelona vs villarreal",
-    "valladolid vs alaves",
-    "real sociedad vs girona",
-    "sevilla vs real madrid",
-    "celta vs rayo"
+    {
+      "match": "las palmas vs leganes",
+      "fecha": "18/05/2025",
+      "hora": "18:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "mallorca vs getafe",
+      "fecha": "18/05/2025",
+      "hora": "19:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "valencia vs athletic",
+      "fecha": "18/05/2025",
+      "hora": "19:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "atletico madrid vs betis",
+      "fecha": "18/05/2025",
+      "hora": "19:00",
+      "resultado": "4-1"
+    },
+    {
+      "match": "osasuna vs espanyol",
+      "fecha": "18/05/2025",
+      "hora": "19:00",
+      "resultado": "2-0"
+    },
+    {
+      "match": "barcelona vs villarreal",
+      "fecha": "18/05/2025",
+      "hora": "19:00",
+      "resultado": "2-3"
+    },
+    {
+      "match": "valladolid vs alaves",
+      "fecha": "18/05/2025",
+      "hora": "19:00",
+      "resultado": "0-1"
+    },
+    {
+      "match": "real sociedad vs girona",
+      "fecha": "18/05/2025",
+      "hora": "19:00",
+      "resultado": "3-2"
+    },
+    {
+      "match": "sevilla vs real madrid",
+      "fecha": "18/05/2025",
+      "hora": "19:00",
+      "resultado": "0-2"
+    },
+    {
+      "match": "celta vs rayo",
+      "fecha": "18/05/2025",
+      "hora": "19:00",
+      "resultado": "1-2"
+    }
   ],
   "38": [
-    "betis vs valencia",
-    "real madrid vs real sociedad",
-    "leganes vs valladolid",
-    "espanyol vs las palmas",
-    "rayo vs mallorca",
-    "alaves vs osasuna",
-    "getafe vs celta",
-    "girona vs atletico madrid",
-    "villarreal vs sevilla",
-    "athletic vs barcelona"
+    {
+      "match": "betis vs valencia",
+      "fecha": "23/05/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "real madrid vs real sociedad",
+      "fecha": "24/05/2025",
+      "hora": "16:15",
+      "resultado": "2-0"
+    },
+    {
+      "match": "leganes vs valladolid",
+      "fecha": "24/05/2025",
+      "hora": "18:30",
+      "resultado": "3-0"
+    },
+    {
+      "match": "espanyol vs las palmas",
+      "fecha": "24/05/2025",
+      "hora": "18:30",
+      "resultado": "2-0"
+    },
+    {
+      "match": "rayo vs mallorca",
+      "fecha": "24/05/2025",
+      "hora": "21:00",
+      "resultado": "0-0"
+    },
+    {
+      "match": "alaves vs osasuna",
+      "fecha": "24/05/2025",
+      "hora": "21:00",
+      "resultado": "1-1"
+    },
+    {
+      "match": "getafe vs celta",
+      "fecha": "24/05/2025",
+      "hora": "21:00",
+      "resultado": "1-2"
+    },
+    {
+      "match": "girona vs atletico madrid",
+      "fecha": "25/05/2025",
+      "hora": "14:00",
+      "resultado": "0-4"
+    },
+    {
+      "match": "villarreal vs sevilla",
+      "fecha": "25/05/2025",
+      "hora": "16:15",
+      "resultado": "4-2"
+    },
+    {
+      "match": "athletic vs barcelona",
+      "fecha": "25/05/2025",
+      "hora": "21:00",
+      "resultado": "0-3"
+    }
   ]
 }

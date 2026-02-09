@@ -9,8 +9,14 @@ def normalize_team_name(value):
     if not value:
         return ''
     
-    # Convertir a minúsculas
-    normalized = value.lower()
+    normalized = value.lower().strip()
+    
+    # Remover prefijos comunes
+    prefixes = ['fc ', 'cd ', 'ad ', 'rcd ', 'real ', 'ud ', 'cf ', 'sd ', 'ef ', 'ca ']
+    for prefix in prefixes:
+        if normalized.startswith(prefix):
+            normalized = normalized[len(prefix):]
+            break
     
     # Remover acentos
     normalized = ''.join(
@@ -38,3 +44,28 @@ def format_temporada(value):
     if not value:
         return ''
     return value.replace('_', '/')
+
+@register.filter
+def weekday_name(value):
+    """Devuelve el nombre del día de la semana en español"""
+    if not value:
+        return ''
+    days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+    return days[value.weekday()]
+
+@register.filter
+def format_fecha_partido(value):
+    """Devuelve la fecha formateada como 'Domingo 23 Febrero, 21:30'"""
+    if not value:
+        return ''
+    
+    days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+    months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+              'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    
+    weekday = days[value.weekday()]
+    day = value.day
+    month = months[value.month - 1]
+    time = value.strftime('%H:%M')
+    
+    return f"{weekday} {day} {month}, {time}"
