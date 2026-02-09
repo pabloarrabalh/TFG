@@ -69,3 +69,24 @@ def format_fecha_partido(value):
     time = value.strftime('%H:%M')
     
     return f"{weekday} {day} {month}, {time}"
+
+@register.filter
+def display_team_name(value):
+    """Mapea los nombres de equipos para mostrar versiones formales"""
+    if not value:
+        return ''
+    
+    name_mapping = {
+        'barcelona': 'FC Barcelona',
+        'alavés': 'Deportivo Alavés',
+        'alaves': 'Deportivo Alavés',
+        'atlético madrid': 'Atlético de Madrid',
+        'atletico madrid': 'Atlético de Madrid',
+        'levante': 'Levante UD',
+        'real mallorca': 'RCD Mallorca',
+        'celta vigo': 'Celta de Vigo',
+        'celta de vigo': 'Celta de Vigo',
+    }
+    
+    lower_value = value.lower().strip()
+    return name_mapping.get(lower_value, value)
