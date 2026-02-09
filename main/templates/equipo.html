@@ -49,6 +49,41 @@
     background-color: rgb(239, 68, 68);
 }
 
+/* Racha con tooltips */
+.racha-item {
+    position: relative;
+    display: inline-block;
+}
+
+.racha-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgb(17, 24, 39);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    margin-bottom: 8px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 50;
+    border: 1px solid rgb(75, 85, 99);
+}
+
+.racha-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: rgb(17, 24, 39);
+}
+
 /* Real Madrid */
 .team-real-madrid,
 .team-madrid {
@@ -279,12 +314,20 @@
                         </div>
                         
                         <!-- Racha Actual debajo del estadio -->
-                        {% if racha_actual %}
+                        {% if racha_actual_detalles %}
                         <div class="flex items-center gap-2 mt-4">
-                            {% for resultado in racha_actual %}
-                            <div class="w-6 h-6 rounded text-xs font-bold text-white flex items-center justify-center
-                                {% if resultado == 'V' %}bg-green-500{% elif resultado == 'E' %}bg-yellow-500{% else %}bg-red-500{% endif %}">
-                                {{ resultado }}
+                            {% for detalle in racha_actual_detalles %}
+                            <div class="relative inline-block racha-item">
+                                {% if detalle.resultado == 'V' %}
+                                    <div class="w-6 h-6 rounded-full bg-green-500 text-xs font-bold text-white flex items-center justify-center">V</div>
+                                {% elif detalle.resultado == 'D' %}
+                                    <div class="w-6 h-6 rounded-full bg-yellow-500 text-xs font-bold text-white flex items-center justify-center">E</div>
+                                {% elif detalle.resultado == 'L' %}
+                                    <div class="w-6 h-6 rounded-full bg-red-500 text-xs font-bold text-white flex items-center justify-center">P</div>
+                                {% elif detalle.resultado == '?' %}
+                                    <div class="w-6 h-6 rounded-full bg-gray-500 text-xs font-bold text-white flex items-center justify-center">?</div>
+                                {% endif %}
+                                <div class="racha-tooltip">{{ detalle.titulo }}</div>
                             </div>
                             {% endfor %}
                         </div>
@@ -294,8 +337,10 @@
 
                 <!-- Arriba a la derecha: Temporada display y Selector de Jornada -->
                 <div class="absolute top-4 right-6 text-right">
-                    <div class="text-white/60 text-sm uppercase font-bold tracking-widest mb-1">Temporada</div>
-                    <div class="text-4xl font-black text-primary mb-4">{{ temporada_actual|format_temporada }}<span class="text-lg text-white/60"></span></div>
+                    <div class="inline-block bg-surface-dark border-l-4 border-primary px-4 py-2 rounded-r-lg mb-4">
+                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Temporada</div>
+                        <div class="text-2xl font-black text-white">{{ temporada_actual }}</div>
+                    </div>
                     
                     <!-- Selector de Jornada con flechas -->
                     {% if jornadas_disponibles %}
@@ -377,6 +422,65 @@
                     {% endfor %}
                 </div>
             </div>
+
+            <!-- Histórico -->
+            {% if historico_temporadas %}
+            <div class="glass-panel rounded-2xl p-6 mb-6">
+                <div class="flex items-center gap-3 mb-6 cursor-pointer" onclick="toggleHistorico()">
+                    <span id="historico-chevron" class="material-symbols-outlined text-primary transition-transform">expand_more</span>
+                    <h2 class="text-2xl font-black text-white uppercase tracking-wider">HISTÓRICO</h2>
+                </div>
+                
+                <div id="historico-content" class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-border-dark">
+                                <th class="text-left py-3 px-4 text-xs font-bold text-gray-400 uppercase">Temporada</th>
+                                <th class="text-center py-3 px-4 text-xs font-bold text-gray-400 uppercase">Pos</th>
+                                <th class="text-center py-3 px-4 text-xs font-bold text-gray-400 uppercase">V</th>
+                                <th class="text-center py-3 px-4 text-xs font-bold text-gray-400 uppercase">E</th>
+                                <th class="text-center py-3 px-4 text-xs font-bold text-gray-400 uppercase">P</th>
+                                <th class="text-center py-3 px-4 text-xs font-bold text-gray-400 uppercase">GF</th>
+                                <th class="text-center py-3 px-4 text-xs font-bold text-gray-400 uppercase">GC</th>
+                                <th class="text-center py-3 px-4 text-xs font-bold text-gray-400 uppercase">DF</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for temp in historico_temporadas %}
+                            <tr class="border-b border-border-dark/30 hover:bg-surface-dark/50 transition-colors">
+                                <td class="py-3 px-4">
+                                    <span class="font-bold text-white">{{ temp.temporada }}</span>
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-black {% if temp.posicion <= 4 %}bg-blue-500/20 text-blue-400{% elif temp.posicion <= 7 %}bg-orange-500/20 text-orange-400{% elif temp.posicion <= 17 %}bg-gray-500/20 text-gray-300{% else %}bg-red-500/20 text-red-400{% endif %}">
+                                        {{ temp.posicion }}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-center text-green-400 font-bold">
+                                    {{ temp.victorias }}
+                                </td>
+                                <td class="py-3 px-4 text-center text-yellow-400 font-bold">
+                                    {{ temp.empates }}
+                                </td>
+                                <td class="py-3 px-4 text-center text-red-400 font-bold">
+                                    {{ temp.derrotas }}
+                                </td>
+                                <td class="py-3 px-4 text-center text-gray-300">
+                                    {{ temp.goles_favor }}
+                                </td>
+                                <td class="py-3 px-4 text-center text-gray-300">
+                                    {{ temp.goles_contra }}
+                                </td>
+                                <td class="py-3 px-4 text-center {% if temp.diferencia_goles > 0 %}text-primary font-bold{% elif temp.diferencia_goles < 0 %}text-red-400 font-bold{% else %}text-gray-300{% endif %}">
+                                    {% if temp.diferencia_goles > 0 %}+{% endif %}{{ temp.diferencia_goles }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
 
             <!-- Plantilla Oficial -->
             <div class="glass-panel rounded-2xl p-6">
@@ -627,37 +731,13 @@
                 
                 {% if proximo_partido and rival_info %}
                 <div class="text-center p-6 bg-surface-dark rounded-2xl space-y-4">
-                    <!-- Indicador de estadio -->
-                    <div class="flex items-center justify-center gap-2 text-primary text-lg">
-                        <span class="text-2xl">📍</span>
-                        <span class="font-bold">{{ rival_info.estadio_partido }}</span>
-                    </div>
-                    
-                    <!-- Rival Badge con colores del equipo -->
+                    <!-- Nombre del rival Badge con colores del equipo -->
                     <div class="flex flex-col items-center gap-2 mb-2">
                         <div class="team-badge team-{{ rival_info.nombre_normalizado }}">
                             <span>{{ rival_info.iniciales }}</span>
                         </div>
                         <h4 class="text-lg font-bold text-white text-center">{{ rival_info.nombre }}</h4>
                     </div>
-                    
-                    <!-- Racha del rival (círculos igual que en clasificación) -->
-                    {% if rival_info.racha %}
-                    <div class="mt-2 text-center">
-                        <div class="text-xs text-gray-400 mb-2">Racha último 6 partidos</div>
-                        <div class="flex justify-center">
-                            {% for resultado in rival_info.racha %}
-                                {% if resultado == 'V' %}
-                                    <span class="racha-circle racha-g">V</span>
-                                {% elif resultado == 'E' %}
-                                    <span class="racha-circle racha-e">E</span>
-                                {% elif resultado == 'P' %}
-                                    <span class="racha-circle racha-p">P</span>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
                     
                     <!-- Fecha y hora con día de la semana -->
                     {% if proximo_partido.fecha_partido %}
@@ -666,30 +746,6 @@
                         </div>
                     {% else %}
                         <div class="text-gray-400">Horario por confirmar</div>
-                    {% endif %}
-                    
-                    <!-- Comparativa dentro del panel del rival -->
-                    {% if proximo_partido and rival_info %}
-                    <div class="border-t border-border-dark pt-4 mt-4 space-y-2">
-                        <div class="text-xs text-gray-400 uppercase font-bold tracking-widest mb-2">Comparativa</div>
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-400">Goles a favor</span>
-                            <div class="flex items-center gap-1">
-                                <span class="text-primary font-bold">{{ goles_equipo_favor }}</span>
-                                <span class="text-gray-400">-</span>
-                                <span class="text-white font-bold">{{ rival_info.goles_favor }}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-400">Goles en contra</span>
-                            <div class="flex items-center gap-1">
-                                <span class="text-green-400 font-bold">{{ goles_equipo_contra }}</span>
-                                <span class="text-gray-400">-</span>
-                                <span class="text-white font-bold">{{ rival_info.goles_contra }}</span>
-                            </div>
-                        </div>
-                    </div>
                     {% endif %}
                     
                     <!-- Botón Ver Análisis dentro del panel -->
@@ -807,22 +863,35 @@ document.addEventListener('DOMContentLoaded', function() {
         container.innerHTML = `<img src="${url}" class="h-4 w-6 object-cover rounded-sm shadow-sm" alt="flag">`;
     }
 
-    // Modal de análisis
-    function openAnalysisModal() {
+    // Tooltips para racha
+    document.querySelectorAll('.racha-item').forEach(item => {
+        const tooltip = item.querySelector('.racha-tooltip');
+        if (tooltip) {
+            item.addEventListener('mouseenter', () => {
+                tooltip.style.opacity = '1';
+            });
+            item.addEventListener('mouseleave', () => {
+                tooltip.style.opacity = '0';
+            });
+        }
+    });
+
+    // Modal de análisis - GLOBAL FUNCTIONS
+    window.openAnalysisModal = function() {
         const modal = document.getElementById('analysisModal');
         if (modal) {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
-    }
+    };
 
-    function closeAnalysisModal() {
+    window.closeAnalysisModal = function() {
         const modal = document.getElementById('analysisModal');
         if (modal) {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
-    }
+    };
 
     // Cerrar modal al clickear fuera
     const modal = document.getElementById('analysisModal');
@@ -833,6 +902,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Toggle histórico
+    window.toggleHistorico = function() {
+        const content = document.getElementById('historico-content');
+        const chevron = document.getElementById('historico-chevron');
+        if (content) {
+            content.classList.toggle('hidden');
+            if (chevron) {
+                chevron.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+            }
+        }
+    };
 });
 </script>
 
@@ -848,23 +929,148 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         
         <!-- Contenido del Modal -->
-        <div class="p-6 space-y-4">
-            <div class="bg-primary/10 border border-primary/30 rounded-lg p-4">
-                <p class="text-gray-300 text-center">Contenido de análisis del partido próximo estará disponible pronto...</p>
+        <div class="p-6 space-y-6">
+            <!-- Últimos 5 partidos del rival -->
+            {% if rival_info.racha %}
+            <div>
+                <h3 class="text-lg font-bold text-white mb-4 uppercase tracking-wider">Últimos 5 Partidos</h3>
+                <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark/50">
+                    <div class="flex justify-center gap-2">
+                        {% for detalle in rival_info.racha %}
+                            <div class="relative inline-block racha-item">
+                                {% if detalle.resultado == 'V' %}
+                                    <div class="w-8 h-8 rounded-full bg-green-500 text-xs font-bold text-white flex items-center justify-center cursor-help">V</div>
+                                {% elif detalle.resultado == 'D' %}
+                                    <div class="w-8 h-8 rounded-full bg-yellow-500 text-xs font-bold text-white flex items-center justify-center cursor-help">E</div>
+                                {% elif detalle.resultado == 'L' %}
+                                    <div class="w-8 h-8 rounded-full bg-red-500 text-xs font-bold text-white flex items-center justify-center cursor-help">P</div>
+                                {% elif detalle.resultado == '?' %}
+                                    <div class="w-8 h-8 rounded-full bg-gray-500 border border-gray-600 text-xs font-bold text-white flex items-center justify-center cursor-help">?</div>
+                                {% endif %}
+                                <div class="racha-tooltip">{{ detalle.titulo }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
+            {% endif %}
             
-            <!-- Dummy Content -->
-            <div class="space-y-4">
-                <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark/50 h-24 flex items-center justify-center">
-                    <p class="text-gray-500 italic">Espacio reservado para análisis táctico</p>
-                </div>
-                <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark/50 h-24 flex items-center justify-center">
-                    <p class="text-gray-500 italic">Espacio reservado para estadísticas comparativas</p>
-                </div>
-                <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark/50 h-24 flex items-center justify-center">
-                    <p class="text-gray-500 italic">Espacio reservado para datos del rival</p>
+            <!-- H2H Histórico -->
+            {% if rival_info.h2h %}
+            <div>
+                <h3 class="text-lg font-bold text-white mb-4 uppercase tracking-wider">Historial H2H (Todas las Temporadas)</h3>
+                <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark/50">
+                    <div class="text-xs text-gray-400 mb-4 uppercase font-bold">Récord historial: {{ rival_info.h2h.victorias }} V - {{ rival_info.h2h.empates }} E - {{ rival_info.h2h.derrotas }} P (Total: {{ rival_info.h2h.total }})</div>
+                    
+                    <!-- Barra de H2H con segmentos -->
+                    <div class="relative h-8 bg-gray-700 rounded-lg overflow-hidden flex">
+                        <!-- Segmento de Victorias (Verde) -->
+                        {% widthratio rival_info.h2h.victorias rival_info.h2h.total 100 as v_width %}
+                        <div class="relative bg-green-500 flex items-center justify-center" style="width: {{ v_width }}%;">
+                            {% if v_width >= 10 %}
+                                <span class="text-xs font-black text-white">{{ rival_info.h2h.victorias }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Segmento de Empates (Amarillo) -->
+                        {% widthratio rival_info.h2h.empates rival_info.h2h.total 100 as e_width %}
+                        <div class="relative bg-yellow-500 flex items-center justify-center" style="width: {{ e_width }}%;">
+                            {% if e_width >= 10 %}
+                                <span class="text-xs font-black text-white">{{ rival_info.h2h.empates }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Segmento de Derrotas (Rojo) -->
+                        {% widthratio rival_info.h2h.derrotas rival_info.h2h.total 100 as d_width %}
+                        <div class="relative bg-red-500 flex items-center justify-center" style="width: {{ d_width }}%;">
+                            {% if d_width >= 10 %}
+                                <span class="text-xs font-black text-white">{{ rival_info.h2h.derrotas }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Leyenda -->
+                    <div class="flex flex-wrap gap-4 mt-3 text-xs">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 bg-green-500 rounded"></div>
+                            <span class="text-gray-400">Victorias: {{ rival_info.h2h.victorias }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 bg-yellow-500 rounded"></div>
+                            <span class="text-gray-400">Empates: {{ rival_info.h2h.empates }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 bg-red-500 rounded"></div>
+                            <span class="text-gray-400">Derrotas: {{ rival_info.h2h.derrotas }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
+            {% endif %}
+            
+            <!-- Comparativa de goles -->
+            {% if proximo_partido and rival_info %}
+            <div>
+                <h3 class="text-lg font-bold text-white mb-4 uppercase tracking-wider">Comparativa de Goles</h3>
+                <div class="space-y-4">
+                    <!-- Goles a favor - Barra unificada -->
+                    {% with total_favor=goles_equipo_favor|add:rival_info.goles_favor %}
+                    <div>
+                        <div class="flex items-center justify-between text-xs mb-2">
+                            <span class="text-gray-400 font-bold">Goles a Favor</span>
+                            <div class="flex gap-2">
+                                <span class="text-primary font-black">{{ goles_equipo_favor }}</span>
+                                <span class="text-gray-400">-</span>
+                                <span class="text-white font-black">{{ rival_info.goles_favor }}</span>
+                            </div>
+                        </div>
+                        <div class="relative h-8 bg-gray-700 rounded-lg overflow-hidden flex">
+                            {% widthratio goles_equipo_favor total_favor 100 as eq_favor_percent %}
+                            {% widthratio rival_info.goles_favor total_favor 100 as rival_favor_percent %}
+                            <div class="relative bg-green-500 flex items-center justify-center" style="width: {{ eq_favor_percent }}%;">
+                                {% if eq_favor_percent >= 10 %}
+                                    <span class="text-xs font-black text-white">{{ goles_equipo_favor }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="relative bg-red-500 flex items-center justify-center" style="width: {{ rival_favor_percent }}%;">
+                                {% if rival_favor_percent >= 10 %}
+                                    <span class="text-xs font-black text-white">{{ rival_info.goles_favor }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endwith %}
+                    
+                    <!-- Goles en contra - Barra unificada -->
+                    {% with total_contra=goles_equipo_contra|add:rival_info.goles_contra %}
+                    <div>
+                        <div class="flex items-center justify-between text-xs mb-2">
+                            <span class="text-gray-400 font-bold">Goles en Contra</span>
+                            <div class="flex gap-2">
+                                <span class="text-primary font-black">{{ goles_equipo_contra }}</span>
+                                <span class="text-gray-400">-</span>
+                                <span class="text-white font-black">{{ rival_info.goles_contra }}</span>
+                            </div>
+                        </div>
+                        <div class="relative h-8 bg-gray-700 rounded-lg overflow-hidden flex">
+                            {% widthratio goles_equipo_contra total_contra 100 as eq_contra_percent %}
+                            {% widthratio rival_info.goles_contra total_contra 100 as rival_contra_percent %}
+                            <div class="relative bg-green-500 flex items-center justify-center" style="width: {{ eq_contra_percent }}%;">
+                                {% if eq_contra_percent >= 10 %}
+                                    <span class="text-xs font-black text-white">{{ goles_equipo_contra }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="relative bg-red-500 flex items-center justify-center" style="width: {{ rival_contra_percent }}%;">
+                                {% if rival_contra_percent >= 10 %}
+                                    <span class="text-xs font-black text-white">{{ rival_info.goles_contra }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endwith %}
+                </div>
+            </div>
+            {% endif %}
         </div>
         
         <!-- Footer del Modal -->

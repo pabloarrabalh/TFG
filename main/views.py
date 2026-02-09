@@ -120,6 +120,195 @@ def get_racha_detalles(equipo, temporada, jornada_actual):
     
     return racha_detalles
 
+def get_racha_futura(equipo, temporada, jornada_actual):
+    """Obtiene los próximos 5 partidos sin resultado (futuros) incluyendo jornada actual si no se ha jugado"""
+    from main.models import Partido, Calendario
+    
+    # Obtener próximos 5 partidos SIN resultado de jornadas >= a la jornada actual
+    partidos = Calendario.objects.filter(
+        jornada__temporada=temporada,
+        jornada__numero_jornada__gte=jornada_actual.numero_jornada
+    ).filter(
+        Q(equipo_local=equipo) | Q(equipo_visitante=equipo)
+    ).select_related('equipo_local', 'equipo_visitante', 'jornada').order_by('jornada__numero_jornada', 'fecha', 'hora')[:5]
+    
+    racha_futura = []
+    
+    for partido_cal in partidos:
+        # Determinar si es local o visitante
+        es_local = partido_cal.equipo_local == equipo
+        
+        if es_local:
+            rival = partido_cal.equipo_visitante.nombre
+        else:
+            rival = partido_cal.equipo_local.nombre
+        
+        # Verificar si ya tiene resultado
+        partido_con_resultado = Partido.objects.filter(
+            jornada=partido_cal.jornada,
+            equipo_local=partido_cal.equipo_local,
+            equipo_visitante=partido_cal.equipo_visitante,
+            goles_local__isnull=False,
+            goles_visitante__isnull=False
+        ).first()
+        
+        if partido_con_resultado:
+            # El partido ya se jugó, mostrar resultado
+            goles_propios = partido_con_resultado.goles_local if es_local else partido_con_resultado.goles_visitante
+            goles_rival = partido_con_resultado.goles_visitante if es_local else partido_con_resultado.goles_local
+            
+            if goles_propios > goles_rival:
+                resultado = 'V'
+            elif goles_propios < goles_rival:
+                resultado = 'L'
+            else:
+                resultado = 'D'
+            
+            titulo = f"Jornada {partido_cal.jornada.numero_jornada} vs {rival} {goles_propios}-{goles_rival}"
+        else:
+            # No tiene resultado aún
+            resultado = '?'
+            goles_propios = None
+            goles_rival = None
+            titulo = f"Jornada {partido_cal.jornada.numero_jornada} - vs {rival}"
+        
+        racha_futura.append({
+            'resultado': resultado,
+            'titulo': titulo,
+            'rival': rival,
+            'goles_propios': goles_propios,
+            'goles_rival': goles_rival,
+            'jornada': partido_cal.jornada.numero_jornada
+        })
+    
+    return racha_futura
+
+def get_historico_temporadas(equipo):
+    """Obtiene las estadísticas de cada temporada (V/E/P, GF, GC, DF, Posición)"""
+    from main.models import Partido, ClasificacionJornada
+    from django.db.models import Q
+    
+    temporadas = Temporada.objects.all().order_by('-nombre')
+    historico = []
+    
+    for temporada in temporadas:
+        # Obtener la última jornada disponible de la temporada
+        ultima_jornada = Jornada.objects.filter(
+            temporada=temporada
+        ).order_by('-numero_jornada').first()
+        
+        if ultima_jornada:
+            # Contar partidos y goles
+            partidos = Partido.objects.filter(
+                jornada__temporada=temporada,
+                goles_local__isnull=False,
+                goles_visitante__isnull=False
+            ).filter(
+                Q(equipo_local=equipo) | Q(equipo_visitante=equipo)
+            )
+            
+            victorias = 0
+            derrotas = 0
+            empates = 0
+            goles_favor = 0
+            goles_contra = 0
+            
+            for partido in partidos:
+                es_local = partido.equipo_local == equipo
+                goles_propios = partido.goles_local if es_local else partido.goles_visitante
+                goles_rival = partido.goles_visitante if es_local else partido.goles_local
+                
+                goles_favor += goles_propios
+                goles_contra += goles_rival
+                
+                if goles_propios > goles_rival:
+                    victorias += 1
+                elif goles_propios < goles_rival:
+                    derrotas += 1
+                else:
+                    empates += 1
+            
+            # Obtener la posición: buscar en la última jornada con clasificación para este equipo
+            clasificacion = ClasificacionJornada.objects.filter(
+                equipo=equipo,
+                jornada__temporada=temporada
+            ).order_by('-jornada__numero_jornada').first()
+            
+            if clasificacion or (victorias + derrotas + empates > 0):
+                display_name = temporada.nombre.replace('_', '/')
+                diferencia_goles = goles_favor - goles_contra
+                
+                historico.append({
+                    'temporada': display_name,
+                    'posicion': clasificacion.posicion if clasificacion else 21,
+                    'victorias': victorias,
+                    'empates': empates,
+                    'derrotas': derrotas,
+                    'goles_favor': goles_favor,
+                    'goles_contra': goles_contra,
+                    'diferencia_goles': diferencia_goles
+                })
+    
+    return historico
+
+def get_h2h_historico(equipo1, equipo2):
+    """Obtiene el histórico H2H entre dos equipos en todas las temporadas"""
+    from main.models import Partido
+    from django.db.models import Q
+    
+    # Obtener todos los partidos entre estos dos equipos
+    partidos = Partido.objects.filter(
+        goles_local__isnull=False,
+        goles_visitante__isnull=False
+    ).filter(
+        Q(
+            Q(equipo_local=equipo1) & Q(equipo_visitante=equipo2)
+        ) | Q(
+            Q(equipo_local=equipo2) & Q(equipo_visitante=equipo1)
+        )
+    ).select_related('equipo_local', 'equipo_visitante', 'jornada__temporada').order_by('-jornada__temporada__nombre', '-jornada__numero_jornada')
+    
+    # Contar resultados para equipo1
+    victorias_eq1 = 0
+    derrotas_eq1 = 0
+    empates_eq1 = 0
+    ultimos_5 = []
+    
+    for partido in partidos:
+        es_local = partido.equipo_local == equipo1
+        goles_propios = partido.goles_local if es_local else partido.goles_visitante
+        goles_rival = partido.goles_visitante if es_local else partido.goles_local
+        rival = partido.equipo_visitante if es_local else partido.equipo_local
+        
+        if goles_propios > goles_rival:
+            victorias_eq1 += 1
+            resultado = 'V'
+        elif goles_propios < goles_rival:
+            derrotas_eq1 += 1
+            resultado = 'P'
+        else:
+            empates_eq1 += 1
+            resultado = 'E'
+        
+        # Guardar últimos 5
+        if len(ultimos_5) < 5:
+            ultimos_5.append({
+                'resultado': resultado,
+                'contra': rival.nombre,
+                'goles_propios': goles_propios,
+                'goles_rival': goles_rival,
+                'temporada': partido.jornada.temporada.nombre.replace('_', '/')
+            })
+    
+    return {
+        'victorias': victorias_eq1,
+        'derrotas': derrotas_eq1,
+        'empates': empates_eq1,
+        'total': victorias_eq1 + derrotas_eq1 + empates_eq1,
+        'ultimos_5': ultimos_5
+    }
+    return historico
+
 def clasificacion(request):
     """Vista de Clasificación de la liga con filtros por temporada y jornada"""
     from main.models import Calendario, Partido
@@ -633,22 +822,14 @@ def equipo(request, equipo_nombre=None, temporada=None):
                     jornada__numero_jornada__lte=jornada_actual
                 ).order_by('-jornada__numero_jornada').first()
                 
+                racha_rival_detalles = []
                 if clasificacion_rival:
                     goles_rival_favor = clasificacion_rival.goles_favor
                     goles_rival_contra = clasificacion_rival.goles_contra
-                    if clasificacion_rival.racha_reciente:
-                        # Convertir racha de W/D/L a V/E/P (español)
-                        racha_raw = list(clasificacion_rival.racha_reciente)
-                        racha_rival = []
-                        for resultado in racha_raw:
-                            if resultado == 'W':
-                                racha_rival.append('V')  # Victoria
-                            elif resultado == 'D':
-                                racha_rival.append('E')  # Empate
-                            elif resultado == 'L':
-                                racha_rival.append('P')  # Pérdida
-                            else:
-                                racha_rival.append(resultado)
+                    
+                    # Obtener racha detallada del rival
+                    jornada_rival_obj = clasificacion_rival.jornada
+                    racha_rival_detalles = get_racha_detalles(rival, temp_obj, jornada_rival_obj)
                     
                     rival_info = {
                         'nombre': rival.nombre,
@@ -657,9 +838,10 @@ def equipo(request, equipo_nombre=None, temporada=None):
                         'es_local': es_local,
                         'estadio_rival': rival.estadio or 'Estadio desconocido',
                         'estadio_partido': estadio_partido,
-                        'racha': racha_rival,
+                        'racha': racha_rival_detalles,
                         'goles_favor': goles_rival_favor,
-                        'goles_contra': goles_rival_contra
+                        'goles_contra': goles_rival_contra,
+                        'h2h': get_h2h_historico(equipo, rival)
                     }
     
     except Equipo.DoesNotExist:
@@ -677,9 +859,32 @@ def equipo(request, equipo_nombre=None, temporada=None):
     
     # Calcular iniciales del equipo
     iniciales = ''
+    racha_actual_detalles = []
+    racha_futura_detalles = []
+    historico_temporadas = []
+    
     if equipo:
         palabras = equipo.nombre.split()
         iniciales = ''.join([palabra[0].upper() for palabra in palabras])
+        
+        # Obtener tabla Jornada actual para las funciones de racha
+        jornada_actual_obj = None
+        if jornada_actual:
+            try:
+                jornada_actual_obj = Jornada.objects.get(
+                    temporada=temp_obj,
+                    numero_jornada=jornada_actual
+                )
+            except Jornada.DoesNotExist:
+                pass
+        
+        # Obtener detalles de racha actual (últimos 5 partidos jugados)
+        if jornada_actual_obj:
+            racha_actual_detalles = get_racha_detalles(equipo, temp_obj, jornada_actual_obj)
+            racha_futura_detalles = get_racha_futura(equipo, temp_obj, jornada_actual_obj)
+        
+        # Obtener histórico de todas las temporadas
+        historico_temporadas = get_historico_temporadas(equipo)
     
     context = {
         'active_page': 'equipos',
@@ -702,6 +907,9 @@ def equipo(request, equipo_nombre=None, temporada=None):
         'goles_equipo_favor': goles_equipo_favor,
         'goles_equipo_contra': goles_equipo_contra,
         'racha_actual': racha_actual,
+        'racha_actual_detalles': racha_actual_detalles,
+        'racha_futura_detalles': racha_futura_detalles,
+        'historico_temporadas': historico_temporadas,
         'desde_clasificacion': equipo_nombre is not None
     }
     
