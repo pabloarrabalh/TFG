@@ -14,7 +14,7 @@ def mi_plantilla(request):
 def clasificacion(request):
     """Vista de Clasificación de la liga con filtros por temporada y jornada"""
     # Obtener parámetros del GET
-    temporada_display = request.GET.get('temporada', '23/24')
+    temporada_display = request.GET.get('temporada', '25/26')
     jornada_num = request.GET.get('jornada', '1')
     
     # Convertir formato 23/24 → 23_24 para búsqueda en BD
@@ -80,7 +80,7 @@ def clasificacion(request):
 def equipo(request, equipo_nombre=None, temporada=None):
     """Vista de detalles de equipo con plantilla de jugadores que jugaron"""
     # Obtener temporada: GET parameter tiene prioridad, luego URL parameter, luego default
-    temporada_display = request.GET.get('temporada') or temporada or '24/25'
+    temporada_display = request.GET.get('temporada') or temporada or '25/26'
     temporada_nombre = temporada_display.replace('/', '_')
     
     # Obtener todas las temporadas disponibles
@@ -110,11 +110,15 @@ def equipo(request, equipo_nombre=None, temporada=None):
             temporada_display = temporada_nombre.replace('_', '/')
         
         # Obtener plantilla del equipo SOLO para la temporada seleccionada
-        # (solo jugadores que jugaron al menos un partido)
+        # Agrupar por jugador para consolidar dorsal 0 (suplentes) con el mismo jugador
         jugadores_equipo_temp = EquipoJugadorTemporada.objects.filter(
             equipo=equipo,
             temporada=temp_obj
         ).select_related('jugador').order_by('dorsal')
+        
+        # Diccionario para agrupar por jugador
+        jugadores_agrupados = {}
+        puntos_dorsal_cero = {}  # Guardar puntos negativos de dorsal 0 para restar después
         
         # Calcular estadísticas de Fantasy para cada jugador EN ESA TEMPORADA
         for eq_jug_temp in jugadores_equipo_temp:
@@ -128,19 +132,79 @@ def equipo(request, equipo_nombre=None, temporada=None):
             total_puntos = stats.aggregate(Sum('puntos_fantasy'))['puntos_fantasy__sum'] or 0
             partidos_jugados = stats.count()
             
-            # Calcular promedio
-            promedio_puntos = total_puntos / partidos_jugados if partidos_jugados > 0 else 0
+            # FILTRO: Si es dorsal 0 con puntos negativos, guardar para matching posterior
+            if eq_jug_temp.dorsal == 0 and total_puntos <= 0:
+                # Guardar el nombre/apellido y puntos para matching después
+                nombre_completo = f"{eq_jug_temp.jugador.nombre} {eq_jug_temp.jugador.apellido}".strip()
+                puntos_dorsal_cero[nombre_completo] = {
+                    'puntos': total_puntos,
+                    'nombre': eq_jug_temp.jugador.nombre,
+                    'apellido': eq_jug_temp.jugador.apellido
+                }
+                continue
             
             # Obtener posición más frecuente en esta temporada
             posicion_frecuente = stats.values('posicion').annotate(
                 count=Count('id')
             ).order_by('-count').first()
             
-            # Añadir atributos al objeto (datos de EstaTemporada)
+            # Agrupar por jugador
+            jugador_id = eq_jug_temp.jugador.id
+            
+            if jugador_id not in jugadores_agrupados:
+                # Primera vez que vemos este jugador
+                jugadores_agrupados[jugador_id] = {
+                    'obj': eq_jug_temp,
+                    'total_puntos': total_puntos,
+                    'partidos_stats': partidos_jugados,
+                    'posicion': posicion_frecuente['posicion'] if posicion_frecuente else None,
+                    'nombre': eq_jug_temp.jugador.nombre,
+                    'apellido': eq_jug_temp.jugador.apellido
+                }
+            else:
+                # Ya existe este jugador (dorsal 0), consolidar puntos
+                jugadores_agrupados[jugador_id]['total_puntos'] += total_puntos
+        
+        # Matching: Buscar coincidencias entre puntos de dorsal 0 y jugadores principales
+        from difflib import SequenceMatcher
+        
+        def similitud_nombres(nombre1, nombre2):
+            """Calcula similitud entre dos nombres (0-1)"""
+            return SequenceMatcher(None, nombre1.lower(), nombre2.lower()).ratio()
+        
+        for nombre_dorsal_cero, datos_dorsal_cero in puntos_dorsal_cero.items():
+            mejor_coincidencia = None
+            mejor_similitud = 0.6  # Umbral mínimo de similitud (60%)
+            
+            # Buscar el jugador principal con nombre más similar
+            for jugador_id, datos_principal in jugadores_agrupados.items():
+                nombre_principal = f"{datos_principal['nombre']} {datos_principal['apellido']}".strip()
+                
+                # Calcular similitud
+                similitud = similitud_nombres(nombre_dorsal_cero, nombre_principal)
+                
+                if similitud > mejor_similitud:
+                    mejor_similitud = similitud
+                    mejor_coincidencia = jugador_id
+            
+            # Si encontramos una coincidencia, restar los puntos
+            if mejor_coincidencia:
+                jugadores_agrupados[mejor_coincidencia]['total_puntos'] += datos_dorsal_cero['puntos']
+        
+        # Crear lista final con jugadores agrupados
+        for jugador_id, datos in jugadores_agrupados.items():
+            eq_jug_temp = datos['obj']
+            total_puntos = datos['total_puntos']
+            partidos_jugados = datos['partidos_stats']
+            
+            # Calcular promedio
+            promedio_puntos = total_puntos / partidos_jugados if partidos_jugados > 0 else 0
+            
+            # Añadir atributos al objeto
             eq_jug_temp.total_puntos_fantasy = total_puntos
             eq_jug_temp.partidos_stats = partidos_jugados
             eq_jug_temp.promedio_puntos_fantasy = round(promedio_puntos, 2)
-            eq_jug_temp.posicion = posicion_frecuente['posicion'] if posicion_frecuente else None
+            eq_jug_temp.posicion = datos['posicion']
             
             jugadores.append(eq_jug_temp)
     
@@ -148,13 +212,21 @@ def equipo(request, equipo_nombre=None, temporada=None):
         equipo = None
         jugadores = []
     
+    # Calcular iniciales del equipo
+    iniciales = ''
+    if equipo:
+        palabras = equipo.nombre.split()
+        iniciales = ''.join([palabra[0].upper() for palabra in palabras])
+    
     context = {
         'active_page': 'equipos',
         'equipo': equipo,
         'equipo_nombre': equipo_display_nombre,
+        'iniciales': iniciales,
         'jugadores': jugadores,
         'temporadas_display': temporadas_display,
-        'temporada_actual': temporada_display,
+        'temporada_actual': temporada_display,  # Formato visual: 25/26
+        'temporada_actual_url': temporada_nombre,  # Formato URL: 25_26
         'temporada_actual_db': temporada_nombre,  # Formato con guion (23_24) para URLs
         'desde_clasificacion': equipo_nombre is not None
     }

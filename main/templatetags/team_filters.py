@@ -31,3 +31,10 @@ def split(value, separator=" "):
     if not value:
         return []
     return value.split(separator)
+
+@register.filter
+def format_temporada(value):
+    """Convierte formato de temporada de 23_24 a 23/24"""
+    if not value:
+        return ''
+    return value.replace('_', '/')

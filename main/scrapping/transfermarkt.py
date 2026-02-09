@@ -7,6 +7,65 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 
 from main.scrapping.commons import normalizar_equipo  # para mapear nombres TM -> tus nombres
+from main.models import Equipo  # para guardar estadios extraídos
+
+
+# ======================== MAPEO DE NOMBRES DE EQUIPOS ========================
+# Mapeo manual: nombre_normalizado_tm -> nombre_exacto_bd
+EQUIPO_TM_TO_BD = {
+    'barcelona': 'Barcelona',
+    'fc barcelona': 'Barcelona',
+    'real madrid': 'Real Madrid',
+    'atletico madrid': 'Atlético Madrid',
+    'atletico': 'Atlético Madrid',
+    'athletic': 'Athletic Club',
+    'athletic bilbao': 'Athletic Club',
+    'villarreal': 'Villarreal',
+    'fc villarreal': 'Villarreal',
+    'betis': 'Real Betis',
+    'real betis': 'Real Betis',
+    'real betis sevilla': 'Real Betis',
+    'rc celta': 'Celta Vigo',
+    'celta': 'Celta Vigo',
+    'celta vigo': 'Celta Vigo',
+    'rayo': 'Rayo Vallecano',
+    'rayo vallecano': 'Rayo Vallecano',
+    'ca osasuna': 'Osasuna',
+    'osasuna': 'Osasuna',
+    'rcd mallorca': 'Real Mallorca',
+    'mallorca': 'Real Mallorca',
+    'real mallorca': 'Real Mallorca',
+    'real sociedad': 'Real Sociedad',
+    'real sociedad san sebastian': 'Real Sociedad',
+    'sociedad': 'Real Sociedad',
+    'valencia cf': 'Valencia',
+    'valencia': 'Valencia',
+    'fc valencia': 'Valencia',
+    'getafe': 'Getafe',
+    'fc getafe': 'Getafe',
+    'rcd espanyol': 'RCD Espanyol',
+    'espanyol': 'RCD Espanyol',
+    'espanyol barcelona': 'RCD Espanyol',
+    'alaves': 'Alavés',
+    'alavés': 'Alavés',
+    'deportivo alaves': 'Alavés',
+    'girona fc': 'Girona',
+    'girona': 'Girona',
+    'fc girona': 'Girona',
+    'sevilla': 'Sevilla',
+    'fc sevilla': 'Sevilla',
+    'cd leganes': 'Leganés',
+    'leganes': 'Leganés',
+    'leganés': 'Leganés',
+    'ud las palmas': 'Las Palmas',
+    'las palmas': 'Las Palmas',
+    'real valladolid': 'Real Valladolid',
+    'valladolid': 'Real Valladolid',
+}
+
+def mapear_equipo_tm_a_bd(equipo_norm):
+    """Mapea nombre normalizado de TM al nombre exacto en BD."""
+    return EQUIPO_TM_TO_BD.get(equipo_norm, equipo_norm)
 
 
 BASE_URL = "https://www.transfermarkt.es/laliga/spieltagtabelle/wettbewerb/ES1"
@@ -456,19 +515,20 @@ def extraer_nacionalidad_desde_bandera(img_bandera):
     return nacionalidad if nacionalidad else None
 
 
-def obtener_plantilla_equipo(href_equipo, delay_min=1, delay_max=3):
+def obtener_plantilla_equipo(href_equipo, saison_id=2024, delay_min=1, delay_max=3):
     """
     Descarga la página de plantilla de un equipo desde Transfermarkt.
     
     Args:
         href_equipo: URL relativa del equipo (ej: /real-madrid/kader/verein/418)
+        saison_id: ID de la temporada en Transfermarkt (2023, 2024, 2025, etc.)
         delay_min, delay_max: Delay entre requests (segundos)
     
     Returns:
         HTML content o None si hay error
     """
     try:
-        url_completa = f"https://www.transfermarkt.es{href_equipo}/saison/2024"
+        url_completa = f"https://www.transfermarkt.es{href_equipo}/saison/{saison_id}"
         print(f"📥 Descargando plantilla: {url_completa}")
         
         delay = random.uniform(delay_min, delay_max)
@@ -490,34 +550,48 @@ def obtener_plantilla_equipo(href_equipo, delay_min=1, delay_max=3):
 
 def procesar_plantilla_equipo(html_content, equipo_norm):
     """
-    Parsea la HTML de plantilla y extrae jugadores con nacionalidad.
+    Parsea la HTML de plantilla y extrae jugadores con nacionalidad + estadio del equipo.
     
     Args:
         html_content: Contenido HTML de la página de plantilla
         equipo_norm: Nombre del equipo normalizado
     
     Returns:
-        Lista de dicts con estructura:
-        {
-            'jugador': str,
-            'nacionalidad': str,
-            'posicion': str,
-            'dorsal': int,
-            'edad': int,
-            'equipo': str
-        }
+        Tupla (lista de dicts jugadores, nombre_estadio)
     """
     jugadores = []
+    estadio = None
     
     try:
         soup = BeautifulSoup(html_content, 'lxml')
         
+        # ============ EXTRAER ESTADIO ============
+        # Buscar en el header la sección del estadio
+        header = soup.find('header', class_='data-header')
+        if header:
+            # Buscar todos los <li> con class data-header__label
+            for li in header.find_all('li', class_='data-header__label'):
+                texto = li.get_text(strip=True)
+                if 'Estadio:' in texto or 'Stadium:' in texto:
+                    # El estadio está en la etiqueta <a> dentro de data-header__content
+                    span_content = li.find('span', class_='data-header__content')
+                    if span_content:
+                        a_tag = span_content.find('a')
+                        if a_tag:
+                            estadio = a_tag.get_text(strip=True)
+                            print(f"✅ Estadio encontrado para {equipo_norm}: {estadio}")
+                            break
+        
+        if not estadio:
+            print(f"⚠️ No se encontró estadio para {equipo_norm}")
+        
+        # ============ EXTRAER JUGADORES ============
         # Buscar tabla principal de plantilla
         tabla = soup.find('table', class_='items')
         
         if not tabla or not tabla.tbody:
             print(f"⚠️ No se encontró tabla de plantilla para {equipo_norm}")
-            return jugadores
+            return jugadores, estadio
         
         filas = tabla.tbody.find_all('tr')
         print(f"[LOG] Procesando {len(filas)} filas de jugadores para {equipo_norm}")
@@ -586,21 +660,23 @@ def procesar_plantilla_equipo(html_content, equipo_norm):
                 continue
         
         print(f"✅ Extraído {len(jugadores)} jugadores de {equipo_norm}")
-        return jugadores
+        return jugadores, estadio
     
     except Exception as e:
         print(f"❌ Error procesando plantilla {equipo_norm}: {e}")
-        return []
+        return [], None
 
 
-def scrapear_plantillas_temporada(código_equipos_to_href, temporada_codigo, carpeta_salida, delay_min=2, delay_max=5):
+def scrapear_plantillas_temporada(código_equipos_to_href, temporada_codigo, carpeta_salida, saison_id=2024, delay_min=2, delay_max=5):
     """
-    Scrapea plantillas de todos los equipos y guarda en CSV.
+    Scrapea plantillas de todos los equipos, extrae datos de jugadores y estadios,
+    guarda jugadores en CSV y actualiza estadios en BD.
     
     Args:
         código_equipos_to_href: Dict {nombre_equipo_norm: href_tm}
         temporada_codigo: Ej. "23_24", "24_25"
         carpeta_salida: Carpeta donde guardar CSVs
+        saison_id: ID de la temporada en Transfermarkt (2023, 2024, 2025, etc.)
         delay_min, delay_max: Delay entre requests
     """
     os.makedirs(carpeta_salida, exist_ok=True)
@@ -608,16 +684,41 @@ def scrapear_plantillas_temporada(código_equipos_to_href, temporada_codigo, car
     ruta_csv = os.path.join(carpeta_salida, f"jugadores_nacionalidad_{temporada_codigo}.csv")
     
     todos_jugadores = []
+    estadios_actualizados = []
     
     for idx, (equipo_norm, href) in enumerate(código_equipos_to_href.items(), 1):
         print(f"\n[{idx}/{len(código_equipos_to_href)}] Procesando {equipo_norm}...")
         
-        html = obtener_plantilla_equipo(href, delay_min, delay_max)
+        html = obtener_plantilla_equipo(href, saison_id=saison_id, delay_min=delay_min, delay_max=delay_max)
         
         if html:
-            jugadores = procesar_plantilla_equipo(html, equipo_norm)
+            # Ahora procesar_plantilla_equipo retorna tupla (jugadores, estadio)
+            jugadores, estadio = procesar_plantilla_equipo(html, equipo_norm)
             todos_jugadores.extend(jugadores)
             
+            # ========== GUARDAR ESTADIO EN BD ==========
+            if estadio:
+                try:
+                    # Mapear nombre normalizado TM al nombre exacto en BD
+                    equipo_bd_nombre = mapear_equipo_tm_a_bd(equipo_norm)
+                    equipo_obj = Equipo.objects.filter(nombre=equipo_bd_nombre).first()
+                    
+                    if equipo_obj:
+                        if equipo_obj.estadio != estadio:
+                            equipo_obj.estadio = estadio
+                            equipo_obj.save()
+                            print(f"✅ Estadio actualizado en BD: {equipo_bd_nombre} -> {estadio}")
+                            estadios_actualizados.append((equipo_bd_nombre, estadio))
+                        else:
+                            print(f"ℹ️ Estadio ya estaba actualizado: {equipo_bd_nombre} -> {estadio}")
+                    else:
+                        print(f"⚠️ No se encontró equipo en BD: {equipo_bd_nombre} (buscado desde: {equipo_norm})")
+                except Exception as e:
+                    print(f"❌ Error actualizando estadio en BD para {equipo_norm}: {e}")
+            else:
+                print(f"⚠️ No se extrajo estadio para {equipo_norm}")
+            
+            # ========== GUARDAR JUGADORES EN CSV ==========
             # Guardar incrementalmente
             if jugadores:
                 with open(ruta_csv, 'a', newline='', encoding='utf-8-sig') as f:
@@ -636,8 +737,14 @@ def scrapear_plantillas_temporada(código_equipos_to_href, temporada_codigo, car
     
     print(f"\n✅ Plantillas guardadas en: {ruta_csv}")
     print(f"📊 Total jugadores: {len(todos_jugadores)}")
+    print(f"🏟️ Total estadios actualizados: {len(estadios_actualizados)}")
+    if estadios_actualizados:
+        print("   Equipos con estadios actualizados:")
+        for equipo, stadium in estadios_actualizados:
+            print(f"   - {equipo}: {stadium}")
     
     return todos_jugadores
+
 
 
 def extraer_hrefs_equipos_desde_clasificacion(html_clasificacion):

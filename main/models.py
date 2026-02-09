@@ -38,7 +38,7 @@ class Temporada(models.Model):
 # ============================================================================
 class Equipo(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    estadio = models.CharField(max_length=150)
+    estadio = models.CharField(max_length=150, blank=True, default='')
 
     class Meta:
         verbose_name = 'Equipo'
@@ -136,6 +136,7 @@ class EquipoJugadorTemporada(models.Model):
     jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE, related_name='equipos_temporada')
     temporada = models.ForeignKey(Temporada, on_delete=models.CASCADE)
     dorsal = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(99)])
+    edad = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(50)])
     partidos_jugados = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
     class Meta:
@@ -295,6 +296,10 @@ class EstadisticasPartidoJugador(models.Model):
     
     # Posición del jugador en el partido
     posicion = models.CharField(max_length=30, choices=Posicion.choices, null=True, blank=True)
+    
+    # Nacionalidad y edad del jugador en el partido
+    nacionalidad = models.CharField(max_length=100, blank=True, default='')
+    edad = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(50)])
 
     class Meta:
         verbose_name = 'Estadísticas Partido Jugador'

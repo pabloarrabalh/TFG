@@ -4,14 +4,16 @@
 SCRIPT UNIFICADO COMPLETO DE CARGA DE DATOS
 
 Carga todos los datos en un único script:
-1. Crea Temporadas, Equipos, Jornadas
-2. Carga EstadisticasPartidoJugador desde CSVs (45 campos)
-3. Carga Roles con fuzzy matching
-4. Calcula y carga Goles en Partidos
-5. Carga ClasificacionJornada desde CSVs
-6. Genera RendimientoHistoricoJugador por agregación
+1. Scrappea plantillas desde Transfermarkt y actualiza estadios
+2. Crea Temporadas, Equipos, Jornadas
+3. Carga EstadisticasPartidoJugador desde CSVs (45 campos)
+4. Carga Roles con fuzzy matching
+5. Calcula y carga Goles en Partidos
+6. Carga ClasificacionJornada desde CSVs
+7. Genera RendimientoHistoricoJugador por agregación
+8. Carga Plantillas por temporada (EquipoJugadorTemporada)
 
-Uso: python cargarTodoUnificado.py
+Uso: python popularDB.py
 """
 
 import os
@@ -22,6 +24,7 @@ import json
 import glob
 import ast
 from datetime import datetime
+import requests
 
 # Configurar Django
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -35,6 +38,10 @@ from main.models import (
 )
 from django.db.models import Sum, Count, Q
 from main.scrapping.alias import MAPEO_POSICIONES_INVERSO
+from main.scrapping.transfermarkt import (
+    scrapear_plantillas_temporada,
+    extraer_hrefs_equipos_desde_clasificacion
+)
 
 # Intentar importar rapidfuzz para fuzzy matching
 try:
@@ -193,8 +200,7 @@ def obtener_o_crear_historial(jugador, equipo, temporada, dorsal):
         equipo=equipo,
         temporada=temporada,
         defaults={
-            'dorsal': dorsal_limpio,
-            'edad': 25
+            'dorsal': dorsal_limpio
         }
     )
     
@@ -224,9 +230,18 @@ def cargar_estadisticas_partido(row, jugador, equipo, partido):
     # Obtener nacionalidad del CSV (puede ser vacío)
     nacionalidad = row.get('nacionalidad', '') if pd.notna(row.get('nacionalidad')) else ''
     
+    # Obtener edad del CSV (puede ser vacío)
+    edad = None
+    if pd.notna(row.get('edad')):
+        try:
+            edad = int(row['edad'])
+        except (ValueError, TypeError):
+            edad = None
+    
     stats = EstadisticasPartidoJugador(
         partido=partido, jugador=jugador,
         nacionalidad=nacionalidad,  # Agregar nacionalidad
+        edad=edad,  # Agregar edad
         min_partido=int(row['min_partido']) if pd.notna(row['min_partido']) else 0,
         titular=bool(row['titular']) if pd.notna(row['titular']) else False,
         gol_partido=int(row['gol_partido']) if pd.notna(row['gol_partido']) else 0,
@@ -403,6 +418,108 @@ def procesar_csv_partido(ruta_csv, temporada):
     except Exception as e:
         print(f"  ❌ Error procesando partido en {ruta_csv}: {e}")
         return False
+
+
+def fase_0_scrapear_plantillas_y_estadios():
+    """
+    FASE 0: Scrapea plantillas desde Transfermarkt para MÚLTIPLES TEMPORADAS
+    y actualiza estadios en BD para cada una.
+    Se ejecuta ANTES de cargar otros datos para asegurar que todos los equipos
+    tienen estadios actualizados en el modelo Equipo.
+    """
+    print("\n" + "=" * 70)
+    print("FASE 0: SCRAPEAR PLANTILLAS Y ACTUALIZAR ESTADIOS (MÚLTIPLES TEMPORADAS)")
+    print("=" * 70)
+    
+    # Definir temporadas a scrapear: temporada_display, saison_id, temporada_codigo
+    temporadas_to_scrap = [
+        ('23/24', 2023, '23_24'),
+        ('24/25', 2024, '24_25'),
+        ('25/26', 2025, '25_26'),
+    ]
+    
+    total_estadios_updated = 0
+    
+    try:
+        for temporada_display, saison_id, temporada_codigo in temporadas_to_scrap:
+            print(f"\n{'─' * 70}")
+            print(f"Scrapando Transfermarkt Temporada {temporada_display} (saison_id={saison_id})")
+            print(f"{'─' * 70}")
+            
+            # Paso 1: Descargar clasificación para obtener hrefs de todos los equipos
+            print(f"\n[0.1] Descargando clasificación de La Liga {temporada_display}...")
+            BASE_URL = "https://www.transfermarkt.es/laliga/spieltagtabelle/wettbewerb/ES1"
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+            
+            try:
+                resp = requests.get(
+                    f"{BASE_URL}?saison_id={saison_id}",
+                    headers=headers,
+                    timeout=15
+                )
+                
+                if resp.status_code != 200:
+                    print(f"⚠️  Error descargando clasificación: Status {resp.status_code}")
+                    continue
+                
+                print("✅ Clasificación descargada correctamente")
+            except Exception as e:
+                print(f"⚠️  Error descargando clasificación: {e}")
+                continue
+            
+            # Paso 2: Extraer hrefs de todos los equipos
+            print(f"\n[0.2] Extrayendo URLs de plantillas de todos los equipos...")
+            equipos_href = extraer_hrefs_equipos_desde_clasificacion(resp.text)
+            
+            if not equipos_href:
+                print("⚠️  No se encontraron equipos en la clasificación")
+                continue
+            
+            print(f"✅ Se encontraron {len(equipos_href)} equipos")
+            
+            # Paso 3: Scrapear plantillas para esta temporada
+            print(f"\n[0.3] Scrapendo plantillas para {temporada_display}...")
+            print("⏳ Esto puede tomar varios minutos (hay delay entre requests)...\n")
+            
+            carpeta_plantillas = os.path.join("csv", "csvGenerados", "plantillas")
+            
+            # scrapear_plantillas_temporada ahora incluye saison_id
+            todos_jugadores = scrapear_plantillas_temporada(
+                código_equipos_to_href=equipos_href,
+                temporada_codigo=temporada_codigo,
+                carpeta_salida=carpeta_plantillas,
+                saison_id=saison_id,
+                delay_min=2,
+                delay_max=5
+            )
+            
+            # Mostrar resumen temporal
+            print(f"\n✓ Temporada {temporada_display} completada")
+            print(f"  - Jugadores extraídos: {len(todos_jugadores)}")
+        
+        # Mostrar resumen final de cobertura de estadios
+        print("\n" + "=" * 70)
+        print("RESUMEN FASE 0 - COBERTURA DE ESTADIOS EN BD:")
+        print("=" * 70)
+        
+        equipos_con_estadio = Equipo.objects.exclude(estadio__exact='').count()
+        equipos_total = Equipo.objects.count()
+        
+        print(f"\n📊 Estadios en BD:")
+        print(f"   • Total equipos: {equipos_total}")
+        print(f"   • Con estadio: {equipos_con_estadio}")
+        print(f"   • Cobertura: {100*equipos_con_estadio/equipos_total:.1f}%")
+        
+        print("\n✅ Fase 0 completada exitosamente")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error en Fase 0: {e}")
+        import traceback
+        traceback.print_exc()
+        print("\n⚠️  Fase 0 falló - continuando sin actualizar estadios")
+        return False
+
 
 def fase_1_cargar_partidos_y_estadisticas():
     """FASE 1: Carga partidos y estadísticas iniciales."""
@@ -725,6 +842,8 @@ def fase_2e_poblar_equipo_jugador_temporada():
     print("FASE 2e: POBLAR EQUIPO-JUGADOR-TEMPORADA")
     print("=" * 70)
     
+    from django.db.models import Max
+    
     temporadas = Temporada.objects.all()
     total_creados = 0
     
@@ -748,7 +867,14 @@ def fase_2e_poblar_equipo_jugador_temporada():
             jugador_id = stat['jugador_id']
             partidos_count = stat['count']
             
-            # Obtener del historial para sacar equipo, dorsal, edad
+            # Obtener la edad máxima de este jugador en esta temporada
+            edad_max = (
+                EstadisticasPartidoJugador.objects
+                .filter(jugador_id=jugador_id, partido__jornada__temporada=temporada, edad__isnull=False)
+                .aggregate(max_edad=Max('edad'))['max_edad']
+            )
+            
+            # Obtener del historial para sacar equipo, dorsal
             historial = (
                 HistorialEquiposJugador.objects
                 .filter(jugador_id=jugador_id, temporada=temporada)
@@ -763,6 +889,7 @@ def fase_2e_poblar_equipo_jugador_temporada():
                     temporada=temporada,
                     defaults={
                         'dorsal': historial.dorsal,
+                        'edad': edad_max,
                         'partidos_jugados': partidos_count,
                     }
                 )
@@ -791,7 +918,7 @@ def fase_2e_poblar_equipo_jugador_temporada():
                             temporada=temporada,
                             defaults={
                                 'dorsal': 0,
-                                'edad': 0,
+                                'edad': edad_max,
                                 'partidos_jugados': partidos_count,
                             }
                         )
@@ -811,6 +938,7 @@ def fase_2e_poblar_equipo_jugador_temporada():
     return total
 
 
+
 def main():
     """Función principal: ejecuta todas las fases."""
     
@@ -818,12 +946,16 @@ def main():
     print("CARGA COMPLETA UNIFICADA DE TODOS LOS DATOS")
     print("=" * 70)
     print("\nEste script carga TODO en una sola ejecución:")
+    print("0. Scrapea plantillas desde Transfermarkt y actualiza estadios")
     print("1. Partidos y Estadísticas (45 campos)")
     print("2. Roles con fuzzy matching")
     print("3. Goles en Partidos")
     print("4. Clasificación Jornada")
     print("5. Rendimiento Histórico de Jugadores")
     print("6. Equipo-Jugador-Temporada (Plantillas por temporada)")
+    
+    # FASE 0: Scrapear plantillas y actualizar estadios (PRIMERO)
+    fase_0_scrapear_plantillas_y_estadios()
     
     # FASE 1: Partidos y Estadísticas
     fase_1_cargar_partidos_y_estadisticas()
@@ -852,16 +984,22 @@ def main():
     rendimiento_count = RendimientoHistoricoJugador.objects.count()
     equipo_jugador_temp = EquipoJugadorTemporada.objects.count()
     
+    # Revisar cobertura de estadios
+    equipos_con_estadio = Equipo.objects.exclude(estadio__exact='').count()
+    equipos_total = Equipo.objects.count()
+    
     print(f"\nDatos complementarios:")
     print(f"  - Roles: {roles_count} estadísticas")
     print(f"  - Goles: {goles_count} partidos")
     print(f"  - Clasificación: {clasificacion_count} registros")
     print(f"  - Rendimiento: {rendimiento_count} registros")
     print(f"  - Plantillas por Temporada: {equipo_jugador_temp} registros")
+    print(f"  - Estadios: {equipos_con_estadio}/{equipos_total} equipos ({100*equipos_con_estadio/equipos_total:.1f}%)")
     
     print("\n" + "=" * 70)
     print("[OK] CARGA COMPLETADA - TODO LISTO EN LA BASE DE DATOS")
     print("=" * 70)
+
 
 if __name__ == '__main__':
     main()
