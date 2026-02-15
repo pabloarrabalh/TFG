@@ -294,7 +294,7 @@ function crearJugadorCard(jugador, posicion, esVacio = false, indice = 0) {
     const puntos = jugador.puntos_fantasy_25_26 || 0;
     
     return `
-        <div class="jugador-existente-btn player-card ${colorClasses[posicion]} rounded-xl p-4 text-center shadow-lg cursor-move min-w-[160px] hover:scale-105 transition-all relative" 
+        <div class="jugador-existente-btn player-card ${colorClasses[posicion]} rounded-xl p-4 text-center shadow-lg cursor-move min-w-[160px] hover:scale-105 transition-all relative drop-zone" 
              draggable="true" 
              data-jugador-id="${jugador.id}" 
              data-posicion="${posicion}" 
@@ -365,7 +365,7 @@ function renderizarBanquillo() {
             };
             
             banquillo.innerHTML += `
-                <div class="jugador-existente-btn player-card ${colorClasses[suplente.posicion]} rounded-xl p-4 text-center shadow-lg cursor-move min-w-[160px] hover:scale-105 transition-all relative" 
+                <div class="jugador-existente-btn player-card ${colorClasses[suplente.posicion]} rounded-xl p-4 text-center shadow-lg cursor-move min-w-[160px] hover:scale-105 transition-all relative drop-zone" 
                      draggable="true" 
                      data-jugador-id="${suplente.id}" 
                      data-posicion="Suplentes" 
@@ -373,7 +373,7 @@ function renderizarBanquillo() {
                      data-posicion-original="${suplente.posicion}"
                      style="touch-action: none;">
                     <button class="btn-eliminar-jugador absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold transition-all pointer-events-auto" data-jugador-id="${suplente.id}" title="Eliminar jugador">
-                        ✕
+                        ✕b
                     </button>
                     <div class="size-14 bg-white/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
                         <span class="text-lg font-bold text-white">${iniciales}</span>
@@ -388,7 +388,7 @@ function renderizarBanquillo() {
         } else {
             // Mostrar slot vacío con +
             banquillo.innerHTML += `
-                <div class="suplente-vacio-btn player-card bg-surface-dark slot-empty rounded-xl p-4 text-center shadow-lg cursor-pointer min-w-[160px] hover:bg-white/10 transition-all flex flex-col items-center justify-center h-40" data-indice="${i}">
+                <div class="suplente-vacio-btn player-card bg-surface-dark slot-empty rounded-xl p-4 text-center shadow-lg cursor-pointer min-w-[160px] hover:bg-white/10 transition-all flex flex-col items-center justify-center h-40 drop-zone" data-indice="${i}" data-posicion="Suplentes">
                     <span class="material-symbols-outlined text-gray-500 text-5xl mb-3">add</span>
                     <span class="text-sm text-gray-500 font-bold">Añadir</span>
                 </div>
@@ -606,7 +606,7 @@ function seleccionarJugador(jugadorId, nombre, apellido, posicion, esSuplente = 
     };
     
     // Si se especifica un índice de slot, asignar exactamente en ese índice
-    if (indiceSlotActual !== null && !esSuplente) {
+    if (indiceSlotActual !== null) {
         // Llenar slots anteriores si es necesario (para evitar undefined)
         while (alineacionActual[targetPosicion].length < indiceSlotActual) {
             alineacionActual[targetPosicion].push(null);
@@ -698,7 +698,9 @@ document.addEventListener('click', function(event) {
     // Botón para añadir suplente
     if (event.target.closest('.suplente-vacio-btn')) {
         event.preventDefault();
-        abrirModalSeleccionar('Suplentes', true);
+        const btn = event.target.closest('.suplente-vacio-btn');
+        const indice = parseInt(btn.getAttribute('data-indice')) || 0;
+        abrirModalSeleccionar('Suplentes', true, indice);
         return;
     }
 });
@@ -727,8 +729,7 @@ document.addEventListener('dragstart', function(event) {
     
     console.log('DRAGSTART - FromPosicion:', draggedFromPosicion, 'FromIndice:', draggedFromIndice);
     console.log('posicionOriginal:', draggedJugador.posicionOriginal);
-    console.log('alineacionActual[draggedFromPosicion]:', alineacionActual[draggedFromPosicion]);
-    console.log('alineacionActual[draggedFromPosicion][draggedFromIndice]:', alineacionActual[draggedFromPosicion]?.[draggedFromIndice]);
+    console.log('Es del banquillo:', draggedFromPosicion === 'Suplentes');
     
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('text/html', jugador.innerHTML);
@@ -762,7 +763,7 @@ document.addEventListener('dragover', function(event) {
     
     // Buscar qué elemento está bajo el cursor
     let dropZone = null;
-    const allZones = document.querySelectorAll('.jugador-vacio-btn, .jugador-existente-btn');
+    const allZones = document.querySelectorAll('.drop-zone, .jugador-vacio-btn, .jugador-existente-btn');
     
     allZones.forEach(zone => {
         const rect = zone.getBoundingClientRect();
@@ -774,8 +775,21 @@ document.addEventListener('dragover', function(event) {
         if (isOver) {
             const zonePosicion = zone.getAttribute('data-posicion');
             
-            if (zonePosicion && zonePosicion === draggedJugador.posicionOriginal) {
-                dropZone = zone;
+            if (zonePosicion) {
+                let esValido = false;
+                
+                // Si arrastra del banquillo, solo permitir en su posición original
+                if (draggedFromPosicion === 'Suplentes') {
+                    esValido = zonePosicion === draggedJugador.posicionOriginal;
+                } 
+                // Si arrastra del campo, permitir en la misma posición o al banquillo
+                else {
+                    esValido = zonePosicion === draggedJugador.posicionOriginal || zonePosicion === 'Suplentes';
+                }
+                
+                if (esValido) {
+                    dropZone = zone;
+                }
             }
         }
     });
@@ -805,7 +819,7 @@ document.addEventListener('drop', function(event) {
     
     // Buscar qué elemento está bajo el cursor
     let dropZone = null;
-    const allZones = document.querySelectorAll('.jugador-vacio-btn, .jugador-existente-btn');
+    const allZones = document.querySelectorAll('.drop-zone, .jugador-vacio-btn, .jugador-existente-btn');
     console.log('Zonas encontradas:', allZones.length);
     
     allZones.forEach((zone, idx) => {
@@ -832,14 +846,28 @@ document.addEventListener('drop', function(event) {
     const targetIndice = parseInt(dropZone.getAttribute('data-indice'));
     
     console.log('Target posición:', targetPosicion, 'Dragged posición original:', draggedJugador.posicionOriginal);
+    console.log('Arrastrando desde:', draggedFromPosicion);
     
-    // Validar que sea la misma posición
-    if (!targetPosicion || targetPosicion !== draggedJugador.posicionOriginal) {
-        mostrarNotificacion(`No puedes mover a un jugador a una posición diferente a la suya`, 'error');
-        return;
+    // Validar destino según origen
+    let esMovimientoValido = false;
+    
+    if (draggedFromPosicion === 'Suplentes') {
+        // Del banquillo: solo permitir mover a su posición original
+        esMovimientoValido = targetPosicion === draggedJugador.posicionOriginal;
+        if (!esMovimientoValido) {
+            mostrarNotificacion(`Este jugador es ${draggedJugador.posicionOriginal}, no lo puedes colocar en ${targetPosicion}`, 'error');
+            return;
+        }
+    } else {
+        // Del campo: permitir a la misma posición o al banquillo
+        esMovimientoValido = targetPosicion === draggedJugador.posicionOriginal || targetPosicion === 'Suplentes';
+        if (!esMovimientoValido) {
+            mostrarNotificacion(`No puedes mover a un jugador a una posición diferente a la suya`, 'error');
+            return;
+        }
     }
     
-    // Si es el mismo slot, no hacer nada
+    // Si es el mismo slot y no es un movimiento al banquillo, no hacer nada
     if (targetPosicion === draggedFromPosicion && targetIndice === draggedFromIndice) {
         console.log('Mismo slot, ignorando');
         return;
@@ -849,15 +877,37 @@ document.addEventListener('drop', function(event) {
     const jugadorEnTarget = alineacionActual[targetPosicion]?.[targetIndice];
     
     console.log('Jugador arrastrado:', jugadorArrastrado);
+    console.log('Jugador en target:', jugadorEnTarget);
     
     if (!jugadorArrastrado) {
         console.log('No hay jugador arrastrado');
         return;
     }
     
-    if (jugadorEnTarget && jugadorEnTarget !== null) {
+    // CASO 1: Mover al banquillo
+    if (targetPosicion === 'Suplentes') {
+        console.log('MOVIMIENTO AL BANQUILLO');
+        
+        // Si el slot en el banquillo está vacío, simplemente mover
+        if (!jugadorEnTarget || jugadorEnTarget === null) {
+            alineacionActual[targetPosicion][targetIndice] = jugadorArrastrado;
+            alineacionActual[draggedFromPosicion][draggedFromIndice] = null;
+            renderizarCampo();
+            renderizarBanquillo();
+            mostrarNotificacion(`${jugadorArrastrado.nombre} movido al banquillo`, 'success');
+        } else {
+            // Si hay otro jugador en el banquillo, intercambiar
+            alineacionActual[targetPosicion][targetIndice] = jugadorArrastrado;
+            alineacionActual[draggedFromPosicion][draggedFromIndice] = jugadorEnTarget;
+            renderizarCampo();
+            renderizarBanquillo();
+            mostrarNotificacion(`${jugadorArrastrado.nombre} movido al banquillo`, 'success');
+        }
+    } 
+    // CASO 2: Mover en el campo (misma posición)
+    else if (jugadorEnTarget && jugadorEnTarget !== null) {
         // INTERCAMBIAR posiciones
-        console.log('INTERCAMBIANDO');
+        console.log('INTERCAMBIANDO EN CAMPO');
         alineacionActual[targetPosicion][targetIndice] = jugadorArrastrado;
         alineacionActual[draggedFromPosicion][draggedFromIndice] = jugadorEnTarget;
         
@@ -865,8 +915,8 @@ document.addEventListener('drop', function(event) {
         renderizarBanquillo();
         mostrarNotificacion(`${jugadorArrastrado.nombre} e ${jugadorEnTarget.nombre} han intercambiado posiciones`, 'success');
     } else {
-        // Slot vacío: simplemente mover
-        console.log('MOVIMIENTO A SLOT VACÍO desde:', draggedFromPosicion);
+        // Slot vacío en campo: simplemente mover
+        console.log('MOVIMIENTO A SLOT VACÍO EN CAMPO');
         alineacionActual[targetPosicion][targetIndice] = jugadorArrastrado;
         alineacionActual[draggedFromPosicion][draggedFromIndice] = null;
         
