@@ -1,8 +1,16 @@
 {% extends 'base.html' %}
+{% load team_filters %}
+{% load static %}
 
 {% block title %}LigaMaster - Menu Principal{% endblock %}
 
 {% block content %}
+<style>
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #10b981; border-radius: 9999px; }
+    .custom-scrollbar { scrollbar-width: thin; scrollbar-color: #10b981 transparent; }
+</style>
 <div class="p-6 space-y-6 bg-background-dark min-h-full">
     <!-- Header de Bienvenida -->
     <div class="mb-8">
@@ -11,24 +19,20 @@
     </div>
 
     <!-- Grid principal -->
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 h-full max-w-screen-2xl mx-auto">
-        <!-- Clasificación (Columna izquierda) -->
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 max-w-screen-2xl mx-auto">
+        <!-- Columna izquierda: Clasificación y Próximos Partidos (más estrecha) -->
         <div class="xl:col-span-4 space-y-6">
             <!-- Clasificación LaLiga -->
             <div class="glass-panel rounded-2xl overflow-hidden">
                 <div class="p-6 border-b border-white/10">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-gradient-to-r from-orange-500 to-red-600 rounded-xl p-3">
-                                <span class="material-symbols-outlined text-white text-xl font-bold">emoji_events</span>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-black text-white">Clasificación</h3>
-                                <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">LaLiga EA Sports</p>
-                            </div>
+                    <div class="flex items-center justify-between gap-3 mb-4">
+                        <div class="flex items-center gap-2">
+                            <img src="{% static 'logos/laliga.png' %}" alt="LaLiga" class="h-8 object-contain" onerror="this.style.display='none'">
+                            <span class="text-sm font-bold text-white">LaLiga</span>
                         </div>
-                        <span class="text-xs text-gray-500 font-bold uppercase tracking-widest">J15</span>
+                        <span class="text-xs text-gray-500 font-bold uppercase tracking-widest">J{{ jornada_actual.numero_jornada }}</span>
                     </div>
+                    <h3 class="text-xl font-black text-white">Clasificación</h3>
                 </div>
                 <div class="overflow-hidden">
                     <table class="w-full">
@@ -40,55 +44,29 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Ejemplo de filas - estas serían generadas dinámicamente -->
+                            {% for equipo_reg in clasificacion_top %}
                             <tr class="hover:bg-white/5 border-b border-white/5 group transition-colors">
-                                <td class="px-6 py-4 text-sm font-bold text-primary group-hover:text-primary">1</td>
+                                <td class="px-6 py-4 text-sm font-bold text-primary group-hover:text-primary">{{ equipo_reg.posicion }}</td>
                                 <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="size-8 bg-gradient-to-br from-blue-600 to-red-700 rounded-lg flex items-center justify-center">
-                                            <span class="text-xs font-bold text-white">FCB</span>
-                                        </div>
+                                    <a href="{% url 'equipo' equipo_reg.equipo.nombre %}" class="flex items-center gap-3 hover:text-primary transition-colors">
+                                        <img src="{% static 'escudos/' %}{{ equipo_reg.equipo.nombre|shield_name }}.png" 
+                                             alt="{{ equipo_reg.equipo.nombre }}" 
+                                             class="size-8 rounded-lg object-contain"
+                                             onerror="this.style.display='none'">
                                         <div>
-                                            <p class="font-bold text-white text-sm">FC Barcelona</p>
+                                            <p class="font-bold text-white text-sm">{{ equipo_reg.equipo.nombre }}</p>
                                         </div>
-                                    </div>
+                                    </a>
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <span class="bg-primary/20 text-primary px-3 py-1.5 rounded-lg text-sm font-bold">37</span>
+                                    <span class="{% if equipo_reg.posicion == 1 %}bg-primary/20 text-primary{% else %}bg-white/20 text-white{% endif %} px-3 py-1.5 rounded-lg text-sm font-bold">{{ equipo_reg.puntos }}</span>
                                 </td>
                             </tr>
-                            <tr class="hover:bg-white/5 border-b border-white/5 group transition-colors">
-                                <td class="px-6 py-4 text-sm font-bold group-hover:text-primary">2</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="size-8 bg-gradient-to-br from-white to-gray-300 rounded-lg flex items-center justify-center">
-                                            <span class="text-xs font-bold text-black">RMA</span>
-                                        </div>
-                                        <div>
-                                            <p class="font-bold text-white text-sm">Real Madrid</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <span class="bg-white/20 text-white px-3 py-1.5 rounded-lg text-sm font-bold">36</span>
-                                </td>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="px-6 py-8 text-center text-gray-500">No hay datos de clasificación disponibles</td>
                             </tr>
-                            <tr class="hover:bg-white/5 border-b border-white/5 group transition-colors">
-                                <td class="px-6 py-4 text-sm font-bold group-hover:text-primary">3</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="size-8 bg-gradient-to-br from-red-600 to-white rounded-lg flex items-center justify-center">
-                                            <span class="text-xs font-bold text-white">ATM</span>
-                                        </div>
-                                        <div>
-                                            <p class="font-bold text-white text-sm">Atlético Madrid</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <span class="bg-white/20 text-white px-3 py-1.5 rounded-lg text-sm font-bold">32</span>
-                                </td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -99,10 +77,7 @@
                     </a>
                 </div>
             </div>
-        </div>
 
-        <!-- Contenido central -->
-        <div class="xl:col-span-8 space-y-6">
             <!-- Próximos Partidos -->
             <div class="glass-panel rounded-2xl p-6">
                 <div class="flex items-center justify-between mb-6">
@@ -112,136 +87,142 @@
                         </div>
                         <div>
                             <h3 class="text-xl font-black text-white">Próximos Partidos</h3>
-                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Jornada 16</p>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">{% if proxima_jornada %}Jornada {{ proxima_jornada.numero_jornada }}{% else %}Próxima jornada{% endif %}</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Lista de partidos -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <!-- Ejemplo de partido -->
-                    <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="size-10 bg-gradient-to-br from-blue-600 to-red-700 rounded-lg flex items-center justify-center">
-                                    <span class="text-xs font-bold text-white">FCB</span>
-                                </div>
-                                <div>
-                                    <p class="font-bold text-white text-sm">Barcelona</p>
+                {% if partidos_proxima_jornada %}
+                <div class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
+                    {% for partido in partidos_proxima_jornada %}
+                    <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 hover:border-primary/50 transition-all">
+                        <div class="flex items-center justify-between gap-2">
+                            <a href="{% url 'equipo' partido.equipo_local.nombre %}" class="flex items-center gap-2 min-w-0 hover:text-primary transition-colors">
+                                <img src="{% static 'escudos/' %}{{ partido.equipo_local.nombre|shield_name }}.png" 
+                                     alt="{{ partido.equipo_local.nombre }}" 
+                                     class="size-10 object-contain flex-shrink-0"
+                                     onerror="this.style.display='none'">
+                                <div class="min-w-0">
+                                    <p class="font-bold text-white text-xs truncate">{{ partido.equipo_local.nombre }}</p>
                                     <p class="text-xs text-gray-400">Local</p>
                                 </div>
-                            </div>
-                            <div class="text-center">
+                            </a>
+                            <div class="text-center flex-shrink-0">
                                 <p class="text-xs text-gray-400 font-bold">VS</p>
-                                <p class="text-xs text-primary font-bold">21:00</p>
+                                <p class="text-xs text-primary font-bold">{% if partido.hora %}{{ partido.hora|time:"H:i" }}{% else %}Por definir{% endif %}</p>
+                                <p class="text-xs text-gray-500 font-bold">{% if partido.fecha %}{{ partido.fecha|date:"d/m" }}{% endif %}</p>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <div>
-                                    <p class="font-bold text-white text-sm text-right">Valencia</p>
+                            <a href="{% url 'equipo' partido.equipo_visitante.nombre %}" class="flex items-center gap-2 min-w-0 flex-row-reverse hover:text-primary transition-colors">
+                                <img src="{% static 'escudos/' %}{{ partido.equipo_visitante.nombre|shield_name }}.png" 
+                                     alt="{{ partido.equipo_visitante.nombre }}" 
+                                     class="size-10 object-contain flex-shrink-0"
+                                     onerror="this.style.display='none'">
+                                <div class="min-w-0">
+                                    <p class="font-bold text-white text-xs truncate text-right">{{ partido.equipo_visitante.nombre }}</p>
                                     <p class="text-xs text-gray-400 text-right">Visitante</p>
                                 </div>
-                                <div class="size-10 bg-gradient-to-br from-orange-500 to-black rounded-lg flex items-center justify-center">
-                                    <span class="text-xs font-bold text-white">VCF</span>
-                                </div>
-                            </div>
+                            </a>
                         </div>
                     </div>
-
-                    <!-- Segundo partido -->
-                    <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="size-10 bg-gradient-to-br from-white to-gray-300 rounded-lg flex items-center justify-center">
-                                    <span class="text-xs font-bold text-black">RMA</span>
-                                </div>
-                                <div>
-                                    <p class="font-bold text-white text-sm">Real Madrid</p>
-                                    <p class="text-xs text-gray-400">Local</p>
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-xs text-gray-400 font-bold">VS</p>
-                                <p class="text-xs text-primary font-bold">16:15</p>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <div>
-                                    <p class="font-bold text-white text-sm text-right">Sevilla</p>
-                                    <p class="text-xs text-gray-400 text-right">Visitante</p>
-                                </div>
-                                <div class="size-10 bg-gradient-to-br from-red-600 to-white rounded-lg flex items-center justify-center">
-                                    <span class="text-xs font-bold text-white">SEV</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
+                {% else %}
+                <div class="text-center text-gray-400 py-8">
+                    <span class="material-symbols-outlined text-4xl mb-2">schedule</span>
+                    <p>No hay partidos programados</p>
+                </div>
+                {% endif %}
             </div>
+        </div>
 
-            <!-- Jugadores Recomendados -->
+        <!-- Columna derecha: Equipos Favoritos y Jugadores Destacados -->
+        <div class="xl:col-span-8 space-y-6">
+            {% if user.is_authenticated and partidos_favoritos %}
             <div class="glass-panel rounded-2xl p-6">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
-                        <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-3">
-                            <span class="material-symbols-outlined text-white text-xl font-bold">star</span>
+                        <div class="bg-gradient-to-r from-primary to-green-500 rounded-xl p-3">
+                            <span class="material-symbols-outlined text-white text-xl font-bold">favorite</span>
                         </div>
                         <div>
-                            <h3 class="text-xl font-black text-white">Jugadores Recomendados</h3>
-                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Para tu plantilla</p>
+                            <h3 class="text-xl font-black text-white">Tus Equipos Favoritos</h3>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Próximos Partidos - Jornada {{ proxima_jornada.numero_jornada }}</p>
                         </div>
                     </div>
-                    <a href="{% url 'mi_plantilla' %}" class="text-sm text-primary hover:text-primary-dark transition-colors font-bold">Ver todos</a>
                 </div>
 
-                <!-- Grid de jugadores -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Ejemplo de jugador -->
-                    <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all group cursor-pointer">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="size-12 bg-gradient-to-br from-primary to-blue-500 rounded-xl flex items-center justify-center">
-                                <span class="text-lg font-bold text-black">LM</span>
+                <!-- Lista de partidos de equipo favoritos -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {% for partido in partidos_favoritos %}
+                    <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
+                        <div class="flex items-center justify-between">
+                            <a href="{% url 'equipo' partido.equipo_local.nombre %}" class="flex items-center gap-3 hover:text-primary transition-colors">
+                                <img src="{% static 'escudos/' %}{{ partido.equipo_local.nombre|shield_name }}.png" 
+                                     alt="{{ partido.equipo_local.nombre }}" 
+                                     class="size-10 object-contain"
+                                     onerror="this.style.display='none'">
+                                <div>
+                                    <p class="font-bold text-white text-sm">{{ partido.equipo_local.nombre }}</p>
+                                    <p class="text-xs text-gray-400">Local</p>
+                                </div>
+                            </a>
+                            <div class="text-center">
+                                <p class="text-xs text-gray-400 font-bold">VS</p>
+                                <p class="text-xs text-primary font-bold">{% if partido.hora %}{{ partido.hora|time:"H:i" }}{% else %}Por definir{% endif %}</p>
+                                <p class="text-xs text-gray-500 font-bold">{% if partido.fecha %}{{ partido.fecha|date:"d/m" }}{% endif %}</p>
                             </div>
-                            <div class="flex-1">
-                                <p class="font-bold text-white text-sm group-hover:text-primary transition-colors">Lionel Messi</p>
-                                <p class="text-xs text-gray-400">Delantero • Barcelona</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="bg-primary/20 text-primary px-2 py-1 rounded font-bold">94</span>
-                            <span class="text-gray-400">€50M</span>
-                        </div>
-                    </div>
-
-                    <!-- Segundo jugador -->
-                    <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all group cursor-pointer">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="size-12 bg-gradient-to-br from-white to-gray-300 rounded-xl flex items-center justify-center">
-                                <span class="text-lg font-bold text-black">KB</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-bold text-white text-sm group-hover:text-primary transition-colors">Karim Benzema</p>
-                                <p class="text-xs text-gray-400">Delantero • Real Madrid</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="bg-white/20 text-white px-2 py-1 rounded font-bold">91</span>
-                            <span class="text-gray-400">€45M</span>
+                            <a href="{% url 'equipo' partido.equipo_visitante.nombre %}" class="flex items-center gap-3 hover:text-primary transition-colors flex-row-reverse">
+                                <div>
+                                    <p class="font-bold text-white text-sm text-right">{{ partido.equipo_visitante.nombre }}</p>
+                                    <p class="text-xs text-gray-400 text-right">Visitante</p>
+                                </div>
+                                <img src="{% static 'escudos/' %}{{ partido.equipo_visitante.nombre|shield_name }}.png" 
+                                     alt="{{ partido.equipo_visitante.nombre }}" 
+                                     class="size-10 object-contain"
+                                     onerror="this.style.display='none'">
+                            </a>
                         </div>
                     </div>
-
-                    <!-- Tercer jugador -->
-                    <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all group cursor-pointer">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="size-12 bg-gradient-to-br from-red-600 to-white rounded-xl flex items-center justify-center">
-                                <span class="text-lg font-bold text-white">JS</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-bold text-white text-sm group-hover:text-primary transition-colors">João Suárez</p>
-                                <p class="text-xs text-gray-400">Centrocampista • Atlético</p>
-                            </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% elif user.is_authenticated %}
+            <div class="glass-panel rounded-2xl p-6 text-center">
+                <span class="material-symbols-outlined text-4xl text-gray-400 mb-2">favorite_border</span>
+                <p class="text-gray-400 text-sm">No tienes equipos favoritos seleccionados</p>
+                <a href="{% url 'select_favorite_teams' %}" class="text-primary hover:text-primary-dark transition-colors text-sm font-bold mt-2 inline-block">Selecciona tus favoritos</a>
+            </div>
+            {% else %}
+            <div class="glass-panel rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-gradient-to-r from-primary to-green-500 rounded-xl p-3">
+                            <span class="material-symbols-outlined text-white text-xl font-bold">favorite</span>
                         </div>
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="bg-red-500/20 text-red-400 px-2 py-1 rounded font-bold">88</span>
-                            <span class="text-gray-400">€35M</span>
+                        <div>
+                            <h3 class="text-xl font-black text-white">Tus Equipos Favoritos</h3>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Próximos Partidos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <p class="text-gray-400 text-sm">Inicia sesión para seleccionar y ver tus equipos favoritos</p>
+                    <a href="{% url 'login_register' %}" class="text-primary hover:text-primary-dark transition-colors text-sm font-bold mt-2 inline-block">Inicia sesión / Regístrate</a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Jugadores Destacados de la Próxima Jornada -->
+            <div class="glass-panel rounded-2xl p-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl p-3">
+                            <span class="material-symbols-outlined text-white text-xl font-bold">trending_up</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black text-white">Jugadores Destacados</h3>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Próxima Jornada - J{{ proxima_jornada.numero_jornada }}</p>
                         </div>
                     </div>
                 </div>

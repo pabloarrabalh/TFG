@@ -138,6 +138,10 @@ class EquipoJugadorTemporada(models.Model):
     dorsal = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(99)])
     edad = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(50)])
     partidos_jugados = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    
+    # Campos para almacenar percentiles precalculados (JSON)
+    posicion = models.CharField(max_length=20, null=True, blank=True)  # Portero, Defensa, Centrocampista, Delantero
+    percentiles = models.JSONField(default=dict, blank=True)  # { ataque: { goles: 50, ... }, ... }
 
     class Meta:
         verbose_name = 'Equipo Jugador Temporada'
@@ -360,3 +364,44 @@ class RendimientoHistoricoJugador(models.Model):
 
     def __str__(self):
         return f"{self.jugador} - {self.temporada.nombre} ({self.equipo.nombre})"
+
+# ============================================================================
+# TABLA: PERFIL DE USUARIO
+# ============================================================================
+class UserProfile(models.Model):
+    STATUS_CHOICES = [
+        ('active', 'Activo'),
+        ('away', 'Ausente'),
+        ('dnd', 'No molestar'),
+    ]
+    
+    user = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='profile')
+    nickname = models.CharField(max_length=100, blank=True, default='')
+    foto = models.FileField(upload_to='profile_pics/%Y/%m/%d/', null=True, blank=True)
+    estado = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
+    plantilla_guardada = models.TextField(blank=True, default='{}')  # JSON con la alineación guardada
+
+    class Meta:
+        verbose_name = 'Perfil de Usuario'
+        verbose_name_plural = 'Perfiles de Usuarios'
+
+    def __str__(self):
+        return f"{self.user.username} - {self.nickname}"
+
+
+# ============================================================================
+# TABLA: EQUIPOS FAVORITOS DEL USUARIO
+# ============================================================================
+class EquipoFavorito(models.Model):
+    usuario = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='equipos_favoritos')
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
+    fecha_agregado = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Equipo Favorito'
+        verbose_name_plural = 'Equipos Favoritos'
+        unique_together = ('usuario', 'equipo')
+        ordering = ['equipo__nombre']
+
+    def __str__(self):
+        return f"{self.usuario.username} - {self.equipo.nombre}"

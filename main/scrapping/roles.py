@@ -13,7 +13,7 @@ MAPEO_CAPTION_A_ROL = {
     "Goals": "goles",
     "Goals/90": "goles_90",
     "Assists": "asistencias",
-    "Assists/90": "asistencias_90",
+    "Assists/90": "asistencias/90min",
     "Penalty Kicks Made": "penaltis_marcados",
     "Shots on Target": "tiros_puerta",
     "Goals/Shot": "goles_por_tiro",
@@ -35,6 +35,34 @@ MAPEO_CAPTION_A_ROL = {
     "Clean Sheets": "porterias_cero",
     "Saves": "paradas",
     "Save Percentage": "save_pct",
+}
+
+DESCRIPCIONES_ROLES = {
+    "goles": "¡Este jugador es un gran finalizador! Te asegura goles si lo incluyes en tu plantilla.",
+    "goles_90": "¡Altamente productivo por cada 90 minutos! Es de los máximos goleadores dados sus minutos.",
+    "asistencias": "¡Gran asistente: siempre encuentra al compañero desmarcado!",
+    "asistencias/90min": "¡Constante creador de ocasiones por cada 90 minutos!",
+    "penaltis_marcados": "¡Seguro desde el punto de penalti! Un seguro para tu plantilla.",
+    "tiros_puerta": "¡Busca siempre la portería y genera peligro! Todo un pistolero.",
+    "goles_por_tiro": "¡Muy eficiente cuando dispara! Todo un pistolero",
+    "pases_clave": "¡Rompe la defensa con pases decisivos!",
+    "pases_completados_pct": "¡Con mucha precisión a la hora de pasar! ",
+    "pases_ultimo_tercio": "¡Aporta en las zonas de mayor peligro!",
+    "centros_area": "¡Centra con intención hacia el área!",
+    "corners": "¡Sacador de balón parado! Un especialista en los corners.",
+    "entradas": "¡Incansable en la recuperación del balón!",
+    "intercepciones": "¡Anticipa y corta el juego rival!",
+    "despejes": "¡Protege bien su área cuando hace falta! Un jugador expeditivo.",
+    "regates_exitosos": "¡Hábil para superar rivales! Imposible pararle.",
+    "minutos": "¡Jugador con gran presencia en el campo! Todo un pulmón.",
+    "apariciones_suplente": "¡Impacta entrando desde el banquillo! Jugador número 12 de su equipo.",
+    "amarillas": "¡Juega con intensidad y carácter! Pero cuidado con el ímpetu.",
+    "rojas": "¡Jugador de carácter que a veces pasa los límites! Todo un peligro alinearlo.",
+    "faltas_cometidas": "¡No rehúye el choque y lucha cada balón! Propenso a cometer faltas.",
+    "faltas_recibidas": "¡Molesta a los rivales y genera faltas a favor!",
+    "porterias_cero": "¡Clave en mantener la portería a cero! Un seguro bajo palos.",
+    "paradas": "¡Brilla con paradas! Es un auténtico gato.",
+    "save_pct": "¡Eficaz bajo palos y determinante en la portería! Para la mayoría de tiros a puerta.",
 }
 
 

@@ -506,12 +506,21 @@ def postprocesar_df_partido(df):
 
 
 def contar_tarjetas_banquillo(df):
+    """
+    Identifica tarjetas de banquillo: jugadores con tarjetas que tienen 0 minutos.
+    EXCEPCIÓN: Si hay tarjeta en minuto 0, significa que se produjo en el campo 
+    (posible expulsión temprana), no en banquillo.
+    """
     if df is None or df.empty:
         return pd.DataFrame()
+    
+    # Tarjetas de banquillo: tarjetas + 0 minutos
+    # Pero NO si la tarjeta ocurrió en minuto 0 (eso es expulsión temprana)
     mask = (
         (df["amarillas"].fillna(0) > 0)
         | (df["rojas"].fillna(0) > 0)
     ) & (df["min_partido"].fillna(0) == 0)
+    
     df_banquillo = df[mask].copy()
     df_banquillo["banquillo"] = True
     return df_banquillo

@@ -31,6 +31,39 @@ def normalize_team_name(value):
     normalized = ''.join(c if c.isalnum() or c == '-' else '' for c in normalized)
     
     return normalized
+
+@register.filter
+def shield_name(value):
+    """Convierte el nombre del equipo a formato para archivos de escudos"""
+    if not value:
+        return ''
+    
+    # Convertir a minúsculas
+    shield = value.lower().strip()
+    
+    # Remover acentos PRIMERO (antes de buscar prefijos)
+    shield = ''.join(
+        c for c in unicodedata.normalize('NFD', shield)
+        if unicodedata.category(c) != 'Mn'
+    )
+    
+    # Remover prefijos comunes (solo "real ", NO "atletico")
+    prefixes = ['fc ', 'rcd ', 'cd ', 'cf ', 'sd ', 'ef ', 'ca ', 'ud ', 'real ']
+    for prefix in prefixes:
+        if shield.startswith(prefix):
+            shield = shield[len(prefix):]
+            break
+    
+    # Reemplazar espacios con guiones bajos
+    shield = shield.replace(' ', '_')
+    
+    # Remover caracteres especiales (mantener solo alfanuméricos y guiones bajos)
+    shield = ''.join(c if c.isalnum() or c == '_' else '' for c in shield)
+    
+    return shield
+
+
+
 @register.filter
 def split(value, separator=" "):
     """Divide un string por un separador"""

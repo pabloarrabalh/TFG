@@ -1,149 +1,507 @@
-{% extends 'base.html' %}
-
-{% block title %}LigaMaster - Acceso{% endblock %}
-
-{% block content %}
-<div class="min-h-full bg-background-dark flex items-center justify-center p-6">
-    <div class="max-w-md w-full space-y-8">
-        <!-- Logo y header -->
-        <div class="text-center">
-            <div class="mx-auto size-20 bg-gradient-to-br from-primary to-blue-500 rounded-2xl flex items-center justify-center mb-6">
-                <span class="text-3xl font-black text-black">LM</span>
-            </div>
-            <h2 class="text-3xl font-black text-white mb-2">Bienvenido a LigaMaster</h2>
-            <p class="text-gray-400">Inicia sesión o crea tu cuenta para continuar</p>
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>LigaMaster - Inicio de sesión y Registro</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#39ff14",
+                        "background-light": "#121212",
+                        "background-dark": "#0a0a0a",
+                        "card-dark": "#161616",
+                        "text-muted": "#a0a0a0"
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                    boxShadow: {
+                        "neon": "0 0 10px rgba(57, 255, 20, 0.2), 0 0 20px rgba(57, 255, 20, 0.1)",
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Animación de shake para campos con error */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        /* Estilos para campos con error */
+        .input-error {
+            border-color: #ef4444 !important;
+            background-color: #7f1d1d !important;
+        }
+        
+        .error-message {
+            color: #fca5a5;
+            font-size: 0.75rem;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        /* Campos con error se ponen rojos */
+        input.input-error {
+            border-color: #ef4444 !important;
+            background-color: #4b0000 !important;
+            color: #fca5a5 !important;
+        }
+        
+        input.input-error::placeholder {
+            color: #f87171 !important;
+        }
+    </style>
+</head>
+<body class="bg-background-dark font-display text-white antialiased selection:bg-primary selection:text-black">
+<div class="flex h-screen w-full flex-row">
+    <!-- LEFT SIDE - Hidden on mobile -->
+    <div class="relative hidden lg:flex w-1/2 flex-col justify-end bg-black p-12 h-screen overflow-hidden">
+        <div class="absolute inset-0 z-0 h-full w-full bg-cover bg-center transition-opacity duration-1000 scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBzeXpYJkPHG_3uYl9-UJnVZUYz_QbYbmmql3pS_oo5mv03eJI7MV-UWEAOkGEm1lQ8Ki4Ky-uNhHIs7660_2BBTrm4noHBp2hcSYTMoP8xWuk3ea-rn8NYwhvv_tXv9HPvComYVXhKJTOfCbAeFw_m_SfYK9wOufTo7013cbt8_8GlrTUZgzrRs0YwikgdQi77uUcJj75uVGasvma-M5zgKbxb2_e--KFWgkiQmn18dLr-mvC930WNGB4_VHwUMUv0bXl1GlZogD0'); filter: brightness(0.6) contrast(1.1);">
         </div>
-
-        <!-- Tabs -->
-        <div class="glass-panel rounded-2xl overflow-hidden">
-            <div class="flex">
-                <button class="flex-1 px-6 py-4 text-center font-bold text-primary bg-primary/10 border-b-2 border-primary transition-colors" id="loginTab">
-                    Iniciar Sesión
-                </button>
-                <button class="flex-1 px-6 py-4 text-center font-bold text-gray-400 hover:text-white transition-colors" id="registerTab">
-                    Registrarse
-                </button>
+        <div class="absolute inset-0 z-10 bg-gradient-to-t from-background-dark via-black/50 to-black/30 opacity-90"></div>
+        <div class="relative z-20 flex flex-col justify-end max-w-lg">
+            <div class="mb-4 flex items-center gap-3">
+                <span class="material-symbols-outlined text-4xl text-primary drop-shadow-[0_0_5px_rgba(57,255,20,0.8)]">sports_soccer</span>
+                <h1 class="text-3xl font-black tracking-tight text-white">LigaMaster</h1>
             </div>
-
-            <!-- Login Form -->
-            <div class="p-6" id="loginForm">
-                <form class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-300 mb-2">Email</label>
-                        <input type="email" class="w-full px-4 py-3 bg-surface-dark border border-border-dark rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" placeholder="tu@email.com" />
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-bold text-gray-300 mb-2">Contraseña</label>
-                        <input type="password" class="w-full px-4 py-3 bg-surface-dark border border-border-dark rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" placeholder="••••••••" />
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <label class="flex items-center">
-                            <input type="checkbox" class="rounded border-border-dark text-primary bg-surface-dark focus:ring-primary/50 focus:ring-2" />
-                            <span class="ml-2 text-sm text-gray-400">Recordarme</span>
-                        </label>
-                        <a href="#" class="text-sm text-primary hover:text-primary-dark transition-colors">¿Olvidaste tu contraseña?</a>
-                    </div>
-
-                    <button type="submit" class="w-full px-4 py-3 bg-gradient-to-r from-primary to-primary-dark text-black font-bold rounded-xl hover:from-primary-dark hover:to-primary transition-all shadow-lg hover:shadow-[0_0_20px_rgba(57,255,20,0.3)]">
-                        Iniciar Sesión
-                    </button>
-                </form>
-            </div>
-
-            <!-- Register Form (hidden by default) -->
-            <div class="p-6 hidden" id="registerForm">
-                <form class="space-y-6">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-300 mb-2">Nombre</label>
-                            <input type="text" class="w-full px-4 py-3 bg-surface-dark border border-border-dark rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" placeholder="Juan" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-300 mb-2">Apellidos</label>
-                            <input type="text" class="w-full px-4 py-3 bg-surface-dark border border-border-dark rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" placeholder="Pérez" />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-bold text-gray-300 mb-2">Email</label>
-                        <input type="email" class="w-full px-4 py-3 bg-surface-dark border border-border-dark rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" placeholder="tu@email.com" />
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-bold text-gray-300 mb-2">Contraseña</label>
-                        <input type="password" class="w-full px-4 py-3 bg-surface-dark border border-border-dark rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" placeholder="••••••••" />
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-bold text-gray-300 mb-2">Confirmar Contraseña</label>
-                        <input type="password" class="w-full px-4 py-3 bg-surface-dark border border-border-dark rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" placeholder="••••••••" />
-                    </div>
-
-                    <div class="flex items-center">
-                        <input type="checkbox" class="rounded border-border-dark text-primary bg-surface-dark focus:ring-primary/50 focus:ring-2" />
-                        <label class="ml-2 text-sm text-gray-400">Acepto los <a href="#" class="text-primary hover:text-primary-dark">términos y condiciones</a></label>
-                    </div>
-
-                    <button type="submit" class="w-full px-4 py-3 bg-gradient-to-r from-primary to-primary-dark text-black font-bold rounded-xl hover:from-primary-dark hover:to-primary transition-all shadow-lg hover:shadow-[0_0_20px_rgba(57,255,20,0.3)]">
-                        Crear Cuenta
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- OAuth options -->
-        <div class="text-center">
-            <p class="text-sm text-gray-400 mb-4">O continúa con</p>
-            <div class="flex gap-4 justify-center">
-                <button class="flex items-center gap-2 px-4 py-2 bg-surface-dark border border-border-dark rounded-xl text-white hover:bg-white/5 transition-all">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    Google
-                </button>
-                <button class="flex items-center gap-2 px-4 py-2 bg-surface-dark border border-border-dark rounded-xl text-white hover:bg-white/5 transition-all">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                    </svg>
-                    Facebook
-                </button>
+            <h2 class="text-4xl font-bold leading-tight tracking-tight text-white mb-4">
+                Gestiona tu equipo soñado como un profesional.
+            </h2>
+            <p class="text-base text-gray-300 font-light mb-8">
+                Únete a más de 5 millones de entrenadores compitiendo en la liga oficial de fantasía de LaLiga. Crea tu plantilla, sigue estadísticas en vivo y domina la clasificación.
+            </p>
+            <div class="flex items-center gap-4">
+                <div class="flex -space-x-4">
+                    <img alt="User 1" class="w-10 h-10 rounded-full border-2 border-background-dark object-cover grayscale opacity-80 hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwg0NZokcDmJ7ehHS5qyKEZgYXPkEOltkMKgDmJbhSbPeT-SkGzLDTIQC3VKIYEdWg7acJahNfLvrqUkNkYSDFKamAu2rjXqeqeSUu72EPvJH76n9So3LltBiSmUOJHcbxcNC7G1ej4rhgotoDrTAlQv6ZejEUNcB-HkbogjQddozo6uYQwC7_356oz7eNeKW_jjXIrwKQiwUPIPqwsRs2bR_KncsDd0M95AmOQpQ1_3PiStsNVogYo6GccpfQuVwZuYxPuadCjTo"/>
+                    <img alt="User 2" class="w-10 h-10 rounded-full border-2 border-background-dark object-cover grayscale opacity-80 hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzWU_l7_Ckio48z6gNM_JsPOUF3-eatASXAlIIv-pN9RXU4XEOZ01y7fB-VCGOFop8EBANL6FpwC2naiNsdMDRvtChyi080nLdHjgB5x8AmqWzyZhxL2e95poXkA87yazLG3QzYt9Vc4mDKwg84IH-8vxfUtUkoxTm5o7QZ1BCLEP8DplVWBdu0aV9mry7NTo9sYJeEa3M1f00bofWbi0h_dC8DWuVkT9J9WsDUf36hCwJLIgacEK2iyBnMF5eLtZkK7CZQI5NoCA"/>
+                    <img alt="User 3" class="w-10 h-10 rounded-full border-2 border-background-dark object-cover grayscale opacity-80 hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvrkpLDjalCuqb5kQkR4RGJ16rvSW2kTFPB39InauK2VaNL50wiqlbiv8FQEBNj2qP1E-Sm6AGTejwWtfsA-cmj3-En_NEPrQnuokgKIGc-hJ1GOkzZk0LANzes5Y19YnVbSlz04RVDK_AGWWXxuMI2plHeKbXG5pDxJWV4WEivF1IIRtTDLVoP-KKeYV4t_qA6HHqLigTmS25SXX0qFu3jUhBjDBKRgXwt4GKOdyi4gX4d88w9pICE_a4R31oBYWYvJfiJNSANqo"/>
+                    <div class="flex items-center justify-center w-10 h-10 text-xs font-bold text-black bg-primary rounded-full border-2 border-background-dark hover:bg-primary/80 transition-colors cursor-pointer shadow-[0_0_10px_rgba(57,255,20,0.5)]">+2k</div>
+                </div>
+                <div class="text-sm font-medium text-gray-300">Managers activos online</div>
             </div>
         </div>
     </div>
+
+    <!-- RIGHT SIDE - Auth Forms -->
+    <div class="flex w-full lg:w-1/2 flex-col items-center justify-start bg-background-dark px-4 py-8 sm:px-12 relative h-screen overflow-y-auto border-l border-[#222] pb-32">
+        <div class="lg:hidden mb-8 flex items-center gap-2">
+            <span class="material-symbols-outlined text-3xl text-primary">sports_soccer</span>
+            <span class="text-2xl font-black tracking-tight text-white">LigaMaster</span>
+        </div>
+
+        <div class="w-full max-w-[440px] flex flex-col gap-6">
+            <div class="w-full rounded-2xl bg-card-dark p-8 shadow-2xl border border-primary/20 hover:border-primary/40 transition-colors duration-300 relative overflow-hidden group">
+                <div class="absolute -top-20 -right-20 w-40 h-40 bg-primary/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-primary/10 transition-colors"></div>
+
+                <div class="mb-6 text-center relative z-10">
+                    <h2 class="text-2xl font-bold text-white">Bienvenido de nuevo</h2>
+                    <p class="mt-2 text-sm text-text-muted">Introduce tus datos para acceder</p>
+                </div>
+
+                <!-- Tabs -->
+                <div class="mb-8 relative z-10">
+                    <div class="flex w-full border-b border-[#333]">
+                        <button id="loginTabBtn" class="relative flex flex-1 items-center justify-center pb-3 text-sm font-bold tracking-[0.015em] text-primary transition-colors hover:text-primary shadow-[0_1px_0_0_#39ff14]" type="button">
+                            <span>Inicia sesión</span>
+                            <span class="absolute bottom-0 left-0 h-0.5 w-full bg-primary shadow-[0_0_8px_#39ff14]"></span>
+                        </button>
+                        <button id="registerTabBtn" class="relative flex flex-1 items-center justify-center pb-3 text-sm font-medium tracking-[0.015em] text-text-muted transition-colors hover:text-white" type="button">
+                            <span>Regístrate</span>
+                            <span class="absolute bottom-0 left-0 h-0.5 w-full bg-transparent"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Forms Container with Slide Animation -->
+                <div class="relative overflow-hidden">
+                    <div id="formsContainer" class="flex transition-transform duration-300 ease-in-out relative z-10">
+                    <!-- LOGIN FORM -->
+                    <form id="loginForm" class="w-full flex-shrink-0 flex flex-col gap-5" method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm font-medium text-gray-300" for="login_email">Correo electrónico</label>
+                            <div class="relative flex items-center group/input">
+                                <span class="material-symbols-outlined absolute left-4 text-gray-500 group-focus-within/input:text-primary transition-colors select-none text-[20px]">mail</span>
+                                <input class="w-full rounded-lg border border-[#333] bg-[#0f0f0f] px-4 py-3 pl-11 text-sm text-white placeholder-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm hover:border-[#444]" id="login_email" name="username" placeholder="manager@ejemplo.com" type="email" required/>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center justify-between">
+                                <label class="text-sm font-medium text-gray-300" for="login_password">Contraseña</label>
+                                <a class="text-xs font-semibold text-primary hover:text-primary/80 transition-colors" href="#">¿Has olvidado tu contraseña?</a>
+                            </div>
+                            <div class="relative flex items-center group/input">
+                                <span class="material-symbols-outlined absolute left-4 text-gray-500 group-focus-within/input:text-primary transition-colors select-none text-[20px]">lock</span>
+                                <input class="w-full rounded-lg border border-[#333] bg-[#0f0f0f] px-4 py-3 pl-11 pr-11 text-sm text-white placeholder-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm hover:border-[#444]" id="login_password" name="password" placeholder="Introduce tu contraseña" type="password" required/>
+                                <button class="absolute right-4 flex items-center justify-center text-gray-500 hover:text-white transition-colors focus:outline-none" type="button">
+                                    <span class="material-symbols-outlined text-[20px]">visibility_off</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button class="mt-4 flex w-full items-center justify-center rounded-lg bg-primary py-3 px-4 text-sm font-black uppercase tracking-wider text-black shadow-[0_0_15px_rgba(57,255,20,0.3)] transition-all hover:bg-[#32e012] hover:shadow-[0_0_20px_rgba(57,255,20,0.5)] hover:-translate-y-0.5 active:scale-[0.98]" type="submit">
+                            Entrar
+                        </button>
+
+                        {% if login_error %}
+                            <div class="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                                <p class="text-red-400 text-sm">{{ login_error }}</p>
+                            </div>
+                        {% endif %}
+                    </form>
+
+                    <!-- REGISTER FORM -->
+                    <form id="registerForm" class="w-full flex-shrink-0 flex flex-col gap-5" method="post" action="{% url 'register' %}">
+                        {% csrf_token %}
+                        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+                        
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm font-medium text-gray-300" for="register_first_name">Nombre</label>
+                            <div class="error-message" id="error_first_name"></div>
+                            <div class="relative">
+                                <input class="w-full rounded-lg border border-[#333] bg-[#0f0f0f] px-4 py-3 text-sm text-white placeholder-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm hover:border-[#444]" id="register_first_name" name="first_name" placeholder="Juan" type="text" required/>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm font-medium text-gray-300" for="register_last_name">Apellidos</label>
+                            <div class="error-message" id="error_last_name"></div>
+                            <div class="relative">
+                                <input class="w-full rounded-lg border border-[#333] bg-[#0f0f0f] px-4 py-3 text-sm text-white placeholder-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm hover:border-[#444]" id="register_last_name" name="last_name" placeholder="Pérez" type="text" required/>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm font-medium text-gray-300" for="register_nickname">Apodo</label>
+                            <div class="error-message" id="error_nickname"></div>
+                            <div class="relative flex items-center group/input">
+                                <span class="material-symbols-outlined absolute left-4 text-gray-500 group-focus-within/input:text-primary transition-colors select-none text-[20px]">person</span>
+                                <input class="w-full rounded-lg border border-[#333] bg-[#0f0f0f] px-4 py-3 pl-11 text-sm text-white placeholder-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm hover:border-[#444]" id="register_nickname" name="nickname" placeholder="Tu apodo en LigaMaster" type="text" required/>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm font-medium text-gray-300" for="register_email">Correo electrónico</label>
+                            <div class="error-message" id="error_email"></div>
+                            <div class="relative flex items-center group/input">
+                                <span class="material-symbols-outlined absolute left-4 text-gray-500 group-focus-within/input:text-primary transition-colors select-none text-[20px]">mail</span>
+                                <input class="w-full rounded-lg border border-[#333] bg-[#0f0f0f] px-4 py-3 pl-11 text-sm text-white placeholder-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm hover:border-[#444]" id="register_email" name="email" placeholder="tu@email.com" type="email" required/>
+                            </div>
+                        </div>
+                        
+                        <!-- Div para capturar errores del servidor (backend) -->
+                        <div id="server-error-container" style="display: none;"></div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm font-medium text-gray-300" for="register_password">Contraseña</label>
+                            <div class="error-message" id="error_password"></div>
+                            <div class="relative flex items-center group/input">
+                                <span class="material-symbols-outlined absolute left-4 text-gray-500 group-focus-within/input:text-primary transition-colors select-none text-[20px]">lock</span>
+                                <input class="w-full rounded-lg border border-[#333] bg-[#0f0f0f] px-4 py-3 pl-11 pr-11 text-sm text-white placeholder-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm hover:border-[#444]" id="register_password" name="password1" placeholder="Introduce tu contraseña" type="password" required/>
+                                <button class="absolute right-4 flex items-center justify-center text-gray-500 hover:text-white transition-colors focus:outline-none" type="button" id="toggle_password">
+                                    <span class="material-symbols-outlined text-[20px]">visibility_off</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm font-medium text-gray-300" for="register_password_confirm">Confirmar Contraseña</label>
+                            <div class="error-message" id="error_password_confirm"></div>
+                            <div class="relative flex items-center group/input">
+                                <span class="material-symbols-outlined absolute left-4 text-gray-500 group-focus-within/input:text-primary transition-colors select-none text-[20px]">lock</span>
+                                <input class="w-full rounded-lg border border-[#333] bg-[#0f0f0f] px-4 py-3 pl-11 pr-11 text-sm text-white placeholder-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all shadow-sm hover:border-[#444]" id="register_password_confirm" name="password2" placeholder="Confirma tu contraseña" type="password" required/>
+                                <button class="absolute right-4 flex items-center justify-center text-gray-500 hover:text-white transition-colors focus:outline-none" type="button" id="toggle_password_confirm">
+                                    <span class="material-symbols-outlined text-[20px]">visibility_off</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-2">
+                            <input class="mt-1 rounded border-[#333] text-primary bg-[#0f0f0f] focus:ring-primary/50 focus:ring-2" id="register_terms" name="terms" type="checkbox" required/>
+                            <label class="text-sm text-gray-400" for="register_terms">Acepto los <a class="text-primary hover:text-primary/80" href="{% url 'terms_conditions' %}">términos y condiciones</a></label>
+                        </div>
+
+                        <button class="mt-4 flex w-full items-center justify-center rounded-lg bg-primary py-3 px-4 text-sm font-black uppercase tracking-wider text-black shadow-[0_0_15px_rgba(57,255,20,0.3)] transition-all hover:bg-[#32e012] hover:shadow-[0_0_20px_rgba(57,255,20,0.5)] hover:-translate-y-0.5 active:scale-[0.98]" type="submit">
+                            Crear Cuenta
+                        </button>
+
+                        {% if register_error %}
+                            <div id="backend_error_container" class="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                                <p class="text-red-400 text-sm" id="backend_error_text">{{ register_error }}</p>
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+                </div>
+                </div>
+
+                <!-- Sign up prompt -->
+                <p class="text-center text-sm text-text-muted">
+                    ¿No tienes cuenta? 
+                    <button id="toggleRegisterBtn" class="font-bold text-primary hover:text-white transition-colors hover:underline" type="button">Regístrate ahora</button>
+                </p>
+        </div>
+
+        <div class="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background-dark to-transparent lg:hidden"></div>
+    </div>
 </div>
-{% endblock %}
 
-{% block extra_scripts %}
 <script>
-document.getElementById('loginTab').addEventListener('click', function() {
-    // Show login form
-    document.getElementById('loginForm').classList.remove('hidden');
-    document.getElementById('registerForm').classList.add('hidden');
+    const formsContainer = document.getElementById('formsContainer');
+    const loginTabBtn = document.getElementById('loginTabBtn');
+    const registerTabBtn = document.getElementById('registerTabBtn');
+    const toggleRegisterBtn = document.getElementById('toggleRegisterBtn');
+    const registerForm = document.getElementById('registerForm');
     
-    // Update tab styles
-    this.classList.add('text-primary', 'bg-primary/10', 'border-b-2', 'border-primary');
-    this.classList.remove('text-gray-400');
-    
-    document.getElementById('registerTab').classList.remove('text-primary', 'bg-primary/10', 'border-b-2', 'border-primary');
-    document.getElementById('registerTab').classList.add('text-gray-400');
-});
+    let currentForm = 0; // 0 = login, 1 = register
 
-document.getElementById('registerTab').addEventListener('click', function() {
-    // Show register form
-    document.getElementById('registerForm').classList.remove('hidden');
-    document.getElementById('loginForm').classList.add('hidden');
+    function showLoginForm() {
+        currentForm = 0;
+        formsContainer.style.transform = 'translateX(0)';
+        
+        loginTabBtn.classList.add('text-primary', 'shadow-[0_1px_0_0_#39ff14]');
+        loginTabBtn.querySelector('span:last-child').classList.add('bg-primary', 'shadow-[0_0_8px_#39ff14]');
+        
+        registerTabBtn.classList.remove('text-primary', 'shadow-[0_1px_0_0_#39ff14]');
+        registerTabBtn.classList.add('text-text-muted');
+        registerTabBtn.querySelector('span:last-child').classList.remove('bg-primary', 'shadow-[0_0_8px_#39ff14]');
+        registerTabBtn.querySelector('span:last-child').classList.add('bg-transparent');
+    }
+
+    function showRegisterForm() {
+        currentForm = 1;
+        formsContainer.style.transform = 'translateX(-100%)';
+        
+        registerTabBtn.classList.add('text-primary', 'shadow-[0_1px_0_0_#39ff14]');
+        registerTabBtn.querySelector('span:last-child').classList.add('bg-primary', 'shadow-[0_0_8px_#39ff14]');
+        
+        loginTabBtn.classList.remove('text-primary', 'shadow-[0_1px_0_0_#39ff14]');
+        loginTabBtn.classList.add('text-text-muted');
+        loginTabBtn.querySelector('span:last-child').classList.remove('bg-primary', 'shadow-[0_0_8px_#39ff14]');
+        loginTabBtn.querySelector('span:last-child').classList.add('bg-transparent');
+    }
+
+    // Toggle de visibilidad de contraseña
+    function setupPasswordToggle(toggleId, inputId) {
+        const toggleBtn = document.getElementById(toggleId);
+        const input = document.getElementById(inputId);
+        
+        if (toggleBtn && input) {
+            toggleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                const icon = toggleBtn.querySelector('.material-symbols-outlined');
+                icon.textContent = isPassword ? 'visibility' : 'visibility_off';
+            });
+        }
+    }
     
-    // Update tab styles
-    this.classList.add('text-primary', 'bg-primary/10', 'border-b-2', 'border-primary');
-    this.classList.remove('text-gray-400');
-    
-    document.getElementById('loginTab').classList.remove('text-primary', 'bg-primary/10', 'border-b-2', 'border-primary');
-    document.getElementById('loginTab').classList.add('text-gray-400');
-});
+    // Limpiar error de un campo específico
+    function clearFieldError(fieldId) {
+        const input = document.getElementById(fieldId);
+        const errorDiv = document.getElementById('error_' + fieldId.replace('register_', ''));
+        
+        if (input && errorDiv) {
+            input.classList.remove('input-error');
+            errorDiv.classList.remove('show');
+            errorDiv.textContent = '';
+        }
+    }
+
+    // Mostrar error de un campo específico
+    function showFieldError(fieldId, errorMessage) {
+        const input = document.getElementById(fieldId);
+        const errorDiv = document.getElementById('error_' + fieldId.replace('register_', ''));
+        
+        console.log('showFieldError:', {fieldId, errorMessage, input, errorDiv});
+        
+        if (input && errorDiv) {
+            input.classList.add('shake', 'input-error');
+            errorDiv.textContent = errorMessage;
+            errorDiv.classList.add('show');
+            
+            console.log('Error shown:', {classes: input.className, error: errorDiv.textContent});
+            
+            // Quitar animación shake después de completarla
+            setTimeout(() => {
+                input.classList.remove('shake');
+            }, 500);
+        } else {
+            console.log('Input or errorDiv not found!', {input, errorDiv});
+        }
+    }
+
+    // Inicializar cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        // Setup password toggles
+        setupPasswordToggle('toggle_password', 'register_password');
+        setupPasswordToggle('toggle_password_confirm', 'register_password_confirm');
+        
+        // Detectar errores del backend y asignarlos al campo correcto
+        const backendErrorContainer = document.getElementById('backend_error_container');
+        const backendErrorText = document.getElementById('backend_error_text');
+        
+        if (backendErrorContainer && backendErrorText) {
+            const errorMsg = backendErrorText.textContent.trim().toLowerCase();
+            console.log('Backend error detected:', errorMsg);
+            
+            // Si es error de email
+            if (errorMsg.includes('email') || errorMsg.includes('unique') || errorMsg.includes('registrado')) {
+                console.log('Email error detected, showing in email field');
+                const emailErrorDiv = document.getElementById('error_email');
+                const emailInput = document.getElementById('register_email');
+                
+                if (emailErrorDiv && emailInput) {
+                    // Mostrar error en el campo de email
+                    emailErrorDiv.textContent = 'Este email ya está registrado';
+                    emailErrorDiv.classList.add('show');
+                    emailInput.classList.add('input-error');
+                    
+                    // Ocultar el error genérico
+                    backendErrorContainer.style.display = 'none';
+                }
+            }
+        }
+        
+        // Agregar validación al formulario de registro
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
+                console.log('=== SUBMIT EVENT TRIGGERED ===');
+                e.preventDefault();
+                
+                const fields = [
+                    { id: 'register_first_name', name: 'Nombre', required: true },
+                    { id: 'register_last_name', name: 'Apellidos', required: true },
+                    { id: 'register_nickname', name: 'Apodo', required: true },
+                    { id: 'register_email', name: 'Email', type: 'email', required: true },
+                    { id: 'register_password', name: 'Contraseña', minLength: 8, required: true },
+                    { id: 'register_password_confirm', name: 'Confirmar Contraseña', required: true }
+                ];
+                
+                let hasErrors = false;
+                
+                console.log('Clearing all errors...');
+                // Limpiar todos los errores primero
+                fields.forEach(field => {
+                    clearFieldError(field.id);
+                });
+                
+                console.log('Validating fields...');
+                // Validar cada campo
+                fields.forEach(field => {
+                    const input = document.getElementById(field.id);
+                    if (!input) {
+                        console.log('Warning: field not found:', field.id);
+                        return;
+                    }
+                    
+                    const value = input.value.trim();
+                    console.log(`Validating ${field.id}: "${value}"`);
+                    
+                    // Validar campo vacío
+                    if (field.required && !value) {
+                        console.log(`Error: ${field.name} is empty`);
+                        showFieldError(field.id, field.name + ' es requerido');
+                        hasErrors = true;
+                        return;
+                    }
+                    
+                    // Validar email
+                    if (field.type === 'email' && value) {
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailRegex.test(value)) {
+                            console.log(`Error: Invalid email: ${value}`);
+                            showFieldError(field.id, 'Email inválido');
+                            hasErrors = true;
+                            return;
+                        }
+                    }
+                    
+                    // Validar longitud mínima
+                    if (field.minLength && value.length < field.minLength) {
+                        console.log(`Error: ${field.name} too short: ${value.length} < ${field.minLength}`);
+                        showFieldError(field.id, field.name + ' debe tener al menos ' + field.minLength + ' caracteres');
+                        hasErrors = true;
+                        return;
+                    }
+                });
+                
+                // Validar que las contraseñas coincidan
+                const password1 = document.getElementById('register_password').value;
+                const password2 = document.getElementById('register_password_confirm').value;
+                
+                if (password1 && password2 && password1 !== password2) {
+                    console.log(`Error: Passwords don't match`);
+                    showFieldError('register_password_confirm', 'Las contraseñas no coinciden');
+                    hasErrors = true;
+                }
+                
+                // Si hay errores, mostrar el formulario de registro y detener el envío
+                if (hasErrors) {
+                    console.log('Validation FAILED - showing register form');
+                    showRegisterForm();
+                    return false;
+                }
+                
+                // Si no hay errores, enviar el formulario
+                console.log('Validation PASSED - submitting form');
+                this.submit();
+            });
+        } else {
+            console.log('ERROR: registerForm element not found!');
+        }
+        
+        // Event listeners para cambiar entre tabs
+        if (loginTabBtn) loginTabBtn.addEventListener('click', showLoginForm);
+        if (registerTabBtn) registerTabBtn.addEventListener('click', showRegisterForm);
+        if (toggleRegisterBtn) toggleRegisterBtn.addEventListener('click', showRegisterForm);
+        
+        // Detectar si hay error de servidor y mostrar pestaña de registro
+        const registerErrorDiv = document.querySelector('.mt-4.p-3.bg-red-500\\/10');
+        if (registerErrorDiv) {
+            console.log('Backend error detected, showing register form');
+            showRegisterForm();
+        } else {
+            showLoginForm();
+        }
+    });
 </script>
-{% endblock %}
+</body>
+</html>

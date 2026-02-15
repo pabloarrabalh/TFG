@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load team_filters %}
+{% load static %}
 
 {% block title %}LigaMaster - {{ equipo_nombre|default:"FC Barcelona" }}{% endblock %}
 
@@ -13,20 +14,26 @@
     box-shadow: 0 50px 70px -20px rgba(0,0,0,0.7);
 }
 
-/* Estilos de equipos */
-.team-badge {
+/* Escudos de equipos */
+.team-shield {
     width: 128px;
     height: 128px;
-    border-radius: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid;
-    font-weight: 900;
-    font-size: 2.25rem;
+    object-fit: contain;
+    object-position: center;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+    display: block;
 }
 
-/* Racha con círculos de colores (igual que clasificacion.html) */
+.team-shield-rival {
+    width: 96px;
+    height: 96px;
+    object-fit: contain;
+    object-position: center;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+    display: block;
+}
+
+/* Racha con círculos de colores */
 .racha-circle {
     display: inline-flex;
     align-items: center;
@@ -83,190 +90,6 @@
     border: 4px solid transparent;
     border-top-color: rgb(17, 24, 39);
 }
-
-/* Real Madrid */
-.team-real-madrid,
-.team-madrid {
-    background-color: #ffffff;
-    border-color: #ffffff;
-    color: #000000;
-}
-
-/* Barcelona */
-.team-barcelona {
-    background: repeating-linear-gradient(90deg, #004687 0 8px, #c60c30 8px 16px);
-    border-color: #1e40af;
-    color: #ffffff;
-}
-
-/* Atlético Madrid */
-.team-atletico-madrid,
-.team-atletico {
-    background: linear-gradient(90deg, white 25%, red 25%, red 50%, white 50%, white 75%, red 75%, red);
-    background-size: 8px 100%;
-    border-color: #dc2626;
-    color: #000000;
-}
-
-/* Athletic Club */
-.team-athletic-club,
-.team-athletic {
-    background: linear-gradient(90deg, white 25%, red 25%, red 50%, white 50%, white 75%, red 75%, red);
-    background-size: 8px 100%;
-    border-color: #dc2626;
-    color: #000000;
-}
-
-/* Villarreal */
-.team-villarreal {
-    background-color: #facc15;
-    border-color: #eab308;
-    color: #000000;
-}
-
-/* Real Betis */
-.team-real-betis,
-.team-betis {
-    background: linear-gradient(90deg, white 25%, #007749 25%, #007749 50%, white 50%, white 75%, #007749 75%, #007749);
-    background-size: 8px 100%;
-    border-color: #15803d;
-    color: #000000;
-}
-
-/* Sevilla */
-.team-sevilla {
-    background-color: #dc2626;
-    border-color: #b91c1c;
-    color: #ffffff;
-}
-
-/* RCD Espanyol */
-.team-rcd-espanyol,
-.team-espanyol {
-    background: linear-gradient(90deg, white 25%, #1e88e5 25%, #1e88e5 50%, white 50%, white 75%, #1e88e5 75%, #1e88e5);
-    background-size: 8px 100%;
-    border-color: #1e40af;
-    color: #000000;
-}
-
-/* Alavés */
-.team-alaves,
-.team-alavés {
-    background: linear-gradient(90deg, white 25%, #1e88e5 25%, #1e88e5 50%, white 50%, white 75%, #1e88e5 75%, #1e88e5);
-    background-size: 8px 100%;
-    border-color: #1e40af;
-    color: #000000;
-}
-
-/* Elche */
-.team-elche {
-    background: linear-gradient(0deg, #1bc47d 25%, white 25%, white 50%, #1bc47d 50%, #1bc47d 75%, white 75%, white);
-    background-size: 100% 8px;
-    border-color: #16a34a;
-    color: #000000;
-}
-
-/* Rayo Vallecano */
-.team-rayo-vallecano,
-.team-rayo {
-    background: linear-gradient(90deg, #ed1c24 0%, #ed1c24 40%, white 40% 60%, #ed1c24 60% 100%);
-    border-color: #dc2626;
-    color: #000000;
-}
-
-/* Osasuna */
-.team-osasuna {
-    background: repeating-linear-gradient(90deg, #1e88e5 0 8px, #ed1c24 8px 16px);
-    border-color: #dc2626;
-    color: #ffffff;
-}
-
-/* Valencia */
-.team-valencia {
-    background-color: #ffffff;
-    border-color: #ffffff;
-    color: #000000;
-}
-
-/* Levante */
-.team-levante {
-    background: repeating-linear-gradient(90deg, #004687 0 8px, #c60c30 8px 16px);
-    border-color: #1e40af;
-    color: #ffffff;
-}
-
-/* Real Sociedad */
-.team-real-sociedad,
-.team-sociedad {
-    background-color: #1e40af;
-    border-color: #1e3a8a;
-    color: #ffffff;
-}
-
-/* Real Mallorca */
-.team-real-mallorca,
-.team-mallorca {
-    background-color: #eab308;
-    border-color: #ca8a04;
-    color: #dc2626;
-    font-weight: 900;
-}
-
-/* Real Oviedo */
-.team-real-oviedo,
-.team-oviedo {
-    background-color: #1e40af;
-    border-color: #1e3a8a;
-    color: #ffffff;
-}
-
-/* Real Valladolid */
-.team-real-valladolid,
-.team-valladolid {
-    background-color: #ffffff;
-    border-color: #d4af37;
-    color: #000000;
-}
-
-/* Girona */
-.team-girona,
-.team-fc-girona {
-    background: linear-gradient(90deg, #ff0000 0%, #ff0000 50%, #ffffff 50%, #ffffff 100%);
-    border-color: #dc2626;
-    color: #ffffff;
-}
-
-/* Getafe */
-.team-getafe,
-.team-cf-getafe {
-    background: linear-gradient(90deg, #1e40af 0%, #1e40af 50%, #ffffff 50%, #ffffff 100%);
-    border-color: #1e40af;
-    color: #ffffff;
-}
-
-/* UD Las Palmas */
-.team-ud-las-palmas,
-.team-las-palmas {
-    background: repeating-linear-gradient(90deg, #ffd700 0 8px, #0066cc 8px 16px);
-    border-color: #cc0000;
-    color: #ffffff;
-}
-
-/* Cádiz */
-.team-cadiz,
-.team-cádiz {
-    background: linear-gradient(90deg, #ffde00 0%, #ffde00 50%, #0066cc 50%, #0066cc 100%);
-    border-color: #0066cc;
-    color: #000000;
-}
-
-/* Granada */
-.team-granada,
-.team-cf-granada {
-    background: repeating-linear-gradient(90deg, #ff0000 0 8px, white 8px 16px);
-    border-color: #dc2626;
-    color: #ffffff;
-}
 {% endblock %}
 
 {% block content %}
@@ -288,9 +111,10 @@
             <div class="bg-pitch-pattern rounded-3xl p-8 mb-6 relative overflow-hidden">
                 <!-- Centro: Equipo info -->
                 <div class="flex items-start gap-8 mb-6">
-                    <div class="team-badge team-{{ equipo.nombre|normalize_team_name }} flex-shrink-0">
-                        <span>{{ iniciales }}</span>
-                    </div>
+                    <img src="{% static 'escudos/' %}{{ equipo.nombre|shield_name }}.png" 
+                         alt="{{ equipo.nombre }}" 
+                         class="team-shield flex-shrink-0"
+                         onerror="this.style.display='none'">
                     <div class="flex-1 min-w-0">
                         <h1 class="text-3xl font-black text-white mb-2 truncate max-w-lg" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                             {{ equipo.nombre|display_team_name|upper|default:"FC BARCELONA" }}
@@ -413,17 +237,96 @@
             <!-- Selector de Temporada (Botones) -->
             <div class="glass-panel rounded-2xl p-6 mb-6">
                 <label class="block text-sm font-bold text-white mb-4">Selecciona la Temporada</label>
-                <div class="flex gap-3 flex-wrap">
-                    {% for temp_item in temporadas_display %}
-                        <a href="{% url 'equipo_temporada' equipo.nombre temp_item.nombre %}" 
-                           class="px-6 py-3 rounded-lg font-bold transition-all {% if temp_item.display == temporada_actual|format_temporada %}bg-green-500 text-black hover:bg-green-600{% else %}bg-surface-dark border border-border-dark text-white hover:border-primary{% endif %}">
-                            Temporada {{ temp_item.display }}
-                        </a>
-                    {% endfor %}
+                <div class="flex gap-3 flex-wrap items-center">
+                    <!-- Botones de temporadas individuales -->
+                    <div id="temporadas-individual" class="flex gap-3 flex-wrap">
+                        {% for temp_item in temporadas_display %}
+                            <a href="{% url 'equipo_temporada' equipo.nombre temp_item.nombre %}" 
+                               class="px-6 py-3 rounded-lg font-bold transition-all {% if temp_item.display == temporada_actual|format_temporada %}bg-green-500 text-black hover:bg-green-600{% else %}bg-surface-dark border border-border-dark text-white hover:border-primary{% endif %}">
+                                Temporada {{ temp_item.display }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Botón de últimas 3 temporadas -->
+                    <button onclick="toggleUltimas3()" class="px-6 py-3 rounded-lg font-bold transition-all bg-primary hover:bg-primary/80 text-black flex items-center gap-2 whitespace-nowrap">
+                        <span class="material-symbols-outlined text-base">trending_up</span>
+                        Últimas 3
+                    </button>
                 </div>
             </div>
 
-            <!-- Histórico -->
+            <!-- Plantilla Últimas 3 Temporadas (oculta por defecto) -->
+            <div id="ultimas3-content" class="hidden glass-panel rounded-2xl p-6 mb-6">
+                <h2 class="text-3xl font-black text-white mb-6">
+                    PLANTILLA <span class="text-primary">ÚLTIMAS 3 TEMPORADAS</span>
+                </h2>
+
+                {% if ultimas_3_stats %}
+                <!-- Resumen de estadísticas agregadas -->
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark/50 text-center">
+                        <div class="text-3xl font-black text-green-400 mb-2">{{ ultimas_3_stats.total_goles }}</div>
+                        <div class="text-xs text-gray-400 uppercase font-bold">Goles Totales</div>
+                        <div class="text-sm text-gray-500 mt-1">{% for temp in ultimas_3_stats.temporadas %}{{ temp }}{% if not forloop.last %}, {% endif %}{% endfor %}</div>
+                    </div>
+
+                    <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark/50 text-center">
+                        <div class="text-3xl font-black text-blue-400 mb-2">{{ ultimas_3_stats.total_asistencias }}</div>
+                        <div class="text-xs text-gray-400 uppercase font-bold">Asistencias Totales</div>
+                        <div class="text-sm text-gray-500 mt-1">&nbsp;</div>
+                    </div>
+
+                    <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark/50 text-center">
+                        <div class="text-3xl font-black text-primary mb-2">{{ ultimas_3_stats.partidos_jugados }}</div>
+                        <div class="text-xs text-gray-400 uppercase font-bold">Partidos Jugados</div>
+                        <div class="text-sm text-gray-500 mt-1">&nbsp;</div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Tabla de jugadores -->
+                {% if ultimas_3_jugadores %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-border-dark">
+                                <th class="text-left py-3 px-4 text-xs font-bold text-gray-400 uppercase">Jugador</th>
+                                <th class="text-center py-3 px-4 text-xs font-bold text-gray-400 uppercase">Goles</th>
+                                <th class="text-center py-3 px-4 text-xs font-bold text-gray-400 uppercase">Asistencias</th>
+                                <th class="text-center py-3 px-4 text-xs font-bold text-gray-400 uppercase">Partidos</th>
+                                <th class="text-center py-3 px-4 text-xs font-bold text-gray-400 uppercase">Minutos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for jugador in ultimas_3_jugadores %}
+                            <tr class="border-b border-border-dark/30 hover:bg-surface-dark/50 transition-colors">
+                                <td class="py-3 px-4">
+                                    <span class="font-bold text-white">{{ jugador.jugador__nombre }} {{ jugador.jugador__apellido }}</span>
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="font-bold text-green-400">{{ jugador.total_goles|default:0 }}</span>
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="font-bold text-blue-400">{{ jugador.total_asistencias|default:0 }}</span>
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="font-bold text-primary">{{ jugador.partidos_count|default:0 }}</span>
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="text-gray-300">{{ jugador.total_minutos|default:0 }}'</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center p-6 text-gray-400">
+                    No hay datos disponibles para las últimas 3 temporadas
+                </div>
+                {% endif %}
+            </div>
             {% if historico_temporadas %}
             <div class="glass-panel rounded-2xl p-6 mb-6">
                 <div class="flex items-center gap-3 mb-6 cursor-pointer" onclick="toggleHistorico()">
@@ -736,11 +639,12 @@
                 
                 {% if proximo_partido and rival_info %}
                 <div class="text-center p-6 bg-surface-dark rounded-2xl space-y-4">
-                    <!-- Nombre del rival Badge con colores del equipo -->
+                    <!-- Escudo del rival -->
                     <div class="flex flex-col items-center gap-2 mb-2">
-                        <div class="team-badge team-{{ rival_info.nombre_normalizado }}">
-                            <span>{{ rival_info.iniciales }}</span>
-                        </div>
+                        <img src="{% static 'escudos/' %}{{ rival_info.nombre|shield_name }}.png" 
+                             alt="{{ rival_info.nombre }}" 
+                             class="team-shield-rival flex-shrink-0"
+                             onerror="this.style.display='none'">
                         <h4 class="text-lg font-bold text-white text-center">{{ rival_info.nombre|display_team_name }}</h4>
                     </div>
                     
@@ -960,6 +864,90 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             {% endif %}
             
+            <!-- Máximos Goleadores -->
+            {% if rival_info.max_goleador_equipo or rival_info.max_goleador_rival %}
+            <div>
+                <h3 class="text-lg font-bold text-white mb-4 uppercase tracking-wider">Máximos Goleadores</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Máximo goleador del equipo -->
+                    <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark/50">
+                        <div class="text-xs text-gray-400 uppercase font-bold mb-3 text-center">{{ equipo_nombre|display_team_name }}</div>
+                        {% if rival_info.max_goleador_equipo %}
+                            <div class="text-center">
+                                <div class="text-2xl font-black text-primary">{{ rival_info.max_goleador_equipo.goles }}</div>
+                                <div class="text-sm font-bold text-white mt-1">{{ rival_info.max_goleador_equipo.nombre }} {{ rival_info.max_goleador_equipo.apellido }}</div>
+                                <div class="text-xs text-gray-400 mt-1">goles en la temporada</div>
+                            </div>
+                        {% else %}
+                            <div class="text-center text-gray-400 text-sm">Sin datos</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Máximo goleador del rival -->
+                    <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark/50">
+                        <div class="text-xs text-gray-400 uppercase font-bold mb-3 text-center">{{ rival_info.nombre|display_team_name }}</div>
+                        {% if rival_info.max_goleador_rival %}
+                            <div class="text-center">
+                                <div class="text-2xl font-black text-primary">{{ rival_info.max_goleador_rival.goles }}</div>
+                                <div class="text-sm font-bold text-white mt-1">{{ rival_info.max_goleador_rival.nombre }} {{ rival_info.max_goleador_rival.apellido }}</div>
+                                <div class="text-xs text-gray-400 mt-1">goles en la temporada</div>
+                            </div>
+                        {% else %}
+                            <div class="text-center text-gray-400 text-sm">Sin datos</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Partido Anterior en la Temporada -->
+            {% if rival_info.partido_anterior %}
+            <div>
+                <h3 class="text-lg font-bold text-white mb-4 uppercase tracking-wider">Enfrentamiento Anterior (Jornada {{ rival_info.partido_anterior.jornada }})</h3>
+                <div class="bg-surface-dark/50 rounded-lg p-6 border border-border-dark/50">
+                    <div class="flex items-center justify-between">
+                        <!-- Equipo local -->
+                        <div class="text-center flex-1">
+                            <div class="text-xs text-gray-400 uppercase font-bold mb-2">
+                                {% if rival_info.partido_anterior.es_local %}
+                                    {{ equipo_nombre|display_team_name }}
+                                {% else %}
+                                    {{ rival_info.nombre|display_team_name }}
+                                {% endif %}
+                            </div>
+                            <div class="text-3xl font-black text-primary">{{ rival_info.partido_anterior.goles_equipo1 }}</div>
+                        </div>
+                        
+                        <!-- Resultado -->
+                        <div class="mx-4 text-center">
+                            <div class="text-xs text-gray-400 uppercase font-bold mb-2">
+                                {% if rival_info.partido_anterior.resultado == 'V' %}
+                                    <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded">Victoria</span>
+                                {% elif rival_info.partido_anterior.resultado == 'E' %}
+                                    <span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded">Empate</span>
+                                {% else %}
+                                    <span class="bg-red-500/20 text-red-400 px-3 py-1 rounded">Derrota</span>
+                                {% endif %}
+                            </div>
+                            <div class="text-lg">vs</div>
+                        </div>
+                        
+                        <!-- Equipo visitante -->
+                        <div class="text-center flex-1">
+                            <div class="text-xs text-gray-400 uppercase font-bold mb-2">
+                                {% if rival_info.partido_anterior.es_local %}
+                                    {{ rival_info.nombre|display_team_name }}
+                                {% else %}
+                                    {{ equipo_nombre|display_team_name }}
+                                {% endif %}
+                            </div>
+                            <div class="text-3xl font-black text-primary">{{ rival_info.partido_anterior.goles_equipo2 }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
             <!-- H2H Histórico -->
             {% if rival_info.h2h %}
             <div>
@@ -1086,4 +1074,20 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 </div>
+
+<script>
+    window.toggleUltimas3 = function() {
+        const content = document.getElementById('ultimas3-content');
+        const individuales = document.getElementById('temporadas-individual');
+        
+        if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            individuales.classList.add('hidden');
+        } else {
+            content.classList.add('hidden');
+            individuales.classList.remove('hidden');
+        }
+    };
+</script>
+
 {% endblock %}

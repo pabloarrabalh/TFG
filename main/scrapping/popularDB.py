@@ -25,6 +25,7 @@ import glob
 import ast
 from datetime import datetime
 import requests
+from scipy import stats as scipy_stats
 
 # Configurar Django
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -657,79 +658,87 @@ def actualizar_fechas_jornadas():
 # ============================================================================
 
 def fase_2_cargar_roles():
-    """FASE 2a: Carga roles con fuzzy matching."""
+    """FASE 2: Carga roles desde ROLES_DESTACADOS de roles.py (optimizado)."""
     print("\n" + "=" * 70)
-    print("FASE 2a: CARGAR ROLES (CON FUZZY MATCHING)")
+    print("FASE 2: CARGAR ROLES (DESDE ROLES_DESTACADOS)")
     print("=" * 70)
     
-    if RAPIDFUZZ_DISPONIBLE:
-        print("[OK] Usando rapidfuzz para fuzzy matching")
-    else:
-        print("[INFO] Usando fuzzy matching simple")
+    try:
+        from main.scrapping.roles import ROLES_DESTACADOS
+        from main.scrapping.commons import normalizar_texto
+    except Exception as e:
+        print(f"[ERROR] No se pudo importar ROLES_DESTACADOS: {e}")
+        return
     
-    temporadas_map = {
-        'temporada_23_24': '23_24',
-        'temporada_24_25': '24_25',
-        'temporada_25_26': '25_26',
-    }
+    if not ROLES_DESTACADOS:
+        print("[WARN] ROLES_DESTACADOS está vacío")
+        return
     
-    cwd = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    data_dir = os.path.join(cwd, 'data')
+    # Obtener temporadas
+    try:
+        temporadas_map = {
+            '23_24': Temporada.objects.get(nombre='23_24'),
+            '24_25': Temporada.objects.get(nombre='24_25'),
+            '25_26': Temporada.objects.get(nombre='25_26'),
+        }
+    except Temporada.DoesNotExist as e:
+        print(f"[ERROR] Temporada no encontrada: {e}")
+        return
     
-    actualizadas = 0
+    contador_total = 0
+    contador_procesados = 0
     
-    for temp_dir, temp_codigo in temporadas_map.items():
-        pattern = os.path.join(data_dir, temp_dir, 'jornada_*', 'p*.csv')
-        csvs = sorted(glob.glob(pattern))
+    # Cargar roles desde ROLES_DESTACADOS (optimizado)
+    for temp_codigo, roles_dict in ROLES_DESTACADOS.items():
+        if temp_codigo not in temporadas_map:
+            continue
         
-        for csv_path in csvs:
+        temporada_obj = temporadas_map[temp_codigo]
+        
+        if not roles_dict:
+            print(f"[SKIP] {temp_codigo}: Sin roles disponibles")
+            continue
+        
+        print(f"\n[{temp_codigo}] Procesando {len(roles_dict)} jugadores...")
+        
+        # Solo procesar stats sin roles (más rápido)
+        actualizados_temp = 0
+        stats_sin_roles = EstadisticasPartidoJugador.objects.filter(
+            partido__jornada__temporada=temporada_obj,
+            roles=[],  # Solo los que no tienen roles aún
+        ).select_related('jugador')[:50000]  # Limitar para evitar timeout
+        
+        for stat in stats_sin_roles:
             try:
-                df = pd.read_csv(csv_path, encoding='utf-8-sig')
+                # Normalizar nombre del jugador
+                jugador_nombre = f"{stat.jugador.nombre} {stat.jugador.apellido}".strip()
+                nombre_norm = normalizar_texto(jugador_nombre)
                 
-                if df.empty:
-                    continue
-                
-                primera_fila = df.iloc[0]
-                jornada_num = int(primera_fila['jornada'])
-                equipo_local_nombre = normalizar_equipo(primera_fila['equipo_propio'] if bool(primera_fila['local']) else primera_fila['equipo_rival'])
-                equipo_visitante_nombre = normalizar_equipo(primera_fila['equipo_rival'] if bool(primera_fila['local']) else primera_fila['equipo_propio'])
-                
-                try:
-                    temporada = Temporada.objects.get(nombre=temp_codigo)
-                    jornada = Jornada.objects.get(temporada=temporada, numero_jornada=jornada_num)
-                    equipo_local = Equipo.objects.get(nombre=equipo_local_nombre)
-                    equipo_visitante = Equipo.objects.get(nombre=equipo_visitante_nombre)
-                    partido = Partido.objects.get(
-                        jornada=jornada,
-                        equipo_local=equipo_local,
-                        equipo_visitante=equipo_visitante
-                    )
-                except Exception:
-                    continue
-                
-                for idx, row in df.iterrows():
-                    try:
-                        roles = parsear_roles(row['roles'])
-                        if not roles:
-                            continue
-                        
-                        nombre_jugador = row['player']
-                        es_local = bool(row['local'])
-                        equipo = equipo_local if es_local else equipo_visitante
-                        
-                        stat = buscar_jugador_partido(nombre_jugador, equipo, partido)
-                        
-                        if stat:
-                            stat.roles = roles
-                            stat.save()
-                            actualizadas += 1
-                    except Exception:
-                        continue
-            except Exception:
-                continue
+                # Buscar en ROLES_DESTACADOS
+                if nombre_norm in roles_dict:
+                    stat.roles = roles_dict[nombre_norm]
+                    stat.save()
+                    actualizados_temp += 1
+                    contador_total += 1
+                    
+                    if contador_total % 100 == 0:
+                        print(f"  [{contador_total}] {jugador_nombre}")
+            except Exception as e:
+                pass
+            finally:
+                contador_procesados += 1
+        
+        print(f"  ✅ {actualizados_temp} stats actualizadas en {temp_codigo}")
     
     con_roles = EstadisticasPartidoJugador.objects.exclude(roles=[]).count()
-    print(f"\n[OK] Roles cargados: {con_roles} estadísticas")
+    print(f"\n[OK] Resumen de carga de roles:")
+    print(f"  - Procesados: {contador_procesados}")
+    print(f"  - Actualizados: {contador_total}")
+    print(f"  - Total EstadísticasPartidoJugador con roles: {con_roles}")
+
+
+
+
 
 def fase_2b_cargar_goles():
     """FASE 2b: Carga goles en partidos - DESHABILITADO.
@@ -1005,6 +1014,9 @@ def main():
     # FASE 3: Cargar Calendario base y Goles desde JSON
     fase_3_cargar_calendario()
     fase_2g_cargar_goles_desde_calendario()
+    
+    # FASE 4: Precalcular percentiles y guardarlos en EquipoJugadorTemporada
+    fase_4_precalcular_percentiles()
     
     # Resumen final
     print("\n" + "=" * 70)
@@ -1336,6 +1348,115 @@ def fase_2g_cargar_goles_desde_calendario():
     total_partidos = Partido.objects.exclude(goles_local__isnull=True).count()
     print(f"\n[OK] Goles cargados: {total_actualizado} partidos actualizados (de {total_procesados} procesados)")
     print(f"Total partidos con goles en BD: {total_partidos}")
+
+
+def fase_4_precalcular_percentiles():
+    """Precalcula y almacena percentiles para todos los EquipoJugadorTemporada"""
+    print("\n" + "="*80)
+    print("FASE 4: PRECALCULAR PERCENTILES PARA PERFILES TÁCTICOS")
+    print("="*80)
+    
+    from main.models import EquipoJugadorTemporada, EstadisticasPartidoJugador
+    from django.db.models import Avg, Sum, Count, F, Q
+    
+    all_records = EquipoJugadorTemporada.objects.all()
+    total_records = all_records.count()
+    updated_count = 0
+    
+    print(f"Procesando {total_records} registros de Equipo-Jugador-Temporada...")
+    
+    stats_grupos = {
+        'ataque': ['goles', 'asistencias', 'tiros_puerta', 'tiros_total'],
+        'defensa': ['despejes', 'entradas', 'bloqueos'],
+        'organizacion': ['pases', 'pases_clave', 'faltas_cometidas'],
+        'regates_block': ['regates_intentados', 'regates_exitosos', 'duelos_totales']
+    }
+    
+    for idx, equipo_jug_temp in enumerate(all_records, 1):
+        if idx % 50 == 0:
+            print(f"  Progreso: {idx}/{total_records}")
+        
+        # Obtener posición del jugador en esa temporada
+        position_stats = EstadisticasPartidoJugador.objects.filter(
+            jugador=equipo_jug_temp.jugador,
+            partido__temporada=equipo_jug_temp.temporada
+        ).values('posicion').annotate(count=Count('posicion')).order_by('-count').first()
+        
+        if not position_stats:
+            continue
+        
+        posicion = position_stats['posicion']
+        equipo_jug_temp.posicion = posicion
+        
+        # Obtener stats del jugador para esta temporada
+        stats_jugador = EstadisticasPartidoJugador.objects.filter(
+            jugador=equipo_jug_temp.jugador,
+            partido__temporada=equipo_jug_temp.temporada
+        ).aggregate(
+            goles=Sum('goles') or 0,
+            asistencias=Sum('asistencias') or 0,
+            tiros_puerta=Sum('tiros_puerta') or 0,
+            tiros_total=Sum('tiros_total') or 0,
+            despejes=Sum('despejes') or 0,
+            entradas=Sum('entradas') or 0,
+            bloqueos=Sum('bloqueos') or 0,
+            pases=Sum('pases') or 0,
+            pases_clave=Sum('pases_clave') or 0,
+            faltas_cometidas=Sum('faltas_cometidas') or 0,
+            regates_intentados=Sum('regates_intentados') or 0,
+            regates_exitosos=Sum('regates_exitosos') or 0,
+            duelos_totales=Sum('duelos_totales') or 0
+        )
+        
+        # Obtener estadísticas de todos los jugadores con la misma posición en esa temporada
+        peers_stats = EstadisticasPartidoJugador.objects.filter(
+            jugador__equipojugadortemporada__posicion=posicion,
+            partido__temporada=equipo_jug_temp.temporada
+        ).values('jugador').annotate(
+            goles=Sum('goles') or 0,
+            asistencias=Sum('asistencias') or 0,
+            tiros_puerta=Sum('tiros_puerta') or 0,
+            tiros_total=Sum('tiros_total') or 0,
+            despejes=Sum('despejes') or 0,
+            entradas=Sum('entradas') or 0,
+            bloqueos=Sum('bloqueos') or 0,
+            pases=Sum('pases') or 0,
+            pases_clave=Sum('pases_clave') or 0,
+            faltas_cometidas=Sum('faltas_cometidas') or 0,
+            regates_intentados=Sum('regates_intentados') or 0,
+            regates_exitosos=Sum('regates_exitosos') or 0,
+            duelos_totales=Sum('duelos_totales') or 0
+        )
+        
+        if not peers_stats:
+            equipo_jug_temp.save()
+            updated_count += 1
+            continue
+        
+        # Calcular percentiles
+        percentiles = {}
+        
+        for grupo, stats_list in stats_grupos.items():
+            percentiles[grupo] = {}
+            for stat in stats_list:
+                valor_jugador = stats_jugador.get(stat, 0)
+                valores_peers = [p[stat] for p in peers_stats]
+                
+                if valores_peers and valor_jugador is not None:
+                    try:
+                        percentil = scipy_stats.percentileofscore(valores_peers, valor_jugador)
+                        percentiles[grupo][stat] = round(percentil, 2)
+                    except:
+                        percentiles[grupo][stat] = 0
+                else:
+                    percentiles[grupo][stat] = 0
+        
+        equipo_jug_temp.percentiles = percentiles
+        equipo_jug_temp.save()
+        updated_count += 1
+    
+    print(f"\n[OK] Percentiles precalculados y almacenados: {updated_count} registros procesados")
+
 
 
 if __name__ == '__main__':

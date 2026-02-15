@@ -42,6 +42,34 @@
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
+        /* Sidebar toggle animation */
+        .sidebar {
+            @apply transition-all duration-300 ease-in-out;
+        }
+        .sidebar-hidden {
+            @apply -translate-x-full !important;
+            position: fixed !important;
+        }
+        /* En desktop, cuando el sidebar está visible, el main tiene margen */
+        @media (min-width: 1024px) {
+            main:has(+ aside:not(.sidebar-hidden)),
+            main {
+                transition: margin-left 300ms ease-in-out;
+            }
+            #sidebar:not(.sidebar-hidden) {
+                position: relative !important;
+                transform: none !important;
+                left: auto !important;
+            }
+        }
+        /* Main content siempre ocupa el espacio disponible */
+        main {
+            @apply flex-1;
+        }
+        /* Inicialización suave del sidebar */
+        #sidebar {
+            will-change: transform;
+        }
         {% block extra_styles %}{% endblock %}
     </style>
 </head>
@@ -49,34 +77,72 @@
     <!-- Header -->
     <header class="flex items-center justify-between px-6 py-4 bg-background-dark border-b border-border-dark z-50">
         <div class="flex items-center gap-8">
-            <div class="flex items-center gap-3">
-                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-primary/40 shadow-[0_0_15px_rgba(57,255,20,0.3)]" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAVDKCCl7fgNTHnOONH9b1pVo5yZV2mf6YUic_74IV64rXvVTstNYJyDhfzERCgryWq7VFK_hN2_Dsejh3EhPeRWLKvXKsGCOPYdc5OM-GORtOpvH4uL6SPzz9HMGkjta4toRj3aWVbwdoGMfBdO-hJe-_37441iZwZx89FKt2ooiHKMqiSasV59_KOP_JylGCyy7Mh-yDZ4aDbPmA0axXAJ_mlQhE9jJiKzb65zwlpRpXoS3P59RUPRtmcPmVPqiuGGfVZq-0J0nE");'></div>
-                <h1 class="text-white text-2xl font-black tracking-tighter italic uppercase bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">LigaMaster</h1>
-            </div>
+            <!-- Icono de hamburguesa para toggle del menú -->
+            <button id="burger-toggle" class="flex items-center justify-center cursor-pointer hover:text-primary transition-colors hover:scale-110 text-gray-300">
+                <span class="material-symbols-outlined text-2xl">menu</span>
+            </button>
+            <!-- Título clickeable para ir al inicio -->
+            <a href="{% url 'menu' %}" class="text-white text-2xl font-black tracking-tighter italic uppercase bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent hover:opacity-80 transition-opacity">LigaMaster</a>
             <div class="relative w-96 hidden md:block group">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <span class="material-symbols-outlined text-gray-500 group-focus-within:text-primary transition-colors">search</span>
                 </div>
-                <input class="block w-full pl-10 pr-3 py-2.5 border border-border-dark rounded-xl bg-surface-dark text-white placeholder-gray-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 text-sm transition-all" placeholder="Buscar jugador, equipo..." type="text"/>
+                <input id="search-input" class="block w-full pl-10 pr-3 py-2.5 border border-border-dark rounded-xl bg-surface-dark text-white placeholder-gray-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 text-sm transition-all" placeholder="Buscar jugador, equipo..." type="text" autocomplete="off"/>
+                <!-- Dropdown de resultados -->
+                <div id="search-results" class="hidden absolute top-full left-0 right-0 mt-1 bg-surface-dark border border-border-dark rounded-xl shadow-lg z-50 max-h-80 overflow-y-auto">
+                </div>
             </div>
         </div>
-        <div class="flex items-center gap-6">
-            <div class="flex items-center gap-3 cursor-pointer group">
+        <div class="flex items-center gap-6 relative">
+            {% if user.is_authenticated %}
+            <!-- Usuario logueado con dropdown -->
+            <button id="user-dropdown-toggle" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
                 <div class="text-right hidden sm:block">
-                    <p class="text-sm font-bold text-white group-hover:text-primary transition-colors">Usuario</p>
+                    <p class="text-sm font-bold text-white">{{ user.first_name }}</p>
                     <div class="flex items-center justify-end gap-1">
-                        <span class="size-2 rounded-full bg-primary animate-pulse"></span>
-                        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Online</p>
+                        <span class="size-2 rounded-full {% if user.profile.estado == 'active' %}bg-green-500{% elif user.profile.estado == 'away' %}bg-gray-500{% else %}bg-yellow-500{% endif %} animate-pulse"></span>
+                        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">{% if user.profile.estado == 'active' %}Activo{% elif user.profile.estado == 'away' %}Ausente{% else %}No molestar{% endif %}</p>
                     </div>
                 </div>
-                <div class="bg-center bg-no-repeat bg-cover rounded-xl size-10 ring-1 ring-border-dark group-hover:ring-primary transition-all shadow-lg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAC70CU1jFvEKdFwEkb5HaYb2N7sEvrLP_bpanZ_IO7UJajBBp-fihK-bZFq2E9YthzHSIEIQECiY557a16ZUSNRdS98Zjbp4_Luy29XNlCqZER5s20aaHYFvyTv_7_XqwK5NRNhR0qXJjJGV0emBQO41m_dLTKOqTkZ7oPIDxDZEy13U3f6OW3bpEwz-_zHd0kmeSJVQ7z22yg-3vIFUMgmJqqv5QqtbETSvTlq3ABJcsUEk8erdKaDJseN5ZBHZbOuQMh4bhGd-A");'></div>
+                <div class="bg-center bg-no-repeat bg-cover rounded-xl size-10 ring-1 ring-border-dark hover:ring-primary transition-all shadow-lg" style='background-image: url("{% if user.profile.foto %}{{ user.profile.foto.url }}{% else %}https://ui-avatars.com/api/?name={{ user.first_name }}+{{ user.last_name }}&background=39ff14&color=050505&bold=true&size=256{% endif %}" );'></div>
+            </button>
+            
+            <!-- Dropdown menu -->
+            <div id="user-dropdown-menu" class="hidden absolute right-0 top-full mt-2 w-56 bg-surface-dark border border-border-dark rounded-xl shadow-lg z-50">
+                <div class="p-4 space-y-2">
+                    <a href="{% url 'perfil' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 text-gray-300 hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">person</span>
+                        <span class="text-sm font-medium">Ver perfil</span>
+                    </a>
+                    <a href="{% url 'mi_plantilla' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 text-gray-300 hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">groups</span>
+                        <span class="text-sm font-medium">Mi Plantilla</span>
+                    </a>
+                    <div class="border-t border-border-dark my-2"></div>
+                    <form method="post" action="{% url 'logout' %}" class="w-full">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-600/10 text-gray-300 hover:text-red-500 transition-colors">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span class="text-sm font-medium">Cerrar sesión</span>
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
+            {% else %}
+            <!-- No autenticado -->
+            <a href="{% url 'login_register' %}" class="flex items-center justify-center gap-2 px-6 py-2 bg-gradient-to-r from-primary to-green-500 hover:from-green-500 hover:to-primary rounded-lg transition-all font-bold shadow-lg text-sm text-black">
+                <span class="material-symbols-outlined text-sm">login</span>
+                <span>Iniciar Sesión</span>
+            </a>
+            {% endif %}
     </header>
 
     <div class="flex h-full w-full overflow-hidden">
+        <!-- Overlay para móviles cuando sidebar está abierto -->
+        <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/50 z-30 lg:hidden" onclick="document.getElementById('sidebar').classList.add('sidebar-hidden')"></div>
+        
         <!-- Sidebar -->
-        <aside class="hidden lg:flex flex-col w-72 h-full bg-surface-dark border-r border-border-dark">
+        <aside id="sidebar" class="sidebar sidebar-hidden fixed flex flex-col w-72 h-full bg-surface-dark border-r border-border-dark z-40">
             <nav class="flex-1 px-4 py-8 space-y-2">
                 <a class="flex items-center gap-4 px-4 py-3.5 rounded-xl {% if active_page == 'menu' %}bg-primary/10 text-primary border border-primary/20 font-bold shadow-[0_0_20px_rgba(57,255,20,0.1)]{% else %}text-gray-400 hover:bg-white/5 hover:text-white font-medium group{% endif %} transition-all" href="{% url 'menu' %}">
                     <span class="material-symbols-outlined {% if active_page != 'menu' %}group-hover:text-primary{% endif %} transition-colors">home</span>
@@ -90,7 +156,7 @@
                     <span class="material-symbols-outlined {% if active_page != 'liga' %}group-hover:text-primary{% endif %} transition-colors">sports_soccer</span>
                     <span class="text-sm tracking-wide">Liga</span>
                 </a>
-                <a class="flex items-center gap-4 px-4 py-3.5 rounded-xl {% if active_page == 'equipos' %}bg-primary/10 text-primary border border-primary/20 font-bold shadow-[0_0_20px_rgba(57,255,20,0.1)]{% else %}text-gray-400 hover:bg-white/5 hover:text-white font-medium group{% endif %} transition-all" href="{% url 'clasificacion' %}">
+                <a class="flex items-center gap-4 px-4 py-3.5 rounded-xl {% if active_page == 'equipos' %}bg-primary/10 text-primary border border-primary/20 font-bold shadow-[0_0_20px_rgba(57,255,20,0.1)]{% else %}text-gray-400 hover:bg-white/5 hover:text-white font-medium group{% endif %} transition-all" href="{% url 'equipos' %}">
                     <span class="material-symbols-outlined {% if active_page != 'equipos' %}group-hover:text-primary{% endif %} transition-colors">shield</span>
                     <span class="text-sm tracking-wide">Equipos</span>
                 </a>
@@ -104,10 +170,20 @@
                 </a>
             </nav>
             <div class="p-4 border-t border-border-dark">
-                <button class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-xl transition-all font-medium shadow-lg text-sm">
-                    <span class="material-symbols-outlined">logout</span>
-                    Salir
-                </button>
+                {% if user.is_authenticated %}
+                <form method="post" action="{% url 'logout' %}" class="w-full">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-xl transition-all font-medium shadow-lg text-sm">
+                        <span class="material-symbols-outlined">logout</span>
+                        Salir
+                    </button>
+                </form>
+                {% else %}
+                <a href="{% url 'login_register' %}" class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-gradient-to-r from-primary to-green-500 hover:from-green-500 hover:to-primary rounded-xl transition-all font-medium shadow-lg text-sm text-black">
+                    <span class="material-symbols-outlined">login</span>
+                    Iniciar Sesión
+                </a>
+                {% endif %}
             </div>
         </aside>
 
@@ -116,6 +192,173 @@
             {% block content %}{% endblock %}
         </main>
     </div>
+    
+    <script>
+        // Obtener referencia al sidebar y setup inicial
+        const sidebar = document.getElementById('sidebar');
+        sidebar.style.transition = 'none'; // Deshabilitar transición inicial
+        
+        // Aplicar estado correcto SIN transición
+        const userPreference = localStorage.getItem('sidebarHidden') === 'true';
+        if (userPreference) {
+            sidebar.classList.add('sidebar-hidden');
+        } else {
+            sidebar.classList.remove('sidebar-hidden');
+        }
+        
+        // Habilitamos transiciones después de que el DOM esté listo
+        setTimeout(() => {
+            sidebar.style.transition = '';
+        }, 50);
+        
+        // Toggle del dropdown del usuario
+        const userDropdownToggle = document.getElementById('user-dropdown-toggle');
+        const userDropdownMenu = document.getElementById('user-dropdown-menu');
+        
+        if (userDropdownToggle) {
+            userDropdownToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdownMenu.classList.toggle('hidden');
+            });
+            
+            // Cerrar dropdown al hacer click fuera
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#user-dropdown-toggle') && !e.target.closest('#user-dropdown-menu')) {
+                    userDropdownMenu.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Toggle del menú lateral con icono de hamburguesa
+        const burgerToggle = document.getElementById('burger-toggle');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        
+        // Recuperar preferencia guardada del usuario
+        function getSidebarPreference() {
+            return localStorage.getItem('sidebarHidden') === 'true';
+        }
+        
+        // Guardar preferencia del usuario
+        function saveSidebarPreference(isHidden) {
+            localStorage.setItem('sidebarHidden', isHidden);
+        }
+        
+        // Actualizar overlay
+        function updateOverlay() {
+            const isHidden = sidebar.classList.contains('sidebar-hidden');
+            if (isHidden) {
+                sidebarOverlay.classList.add('hidden');
+            } else {
+                sidebarOverlay.classList.remove('hidden');
+            }
+        }
+        
+        // Actualizar overlay en carga
+        updateOverlay();
+        
+        // Controlar el toggle del menú con la hamburguesa
+        burgerToggle?.addEventListener('click', (e) => {
+            e.preventDefault();
+            sidebar.classList.toggle('sidebar-hidden');
+            updateOverlay();
+            // Guardar el estado
+            const isHidden = sidebar.classList.contains('sidebar-hidden');
+            saveSidebarPreference(isHidden);
+        });
+        
+        // Cerrar el menú al hacer click en un enlace (en mobile) - GUARDANDO preferencia
+        const sidebarLinks = sidebar.querySelectorAll('a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) {
+                    sidebar.classList.add('sidebar-hidden');
+                    updateOverlay();
+                    // Guardar la preferencia de que debe estar cerrado
+                    saveSidebarPreference(true);
+                }
+            });
+        });
+        
+        // Cerrar menú al hacer click en botón de salir (en mobile) - GUARDANDO preferencia
+        const logoutForms = sidebar.querySelectorAll('form');
+        logoutForms.forEach(form => {
+            form.addEventListener('submit', () => {
+                if (window.innerWidth < 1024) {
+                    sidebar.classList.add('sidebar-hidden');
+                    updateOverlay();
+                    // Guardar la preferencia de que debe estar cerrado
+                    saveSidebarPreference(true);
+                }
+            });
+        });
+        
+        // Reinicializar cuando se cambia el tamaño de la ventana
+        window.addEventListener('resize', () => {
+            const isDesktop = window.innerWidth >= 1024;
+            const userPreference = getSidebarPreference();
+            
+            // En mobile, siempre cerrar el sidebar
+            if (!isDesktop && !sidebar.classList.contains('sidebar-hidden')) {
+                sidebar.classList.add('sidebar-hidden');
+                updateOverlay();
+            }
+        });
+
+        // ===== BÚSQUEDA EN VIVO =====
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+        let searchTimeout;
+
+        searchInput?.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+
+            if (query.length < 3) {
+                searchResults.classList.add('hidden');
+                searchResults.innerHTML = '';
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                fetch(`/api/buscar/?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.results && data.results.length > 0) {
+                            searchResults.innerHTML = data.results.map(result => {
+                                const tipo = result.type === 'jugador' ? 'Jugador' : 'Equipo';
+                                const icon = result.type === 'jugador' ? 'person' : 'shield';
+                                const subtitle = result.type === 'jugador' ? result.posicion : '';
+                                
+                                return `
+                                    <a href="${result.url}" class="flex items-center gap-3 px-4 py-3 hover:bg-surface-light transition-colors border-b border-border-dark last:border-b-0">
+                                        <span class="material-symbols-outlined text-primary">${icon}</span>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-semibold text-white">${result.nombre}</p>
+                                            <p class="text-xs text-gray-400">${tipo}${subtitle ? ' • ' + subtitle : ''}</p>
+                                        </div>
+                                    </a>
+                                `;
+                            }).join('');
+                            searchResults.classList.remove('hidden');
+                        } else {
+                            searchResults.innerHTML = '<p class="px-4 py-6 text-center text-gray-400 text-sm">No hay resultados</p>';
+                            searchResults.classList.remove('hidden');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error en búsqueda:', error);
+                        searchResults.classList.add('hidden');
+                    });
+            }, 300);
+        });
+
+        // Cerrar resultados al hacer clic fuera
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.relative.w-96')) {
+                searchResults.classList.add('hidden');
+            }
+        });
+    </script>
     
     {% block extra_scripts %}{% endblock %}
 </body>

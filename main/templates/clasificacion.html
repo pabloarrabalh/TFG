@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load team_filters %}
+{% load static %}
 
 {% block title %}LigaMaster - Clasificación{% endblock %}
 
@@ -45,9 +46,11 @@
     @apply bg-surface-dark border border-border-dark text-white px-4 py-2.5 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all cursor-pointer;
 }
 
-/* Estilos de equipos */
-.team-badge {
-    @apply size-8 rounded-lg flex items-center justify-center border-2 font-bold text-xs;
+/* Escudo de equipo pequeño en tabla */
+.team-shield-small {
+    @apply size-8 rounded-lg object-contain drop-shadow-md;
+    object-position: center;
+    display: block;
 }
 
 /* Racha con círculos de colores */
@@ -67,158 +70,6 @@
 /* Equipo seleccionado o resaltado */
 .team-highlighted {
     @apply bg-yellow-500/20 text-yellow-400 font-bold px-3 py-2 rounded-lg;
-}
-
-/* Colores y patrones personalizados por equipo */
-.team-real-madrid,
-.team-madrid {
-    @apply bg-white border-white text-black;
-}
-
-.team-barcelona,
-.team-fc-barcelona {
-    background: repeating-linear-gradient(90deg, #004687 0 8px, #c60c30 8px 16px);
-    @apply border-blue-600 text-white;
-}
-
-.team-atletico-madrid,
-.team-atletico {
-    background: linear-gradient(90deg, white 25%, red 25%, red 50%, white 50%, white 75%, red 75%, red);
-    background-size: 8px 100%;
-    @apply border-red-600 text-black;
-}
-
-.team-athletic-club,
-.team-athletic {
-    background: linear-gradient(90deg, white 25%, red 25%, red 50%, white 50%, white 75%, red 75%, red);
-    background-size: 8px 100%;
-    @apply border-red-600 text-black;
-}
-
-.team-villarreal {
-    @apply bg-yellow-400 border-yellow-500 text-black;
-}
-
-.team-real-betis,
-.team-betis {
-    background: linear-gradient(90deg, white 25%, #007749 25%, #007749 50%, white 50%, white 75%, #007749 75%, #007749);
-    background-size: 8px 100%;
-    @apply border-green-700 text-black;
-}
-
-.team-sevilla {
-    @apply bg-red-600 border-red-700 text-white;
-}
-
-.team-rcd-espanyol,
-.team-espanyol {
-    background: linear-gradient(90deg, white 25%, #1e88e5 25%, #1e88e5 50%, white 50%, white 75%, #1e88e5 75%, #1e88e5);
-    background-size: 8px 100%;
-    @apply border-blue-600 text-black;
-}
-
-.team-alaves,
-.team-alavés {
-    background: linear-gradient(90deg, white 25%, #1e88e5 25%, #1e88e5 50%, white 50%, white 75%, #1e88e5 75%, #1e88e5);
-    background-size: 8px 100%;
-    @apply border-blue-600 text-black;
-}
-
-.team-elche {
-    @apply bg-green-500 border-green-600 text-black;
-}
-
-.team-rayo-vallecano,
-.team-rayo {
-    /* Fondo rojo con una franja blanca central más estrecha */
-    background: linear-gradient(90deg, #ed1c24 0%, #ed1c24 40%, white 40% 60%, #ed1c24 60% 100%);
-    @apply border-red-600 text-black;
-}
-
-.team-osasuna,
-.team-ca-osasuna {
-    /* Rayas verticales azul y rojo */
-    background: repeating-linear-gradient(90deg, #1e88e5 0 8px, #ed1c24 8px 16px);
-    @apply border-red-600 text-white;
-}
-
-.team-valencia,
-.team-cf-valencia {
-    @apply bg-white border-white text-black;
-}
-
-.team-levante {
-    /* Rayas verticales similares a Barcelona */
-    background: repeating-linear-gradient(90deg, #004687 0 8px, #c60c30 8px 16px);
-    @apply border-blue-600 text-white;
-}
-
-.team-real-mallorca,
-.team-mallorca {
-    background: linear-gradient(90deg, #c60c30 25%, black 25%, black 50%, #c60c30 50%, #c60c30 75%, black 75%, black);
-    background-size: 8px 100%;
-    @apply border-red-600 text-white;
-}
-
-.team-celta-vigo,
-.team-celta {
-    @apply bg-blue-400 border-blue-500 text-white;
-}
-
-.team-real-sociedad,
-.team-sociedad {
-    background: linear-gradient(90deg, white 25%, #1e88e5 25%, #1e88e5 50%, white 50%, white 75%, #1e88e5 75%, #1e88e5);
-    background-size: 8px 100%;
-    @apply border-blue-600 text-black;
-}
-
-.team-real-oviedo,
-.team-oviedo {
-    @apply bg-blue-900 border-blue-950 text-white;
-}
-
-.team-girona,
-.team-fc-girona {
-    @apply bg-red-600 border-red-700 text-white;
-}
-
-.team-getafe,
-.team-cf-getafe {
-    @apply bg-blue-600 border-blue-700 text-white;
-}
-
-.team-granada,
-.team-cf-granada {
-    /* Rojo con múltiples líneas horizontales blancas centradas */
-    background: repeating-linear-gradient(0deg, white 0 3px, #c60c30 3px 12px);
-    @apply border-red-700 text-black;
-}
-
-.team-las-palmas,
-.team-ud-las-palmas {
-    @apply bg-yellow-400 border-yellow-500 text-black;
-}
-
-.team-cadiz,
-.team-cádiz {
-    @apply bg-yellow-300 border-yellow-400 text-black;
-}
-
-.team-almeria,
-.team-almería {
-    /* Rojo con líneas verticales blancas como Alavés */
-    background: linear-gradient(90deg, white 25%, #c60c30 25%, #c60c30 50%, white 50%, white 75%, #c60c30 75%, #c60c30);
-    background-size: 8px 100%;
-    @apply border-red-700 text-black;
-}
-
-.team-real-valladolid,
-.team-valladolid {
-    @apply bg-white border-yellow-400 text-black;
-}
-
-.team-leganes {
-    @apply bg-yellow-400 border-yellow-500 text-black;
 }
 {% endblock %}
 
@@ -476,9 +327,10 @@
                                 <td class="px-6 py-4 text-sm font-bold text-primary group-hover:text-primary">{{ registro.posicion }}</td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
-                                        <div class="team-badge team-{{ registro.equipo.nombre|normalize_team_name }}">
-                                            <span>{{ registro.iniciales }}</span>
-                                        </div>
+                                        <img src="{% static 'escudos/' %}{{ registro.equipo.nombre|shield_name }}.png" 
+                                             alt="{{ registro.equipo.nombre }}" 
+                                             class="team-shield-small"
+                                             onerror="this.style.display='none'">
                                         <div>
                                             <a href="{% url 'equipo_temporada' registro.equipo.nombre temporada_nombre %}?jornada={{ jornada_actual }}" class="font-bold text-sm hover:text-primary transition-colors cursor-pointer {% if equipo_seleccionado == registro.equipo.nombre %}text-yellow-400{% else %}text-white{% endif %}">{{ registro.equipo.nombre|display_team_name }}</a>
                                         </div>
