@@ -78,170 +78,107 @@ def cargar_clasificacion(path: str, temporada_tag: str) -> pd.DataFrame:
     return standings
 
 
-def cargar_cuotas(path: str, temporada_tag: str) -> pd.DataFrame:
-    odds = pd.read_csv(path)
-    odds["temporada"] = temporada_tag
-    odds["Date"] = pd.to_datetime(odds["Date"], format="%d/%m/%Y", errors="coerce")
-    odds["HomeTeam"] = normalizar_equipo_series(odds["HomeTeam"])
-    odds["AwayTeam"] = normalizar_equipo_series(odds["AwayTeam"])
-    return odds
-
-
 def construir_dataset_completo():
     df_players_23_24 = cargar_jugadores_temporada("data/temporada_23_24", "23_24")
     standings_23_24 = cargar_clasificacion("data/temporada_23_24/clasificacion_temporada.csv", "23_24")
-    odds_23_24 = cargar_cuotas("data/temporada_23_24/SP1.csv", "23_24")
 
     df_players_24_25 = cargar_jugadores_temporada("data/temporada_24_25", "24_25")
     standings_24_25 = cargar_clasificacion("data/temporada_24_25/clasificacion_temporada.csv", "24_25")
-    odds_24_25 = cargar_cuotas("data/temporada_24_25/SP1.csv", "24_25")
 
     df_players_25_26 = cargar_jugadores_temporada("data/temporada_25_26", "25_26")
     standings_25_26 = cargar_clasificacion("data/temporada_25_26/clasificacion_temporada.csv", "25_26")
-    odds_25_26 = cargar_cuotas("data/temporada_25_26/SP1.csv", "25_26")
 
     df_players = pd.concat([df_players_23_24, df_players_24_25, df_players_25_26], ignore_index=True)
-    for col in ["Equipo_propio", "Equipo_rival"]:
-        df_players[col] = normalizar_equipo_series(df_players[col])
+    
+    # Normalizar nombres de columnas de equipo (caso-insensitivo)
+    equipo_cols = [col for col in df_players.columns if 'equipo' in col.lower()]
+    for col in equipo_cols:
+        if df_players[col].dtype == 'object':  # Solo si es string
+            df_players[col] = normalizar_equipo_series(df_players[col])
+    
     df_players = enriquecer_roles(df_players)
+    
+    # Limpiar outliers de puntos > 30 (reemplazar por mediana)
+    # Detectar columna de puntos (case-insensitive)
+    puntos_col = next((col for col in df_players.columns if 'puntos' in col.lower()), None)
+    if puntos_col:
+        mediana_puntos = df_players[df_players[puntos_col] <= 30][puntos_col].median()
+        df_players.loc[df_players[puntos_col] > 30, puntos_col] = mediana_puntos
+        print(f"✅ Outliers en {puntos_col} limpiados (mediana: {mediana_puntos:.2f})")
+    else:
+        print("⚠️ No se encontró columna de puntos")
 
     standings = pd.concat([standings_23_24, standings_24_25, standings_25_26], ignore_index=True)
-    odds = pd.concat([odds_23_24, odds_24_25, odds_25_26], ignore_index=True)
 
     df_players.to_csv("csv/csvGenerados/players_matches_all_seasons.csv", index=False)
     standings.to_csv("csv/csvGenerados/standings_all_seasons.csv", index=False)
-    odds.to_csv("csv/csvGenerados/odds_all_seasons.csv", index=False)
+    
+    print(f"📊 Columnas en df_players: {df_players.columns.tolist()[:10]}...")
 
-    return df_players, standings, odds
+    return df_players, standings
 
 
-def preparar_datos_exp1(df_players: pd.DataFrame, standings: pd.DataFrame, odds: pd.DataFrame) -> pd.DataFrame:
+def agregar_standings_lagged_y_crear_target(df_players: pd.DataFrame, standings: pd.DataFrame) -> pd.DataFrame:
+    """
+    Enriquece datos de jugadores con standings de la jornada anterior (lagged)
+    y crea el target (puntos fantasy de la próxima jornada).
+    
+    Usado para TRAINING: proporciona features + targets históricos.
+    
+    Args:
+        df_players: DataFrame con datos de jugadores (todas las jornadas)
+        standings: DataFrame con clasificación por jornada
+    
+    Returns:
+        DataFrame enriquecido con:
+        - jornada_anterior: referencia a jornada previa
+        - Columnas standings del equipo propio (jornada anterior) con sufijo "_equipo"
+        - Columnas standings del rival (jornada anterior) con sufijo "_rival"
+        - target_pf_next: puntos fantasy que sacará en la próxima jornada (LABEL para ML)
+    """
     df = df_players.copy()
     df["jornada_anterior"] = df["jornada"] - 1
 
-    st_own = standings.rename(columns={"equipo": "Equipo_propio", "jornada": "jornada_anterior"})
-    df = df.merge(st_own, on=["temporada", "jornada_anterior", "Equipo_propio"], how="left", suffixes=("", "_equipo"))
+    # Detectar nombres de columnas de equipo (case-insensitive)
+    equipo_propio_col = next((col for col in df.columns if 'equipo' in col.lower() and 'propio' in col.lower()), None)
+    equipo_rival_col = next((col for col in df.columns if 'equipo' in col.lower() and 'rival' in col.lower()), None)
+    
+    # Si no encuentra, usar nombres estándar
+    if not equipo_propio_col:
+        equipo_propio_col = "equipo_propio"
+    if not equipo_rival_col:
+        equipo_rival_col = "equipo_rival"
 
-    st_rival = standings.rename(columns={"equipo": "Equipo_rival", "jornada": "jornada_anterior"})
-    df = df.merge(st_rival, on=["temporada", "jornada_anterior", "Equipo_rival"], how="left", suffixes=("", "_rival"))
+    equipo_col_standings = next((col for col in standings.columns if col.lower() == 'equipo'), 'equipo')
+    
+    # Detectar columna de puntos
+    puntos_col = next((col for col in df.columns if 'puntos' in col.lower()), 'puntos')
+    
+    print(f"\n📋 Detectadas columnas:")
+    print(f"   - Equipo propio: {equipo_propio_col}")
+    print(f"   - Equipo rival: {equipo_rival_col}")
+    print(f"   - Puntos: {puntos_col}")
+    print(f"   - Equipo en standings: {equipo_col_standings}")
+    
+    try:
+        st_own = standings.rename(columns={equipo_col_standings: equipo_propio_col, "jornada": "jornada_anterior"})
+        df = df.merge(st_own, on=["temporada", "jornada_anterior", equipo_propio_col], how="left", suffixes=("", "_equipo"))
 
-    o = odds.copy()
-    o = o.rename(columns={"HomeTeam": "home", "AwayTeam": "away"})
-    for c in ["AvgH", "AvgD", "AvgA"]:
-        o[c] = pd.to_numeric(o[c], errors="coerce")
-
-    o["inv_H"] = 1 / o["AvgH"]
-    o["inv_D"] = 1 / o["AvgD"]
-    o["inv_A"] = 1 / o["AvgA"]
-    o["sum_inv"] = o[["inv_H", "inv_D", "inv_A"]].sum(axis=1)
-
-    o["p_home"] = o["inv_H"] / o["sum_inv"]
-    o["p_draw"] = o["inv_D"] / o["sum_inv"]
-    o["p_away"] = o["inv_A"] / o["sum_inv"]
-
-    o["Avg>2.5"] = pd.to_numeric(o["Avg>2.5"], errors="coerce")
-    o["Avg<2.5"] = pd.to_numeric(o["Avg<2.5"], errors="coerce")
-    o["inv_over"] = 1 / o["Avg>2.5"]
-    o["inv_under"] = 1 / o["Avg<2.5"]
-    o["sum_ou"] = o["inv_over"] + o["inv_under"]
-    o["p_over25"] = o["inv_over"] / o["sum_ou"]
-    o["ah_line"] = pd.to_numeric(o["AHh"], errors="coerce")
-
-    o_small = o[["temporada", "Date", "home", "away", "p_home", "p_draw", "p_away", "p_over25", "ah_line", "HS", "AS", "HST", "AST"]]
-
-    merge_home = df.merge(o_small, left_on=["temporada", "Equipo_propio", "Equipo_rival"], 
-                          right_on=["temporada", "home", "away"], how="left")
-    merge_away = df.merge(o_small, left_on=["temporada", "Equipo_propio", "Equipo_rival"], 
-                          right_on=["temporada", "away", "home"], how="left", suffixes=("", "_alt"))
-
-    cols_backup = ["p_home", "p_draw", "p_away", "p_over25", "ah_line", "HS", "AS", "HST", "AST", "home", "away", "Date"]
-    for col in cols_backup:
-        if f"{col}_alt" in merge_away.columns:
-            merge_away[f"{col}_alt_final"] = merge_away[f"{col}_alt"]
-        else:
-            merge_away[f"{col}_alt_final"] = merge_away[col]
-    for col in cols_backup:
-        merge_home[col] = merge_home[col].where(~merge_home[col].isna(), merge_away[f"{col}_alt_final"])
-
-    df = merge_home
-
-    df["p_win_propio"] = df["p_home"] * df["local"] + df["p_away"] * (1 - df["local"])
-    df["p_loss_propio"] = df["p_away"] * df["local"] + df["p_home"] * (1 - df["local"])
-    df["p_draw_match"] = df["p_draw"]
-    df["p_over25_match"] = df["p_over25"]
-    df["ah_line_match"] = df["ah_line"]
-
-    df["shots_propio_partido"] = df["HS"] * df["local"] + df["AS"] * (1 - df["local"])
-    df["shots_rival_partido"] = df["AS"] * df["local"] + df["HS"] * (1 - df["local"])
-    df["shots_on_target_propio_partido"] = df["HST"] * df["local"] + df["AST"] * (1 - df["local"])
-    df["shots_on_target_rival_partido"] = df["AST"] * df["local"] + df["HST"] * (1 - df["local"])
+        st_rival = standings.rename(columns={equipo_col_standings: equipo_rival_col, "jornada": "jornada_anterior"})
+        df = df.merge(st_rival, on=["temporada", "jornada_anterior", equipo_rival_col], how="left", suffixes=("", "_rival"))
+        print(f"✅ Merge con standings completado")
+    except Exception as e:
+        print(f"⚠️ Warning en merge de clasificación: {e}")
+        print(f"   Columnas en df: {df.columns.tolist()[:15]}")
 
     df = df.sort_values(["player", "temporada", "jornada", "fecha_partido"])
-    df["target_pf_next"] = df.groupby(["player", "temporada"])["puntosFantasy"].shift(-1)
-
-    return df
-
-
-def preparar_rachas(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.sort_values(["temporada", "jornada", "fecha_partido"])
-
-    xg_team = df.groupby(["temporada", "jornada", "Equipo_propio"])["xG_partido"].sum().reset_index().rename(columns={"xG_partido": "xg_team_partido"})
-    df = df.merge(xg_team, on=["temporada", "jornada", "Equipo_propio"], how="left")
-
-    xg_rival_partido = df.groupby(["temporada", "jornada", "Equipo_rival"])["xG_partido"].sum().reset_index().rename(columns={"xG_partido": "xg_rival_partido"})
-    df = df.merge(xg_rival_partido, on=["temporada", "jornada", "Equipo_rival"], how="left")
-
-    g_team = df.groupby(["Equipo_propio", "temporada"])
-    for ventana in [3, 5, 8]:
-        df[f"gf_last{ventana}_mean_team"] = g_team["gf"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).mean())
-        df[f"gc_last{ventana}_mean_team"] = g_team["gc"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).mean())
-        df[f"goal_diff_last{ventana}_team"] = df[f"gf_last{ventana}_mean_team"] - df[f"gc_last{ventana}_mean_team"]
-        df[f"xg_last{ventana}_mean_team"] = g_team["xg_team_partido"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).mean())
-        df[f"xg_contra_last{ventana}_mean_team"] = g_team["xg_rival_partido"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).mean())
-
-    g_rival = df.groupby(["Equipo_rival", "temporada"])
-    for ventana in [3, 5, 8]:
-        df[f"shots_last{ventana}_mean_rival"] = g_rival["shots_rival_partido"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).mean())
-        df[f"shots_on_target_last{ventana}_mean_rival"] = g_rival["shots_on_target_rival_partido"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).mean())
-        df[f"shots_on_target_ratio_rival_last{ventana}"] = df[f"shots_on_target_last{ventana}_mean_rival"] / df[f"shots_last{ventana}_mean_rival"].replace(0, np.nan)
-        df[f"gf_last{ventana}_mean_rival"] = g_rival["gf_rival"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).mean())
-        df[f"gc_last{ventana}_mean_rival"] = g_rival["gc_rival"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).mean())
-        df[f"goal_diff_last{ventana}_rival"] = df[f"gf_last{ventana}_mean_rival"] - df[f"gc_last{ventana}_mean_rival"]
-        df[f"xg_last{ventana}_mean_rival"] = g_rival["xg_team_partido"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).mean())
-        df[f"xg_contra_last{ventana}_mean_rival"] = g_rival["xg_rival_partido"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).mean())
-
-    df["goal_per_shot_rival"] = df["gf_last5_mean_rival"] / df["shots_last5_mean_rival"].replace(0, np.nan)
-    df["goal_attack_vs_defense"] = df["gf_last5_mean_rival"] - df["gc_last5_mean_team"]
-
-    df["pts_diff"] = df["pts"] - df["pts_rival"]
-    df["gf_diff"] = df["gf"] - df["gf_rival"]
-    df["gc_diff"] = df["gc"] - df["gc_rival"]
-
-    df["is_top4_propio"] = (df["posicion_equipo"] <= 4).astype(int)
-    df["is_top4_rival"] = (df["posicion_rival"] <= 4).astype(int)
-    df["is_bottom3_rival"] = (df["posicion_rival"] >= 18).astype(int)
-
-    df = df.sort_values(["player", "temporada", "jornada", "fecha_partido"])
-    gk_group = df.groupby(["player", "temporada"])
-
-    for ventana in [3, 5, 8]:
-        df[f"pf_last{ventana}_std"] = gk_group["puntosFantasy"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).std())
-        df[f"gc_last{ventana}_std"] = gk_group["Goles_en_contra"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).std())
-        df[f"psxg_last{ventana}_std"] = gk_group["PSxG"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).std())
-        df[f"min_last{ventana}_sum"] = gk_group["Min_partido"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).sum())
-        df[f"psxg_last{ventana}_sum"] = gk_group["PSxG"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).sum())
-        df[f"gc_last{ventana}_sum"] = gk_group["Goles_en_contra"].transform(lambda s: s.shift(1).rolling(ventana, min_periods=1).sum())
-        df[f"psxg_per90_last{ventana}"] = pd.NA
-        df[f"gc_per90_last{ventana}"] = pd.NA
-        cond = df[f"min_last{ventana}_sum"] >= 180
-        df.loc[cond, f"psxg_per90_last{ventana}"] = df.loc[cond, f"psxg_last{ventana}_sum"] * 90 / df.loc[cond, f"min_last{ventana}_sum"]
-        df.loc[cond, f"gc_per90_last{ventana}"] = df.loc[cond, f"gc_last{ventana}_sum"] * 90 / df.loc[cond, f"min_last{ventana}_sum"]
-
-    p80_xg_rival = df["xg_last5_mean_rival"].quantile(0.8)
-    p80_gc_team = df["gc_last5_mean_team"].quantile(0.8)
-    df["ataque_top_rival"] = (df["xg_last5_mean_rival"] >= p80_xg_rival).astype(int)
-    df["defensa_floja_propia"] = (df["gc_last5_mean_team"] >= p80_gc_team).astype(int)
-    df["ataque_top_y_defensa_floja"] = (df["ataque_top_rival"] & df["defensa_floja_propia"]).astype(int)
+    
+    # Crear target usando la columna detectada
+    if puntos_col in df.columns:
+        df["target_pf_next"] = df.groupby(["player", "temporada"])[puntos_col].shift(-1)
+        print(f"✅ Target creado desde columna '{puntos_col}'")
+    else:
+        print(f"⚠️ Columna '{puntos_col}' no encontrada")
 
     return df
 
@@ -254,22 +191,15 @@ if __name__ == "__main__":
     try:
         df_players = pd.read_csv("csv/csvGenerados/players_matches_all_seasons.csv")
         standings = pd.read_csv("csv/csvGenerados/standings_all_seasons.csv")
-        odds = pd.read_csv("csv/csvGenerados/odds_all_seasons.csv")
         print("\n✅ Datos cargados desde CSV")
     except FileNotFoundError:
         print("\n⚠️ CSV no encontrados, construyendo desde carpetas...")
-        df_players, standings, odds = construir_dataset_completo()
+        df_players, standings = construir_dataset_completo()
 
     print("\n" + "="*60)
-    print("Preparando datos con clasificación lagged y cuotas")
+    print("Preparando datos con clasificación lagged y target")
     print("="*60)
-    df = preparar_datos_exp1(df_players, standings, odds)
-    print(f"✅ Shape: {df.shape}")
-
-    print("\n" + "="*60)
-    print("Calculando rachas y features de equipo")
-    print("="*60)
-    df = preparar_rachas(df)
+    df = agregar_standings_lagged_y_crear_target(df_players, standings)
     print(f"✅ Shape: {df.shape}")
 
     df.to_csv("csv/csvGenerados/players_with_features.csv", index=False)
