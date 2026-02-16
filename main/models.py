@@ -405,3 +405,24 @@ class EquipoFavorito(models.Model):
 
     def __str__(self):
         return f"{self.usuario.username} - {self.equipo.nombre}"
+
+
+# ============================================================================
+# TABLA: PLANTILLAS DEL USUARIO
+# ============================================================================
+class Plantilla(models.Model):
+    usuario = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='plantillas')
+    nombre = models.CharField(max_length=100)
+    formacion = models.CharField(max_length=10, default='4-3-3')  # e.g., "4-3-3", "4-4-2"
+    alineacion = models.JSONField(default=dict)  # Almacena posiciones y jugadores
+    fecha_creada = models.DateTimeField(auto_now_add=True)
+    fecha_modificada = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Plantilla'
+        verbose_name_plural = 'Plantillas'
+        unique_together = ('usuario', 'nombre')
+        ordering = ['-fecha_modificada']
+
+    def __str__(self):
+        return f"{self.usuario.username} - {self.nombre}"

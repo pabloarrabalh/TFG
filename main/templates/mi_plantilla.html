@@ -70,25 +70,114 @@
     <!-- Información del equipo -->
     <div class="glass-panel rounded-2xl p-6 mb-6">
         <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-4 flex-1">
                 <div class="size-16 bg-gradient-to-br from-primary to-blue-500 rounded-2xl flex items-center justify-center">
                     <span class="text-2xl font-black text-black">MT</span>
                 </div>
-                <div>
-                    <h3 class="text-2xl font-black text-white">Mi Team</h3>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <h3 class="text-2xl font-black text-white" id="nombre-plantilla">Mi Team</h3>
+                        <button id="btn-editar-nombre" class="text-gray-400 hover:text-primary transition-colors p-1" title="Editar nombre">
+                            <span class="material-symbols-outlined text-xl">edit</span>
+                        </button>
+                    </div>
                     <p class="text-gray-400" id="formacion-display">Formación: 4-3-3</p>
                 </div>
             </div>
             <div class="flex gap-3 items-center">
+                <!-- Selector de Plantillas -->
+                <select id="selector-plantillas" class="px-4 py-2 bg-surface-dark border border-border-dark text-white rounded-xl font-bold hover:bg-white/5 transition-colors text-sm">
+                    <option value="">Cargar plantilla...</option>
+                </select>
+                
+                <!-- Botón crear nueva plantilla -->
+                <button onclick="crearNuevaPlantilla()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-colors flex items-center gap-2 text-sm">
+                    <span class="material-symbols-outlined text-base">add</span>
+                    Nueva
+                </button>
+                
+                <!-- Botón eliminar plantilla -->
+                <button id="btn-eliminar-plantilla" onclick="eliminarPlantillaActual()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-colors text-sm hidden">
+                    <span class="material-symbols-outlined text-base">delete</span>
+                </button>
+                
                 <button onclick="guardarPlantilla()" class="px-4 py-2 bg-primary text-black rounded-xl font-bold hover:bg-primary-dark transition-colors">
                     Guardar Plantilla
                 </button>
                 
                 <!-- Selector de Formación -->
-                <button onclick="toggleFormacionDropdown()" class="px-4 py-2 bg-surface-dark border border-border-dark text-white rounded-xl font-bold hover:bg-white/5 transition-colors flex items-center gap-2">
-                    Formación
+                <button id="btn-formacion" onclick="toggleFormacionDropdown()" class="px-4 py-2 bg-surface-dark border border-border-dark text-white rounded-xl font-bold hover:bg-white/5 transition-colors flex items-center gap-2">
+                    <span id="formacion-display-btn">Formación: 4-3-3</span>
                     <span class="material-symbols-outlined text-sm">expand_more</span>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para renombrar plantilla -->
+    <div id="modal-renombrar" class="hidden fixed inset-0 bg-black/50 z-[9998] flex items-center justify-center p-4">
+        <div class="bg-surface-dark border border-border-dark rounded-2xl max-w-sm w-full p-6 relative z-[9998]">
+            <h2 class="text-2xl font-black text-white mb-4">Renombrar Plantilla</h2>
+            <input 
+                type="text" 
+                id="input-nombre-plantilla" 
+                placeholder="Nuevo nombre..." 
+                class="w-full px-4 py-2 bg-background-dark border border-border-dark rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-primary mb-4"
+            >
+            <div class="flex gap-3">
+                <button onclick="cerrarModalRenombrar()" class="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-bold transition-colors">
+                    Cancelar
+                </button>
+                <button onclick="confirmarRenombrar()" class="flex-1 px-4 py-2 bg-primary text-black rounded-xl font-bold hover:bg-primary-dark transition-colors">
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para detalles del jugador -->
+    <div id="modal-detalles-jugador" class="hidden fixed inset-0 bg-black/50 z-[9998] flex items-center justify-center p-4">
+        <div class="bg-surface-dark border border-border-dark rounded-2xl max-w-md w-full p-6 relative z-[9998]">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-black text-white" id="modal-jugador-nombre">-</h2>
+                <button onclick="cerrarModalDetallesJugador()" class="text-gray-400 hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            
+            <!-- Contenido -->
+            <div class="space-y-4">
+                <!-- Equipo actual -->
+                <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark">
+                    <p class="text-xs text-gray-400 uppercase mb-1">Equipo actual</p>
+                    <div class="flex items-center gap-3">
+                        <div id="modal-jugador-escudo-equipo" class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                            <span class="text-sm font-bold text-white">--</span>
+                        </div>
+                        <p class="text-lg font-bold text-white" id="modal-jugador-equipo">-</p>
+                    </div>
+                </div>
+                
+                <!-- Próximo rival -->
+                <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark">
+                    <p class="text-xs text-gray-400 uppercase mb-1">Próximo rival</p>
+                    <div class="flex items-center gap-3">
+                        <span class="text-white font-bold">vs</span>
+                        <div id="modal-jugador-escudo-rival" class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                            <span class="text-sm font-bold text-white">--</span>
+                        </div>
+                        <p class="text-lg font-bold text-white" id="modal-jugador-rival">-</p>
+                    </div>
+                </div>
+                
+                <!-- Predicción de puntos (vacío por ahora) -->
+                <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark">
+                    <p class="text-xs text-gray-400 uppercase mb-2">Predicción de puntos</p>
+                    <div class="h-12 bg-background-dark rounded-lg flex items-center justify-center">
+                        <span class="text-gray-500">Próximamente</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -177,14 +266,14 @@
 
 <!-- Dropdown de formación (flotante global) -->
 <div id="formacion-dropdown" class="hidden fixed top-20 right-6 bg-surface-dark border border-border-dark rounded-lg shadow-2xl z-[99999] min-w-48 max-h-80 overflow-y-auto pointer-events-auto">
-    <button onclick="cambiarFormacion('4-3-3')" class="block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold">4-3-3</button>
-    <button onclick="cambiarFormacion('4-4-2')" class="block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold">4-4-2</button>
-    <button onclick="cambiarFormacion('3-5-2')" class="block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold">3-5-2</button>
-    <button onclick="cambiarFormacion('3-4-3')" class="block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold">3-4-3</button>
-    <button onclick="cambiarFormacion('4-2-4')" class="block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold">4-2-4</button>
-    <button onclick="cambiarFormacion('5-4-1')" class="block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold">5-4-1</button>
-    <button onclick="cambiarFormacion('5-3-2')" class="block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold">5-3-2</button>
-    <button onclick="cambiarFormacion('4-5-1')" class="block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold">4-5-1</button>
+    <button class="formacion-btn block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold" data-formacion="4-3-3" onclick="cambiarFormacion('4-3-3')">4-3-3</button>
+    <button class="formacion-btn block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold" data-formacion="4-4-2" onclick="cambiarFormacion('4-4-2')">4-4-2</button>
+    <button class="formacion-btn block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold" data-formacion="3-5-2" onclick="cambiarFormacion('3-5-2')">3-5-2</button>
+    <button class="formacion-btn block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold" data-formacion="3-4-3" onclick="cambiarFormacion('3-4-3')">3-4-3</button>
+    <button class="formacion-btn block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold" data-formacion="4-2-4" onclick="cambiarFormacion('4-2-4')">4-2-4</button>
+    <button class="formacion-btn block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold" data-formacion="5-4-1" onclick="cambiarFormacion('5-4-1')">5-4-1</button>
+    <button class="formacion-btn block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold" data-formacion="5-3-2" onclick="cambiarFormacion('5-3-2')">5-3-2</button>
+    <button class="formacion-btn block w-full text-left px-4 py-2 text-white hover:bg-primary/20 transition-colors text-sm font-bold" data-formacion="4-5-1" onclick="cambiarFormacion('4-5-1')">4-5-1</button>
 </div>
 
 <!-- Modal para seleccionar jugador -->
@@ -247,6 +336,10 @@
 const jugadoresDisponibles = JSON.parse('{{ jugadores_json|escapejs }}');
 const plantillaGuardada = JSON.parse('{{ plantilla_guardada|escapejs }}');
 const equiposDisponibles = JSON.parse('{{ equipos_json|escapejs }}');
+const todasPlantillas = JSON.parse('{{ plantillas|escapejs }}');
+
+let plantillaActualId = {{ plantilla_actual_id|default:'null' }};
+let plantillaActualNombre = plantillaGuardada.nombre || 'Mi Team';
 let formacionActual = plantillaGuardada.formacion || '4-3-3';
 let alineacionActual = plantillaGuardada.alineacion || {
     'Portero': [],
@@ -292,14 +385,19 @@ function crearJugadorCard(jugador, posicion, esVacio = false, indice = 0) {
     const iniciales = (jugador.nombre[0] + (jugador.apellido ? jugador.apellido[0] : '')).toUpperCase();
     const nombreCompleto = `${jugador.nombre} ${jugador.apellido || ''}`.trim();
     const puntos = jugador.puntos_fantasy_25_26 || 0;
+    const rivalNombre = jugador.proximo_rival_nombre || 'TBD';
+    const rivalInicial = rivalNombre !== 'TBD' ? rivalNombre.substring(0, 2).toUpperCase() : '--';
     
     return `
-        <div class="jugador-existente-btn player-card ${colorClasses[posicion]} rounded-xl p-4 text-center shadow-lg cursor-move min-w-[160px] hover:scale-105 transition-all relative drop-zone" 
+        <div class="jugador-existente-btn player-card ${colorClasses[posicion]} rounded-xl p-4 text-center shadow-lg cursor-move min-w-[160px] hover:scale-105 transition-all relative drop-zone group" 
              draggable="true" 
              data-jugador-id="${jugador.id}" 
              data-posicion="${posicion}" 
              data-indice="${indice}"
              data-posicion-original="${posicion}"
+             data-jugador-nombre="${nombreCompleto}"
+             data-jugador-equipo="${jugador.equipo_nombre}"
+             data-jugador-rival="${rivalNombre}"
              style="touch-action: none;">
             <button class="btn-eliminar-jugador absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold transition-all pointer-events-auto" data-jugador-id="${jugador.id}" title="Eliminar jugador">
                 ✕
@@ -308,10 +406,16 @@ function crearJugadorCard(jugador, posicion, esVacio = false, indice = 0) {
                 <span class="text-lg font-bold text-white">${iniciales}</span>
             </div>
             <p class="font-bold text-white text-sm mb-1 line-clamp-1">${nombreCompleto}</p>
-            <div class="flex items-center justify-center gap-2 text-xs">
-                <p class="text-white/80 uppercase tracking-widest">${posicion === 'Centrocampista' ? 'MC' : posicion === 'Delantero' ? 'DT' : posicion === 'Defensa' ? 'DF' : 'PT'}</p>
-                <p class="text-yellow-400 font-bold">${puntos}</p>
+            <div class="flex items-center justify-center gap-1 text-xs h-6">
+                <span class="text-white/80 font-bold">vs</span>
+                <div class="size-5 bg-white/10 rounded flex items-center justify-center text-xs font-bold text-white/80">
+                    ${rivalInicial}
+                </div>
             </div>
+            <!-- Botón para ver detalles (oculto, aparece al hover) -->
+            <button class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl bg-black/50 flex items-center justify-center cursor-pointer pointer-events-auto" onclick="abrirModalDetallesJugador(event)">
+                <span class="material-symbols-outlined text-white text-3xl">info</span>
+            </button>
         </div>
     `;
 }
@@ -357,6 +461,8 @@ function renderizarBanquillo() {
             const iniciales = (suplente.nombre[0] + (suplente.apellido ? suplente.apellido[0] : '')).toUpperCase();
             const nombreCompleto = `${suplente.nombre} ${suplente.apellido || ''}`.trim();
             const puntos = suplente.puntos_fantasy_25_26 || 0;
+            const rivalNombre = suplente.proximo_rival_nombre || 'TBD';
+            const rivalInicial = rivalNombre !== 'TBD' ? rivalNombre.substring(0, 2).toUpperCase() : '--';
             const colorClasses = {
                 'Portero': 'position-pt',
                 'Defensa': 'position-df',
@@ -365,24 +471,33 @@ function renderizarBanquillo() {
             };
             
             banquillo.innerHTML += `
-                <div class="jugador-existente-btn player-card ${colorClasses[suplente.posicion]} rounded-xl p-4 text-center shadow-lg cursor-move min-w-[160px] hover:scale-105 transition-all relative drop-zone" 
+                <div class="jugador-existente-btn player-card ${colorClasses[suplente.posicion]} rounded-xl p-4 text-center shadow-lg cursor-move min-w-[160px] hover:scale-105 transition-all relative drop-zone group" 
                      draggable="true" 
                      data-jugador-id="${suplente.id}" 
                      data-posicion="Suplentes" 
                      data-indice="${i}"
                      data-posicion-original="${suplente.posicion}"
+                     data-jugador-nombre="${nombreCompleto}"
+                     data-jugador-equipo="${suplente.equipo_nombre}"
+                     data-jugador-rival="${rivalNombre}"
                      style="touch-action: none;">
                     <button class="btn-eliminar-jugador absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold transition-all pointer-events-auto" data-jugador-id="${suplente.id}" title="Eliminar jugador">
-                        ✕b
+                        ✕
                     </button>
                     <div class="size-14 bg-white/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
                         <span class="text-lg font-bold text-white">${iniciales}</span>
                     </div>
                     <p class="font-bold text-white text-sm mb-1 line-clamp-1">${nombreCompleto}</p>
-                    <div class="flex items-center justify-center gap-2 text-xs">
-                        <p class="text-white/80 uppercase tracking-widest">${suplente.posicion === 'Centrocampista' ? 'MC' : suplente.posicion === 'Delantero' ? 'DT' : suplente.posicion === 'Defensa' ? 'DF' : 'PT'}</p>
-                        <p class="text-yellow-400 font-bold">${puntos}</p>
+                    <div class="flex items-center justify-center gap-1 text-xs h-6">
+                        <span class="text-white/80 font-bold">vs</span>
+                        <div class="size-5 bg-white/10 rounded flex items-center justify-center text-xs font-bold text-white/80">
+                            ${rivalInicial}
+                        </div>
                     </div>
+                    <!-- Botón para ver detalles (oculto, aparece al hover) -->
+                    <button class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl bg-black/50 flex items-center justify-center cursor-pointer pointer-events-auto" onclick="abrirModalDetallesJugador(event)">
+                        <span class="material-symbols-outlined text-white text-3xl">info</span>
+                    </button>
                 </div>
             `;
         } else {
@@ -400,6 +515,9 @@ function renderizarBanquillo() {
 function cambiarFormacion(formacion) {
     formacionActual = formacion;
     const config = alineacion[formacion];
+    
+    // Actualizar el botón de formación
+    document.getElementById('formacion-display-btn').textContent = `Formación: ${formacion}`;
     
     // Mover jugadores sobrantes al banquillo en lugar de eliminarlos
     const posiciones = ['Defensa', 'Centrocampista', 'Delantero'];
@@ -624,6 +742,8 @@ function seleccionarJugador(jugadorId, nombre, apellido, posicion, esSuplente = 
 
 function guardarPlantilla() {
     const plantillaData = {
+        plantilla_id: plantillaActualId || null,
+        nombre: plantillaActualNombre || 'Mi Team',
         formacion: formacionActual,
         alineacion: alineacionActual
     };
@@ -639,16 +759,63 @@ function guardarPlantilla() {
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            alert('✓ Plantilla guardada correctamente');
+            plantillaActualId = data.plantilla_id;
+            
+            // Actualizar todasPlantillas sin recargar
+            if (!todasPlantillas.find(p => p.id === data.plantilla_id)) {
+                // Agregar nueva plantilla
+                todasPlantillas.unshift({
+                    id: data.plantilla_id,
+                    nombre: data.plantilla_nombre,
+                    formacion: formacionActual,
+                    alineacion: alineacionActual
+                });
+            } else {
+                // Actualizar plantilla existente
+                const idx = todasPlantillas.findIndex(p => p.id === data.plantilla_id);
+                if (idx >= 0) {
+                    todasPlantillas[idx].nombre = data.plantilla_nombre;
+                    todasPlantillas[idx].formacion = formacionActual;
+                    todasPlantillas[idx].alineacion = alineacionActual;
+                }
+            }
+            
+            // Refrescar select sin recargar página
+            cargarListaPlantillas();
+            document.getElementById('selector-plantillas').value = data.plantilla_id;
+            
+            mostrarNotificacion(`✓ ${data.message}`, 'success');
         } else {
-            alert('✗ Error al guardar: ' + data.message);
+            mostrarNotificacion('✗ Error al guardar: ' + data.message, 'error');
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarNotificacion('✗ Error en la conexión', 'error');
+    });
 }
 
 function toggleFormacionDropdown() {
-    document.getElementById('formacion-dropdown').classList.toggle('hidden');
+    const dropdown = document.getElementById('formacion-dropdown');
+    const estaVisible = !dropdown.classList.contains('hidden');
+    
+    // Si se abre, actualizar el estado visual de los botones
+    if (!estaVisible) {
+        // Limpiar todas las formaciones
+        document.querySelectorAll('.formacion-btn').forEach(btn => {
+            btn.classList.remove('bg-primary', 'text-black', 'font-black');
+            btn.classList.add('hover:bg-primary/20');
+        });
+        
+        // Marcar la formación actual
+        const btnActual = document.querySelector(`.formacion-btn[data-formacion="${formacionActual}"]`);
+        if (btnActual) {
+            btnActual.classList.add('bg-primary', 'text-black', 'font-black');
+            btnActual.classList.remove('hover:bg-primary/20');
+        }
+    }
+    
+    dropdown.classList.toggle('hidden');
 }
 
 // Cerrar dropdown al clickear fuera
@@ -942,6 +1109,257 @@ document.addEventListener('click', function(event) {
 // Inicializar
 window.addEventListener('load', function() {
     renderizarCampo();
+    document.getElementById('formacion-display-btn').textContent = `Formación: ${formacionActual}`;
+    document.getElementById('nombre-plantilla').textContent = plantillaActualNombre;
+    cargarListaPlantillas();
+    registrarEventListenerSelector();
+    registrarEventEditarNombre();
+});
+
+// ============================================================================
+// FUNCIONES PARA MÚLTIPLES PLANTILLAS
+// ============================================================================
+
+function cargarListaPlantillas() {
+    const selector = document.getElementById('selector-plantillas');
+    selector.innerHTML = '';
+    
+    // Solo mostrar placeholder si no hay plantillas
+    if (todasPlantillas.length === 0) {
+        const opcionPlaceholder = document.createElement('option');
+        opcionPlaceholder.value = '';
+        opcionPlaceholder.textContent = 'Cargar plantilla...';
+        selector.appendChild(opcionPlaceholder);
+    }
+    
+    todasPlantillas.forEach(plantilla => {
+        const option = document.createElement('option');
+        option.value = plantilla.id;
+        option.textContent = plantilla.nombre;
+        if (plantilla.id === plantillaActualId) {
+            option.selected = true;
+        }
+        selector.appendChild(option);
+    });
+    
+    // Actualizar visibilidad del botón eliminar
+    const btnEliminar = document.getElementById('btn-eliminar-plantilla');
+    if (plantillaActualId) {
+        btnEliminar.classList.remove('hidden');
+    } else {
+        btnEliminar.classList.add('hidden');
+    }
+}
+
+function crearNuevaPlantilla() {
+    plantillaActualId = null;
+    plantillaActualNombre = 'Mi Team';
+    formacionActual = '4-3-3';
+    alineacionActual = {
+        'Portero': [],
+        'Defensa': [],
+        'Centrocampista': [],
+        'Delantero': [],
+        'Suplentes': []
+    };
+    
+    document.getElementById('selector-plantillas').value = '';
+    document.getElementById('nombre-plantilla').textContent = plantillaActualNombre;
+    document.getElementById('formacion-display-btn').textContent = `Formación: ${formacionActual}`;
+    document.getElementById('formacion-display').textContent = `Formación: ${formacionActual}`;
+    
+    renderizarCampo();
+    mostrarNotificacion('✓ Nueva plantilla creada (aún no guardada)', 'info');
+}
+
+function registrarEventListenerSelector() {
+    const selector = document.getElementById('selector-plantillas');
+    if (!selector) return;
+    
+    selector.addEventListener('change', function(e) {
+        if (!e.target.value) return;
+        
+        const plantillaId = parseInt(e.target.value);
+        const plantilla = todasPlantillas.find(p => p.id === plantillaId);
+        
+        if (plantilla) {
+            plantillaActualId = plantilla.id;
+            plantillaActualNombre = plantilla.nombre;
+            formacionActual = plantilla.formacion || '4-3-3';
+            alineacionActual = plantilla.alineacion || {
+                'Portero': [],
+                'Defensa': [],
+                'Centrocampista': [],
+                'Delantero': [],
+                'Suplentes': []
+            };
+            
+            document.getElementById('nombre-plantilla').textContent = plantillaActualNombre;
+            document.getElementById('formacion-display-btn').textContent = `Formación: ${formacionActual}`;
+            document.getElementById('formacion-display').textContent = `Formación: ${formacionActual}`;
+            
+            renderizarCampo();
+            mostrarNotificacion(`✓ Plantilla "${plantillaActualNombre}" cargada`, 'success');
+        }
+    });
+}
+
+function registrarEventEditarNombre() {
+    const btnEditar = document.getElementById('btn-editar-nombre');
+    if (!btnEditar) return;
+    
+    btnEditar.addEventListener('click', function() {
+        const modal = document.getElementById('modal-renombrar');
+        const input = document.getElementById('input-nombre-plantilla');
+        input.value = plantillaActualNombre;
+        modal.classList.remove('hidden');
+        setTimeout(() => input.focus(), 100);
+    });
+}
+
+function cerrarModalRenombrar() {
+    document.getElementById('modal-renombrar').classList.add('hidden');
+}
+
+function confirmarRenombrar() {
+    const nuevoNombre = document.getElementById('input-nombre-plantilla').value.trim();
+    
+    if (!nuevoNombre) {
+        mostrarNotificacion('✗ El nombre no puede estar vacío', 'error');
+        return;
+    }
+    
+    if (!plantillaActualId) {
+        // Si es una plantilla nueva, solo actualizar el nombre local
+        plantillaActualNombre = nuevoNombre;
+        document.getElementById('nombre-plantilla').textContent = nuevoNombre;
+        cerrarModalRenombrar();
+        mostrarNotificacion('✓ Nombre actualizado (guarda la plantilla para confirmar)', 'info');
+        return;
+    }
+    
+    // Enviar solicitud de renombrado
+    fetch(`/mi-plantilla/${plantillaActualId}/renombrar/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+        },
+        body: JSON.stringify({ nombre: nuevoNombre })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            plantillaActualNombre = nuevoNombre;
+            document.getElementById('nombre-plantilla').textContent = nuevoNombre;
+            cerrarModalRenombrar();
+            
+            // Actualizar en todasPlantillas sin recargar
+            const idx = todasPlantillas.findIndex(p => p.id === plantillaActualId);
+            if (idx >= 0) {
+                todasPlantillas[idx].nombre = nuevoNombre;
+            }
+            cargarListaPlantillas();
+            document.getElementById('selector-plantillas').value = plantillaActualId;
+            
+            mostrarNotificacion(data.message, 'success');
+        } else {
+            mostrarNotificacion('✗ ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarNotificacion('✗ Error en la conexión', 'error');
+    });
+}
+
+function eliminarPlantillaActual() {
+    if (!plantillaActualId) {
+        mostrarNotificacion('✗ No hay plantilla seleccionada', 'error');
+        return;
+    }
+    
+    if (!confirm(`¿Estás seguro de que quieres eliminar la plantilla "${plantillaActualNombre}"?`)) {
+        return;
+    }
+    
+    fetch(`/mi-plantilla/${plantillaActualId}/eliminar/`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Remover de todasPlantillas sin recargar
+            const idx = todasPlantillas.findIndex(p => p.id === plantillaActualId);
+            if (idx >= 0) {
+                todasPlantillas.splice(idx, 1);
+            }
+            
+            mostrarNotificacion(data.message, 'success');
+            crearNuevaPlantilla();
+            cargarListaPlantillas();
+        } else {
+            mostrarNotificacion('✗ ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarNotificacion('✗ Error en la conexión', 'error');
+    });
+}
+
+// Cerrar modal de renombrar al hacer click fuera
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('modal-renombrar');
+    if (modal && event.target === modal) {
+        cerrarModalRenombrar();
+    }
+});
+
+// ============================================================================
+// FUNCIONES PARA MODAL DE DETALLES DEL JUGADOR
+// ============================================================================
+
+function abrirModalDetallesJugador(event) {
+    event.stopPropagation();
+    
+    // Obtener el card del jugador
+    const card = event.target.closest('.jugador-existente-btn');
+    if (!card) return;
+    
+    const nombre = card.getAttribute('data-jugador-nombre') || '-';
+    const equipo = card.getAttribute('data-jugador-equipo') || '-';
+    const rival = card.getAttribute('data-jugador-rival') || '-';
+    
+    // Actualizar el modal
+    document.getElementById('modal-jugador-nombre').textContent = nombre;
+    document.getElementById('modal-jugador-equipo').textContent = equipo;
+    document.getElementById('modal-jugador-rival').textContent = rival;
+    
+    // Actualizar escudos (iniciales)
+    const equipoInicial = equipo ? equipo.substring(0, 2).toUpperCase() : '--';
+    const rivalInicial = rival && rival !== '-' ? rival.substring(0, 2).toUpperCase() : '--';
+    
+    document.getElementById('modal-jugador-escudo-equipo').innerHTML = `<span class="text-sm font-bold text-white">${equipoInicial}</span>`;
+    document.getElementById('modal-jugador-escudo-rival').innerHTML = `<span class="text-sm font-bold text-white">${rivalInicial}</span>`;
+    
+    // Abrir modal
+    document.getElementById('modal-detalles-jugador').classList.remove('hidden');
+}
+
+function cerrarModalDetallesJugador() {
+    document.getElementById('modal-detalles-jugador').classList.add('hidden');
+}
+
+// Cerrar modal de detalles al hacer click fuera
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('modal-detalles-jugador');
+    if (modal && event.target === modal) {
+        cerrarModalDetallesJugador();
+    }
 });
 </script>
 {% endblock %}

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load team_filters %}
+{% load static %}
 
 {% block title %}LigaMaster - {{ jugador.nombre }} {{ jugador.apellido }}{% endblock %}
 
@@ -507,9 +508,13 @@ select:focus {
                     </div>
                     
                     {% if equipo_temporada %}
-                    <p class="text-lg text-gray-300 mb-2">
-                        <span class="font-bold text-cyan-300">{{ equipo_temporada.equipo.nombre|display_team_name }}</span>
-                    </p>
+                    <div class="flex items-center gap-4 mb-2">
+                        <img src="{% static 'escudos/' %}{{ equipo_temporada.equipo.nombre|shield_name }}.png" 
+                             alt="{{ equipo_temporada.equipo.nombre }}" 
+                             class="h-16 w-16 object-contain object-center flex-shrink-0"
+                             onerror="this.style.display='none'">
+                        <span class="text-lg font-bold text-cyan-300">{{ equipo_temporada.equipo.nombre|display_team_name }}</span>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -1566,6 +1571,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Cerrar popover al hacer scroll - con window en lugar de document
+    window.addEventListener('scroll', () => {
+        if (!rolePopover.classList.contains('hidden')) {
+            rolePopover.classList.add('hidden');
+        }
+    }, true);
+
     flagElements.forEach(async (element) => {
         const iso3 = element.getAttribute('data-nationality');
         if (!iso3 || iso3 === '0') {
@@ -1731,6 +1743,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 percentilePopover.classList.add('hidden');
             }
         });
+
+        // Cerrar popover al hacer scroll - con window en lugar de document
+        window.addEventListener('scroll', () => {
+            if (percentilePopover && !percentilePopover.classList.contains('hidden')) {
+                percentilePopover.classList.add('hidden');
+            }
+        }, true);
     } else {
         console.warn('❌ Percentiles no disponibles o vacíos');
     }

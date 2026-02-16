@@ -25,6 +25,10 @@ urlpatterns = [
     path('perfil/update-status/', views.update_user_status, name='update_user_status'),
     path('perfil/delete-favorite/<int:fav_id>/', views.delete_favorite_team, name='delete_favorite_team'),
     path('mi-plantilla/guardar/', views.guardar_plantilla, name='guardar_plantilla'),
+    path('mi-plantilla/listar/', views.listar_plantillas, name='listar_plantillas'),
+    path('mi-plantilla/<int:plantilla_id>/', views.obtener_plantilla, name='obtener_plantilla'),
+    path('mi-plantilla/<int:plantilla_id>/eliminar/', views.eliminar_plantilla, name='eliminar_plantilla'),
+    path('mi-plantilla/<int:plantilla_id>/renombrar/', views.renombrar_plantilla, name='renombrar_plantilla'),
     path('terms-conditions/', views.terms_conditions, name='terms_conditions'),
     # API Endpoints
     path('api/radar/<int:jugador_id>/<str:temporada>/', api_endpoints.api_radar_jugador, name='api_radar_jugador'),

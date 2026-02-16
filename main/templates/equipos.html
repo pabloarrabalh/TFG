@@ -178,6 +178,22 @@
 </div>
 
 <script>
+function mostrarNotificacion(mensaje, tipo = 'success') {
+    const notif = document.createElement('div');
+    notif.className = `fixed top-6 left-6 px-6 py-4 rounded-lg text-white shadow-lg z-[100000] transition-all duration-500 ${
+        tipo === 'success' ? 'bg-green-600' :
+        tipo === 'error' ? 'bg-red-600' :
+        'bg-blue-600'
+    }`;
+    notif.textContent = mensaje;
+    document.body.appendChild(notif);
+    
+    setTimeout(() => {
+        notif.style.opacity = '0';
+        setTimeout(() => notif.remove(), 500);
+    }, 3000);
+}
+
 function toggleDropdown(button) {
     const card = button.closest('.team-card');
     const content = card.querySelector('.dropdown-content');
@@ -188,10 +204,17 @@ function toggleDropdown(button) {
     chevron.style.transition = 'transform 0.3s ease';
 }
 
-// Manejo del botón favorito con animación
+// Manejo del botón favorito con animación y mensaje
 document.querySelectorAll('.favorite-btn').forEach(btn => {
     btn.addEventListener('click', function(e) {
         e.preventDefault();
+        e.stopPropagation();
+        
+        const card = this.closest('.team-card');
+        const form = this.closest('form');
+        const teamId = form.querySelector('input[name="team_id"]').value;
+        const teamName = card.querySelector('.text-sm.font-black.text-white')?.textContent?.trim() || 'Equipo';
+        const esActualmenteFavorito = this.classList.contains('active');
         
         // Agregar animación
         this.style.transform = 'scale(0.8)';
@@ -199,8 +222,42 @@ document.querySelectorAll('.favorite-btn').forEach(btn => {
             this.style.transform = 'scale(1)';
         }, 100);
         
-        // Enviar el formulario
-        this.closest('form').submit();
+        // Crear FormData
+        const formData = new FormData();
+        formData.append('team_id', teamId);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name="csrfmiddlewaretoken"]').value);
+        
+        // Obtener el token CSRF del formulario si no lo encontramos globalmente
+        const csrfToken = form.querySelector('[name="csrfmiddlewaretoken"]')?.value || document.querySelector('[name="csrfmiddlewaretoken"]')?.value;
+        
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Actualizar estado del botón
+                this.classList.toggle('active');
+                
+                // Mostrar mensaje con nombre del equipo
+                if (esActualmenteFavorito) {
+                    mostrarNotificacion(`✓ ${teamName} eliminado de favoritos`, 'success');
+                } else {
+                    mostrarNotificacion(`✓ ${teamName} añadido a favoritos`, 'success');
+                }
+            } else {
+                mostrarNotificacion('✗ Error al actualizar favorito', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarNotificacion('✗ Error en la conexión', 'error');
+        });
     });
 });
 </script>

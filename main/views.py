@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from .models import (Temporada, Jornada, ClasificacionJornada, Equipo, HistorialEquiposJugador, 
-                     EquipoJugadorTemporada, Partido, EstadisticasPartidoJugador, Jugador, Calendario)
+                     EquipoJugadorTemporada, Partido, EstadisticasPartidoJugador, Jugador, Calendario, Plantilla)
 from django.db.models import Sum, Count, F, Case, When, FloatField, Q, Avg
 from datetime import datetime, time
 import unicodedata
@@ -151,8 +153,9 @@ def menu(request):
 def mi_plantilla(request):
     """Vista de Mi Plantilla - Requiere autenticación"""
     import json
-    from django.db.models import Sum
-    from main.models import EquipoJugadorTemporada, Temporada, Equipo, EstadisticasPartidoJugador
+    from django.db.models import Sum, Q
+    from main.models import EquipoJugadorTemporada, Temporada, Equipo, EstadisticasPartidoJugador, Partido, Jornada
+    from datetime import datetime
     
     # Obtener temporada actual (la última disponible)
     temporada_actual = Temporada.objects.last()
@@ -169,6 +172,8 @@ def mi_plantilla(request):
             }),
             'plantilla_guardada': json.dumps({}),
             'equipos_json': json.dumps([]),
+            'plantillas': [],
+            'plantilla_actual': None,
         }
         return render(request, 'mi_plantilla.html', context)
     
@@ -178,6 +183,27 @@ def mi_plantilla(request):
     ).distinct().order_by('nombre')
     
     equipos_list = [{'id': e.id, 'nombre': e.nombre} for e in equipos_temporada]
+    
+    # Obtener próximos partidos de cada equipo
+    proximos_partidos = {}
+    ahora = datetime.now()
+    for equipo in equipos_temporada:
+        # Buscar el próximo partido (local o visitante) que no se haya jugado aún
+        proximo = Partido.objects.filter(
+            Q(equipo_local=equipo) | Q(equipo_visitante=equipo),
+            jornada__temporada=temporada_actual,
+            fecha_partido__gte=ahora
+        ).select_related('equipo_local', 'equipo_visitante').order_by('fecha_partido').first()
+        
+        if proximo:
+            # Determinar el rival
+            rival = proximo.equipo_visitante if proximo.equipo_local == equipo else proximo.equipo_local
+            proximos_partidos[equipo.id] = {
+                'rival_id': rival.id,
+                'rival_nombre': rival.nombre
+            }
+        else:
+            proximos_partidos[equipo.id] = None
     
     # Obtener los jugadores disponibles en la temporada actual, organizados por posición
     # IMPORTANT: Incluir ALL jugadores (no evitar duplicados) para que aparezcan en el buscador
@@ -207,6 +233,9 @@ def mi_plantilla(request):
         
         puntos_fantasy = stats_puntos['total_puntos'] or 0
         
+        # Obtener información del próximo rival
+        proximo_rival = proximos_partidos.get(ejecucion_temporada.equipo.id)
+        
         if posicion in jugadores_por_posicion:
             jugadores_por_posicion[posicion].append({
                 'id': jugador.id,
@@ -215,54 +244,222 @@ def mi_plantilla(request):
                 'posicion': posicion,
                 'equipo_id': ejecucion_temporada.equipo.id,
                 'equipo_nombre': ejecucion_temporada.equipo.nombre,
-                'puntos_fantasy_25_26': puntos_fantasy
+                'puntos_fantasy_25_26': puntos_fantasy,
+                'proximo_rival_id': proximo_rival['rival_id'] if proximo_rival else None,
+                'proximo_rival_nombre': proximo_rival['rival_nombre'] if proximo_rival else None
             })
     
-    # Cargar plantilla guardada del usuario
-    plantilla_guardada = {
-        'formacion': '4-3-3',
-        'alineacion': {
-            'Portero': [],
-            'Defensa': [],
-            'Centrocampista': [],
-            'Delantero': [],
-            'Suplentes': []
+    # Cargar plantillas del usuario autenticado
+    plantillas = []
+    plantilla_actual = None
+    plantilla_actual_id = None
+    if request.user.is_authenticated:
+        plantillas_qs = Plantilla.objects.filter(usuario=request.user).order_by('-fecha_modificada')
+        plantillas = list(plantillas_qs.values('id', 'nombre', 'formacion', 'alineacion'))
+        
+        # Si hay plantillas, usar la primera (más reciente)
+        if plantillas:
+            plantilla_actual = plantillas[0]
+            plantilla_actual_id = plantilla_actual['id']
+    
+    # Fallback a la plantilla guardada antigua si existe
+    if not plantilla_actual:
+        plantilla_actual = {
+            'id': None,
+            'formacion': '4-3-3',
+            'alineacion': {
+                'Portero': [],
+                'Defensa': [],
+                'Centrocampista': [],
+                'Delantero': [],
+                'Suplentes': []
+            },
+            'nombre': 'Mi Team'
         }
-    }
-    if request.user.profile.plantilla_guardada and request.user.profile.plantilla_guardada != '{}':
-        plantilla_guardada = json.loads(request.user.profile.plantilla_guardada)
+        
+        # Intentar cargar la antigua si existe
+        if request.user.is_authenticated and request.user.profile.plantilla_guardada and request.user.profile.plantilla_guardada != '{}':
+            try:
+                old_data = json.loads(request.user.profile.plantilla_guardada)
+                plantilla_actual.update(old_data)
+            except:
+                pass
     
     context = {
         'active_page': 'mi-plantilla',
         'jugadores_json': json.dumps(jugadores_por_posicion),
-        'plantilla_guardada': json.dumps(plantilla_guardada),
+        'plantilla_guardada': json.dumps(plantilla_actual),
         'equipos_json': json.dumps(equipos_list),
+        'plantillas': json.dumps(plantillas),
+        'plantilla_actual': plantilla_actual,
+        'plantilla_actual_id': plantilla_actual_id,
     }
     
     return render(request, 'mi_plantilla.html', context)
 
 @login_required(login_url='login_register')
 def guardar_plantilla(request):
-    """Guardar la alineación de la plantilla del usuario"""
+    """Guardar o actualizar una plantilla del usuario"""
     if request.method == 'POST':
         import json
         from django.http import JsonResponse
         
         try:
             data = json.loads(request.body)
-            plantilla_data = {
-                'formacion': data.get('formacion', '4-3-3'),
-                'alineacion': data.get('alineacion', {})
-            }
+            plantilla_id = data.get('plantilla_id')
+            nombre = data.get('nombre', 'Mi Team')
+            formacion = data.get('formacion', '4-3-3')
+            alineacion = data.get('alineacion', {})
             
-            # Guardar en el perfil del usuario
-            request.user.profile.plantilla_guardada = json.dumps(plantilla_data)
-            request.user.profile.save()
+            # Si se proporciona ID, actualizar; si no, crear nueva
+            if plantilla_id:
+                # Actualizar plantilla existente
+                plantilla = Plantilla.objects.get(id=plantilla_id, usuario=request.user)
+                plantilla.nombre = nombre
+                plantilla.formacion = formacion
+                plantilla.alineacion = alineacion
+                plantilla.save()
+                mensaje = 'Plantilla actualizada correctamente'
+            else:
+                # Crear nueva plantilla
+                # Asegurar que el nombre sea único para este usuario
+                contador = 1
+                nombre_original = nombre
+                while Plantilla.objects.filter(usuario=request.user, nombre=nombre).exists():
+                    nombre = f"{nombre_original} ({contador})"
+                    contador += 1
+                
+                plantilla = Plantilla.objects.create(
+                    usuario=request.user,
+                    nombre=nombre,
+                    formacion=formacion,
+                    alineacion=alineacion
+                )
+                mensaje = f'Plantilla "{nombre}" guardada correctamente'
             
             return JsonResponse({
                 'status': 'success',
-                'message': 'Plantilla guardada correctamente'
+                'message': mensaje,
+                'plantilla_id': plantilla.id,
+                'plantilla_nombre': plantilla.nombre
             })
+        except Plantilla.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Plantilla no encontrada'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)
+    
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
+
+@login_required(login_url='login_register')
+def listar_plantillas(request):
+    """Obtener todas las plantillas del usuario"""
+    if request.method == 'GET':
+        try:
+            plantillas = Plantilla.objects.filter(usuario=request.user).order_by('-fecha_modificada').values(
+                'id', 'nombre', 'formacion', 'alineacion', 'fecha_creada', 'fecha_modificada'
+            )
+            return JsonResponse({
+                'status': 'success',
+                'plantillas': list(plantillas)
+            })
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)
+    
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
+
+@login_required(login_url='login_register')
+def obtener_plantilla(request, plantilla_id):
+    """Obtener una plantilla específica del usuario"""
+    if request.method == 'GET':
+        try:
+            plantilla = Plantilla.objects.get(id=plantilla_id, usuario=request.user)
+            return JsonResponse({
+                'status': 'success',
+                'plantilla': {
+                    'id': plantilla.id,
+                    'nombre': plantilla.nombre,
+                    'formacion': plantilla.formacion,
+                    'alineacion': plantilla.alineacion,
+                }
+            })
+        except Plantilla.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Plantilla no encontrada'
+            }, status=404)
+    
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
+
+@login_required(login_url='login_register')
+def eliminar_plantilla(request, plantilla_id):
+    """Eliminar una plantilla del usuario"""
+    if request.method == 'DELETE':
+        try:
+            plantilla = Plantilla.objects.get(id=plantilla_id, usuario=request.user)
+            nombre = plantilla.nombre
+            plantilla.delete()
+            return JsonResponse({
+                'status': 'success',
+                'message': f'Plantilla "{nombre}" eliminada correctamente'
+            })
+        except Plantilla.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Plantilla no encontrada'
+            }, status=404)
+    
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
+
+@login_required(login_url='login_register')
+def renombrar_plantilla(request, plantilla_id):
+    """Renombrar una plantilla del usuario"""
+    if request.method == 'POST':
+        try:
+            import json
+            data = json.loads(request.body)
+            nuevo_nombre = data.get('nombre', '').strip()
+            
+            if not nuevo_nombre:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'El nombre no puede estar vacío'
+                }, status=400)
+            
+            plantilla = Plantilla.objects.get(id=plantilla_id, usuario=request.user)
+            
+            # Verificar que el nuevo nombre sea único
+            if Plantilla.objects.filter(usuario=request.user, nombre=nuevo_nombre).exclude(id=plantilla_id).exists():
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Ya existe una plantilla con ese nombre'
+                }, status=400)
+            
+            plantilla.nombre = nuevo_nombre
+            plantilla.save()
+            
+            return JsonResponse({
+                'status': 'success',
+                'message': f'Plantilla renombrada a "{nuevo_nombre}"',
+                'nuevo_nombre': nuevo_nombre
+            })
+        except Plantilla.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Plantilla no encontrada'
+            }, status=404)
         except Exception as e:
             return JsonResponse({
                 'status': 'error',
@@ -2034,35 +2231,56 @@ def select_favorite_teams(request):
     return render(request, 'select_favorite_teams.html', context)
 
 @login_required(login_url='login_register')
+@require_http_methods(["POST"])
 def toggle_favorite_team(request):
     """Toggle un equipo como favorito para el usuario autenticado"""
-    if request.method == 'POST':
-        team_id = request.POST.get('team_id')
-        
-        if team_id:
-            try:
-                equipo = Equipo.objects.get(id=team_id)
-                from .models import EquipoFavorito
-                
-                # Check if already favorite
-                favorito = EquipoFavorito.objects.filter(
-                    usuario=request.user,
-                    equipo=equipo
-                ).first()
-                
-                if favorito:
-                    # Remove from favorites
-                    favorito.delete()
-                else:
-                    # Add to favorites
-                    EquipoFavorito.objects.create(
-                        usuario=request.user,
-                        equipo=equipo
-                    )
-            except Equipo.DoesNotExist:
-                pass
+    from django.http import JsonResponse
     
-    # Redirect back to equipos page
+    team_id = request.POST.get('team_id')
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    if not team_id:
+        if is_ajax:
+            return JsonResponse({'status': 'error', 'message': 'Team ID requerido'}, status=400)
+        return redirect('equipos')
+    
+    try:
+        equipo = Equipo.objects.get(id=team_id)
+        from .models import EquipoFavorito
+        
+        # Check if already favorite
+        favorito = EquipoFavorito.objects.filter(
+            usuario=request.user,
+            equipo=equipo
+        ).first()
+        
+        is_favorite = False
+        if favorito:
+            # Remove from favorites
+            favorito.delete()
+        else:
+            # Add to favorites
+            EquipoFavorito.objects.create(
+                usuario=request.user,
+                equipo=equipo
+            )
+            is_favorite = True
+        
+        # Si es AJAX, devolver JSON
+        if is_ajax:
+            return JsonResponse({
+                'status': 'success',
+                'is_favorite': is_favorite
+            })
+            
+    except Equipo.DoesNotExist:
+        if is_ajax:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Equipo no encontrado'
+            }, status=404)
+    
+    # Si no es AJAX, redirect back to equipos page
     return redirect('equipos')
 
 def logout_view(request):
