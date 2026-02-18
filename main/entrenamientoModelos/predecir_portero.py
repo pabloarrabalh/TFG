@@ -84,21 +84,48 @@ def cargar_datos_completos():
         df = pd.read_csv(CONFIG['archivo'])
         print(f"[OK] {len(df)} registros cargados")
         
-        # Filtrar porteros
-        posicion_cols = [c for c in df.columns if 'posicion' in c.lower()]
-        if posicion_cols:
-            df = df[df[posicion_cols[0]].str.upper() == "PT"].copy()
-        
-        # Filtrar solo temporada 25/26
+        # Guardar todos los jugadores de 25/26 para calcular std global
         temporada_cols = [c for c in df.columns if 'temporada' in c.lower()]
         if temporada_cols:
             df = df[df[temporada_cols[0]] == '25_26'].copy()
         
-        print(f"[OK] {len(df)} porteros filtrados (temporada 25/26)\n")
-        return df
+        # Luego filtrar solo a porteros
+        posicion_cols = [c for c in df.columns if 'posicion' in c.lower()]
+        if posicion_cols:
+            df_porteros = df[df[posicion_cols[0]].str.upper() == "PT"].copy()
+        else:
+            df_porteros = df.copy()
+        
+        print(f"[OK] {len(df_porteros)} porteros filtrados (temporada 25/26)\n")
+        print(f"[INFO] std calculado sobre {len(df)} registros totales (todos los jugadores)\n")
+        
+        return df_porteros, df  # Retornar porteros + todos para std
     except Exception as e:
         print(f"[ERROR] Error cargando datos: {e}")
-        return None
+        return None, None
+
+
+def calcular_std_puntos(df_all):
+    """
+    Calcula la desviación estándar de puntos fantasy de todos los porteros.
+    
+    Args:
+        df_all: DataFrame completo con todos los porteros
+    
+    Returns:
+        float: Desviación estándar de puntos fantasy
+    """
+    try:
+        puntos_col = [c for c in df_all.columns if 'puntos' in c.lower() or 'points' in c.lower()]
+        if puntos_col:
+            std_puntos = pd.to_numeric(df_all[puntos_col[0]], errors='coerce').std()
+            if pd.isna(std_puntos):
+                return 2.5
+            return float(std_puntos)
+        return 2.5
+    except Exception as e:
+        print(f"[WARNING] Error calculando std: {e}")
+        return 2.5
 
 
 def calcular_margen_confianza(puntos_prediccion, df_all):
@@ -106,7 +133,7 @@ def calcular_margen_confianza(puntos_prediccion, df_all):
     Calcula el margen de confianza (±x) basado en análisis matemático.
     
     Combina:
-    - MAE del modelo: 3.22
+    - MAE del modelo: 3.22 (del entrenamiento RF)
     - Desviación estándar de puntos fantasy de los porteros
     - Fórmula: margen = sqrt(MAE^2 + std^2/4)
     
@@ -119,19 +146,13 @@ def calcular_margen_confianza(puntos_prediccion, df_all):
         df_all: DataFrame completo con todos los porteros
     
     Returns:
-        float: Margen de confianza en puntos (±)
+        dict: {'margen': float, 'MAE': float, 'std': float}
     """
     try:
-        MAE_MODELO = 3.22  # Medido empíricamente
+        MAE_MODELO = 3.2221159391676863  # Valor real del entrenamiento RF
         
         # Calcular std de puntos fantasy
-        puntos_col = [c for c in df_all.columns if 'puntos' in c.lower() or 'points' in c.lower()]
-        if puntos_col:
-            std_puntos = pd.to_numeric(df_all[puntos_col[0]], errors='coerce').std()
-            if pd.isna(std_puntos):
-                std_puntos = 2.5
-        else:
-            std_puntos = 2.5
+        std_puntos = calcular_std_puntos(df_all)
         
         # Fórmula: combinar MAE + std en un margen robusto
         # sqrt(MAE^2 + (std/2)^2) captura error del modelo + variabilidad natural
@@ -140,10 +161,18 @@ def calcular_margen_confianza(puntos_prediccion, df_all):
         # Redondear a 1 decimal para legibilidad
         margen = round(margen, 1)
         
-        return margen
+        return {
+            'margen': margen,
+            'MAE': round(MAE_MODELO, 4),
+            'std': round(std_puntos, 2)
+        }
     except Exception as e:
         print(f"[WARNING] Error calculando margen: {e}")
-        return 1.5  # Fallback
+        return {
+            'margen': 3.8,
+            'MAE': 3.22,
+            'std': 2.5
+        }
 
 
 def obtener_puntos_reales_ultimo_partido(df, jugador_id, jornada_a_predecir):
@@ -587,14 +616,16 @@ def predecir_puntos_portero(jugador_id, jornada_actual=None, verbose=True, model
         }
     
     # Cargar datos
-    df = cargar_datos_completos()
-    if df is None:
+    df_porteros, df_todos = cargar_datos_completos()
+    if df_porteros is None or df_todos is None:
         return {
             'error': 'Datos no disponibles',
             'jugador_id': jugador_id,
             'prediccion': None,
             'jornada': None
         }
+    
+    df = df_porteros  # Usar porteros para predicción
     
     # Si no se especifica jornada, usar la última + 1 (próxima jornada a predecir)
     if jornada_actual is None:
@@ -683,7 +714,8 @@ def predecir_puntos_portero(jugador_id, jornada_actual=None, verbose=True, model
         if verbose:
             print(f"[WARNING] Faltan features ({len(features_disponibles)}/27). Usando promedio histórico: {promedio_historico:.2f}")
         
-        margen = calcular_margen_confianza(promedio_historico, df)
+        margen_dict = calcular_margen_confianza(promedio_historico, df)
+        margen = margen_dict['margen']
         puntos_reales = obtener_puntos_reales_ultimo_partido(df, jugador_id, partido['jornada_prediccion'])
         
         return {
@@ -692,7 +724,9 @@ def predecir_puntos_portero(jugador_id, jornada_actual=None, verbose=True, model
             'puntos_reales': round(puntos_reales, 2) if puntos_reales is not None else None,
             'puntos_reales_texto': f"{round(puntos_reales, 2)}" if puntos_reales is not None else "Aún no jugado",
             'margen': margen,
-            'rango_min': round(promedio_historico - margen, 2),
+            'mae_value': margen_dict['MAE'],
+            'std_value': margen_dict['std'],
+            'rango_min': round(max(0, promedio_historico - margen), 2),
             'rango_max': round(promedio_historico + margen, 2),
             'jornada': partido['jornada_prediccion'],
             'modelo': 'Promedio Histórico (features incompletas)',
@@ -709,8 +743,9 @@ def predecir_puntos_portero(jugador_id, jornada_actual=None, verbose=True, model
         # Obtener puntos reales de la jornada a predecir
         puntos_reales = obtener_puntos_reales_ultimo_partido(df, jugador_id, partido['jornada_prediccion'])
         
-        # Calcular margen de confianza matemáticamente
-        margen = calcular_margen_confianza(prediccion, df)
+        # Calcular margen de confianza matemáticamente (usando todos los jugadores para std)
+        margen_dict = calcular_margen_confianza(prediccion, df_todos)
+        margen = margen_dict['margen']
         
         if verbose:
             print(f"[OK] Predicción: {prediccion:.2f} puntos")
@@ -723,7 +758,9 @@ def predecir_puntos_portero(jugador_id, jornada_actual=None, verbose=True, model
             'puntos_reales': round(puntos_reales, 2) if puntos_reales is not None else None,
             'puntos_reales_texto': f"{round(puntos_reales, 2)}" if puntos_reales is not None else "Aún no jugado",
             'margen': margen,
-            'rango_min': round(prediccion - margen, 2),
+            'mae_value': margen_dict['MAE'],
+            'std_value': margen_dict['std'],
+            'rango_min': round(max(0, prediccion - margen), 2),
             'rango_max': round(prediccion + margen, 2),
             'jornada': partido['jornada_prediccion'],
             'modelo': 'Random Forest',
@@ -939,8 +976,9 @@ def explicar_prediccion_portero(jugador_id, jornada_actual=None, modelo_tipo='RF
             puntos_reales = obtener_puntos_reales_ultimo_partido(df, jugador_id, jornada_actual)
             puntos_reales_texto = str(puntos_reales) if puntos_reales is not None else "Aún no jugado"
             
-            # Calcular margen de confianza
-            margen = calcular_margen_confianza(prediccion, df)
+            # Calcular margen de confianza (usando todos los jugadores para std)
+            margen_dict = calcular_margen_confianza(prediccion, df_todos)
+            margen = margen_dict['margen']
             rango_min = max(0, prediccion - margen)
             rango_max = prediccion + margen
             
@@ -949,6 +987,8 @@ def explicar_prediccion_portero(jugador_id, jornada_actual=None, modelo_tipo='RF
                 'puntos_reales': puntos_reales,
                 'puntos_reales_texto': puntos_reales_texto,
                 'margen': round(margen, 1),
+                'mae_value': margen_dict['MAE'],
+                'std_value': margen_dict['std'],
                 'rango_min': round(rango_min, 2),
                 'rango_max': round(rango_max, 2),
                 'jornada': partido['jornada_prediccion'],
@@ -966,7 +1006,8 @@ def explicar_prediccion_portero(jugador_id, jornada_actual=None, modelo_tipo='RF
             # Aún así retornar todos los campos necesarios
             puntos_reales = obtener_puntos_reales_ultimo_partido(df, jugador_id, jornada_actual) if 'df' in locals() else None
             puntos_reales_texto = str(puntos_reales) if puntos_reales is not None else "Aún no jugado"
-            margen = calcular_margen_confianza(prediccion, df) if 'df' in locals() else 3.8
+            margen_dict = calcular_margen_confianza(prediccion, df) if 'df' in locals() else {'margen': 3.8, 'MAE': 3.22, 'std': 2.5}
+            margen = margen_dict['margen']
             rango_min = max(0, prediccion - margen)
             rango_max = prediccion + margen
             jornada_pred = partido['jornada_prediccion'] if 'partido' in locals() else jornada_actual
@@ -976,6 +1017,8 @@ def explicar_prediccion_portero(jugador_id, jornada_actual=None, modelo_tipo='RF
                 'puntos_reales': puntos_reales,
                 'puntos_reales_texto': puntos_reales_texto,
                 'margen': round(margen, 1),
+                'mae_value': margen_dict['MAE'],
+                'std_value': margen_dict['std'],
                 'rango_min': round(rango_min, 2),
                 'rango_max': round(rango_max, 2),
                 'jornada': jornada_pred,
