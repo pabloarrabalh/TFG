@@ -126,11 +126,45 @@ def crear_features_fantasy_gk(df: pd.DataFrame, verbose: bool = True) -> pd.Data
     # -----------------------------------------------------------------------
     # 0. Seguridad minutos
     # -----------------------------------------------------------------------
-    if "Min_partido" in df.columns:
-        df["Min_partido_safe"] = df["Min_partido"].replace(0, 0.1)
+    if "min_partido" in df.columns:
+        df["min_partido_safe"] = df["min_partido"].replace(0, 0.1)
     else:
-        df["Min_partido_safe"] = 1
+        df["min_partido_safe"] = 1
+    
+    # -----------------------------------------------------------------------
+    # 1. CLEAN SHEET PROBABILITY MEJORADA
+    # -----------------------------------------------------------------------
+    cs_components = []
 
+    # A) Probabilidad implícita de pocos goles vía mercado (p_over25_ewma5)
+    if "p_over25_ewma5" in df.columns:
+        df['cs_prob_from_odds'] = 1.0 - df['p_over25_ewma5'].fillna(0.5)
+        cs_components.append(df['cs_prob_from_odds'])
+
+    # B) Rival que normalmente marca poco (opp_gc_ewma5 bajo)
+    if "opp_gc_ewma5" in df.columns:
+        df['cs_prob_from_gc'] = 1.0 / (1.0 + df['opp_gc_ewma5'].fillna(1))
+        cs_components.append(df['cs_prob_from_gc'])
+
+    # C) Rival que genera pocos tiros (opp_shots_ewma5 bajo)
+    if "opp_shots_ewma5" in df.columns:
+        df['cs_prob_from_shots'] = 1.0 / (1.0 + df['opp_shots_ewma5'].fillna(1))
+        cs_components.append(df['cs_prob_from_shots'])
+
+    # D) Efecto de la dificultad de fixture (home/away)
+    if "fixture_difficulty_home" in df.columns and "fixture_difficulty_away" in df.columns and "is_home" in df.columns:
+        df['cs_prob_from_fixture'] = df.apply(lambda x: x['fixture_difficulty_home'] if x['is_home'] else x['fixture_difficulty_away'], axis=1)
+        cs_components.append(df['cs_prob_from_fixture'])
+
+    if cs_components:
+        df['cs_probability'] = pd.concat(cs_components, axis=1).mean(axis=1).fillna(0.5).clip(0, 1)
+        df['cs_expected_points'] = df['cs_probability'] * 4  # 4 puntos por clean sheet
+    else:
+        df['cs_probability'] = 0.5
+        df['cs_expected_points'] = 2
+
+    # Clean sheet rate reciente (últimos 3 partidos, sin leakage)
+    
     # -----------------------------------------------------------------------
     # 1. CLEAN SHEET PROBABILITY MEJORADA
     # -----------------------------------------------------------------------
@@ -275,8 +309,8 @@ def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) ->
         df['cs_probability'] = 1.0 / (1.0 + df['opp_shots_ewma5'].fillna(0) + 0.1)
         
         # Rate de clean sheets en últimos 3 partidos
-        if 'puntosFantasy' in df.columns:
-            df['cs_in_last_3'] = df.groupby('player')['puntosFantasy'].transform(
+        if 'puntos_fantasy' in df.columns:
+            df['cs_in_last_3'] = df.groupby('player')['puntos_fantasy'].transform(
                 lambda x: ((x >= -10) & (x <= 10)).shift().rolling(3, min_periods=1).sum()
             ).fillna(0)
             
@@ -290,13 +324,13 @@ def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) ->
     # 2. EFFICIENCY METRICS (per 90 minutes - SIN LEAKAGE)
     # ========================================================================
     
-    if 'Entradas' in df.columns and 'Min_partido' in df.columns:
+    if 'entradas' in df.columns and 'min_partido' in df.columns:
         # Tackling per 90
-        df['Entradas'] = pd.to_numeric(df['Entradas'], errors='coerce').fillna(0)
-        df['Min_partido'] = pd.to_numeric(df['Min_partido'], errors='coerce').fillna(1)
+        df['entradas'] = pd.to_numeric(df['entradas'], errors='coerce').fillna(0)
+        df['min_partido'] = pd.to_numeric(df['min_partido'], errors='coerce').fillna(1)
         
         df['tackles_per_90'] = (
-            df['Entradas'] / (df['Min_partido'] / 90.0 + 0.1)
+            df['entradas'] / (df['min_partido'] / 90.0 + 0.1)
         ).fillna(0)
         
         # Media móvil exponencial de tackles per 90
@@ -308,11 +342,11 @@ def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) ->
             print("✅ tackles_per_90 (normalizadas a 90 min) - Sin leakage")
             print("✅ tackles_per_90_ewma5 (media móvil) - Sin leakage")
     
-    if 'Intercepciones' in df.columns and 'Min_partido' in df.columns:
-        df['Intercepciones'] = pd.to_numeric(df['Intercepciones'], errors='coerce').fillna(0)
+    if 'intercepciones' in df.columns and 'min_partido' in df.columns:
+        df['intercepciones'] = pd.to_numeric(df['intercepciones'], errors='coerce').fillna(0)
         
         df['int_per_90'] = (
-            df['Intercepciones'] / (df['Min_partido'] / 90.0 + 0.1)
+            df['intercepciones'] / (df['min_partido'] / 90.0 + 0.1)
         ).fillna(0)
         
         df['int_per_90_ewma5'] = df.groupby('player')['int_per_90'].transform(
@@ -323,11 +357,11 @@ def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) ->
             print("✅ int_per_90 (normalizadas a 90 min) - Sin leakage")
             print("✅ int_per_90_ewma5 (media móvil) - Sin leakage")
     
-    if 'Despejes' in df.columns and 'Min_partido' in df.columns:
-        df['Despejes'] = pd.to_numeric(df['Despejes'], errors='coerce').fillna(0)
+    if 'despejes' in df.columns and 'min_partido' in df.columns:
+        df['despejes'] = pd.to_numeric(df['despejes'], errors='coerce').fillna(0)
         
         df['clearances_per_90'] = (
-            df['Despejes'] / (df['Min_partido'] / 90.0 + 0.1)
+            df['despejes'] / (df['min_partido'] / 90.0 + 0.1)
         ).fillna(0)
         
         if verbose:
@@ -338,13 +372,13 @@ def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) ->
     # ========================================================================
     
     df['defensive_actions_total'] = (
-        df.get('Entradas', 0) + 
-        df.get('Intercepciones', 0) + 
-        df.get('Despejes', 0) * 0.5  # Despejes menos valorados
+        df.get('entradas', 0) + 
+        df.get('intercepciones', 0) + 
+        df.get('despejes', 0) * 0.5  # Despejes menos valorados
     )
     
     df['def_actions_per_90'] = (
-        df['defensive_actions_total'] / (df['Min_partido'] / 90.0 + 0.1)
+        df['defensive_actions_total'] / (df['min_partido'] / 90.0 + 0.1)
     ).fillna(0)
     
     df['def_actions_ewma5'] = df.groupby('player')['defensive_actions_total'].transform(
