@@ -63,9 +63,13 @@
     <div class="p-8 space-y-6 bg-background-dark min-h-full">
         <!-- Header -->
         <div class="mb-8">
-        <h2 class="text-3xl font-black text-white mb-2">Mi Plantilla</h2>
-        <p class="text-gray-400 text-lg">Gestiona tu equipo ideal</p>
-    </div>
+            <h2 class="text-3xl font-black text-white mb-2">Mi Plantilla</h2>
+            <p class="text-gray-400 text-lg">Gestiona tu equipo ideal</p>
+        </div>
+
+        <!-- Selector de Jornada MOVIDO ABAJO, ENTRE CAMPO Y BANQUILLO -->
+                            <option value="">No hay jornadas disponibles</option>
+
 
     <!-- Información del equipo -->
     <div class="glass-panel rounded-2xl p-6 mb-6">
@@ -171,11 +175,19 @@
                     </div>
                 </div>
                 
-                <!-- Predicción de puntos (vacío por ahora) -->
+                <!-- Predicción de puntos (con explicabilidad) -->
                 <div class="bg-surface-dark/50 rounded-lg p-4 border border-border-dark">
                     <p class="text-xs text-gray-400 uppercase mb-2">Predicción de puntos</p>
-                    <div class="h-12 bg-background-dark rounded-lg flex items-center justify-center">
-                        <span class="text-gray-500">Próximamente</span>
+                    <div id="modal-prediccion-container" class="h-12 bg-background-dark rounded-lg flex items-center justify-center">
+                        <span class="text-gray-500">Cargando...</span>
+                    </div>
+                    <div id="modal-explicacion-container" class="hidden mt-3 p-3 bg-background-dark rounded border border-primary/30">
+                        <button id="btn-ver-explicacion" class="text-xs text-primary font-bold uppercase mb-2 hover:text-primary/80 transition" style="display:none;">
+                            ▼ Ver Explicaciones
+                        </button>
+                        <div id="modal-explicacion-detalle" class="hidden mt-2 text-xs text-gray-300 space-y-2 max-h-64 overflow-y-auto">
+                            <!-- Se llena dinámicamente con features de SHAP -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -253,6 +265,25 @@
                 <circle cx="50%" cy="95%" r="80" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" clip-path="polygon(0% 95%, 100% 95%, 100% 100%, 0% 100%)"/>
             </svg>
         </div>
+    </div>
+
+    <!-- Selector de Jornada CON BOTONES E INPUT (entre campo y banquillo) -->
+    <div class="glass-panel rounded-2xl p-6 my-6 flex items-center justify-center gap-6">
+        <button id="btn-jornada-anterior" onclick="cambiarJornada(-1)" class="px-6 py-3 bg-surface-dark border border-border-dark text-white rounded-lg hover:bg-primary/20 transition-colors font-bold text-lg">
+            <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <div class="text-center min-w-64">
+            <p class="text-gray-400 text-sm mb-2">Jornada Actual</p>
+            <select id="jornada-input" 
+                   class="text-4xl font-black text-white bg-surface-darker border-2 border-primary rounded-lg px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
+                   style="font-family: 'Courier New', monospace; color-scheme: dark;"
+                   onchange="cambiarJornadaPorInput(this.value)">
+            </select>
+            <p class="text-gray-400 text-sm mt-2">Temporada {{ temporada_actual }}</p>
+        </div>
+        <button id="btn-jornada-siguiente" onclick="cambiarJornada(1)" class="px-6 py-3 bg-surface-dark border border-border-dark text-white rounded-lg hover:bg-primary/20 transition-colors font-bold text-lg">
+            <span class="material-symbols-outlined">chevron_right</span>
+        </button>
     </div>
 
     <!-- Panel de suplentes -->
@@ -337,6 +368,266 @@ const jugadoresDisponibles = JSON.parse('{{ jugadores_json|escapejs }}');
 const plantillaGuardada = JSON.parse('{{ plantilla_guardada|escapejs }}');
 const equiposDisponibles = JSON.parse('{{ equipos_json|escapejs }}');
 const todasPlantillas = JSON.parse('{{ plantillas|escapejs }}');
+const jornadasDisponibles = JSON.parse('{{ jornadas|escapejs }}');
+let jornadaActual = {{ jornada_actual|default:'null' }}; // Jornada actual seleccionada
+
+// Inicializar select de jornadas y cargar jornada 17 por defecto
+function inicializarJornadaSelect() {
+    const selectElement = document.getElementById('jornada-input');
+    if (selectElement) {
+        // Limpiar opciones existentes
+        selectElement.innerHTML = '';
+        
+        // Añadir opciones de 1 a 38
+        for (let i = 1; i <= 38; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            selectElement.appendChild(option);
+        }
+        
+        // Si jornadaActual no está definido, usar 17 por defecto
+        if (jornadaActual === null || jornadaActual === undefined) {
+            jornadaActual = 17;
+        }
+        
+        // Set el valor seleccionado
+        selectElement.value = jornadaActual;
+    }
+}
+
+// Ejecutar inicialización cuando el select esté disponible
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarJornadaSelect);
+} else {
+    // Si el documento ya está cargado, ejecutar inmediatamente
+    inicializarJornadaSelect();
+}
+
+// Función para obtener el nombre del escudo basándose en el nombre del equipo
+function obtenerEscudo(nombreEquipo) {
+    if (!nombreEquipo) return null;
+    
+    // Mapeo de nombres de equipos a nombres de archivos de escudos
+    const mapeos = {
+        'Real Madrid': 'madrid',
+        'Barcelona': 'barcelona',
+        'Atlético Madrid': 'atletico_madrid',
+        'Real Sociedad': 'sociedad',
+        'Villarreal': 'villarreal',
+        'Athletic Club': 'athletic_club',
+        'Real Betis': 'betis',
+        'Girona': 'girona',
+        'Rayo Vallecano': 'rayo_vallecano',
+        'Osasuna': 'osasuna',
+        'Valencia': 'valencia',
+        'Celta Vigo': 'celta_vigo',
+        'Real Mallorca': 'mallorca',
+        'Getafe': 'getafe',
+        'Sevilla': 'sevilla',
+        'Real Oviedo': 'oviedo',
+        'Levante': 'levante',
+        'Alavés': 'alaves',
+        'RCD Espanyol': 'espanyol',
+        'Elche': 'elche',
+        'Las Palmas': 'las_palmas',
+        'Almería': 'almeria',
+        'Granada': 'granada',
+        'Valladolid': 'valladolid',
+        'Cádiz': 'cadiz',
+        'Leganés': 'leganes'
+    };
+    
+    return mapeos[nombreEquipo] || nombreEquipo?.toLowerCase().replace(/\s+/g, '_');
+}
+
+// Función para cambiar de jornada dinámicamente
+function cambiarJornada(delta) {
+    let nuevaJornada;
+    if (delta === undefined) {
+        // Llamada desde input number (sin delta)
+        nuevaJornada = parseInt(document.getElementById('jornada-input').value);
+    } else {
+        // Llamada desde botones con delta
+        nuevaJornada = jornadaActual + delta;
+    }
+    
+    const totalJornadas = 38; // Temporada 25/26 tiene exactamente 38 jornadas
+    
+    if (nuevaJornada < 1 || nuevaJornada > totalJornadas) {
+        console.log('Jornada fuera de rango (1-38)');
+        return;
+    }
+    
+    console.log(`[CAMBIO] Cambiando de jornada ${jornadaActual} a ${nuevaJornada}`);
+    
+    // hacer POST a la API para actualizar los datos de los jugadores
+    fetch('/api/cambiar-jornada/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({ jornada: nuevaJornada })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            console.log(`[CAMBIO] Respuesta API recibida con ${Object.keys(data.jugadores_por_posicion).length} posiciones`);
+            
+            // Actualizar jornada global
+            jornadaActual = nuevaJornada;
+            document.getElementById('jornada-input').value = nuevaJornada;
+            
+            // Actualizar jugadoresDisponibles CON TODOS LOS DATOS
+            Object.keys(data.jugadores_por_posicion).forEach(posicion => {
+                jugadoresDisponibles[posicion] = data.jugadores_por_posicion[posicion];
+                console.log(`[CAMBIO] ${posicion}: ${jugadoresDisponibles[posicion].length} jugadores`);
+            });
+            
+            console.log('[CAMBIO] Actualizando rivales en alineacion...');
+            // Actualizar los rivales en la alineación actual
+            actualizarRivalesEnAlineacion();
+            
+            console.log('[CAMBIO] Re-renderizando campo...');
+            // Re-renderizar el campo CON LOS NUEVOS DATOS
+            renderizarCampo();
+            
+            console.log(`[CAMBIO] Jornada actualizada a: ${nuevaJornada} ✓`);
+        } else {
+            console.error('Error al cambiar jornada:', data);
+            alert('Error al cambiar jornada: ' + (data.error || 'desconocido'));
+        }
+    })
+    .catch(error => {
+        console.error('Error en cambiarJornada:', error);
+        alert('Error de conexión al cambiar jornada');
+    });
+}
+
+function cambiarJornadaPorInput(valor) {
+    const jornada = parseInt(valor);
+    if (jornada >= 1 && jornada <= 38) {
+        cambiarJornada(); // Llamar sin delta para que use el valor del input
+    }
+}
+
+// Función para enriquecer la alineación actual con datos de equipo y rival desde jugadoresDisponibles
+function enriquecerAlineacionConDatos() {
+    /**
+     * Busca cada jugador en jugadoresDisponibles y copia sus datos de equipo y rival
+     * Importante: Se llama al cargar la plantilla inicial para completar datos faltantes
+     */
+    const posiciones = ['Portero', 'Defensa', 'Centrocampista', 'Delantero'];
+    
+    console.log('[ENRIQUECIMIENTO] Iniciando enriquecimiento de alineación...');
+    
+    // Enriquecer campo
+    posiciones.forEach(posicion => {
+        if (Array.isArray(alineacionActual[posicion])) {
+            alineacionActual[posicion].forEach((jugador, idx) => {
+                if (jugador && jugador.id) {
+                    const encontrado = window.buscarJugadorEnDisponibles(jugador.id);
+                    if (encontrado) {
+                        // Completar datos faltantes (no sobrescribir si ya existen)
+                        if (!jugador.equipo_nombre) jugador.equipo_nombre = encontrado.equipo_nombre;
+                        if (!jugador.equipo_id) jugador.equipo_id = encontrado.equipo_id;
+                        if (!jugador.proximo_rival_nombre) jugador.proximo_rival_nombre = encontrado.proximo_rival_nombre;
+                        if (!jugador.proximo_rival_id) jugador.proximo_rival_id = encontrado.proximo_rival_id;
+                        console.log(`[ENRIQUECIMIENTO] ${posicion}[${idx}]: ${jugador.nombre} → ${jugador.equipo_nombre} vs ${jugador.proximo_rival_nombre}`);
+                    } else {
+                        console.warn(`[ENRIQUECIMIENTO] NO ENCONTRADO ${posicion}[${idx}]: ${jugador.nombre} (ID: ${jugador.id})`);
+                    }
+                }
+            });
+        }
+    });
+    
+    // Enriquecer suplentes
+    if (Array.isArray(alineacionActual['Suplentes'])) {
+        alineacionActual['Suplentes'].forEach((jugador, idx) => {
+            if (jugador && jugador.id) {
+                const encontrado = window.buscarJugadorEnDisponibles(jugador.id);
+                if (encontrado) {
+                    if (!jugador.equipo_nombre) jugador.equipo_nombre = encontrado.equipo_nombre;
+                    if (!jugador.equipo_id) jugador.equipo_id = encontrado.equipo_id;
+                    if (!jugador.proximo_rival_nombre) jugador.proximo_rival_nombre = encontrado.proximo_rival_nombre;
+                    if (!jugador.proximo_rival_id) jugador.proximo_rival_id = encontrado.proximo_rival_id;
+                    console.log(`[ENRIQUECIMIENTO] Suplente[${idx}]: ${jugador.nombre} → ${jugador.equipo_nombre} vs ${jugador.proximo_rival_nombre}`);
+                } else {
+                    console.warn(`[ENRIQUECIMIENTO] NO ENCONTRADO Suplente[${idx}]: ${jugador.nombre} (ID: ${jugador.id})`);
+                }
+            }
+        });
+    }
+    
+    console.log('[ENRIQUECIMIENTO] Alineación enriquecida ✓');
+}
+
+// Función para actualizar los rivales en la alineación actual basándose en los nuevos jugadores disponibles
+function actualizarRivalesEnAlineacion() {
+    const posiciones = ['Portero', 'Defensa', 'Centrocampista', 'Delantero'];
+    
+    // Actualizar jugadores del campo
+    posiciones.forEach(posicion => {
+        if (Array.isArray(alineacionActual[posicion])) {
+            alineacionActual[posicion].forEach((jugador, idx) => {
+                if (jugador && jugador.id) {
+                    // Buscar en TODAS las posiciones disponibles usando helper global
+                    const jugadorNuevo = window.buscarJugadorEnDisponibles(jugador.id);
+                    
+                    if (jugadorNuevo) {
+                        // Actualizar equipo y rival
+                        jugador.equipo_nombre = jugadorNuevo.equipo_nombre;
+                        jugador.equipo_id = jugadorNuevo.equipo_id;
+                        jugador.proximo_rival_nombre = jugadorNuevo.proximo_rival_nombre;
+                        jugador.proximo_rival_id = jugadorNuevo.proximo_rival_id;
+                        console.log(`[DEBUG] Campo ${posicion}[${idx}]: ${jugador.nombre} -> ${jugador.equipo_nombre} vs ${jugador.proximo_rival_nombre}`);
+                    } else {
+                        console.warn(`[DEBUG] Campo ${posicion}[${idx}]: NO ENCONTRADO ${jugador.nombre} (ID: ${jugador.id})`);
+                    }
+                }
+            });
+        }
+    });
+    
+    // Actualizar suplentes
+    if (Array.isArray(alineacionActual['Suplentes'])) {
+        alineacionActual['Suplentes'].forEach((jugador, idx) => {
+            if (jugador && jugador.id) {
+                // Buscar en TODAS las posiciones disponibles usando helper global
+                const jugadorNuevo = window.buscarJugadorEnDisponibles(jugador.id);
+                
+                if (jugadorNuevo) {
+                    jugador.equipo_nombre = jugadorNuevo.equipo_nombre;
+                    jugador.equipo_id = jugadorNuevo.equipo_id;
+                    jugador.proximo_rival_nombre = jugadorNuevo.proximo_rival_nombre;
+                    jugador.proximo_rival_id = jugadorNuevo.proximo_rival_id;
+                    console.log(`[DEBUG] Suplente[${idx}]: ${jugador.nombre} -> ${jugador.equipo_nombre} vs ${jugador.proximo_rival_nombre}`);
+                } else {
+                    console.warn(`[DEBUG] Suplente[${idx}]: NO ENCONTRADO ${jugador.nombre} (ID: ${jugador.id})`);
+                }
+            }
+        });
+    }
+}
+
+// DEBUG: Ver qué datos llegan de Django
+console.log('Jornada Actual:', jornadaActual);
+console.log('DEBUG - Jugadores Porteros:', jugadoresDisponibles['Portero']?.slice(0, 3));
+console.log('DEBUG - Equipos disponibles:', equiposDisponibles);
+
+// Verificar que los campos equipo_nombre y proximo_rival_nombre existen
+if (jugadoresDisponibles['Portero']?.length > 0) {
+    const primerPortero = jugadoresDisponibles['Portero'][0];
+    console.log('Primer portero - Equipo e Rival:',{
+        nombre: primerPortero.nombre,
+        equipo_id: primerPortero.equipo_id,
+        equipo_nombre: primerPortero.equipo_nombre,
+        rival_id: primerPortero.proximo_rival_id,
+        rival_nombre: primerPortero.proximo_rival_nombre
+    });
+}
 
 let plantillaActualId = {{ plantilla_actual_id|default:'null' }};
 let plantillaActualNombre = plantillaGuardada.nombre || 'Mi Team';
@@ -382,11 +673,29 @@ function crearJugadorCard(jugador, posicion, esVacio = false, indice = 0) {
         `;
     }
     
+    // Si el jugador no tiene equipo_nombre o proximo_rival_nombre, completar desde jugadoresDisponibles
+    if (!jugador.equipo_nombre) {
+        const posicionMap = {
+            'Portero': 'Portero',
+            'Defensa': 'Defensa',
+            'Centrocampista': 'Centrocampista',
+            'Delantero': 'Delantero'
+        };
+        const posKey = posicionMap[posicion] || 'Delantero';
+        const jugadorCompleto = jugadoresDisponibles[posKey]?.find(j => j.id === jugador.id);
+        if (jugadorCompleto) {
+            jugador.equipo_nombre = jugadorCompleto.equipo_nombre;
+            jugador.equipo_id = jugadorCompleto.equipo_id;
+            jugador.proximo_rival_nombre = jugadorCompleto.proximo_rival_nombre;
+            jugador.proximo_rival_id = jugadorCompleto.proximo_rival_id;
+        }
+    }
+    
     const iniciales = (jugador.nombre[0] + (jugador.apellido ? jugador.apellido[0] : '')).toUpperCase();
     const nombreCompleto = `${jugador.nombre} ${jugador.apellido || ''}`.trim();
     const puntos = jugador.puntos_fantasy_25_26 || 0;
     const rivalNombre = jugador.proximo_rival_nombre || 'TBD';
-    const rivalInicial = rivalNombre !== 'TBD' ? rivalNombre.substring(0, 2).toUpperCase() : '--';
+    const escudoRival = obtenerEscudo(rivalNombre);
     
     return `
         <div class="jugador-existente-btn player-card ${colorClasses[posicion]} rounded-xl p-4 text-center shadow-lg cursor-move min-w-[160px] hover:scale-105 transition-all relative drop-zone group" 
@@ -406,12 +715,12 @@ function crearJugadorCard(jugador, posicion, esVacio = false, indice = 0) {
                 <span class="text-lg font-bold text-white">${iniciales}</span>
             </div>
             <p class="font-bold text-white text-sm mb-1 line-clamp-1">${nombreCompleto}</p>
-            <div class="flex items-center justify-center gap-1 text-xs h-6">
+            <div class="flex items-center justify-center gap-2 text-xs h-6">
                 <span class="text-white/80 font-bold">vs</span>
-                <div class="size-5 bg-white/10 rounded flex items-center justify-center text-xs font-bold text-white/80">
-                    ${rivalInicial}
-                </div>
+                ${escudoRival ? `<img src="/static/escudos/${escudoRival}.png" alt="${rivalNombre}" class="h-5 w-5 rounded object-cover" onerror="this.style.display='none'">` : ''}
+                ${!escudoRival || rivalNombre === 'TBD' ? '<span class="text-white/80 text-xs">TBD</span>' : ''}
             </div>
+            <p class="prediccion-puntos text-white font-bold text-xs mt-1 opacity-50" title="Cargando predicción...">--pt</p>
             <!-- Botón para ver detalles (oculto, aparece al hover) -->
             <button class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl bg-black/50 flex items-center justify-center cursor-pointer pointer-events-auto" onclick="abrirModalDetallesJugador(event)">
                 <span class="material-symbols-outlined text-white text-3xl">info</span>
@@ -426,13 +735,23 @@ function renderizarCampo() {
     
     posiciones.forEach(posicion => {
         const container = document.getElementById(posicion === 'Centrocampista' ? 'centrocampistas' : posicion.toLowerCase() + 's');
-        if (!container) return;
+        if (!container) {
+            console.warn(`Container no encontrado para posición: ${posicion}`);
+            return;
+        }
         
         container.innerHTML = '';
         
+        // Asegurar que alineacionActual[posicion] es un array
+        if (!Array.isArray(alineacionActual[posicion])) {
+            alineacionActual[posicion] = [];
+        }
+        
         for (let i = 0; i < config[posicion]; i++) {
-            if (i < alineacionActual[posicion].length && alineacionActual[posicion][i] !== null) {
-                container.innerHTML += crearJugadorCard(alineacionActual[posicion][i], posicion, false, i);
+            const jugadorEnSlot = alineacionActual[posicion][i];
+            
+            if (jugadorEnSlot && jugadorEnSlot !== null && jugadorEnSlot.id) {
+                container.innerHTML += crearJugadorCard(jugadorEnSlot, posicion, false, i);
             } else {
                 container.innerHTML += crearJugadorCard(null, posicion, true, i);
             }
@@ -441,6 +760,7 @@ function renderizarCampo() {
     
     renderizarBanquillo();
     document.getElementById('formacion-display').textContent = `Formación: ${formacionActual}`;
+    cargarPrediccionesPorteros();
 }
 
 function renderizarBanquillo() {
@@ -462,7 +782,7 @@ function renderizarBanquillo() {
             const nombreCompleto = `${suplente.nombre} ${suplente.apellido || ''}`.trim();
             const puntos = suplente.puntos_fantasy_25_26 || 0;
             const rivalNombre = suplente.proximo_rival_nombre || 'TBD';
-            const rivalInicial = rivalNombre !== 'TBD' ? rivalNombre.substring(0, 2).toUpperCase() : '--';
+            const escudoRival = suplente.proximo_rival_nombre ? obtenerEscudo(suplente.proximo_rival_nombre) : null;
             const colorClasses = {
                 'Portero': 'position-pt',
                 'Defensa': 'position-df',
@@ -478,7 +798,7 @@ function renderizarBanquillo() {
                      data-indice="${i}"
                      data-posicion-original="${suplente.posicion}"
                      data-jugador-nombre="${nombreCompleto}"
-                     data-jugador-equipo="${suplente.equipo_nombre}"
+                     data-jugador-equipo="${suplente.equipo_nombre || 'TBD'}"
                      data-jugador-rival="${rivalNombre}"
                      style="touch-action: none;">
                     <button class="btn-eliminar-jugador absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold transition-all pointer-events-auto" data-jugador-id="${suplente.id}" title="Eliminar jugador">
@@ -488,12 +808,12 @@ function renderizarBanquillo() {
                         <span class="text-lg font-bold text-white">${iniciales}</span>
                     </div>
                     <p class="font-bold text-white text-sm mb-1 line-clamp-1">${nombreCompleto}</p>
-                    <div class="flex items-center justify-center gap-1 text-xs h-6">
+                    <div class="flex items-center justify-center gap-2 text-xs h-6">
                         <span class="text-white/80 font-bold">vs</span>
-                        <div class="size-5 bg-white/10 rounded flex items-center justify-center text-xs font-bold text-white/80">
-                            ${rivalInicial}
-                        </div>
+                        ${escudoRival ? `<img src="/static/escudos/${escudoRival}.png" alt="${rivalNombre}" class="h-5 w-5 rounded object-cover" onerror="this.style.display='none'">` : ''}
+                        ${!escudoRival || rivalNombre === 'TBD' ? '<span class="text-white/80 text-xs">TBD</span>' : ''}
                     </div>
+                    <p class="prediccion-puntos text-white font-bold text-xs mt-1 opacity-50" title="Cargando predicción...">--pt</p>
                     <!-- Botón para ver detalles (oculto, aparece al hover) -->
                     <button class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl bg-black/50 flex items-center justify-center cursor-pointer pointer-events-auto" onclick="abrirModalDetallesJugador(event)">
                         <span class="material-symbols-outlined text-white text-3xl">info</span>
@@ -711,7 +1031,7 @@ function seleccionarJugador(jugadorId, nombre, apellido, posicion, esSuplente = 
         alineacionActual[targetPosicion] = [];
     }
     
-    // Buscar el jugador en jugadoresModalActuales para obtener sus puntos
+    // Buscar el jugador en jugadoresModalActuales para obtener TODOS sus datos
     const jugadorCompleto = jugadoresModalActuales.find(j => j.id === jugadorId);
     const puntos = jugadorCompleto ? (jugadorCompleto.puntos_fantasy_25_26 || 0) : 0;
     
@@ -720,7 +1040,11 @@ function seleccionarJugador(jugadorId, nombre, apellido, posicion, esSuplente = 
         nombre: nombre,
         apellido: apellido,
         posicion: posicion,  // Guardar posición real siempre para colores
-        puntos_fantasy_25_26: puntos  // Incluir puntos fantasy
+        puntos_fantasy_25_26: puntos,  // Incluir puntos fantasy
+        equipo_id: jugadorCompleto?.equipo_id || null,  // Equipo actual del jugador
+        equipo_nombre: jugadorCompleto?.equipo_nombre || 'TBD',  // Nombre del equipo
+        proximo_rival_id: jugadorCompleto?.proximo_rival_id || null,  // Rival en la jornada
+        proximo_rival_nombre: jugadorCompleto?.proximo_rival_nombre || 'TBD'  // Nombre del rival
     };
     
     // Si se especifica un índice de slot, asignar exactamente en ese índice
@@ -1059,6 +1383,10 @@ document.addEventListener('drop', function(event) {
         if (!jugadorEnTarget || jugadorEnTarget === null) {
             alineacionActual[targetPosicion][targetIndice] = jugadorArrastrado;
             alineacionActual[draggedFromPosicion][draggedFromIndice] = null;
+            
+            // Re-enriquecer después del movimiento
+            window.reEnriquecerJugadorDrop(jugadorArrastrado, `MOVER-BANQUILLO: ${jugadorArrastrado.nombre}`);
+            
             renderizarCampo();
             renderizarBanquillo();
             mostrarNotificacion(`${jugadorArrastrado.nombre} movido al banquillo`, 'success');
@@ -1066,6 +1394,11 @@ document.addEventListener('drop', function(event) {
             // Si hay otro jugador en el banquillo, intercambiar
             alineacionActual[targetPosicion][targetIndice] = jugadorArrastrado;
             alineacionActual[draggedFromPosicion][draggedFromIndice] = jugadorEnTarget;
+            
+            // Re-enriquecer ambos jugadores después del intercambio
+            window.reEnriquecerJugadorDrop(jugadorArrastrado, `SWAP-BANQUILLO-FROM: ${jugadorArrastrado.nombre}`);
+            window.reEnriquecerJugadorDrop(jugadorEnTarget, `SWAP-BANQUILLO-TO: ${jugadorEnTarget.nombre}`);
+            
             renderizarCampo();
             renderizarBanquillo();
             mostrarNotificacion(`${jugadorArrastrado.nombre} movido al banquillo`, 'success');
@@ -1078,6 +1411,10 @@ document.addEventListener('drop', function(event) {
         alineacionActual[targetPosicion][targetIndice] = jugadorArrastrado;
         alineacionActual[draggedFromPosicion][draggedFromIndice] = jugadorEnTarget;
         
+        // Re-enriquecer ambos jugadores después del intercambio
+        window.reEnriquecerJugadorDrop(jugadorArrastrado, `SWAP-CAMPO-FROM: ${jugadorArrastrado.nombre}`);
+        window.reEnriquecerJugadorDrop(jugadorEnTarget, `SWAP-CAMPO-TO: ${jugadorEnTarget.nombre}`);
+        
         renderizarCampo();
         renderizarBanquillo();
         mostrarNotificacion(`${jugadorArrastrado.nombre} e ${jugadorEnTarget.nombre} han intercambiado posiciones`, 'success');
@@ -1086,6 +1423,9 @@ document.addEventListener('drop', function(event) {
         console.log('MOVIMIENTO A SLOT VACÍO EN CAMPO');
         alineacionActual[targetPosicion][targetIndice] = jugadorArrastrado;
         alineacionActual[draggedFromPosicion][draggedFromIndice] = null;
+        
+        // Re-enriquecer después del movimiento
+        window.reEnriquecerJugadorDrop(jugadorArrastrado, `MOVER-CAMPO: ${jugadorArrastrado.nombre}`);
         
         renderizarCampo();
         renderizarBanquillo();
@@ -1106,8 +1446,51 @@ document.addEventListener('click', function(event) {
     }
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// FUNCIÓN GLOBAL: Buscar jugador en jugadoresDisponibles (todas las posiciones)
+// ═══════════════════════════════════════════════════════════════════════════
+window.buscarJugadorEnDisponibles = function(jugadorId) {
+    const posiciones = ['Portero', 'Defensa', 'Centrocampista', 'Delantero'];
+    for (let pos of posiciones) {
+        if (Array.isArray(jugadoresDisponibles[pos])) {
+            const encontrado = jugadoresDisponibles[pos].find(j => j.id === jugadorId);
+            if (encontrado) return encontrado;
+        }
+    }
+    return null;
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FUNCIÓN GLOBAL: Re-enriquecer un jugador después de drag/drop
+// Refresh equipo/rival data from jugadoresDisponibles after move/swap
+// ═══════════════════════════════════════════════════════════════════════════
+window.reEnriquecerJugadorDrop = function(jugador, operacion = '') {
+    if (!jugador || !jugador.id) return false;
+
+    const frescoData = window.buscarJugadorEnDisponibles(jugador.id);
+    if (frescoData) {
+        const antes = `${jugador.equipo_nombre || '?'} vs ${jugador.proximo_rival_nombre || '?'}`;
+        
+        jugador.equipo_nombre = frescoData.equipo_nombre;
+        jugador.equipo_id = frescoData.equipo_id;
+        jugador.proximo_rival_nombre = frescoData.proximo_rival_nombre;
+        jugador.proximo_rival_id = frescoData.proximo_rival_id;
+        
+        const despues = `${jugador.equipo_nombre} vs ${jugador.proximo_rival_nombre}`;
+        console.log(`[DROP-REFRESH] ${operacion}: ${jugador.nombre} → ${antes} → ${despues}`);
+        return true;
+    } else {
+        console.warn(`[DROP-REFRESH] NO ENCONTRADO: ${jugador.nombre} (ID: ${jugador.id})`);
+        return false;
+    }
+};
+
 // Inicializar
 window.addEventListener('load', function() {
+    // Enriquecer la alineación cargada con datos de equipo y rival
+    enriquecerAlineacionConDatos();
+    
+    // Luego renderizar el campo con datos completos
     renderizarCampo();
     document.getElementById('formacion-display-btn').textContent = `Formación: ${formacionActual}`;
     document.getElementById('nombre-plantilla').textContent = plantillaActualNombre;
@@ -1333,18 +1716,40 @@ function abrirModalDetallesJugador(event) {
     const nombre = card.getAttribute('data-jugador-nombre') || '-';
     const equipo = card.getAttribute('data-jugador-equipo') || '-';
     const rival = card.getAttribute('data-jugador-rival') || '-';
+    const jugadorId = card.getAttribute('data-jugador-id');
     
     // Actualizar el modal
     document.getElementById('modal-jugador-nombre').textContent = nombre;
     document.getElementById('modal-jugador-equipo').textContent = equipo;
     document.getElementById('modal-jugador-rival').textContent = rival;
     
-    // Actualizar escudos (iniciales)
-    const equipoInicial = equipo ? equipo.substring(0, 2).toUpperCase() : '--';
-    const rivalInicial = rival && rival !== '-' ? rival.substring(0, 2).toUpperCase() : '--';
+    // Actualizar escudos (usando imágenes)
+    const escudoEquipo = obtenerEscudo(equipo);
+    const escudoRival = obtenerEscudo(rival);
     
-    document.getElementById('modal-jugador-escudo-equipo').innerHTML = `<span class="text-sm font-bold text-white">${equipoInicial}</span>`;
-    document.getElementById('modal-jugador-escudo-rival').innerHTML = `<span class="text-sm font-bold text-white">${rivalInicial}</span>`;
+    // Mostrar escudo del equipo
+    if (escudoEquipo && equipo !== '-') {
+        document.getElementById('modal-jugador-escudo-equipo').innerHTML = `<img src="/static/escudos/${escudoEquipo}.png" alt="${equipo}" class="h-10 w-10 rounded object-cover" onerror="this.innerHTML='<span class=\\'text-sm font-bold text-white\\'>--</span>'">`;
+    } else {
+        document.getElementById('modal-jugador-escudo-equipo').innerHTML = `<span class="text-sm font-bold text-white">--</span>`;
+    }
+    
+    // Mostrar escudo del rival
+    if (escudoRival && rival !== '-') {
+        document.getElementById('modal-jugador-escudo-rival').innerHTML = `<img src="/static/escudos/${escudoRival}.png" alt="${rival}" class="h-10 w-10 rounded object-cover" onerror="this.innerHTML='<span class=\\'text-sm font-bold text-white\\'>TBD</span>'">`;
+    } else {
+        document.getElementById('modal-jugador-escudo-rival').innerHTML = `<span class="text-sm font-bold text-white">TBD</span>`;
+    }
+    
+    // Si es portero, cargar predicción y explicabilidad
+    const posicion = card.getAttribute('data-posicion');
+    if (posicion === 'Portero' && jugadorId) {
+        cargarPrediccionPortero(jugadorId);
+    } else {
+        // Para otros, limpiar predicción
+        document.getElementById('modal-prediccion-container').innerHTML = '<span class="text-gray-500">Sin predicción</span>';
+        document.getElementById('modal-explicacion-container').classList.add('hidden');
+    }
     
     // Abrir modal
     document.getElementById('modal-detalles-jugador').classList.remove('hidden');
@@ -1361,5 +1766,355 @@ document.addEventListener('click', function(event) {
         cerrarModalDetallesJugador();
     }
 });
+
+// ============================================================================
+// FUNCIONES DE PREDICCIÓN Y EXPLICABILIDAD PARA PORTEROS (XAI con SHAP)
+// ============================================================================
+
+// Variable global para cancelar fetch anterior
+let prediccionAbortController = null;
+
+function cargarPrediccionPortero(jugadorId) {
+    /**
+     * Carga la predicción y explicabilidad (SHAP) para un portero
+     * Ahora muestra explicaciones en TEXTO NATURAL
+     */
+    const prediccionContainer = document.getElementById('modal-prediccion-container');
+    const explicacionContainer = document.getElementById('modal-explicacion-container');
+    const detalleContainer = document.getElementById('modal-explicacion-detalle');
+    const btnExplicacion = document.getElementById('btn-ver-explicacion');
+    
+    // Cancelar fetch anterior si existe
+    if (prediccionAbortController) {
+        prediccionAbortController.abort();
+    }
+    prediccionAbortController = new AbortController();
+    
+    // Limpiar COMPLETAMENTE los contenedores
+    prediccionContainer.innerHTML = '<span class="text-primary/60 italic">Cargando predicción...</span>';
+    explicacionContainer.classList.add('hidden');
+    detalleContainer.classList.add('hidden');
+    detalleContainer.innerHTML = '';
+    if (btnExplicacion) {
+        btnExplicacion.textContent = '▼ Ver Explicación';
+    }
+    
+    // Fetch a API de explicación
+    fetch('/api/explicar-prediccion/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({
+            jugador_id: parseInt(jugadorId),
+            jornada: jornadaActual,
+            modelo: 'RF'  // Usar Random Forest
+        }),
+        signal: prediccionAbortController.signal
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Mostrar predicción
+            const prediccion = data.prediccion;
+            const puntos_reales_texto = data.puntos_reales_texto || 'Aún no jugado';
+            const margen = data.margen || 0;
+            const mae_value = data.mae_value || 3.22;
+            const std_value = data.std_value || 2.5;
+            
+            // Si predicción es null, mostrar "??"
+            const prediccionTexto = prediccion !== null && prediccion !== undefined ? prediccion.toFixed(1) : "??";
+            const rangoTexto = margen > 0 ? `±${margen}` : "--";
+            
+            prediccionContainer.innerHTML = `
+                <div class="flex items-center justify-between w-full gap-4">
+                    <div class="text-center flex-1">
+                        <div class="text-xs text-gray-400 mb-1">Reales</div>
+                        <div class="text-2xl font-black ${puntos_reales_texto === 'Aún no jugado' ? 'text-gray-500' : 'text-yellow-400'}">${puntos_reales_texto}</div>
+                    </div>
+                    <div class="w-px h-12 bg-border-dark"></div>
+                    <div class="text-center flex-1">
+                        <div class="text-xs text-gray-400 mb-1">Predicción</div>
+                        <div class="text-3xl font-black ${prediccion !== null ? 'text-primary' : 'text-gray-600'}">${prediccionTexto}</div>
+                    </div>
+                    <div class="w-px h-12 bg-border-dark"></div>
+                    <div class="text-center flex-1">
+                        <div class="text-xs text-gray-400 mb-1">Rango</div>
+                        <div class="flex items-center justify-center gap-2">
+                            <div id="rango-hover" class="text-lg font-bold cursor-pointer hover:opacity-80 transition ${margen > 0 ? 'text-green-400' : 'text-gray-600'}" title="Pulsa para ver la fórmula">${rangoTexto}</div>
+                            <button id="rango-info-btn" class="text-gray-400 hover:text-primary transition rounded-full p-1 flex items-center justify-center ${margen > 0 ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed'}" title="${margen > 0 ? 'Ver fórmula del rango' : 'Sin rango calculado'}" ${margen > 0 ? '' : 'disabled'}>
+                                <span class="material-symbols-outlined text-base">info</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Agregar event listeners al rango e icono info para mostrar explicación
+            if (margen > 0) {
+                const rangoElement = prediccionContainer.querySelector('#rango-hover');
+                const infoBtn = prediccionContainer.querySelector('#rango-info-btn');
+                
+                if (rangoElement) {
+                    rangoElement.addEventListener('click', function() {
+                        mostrarExplicacionRango(margen, prediccion, mae_value, std_value);
+                    });
+                }
+                
+                if (infoBtn) {
+                    infoBtn.addEventListener('click', function() {
+                        mostrarExplicacionRango(margen, prediccion, mae_value, std_value);
+                    });
+                }
+            }
+            
+            // Si hay explicación de texto, mostrar botón y contenido
+            if (data.explicacion_texto) {
+                explicacionContainer.classList.remove('hidden');
+                if (btnExplicacion) {
+                    btnExplicacion.style.display = 'block';
+                }
+                
+                // Guardar el texto de explicación para luego
+                window.explicacionActual = data.explicacion_texto;
+                
+                // Agregar event listener al botón
+                if (btnExplicacion) {
+                    btnExplicacion.onclick = function() {
+                        toggleExplicacionDetalles(data.explicacion_texto);
+                    };
+                }
+            } else {
+                explicacionContainer.classList.add('hidden');
+            }
+        } else {
+            prediccionContainer.innerHTML = `<span class="text-red-400 text-sm">${data.error || 'Error en predicción'}</span>`;
+            explicacionContainer.classList.add('hidden');
+        }
+    })
+    .catch(error => {
+        // Solo mostrar error si no fue abortado
+        if (error.name !== 'AbortError') {
+            console.error('Error cargando predicción:', error);
+            prediccionContainer.innerHTML = '<span class="text-red-400 text-sm">Error cargando datos</span>';
+            explicacionContainer.classList.add('hidden');
+        }
+    });
+}
+
+function toggleExplicacionDetalles(explicacionTexto) {
+    /**
+     * Alterna la visibilidad del texto de explicaciones (SHAP en texto natural)
+     */
+    const btnVerExplicacion = document.getElementById('btn-ver-explicacion');
+    const detalle = document.getElementById('modal-explicacion-detalle');
+    
+    if (detalle.classList.contains('hidden')) {
+        // Mostrar explicaciones
+        detalle.classList.remove('hidden');
+        btnVerExplicacion.textContent = '▲ Ocultar Explicación';
+        
+        // Mostrar el texto de explicación formateado
+        const lineas = explicacionTexto.split('\n').filter(l => l.trim());
+        let html = '<div class="text-sm text-gray-200 space-y-2">';
+        
+        lineas.forEach((linea, idx) => {
+            // Detectar si es un encabezado (contiene "Predicción:" o "Factores:")
+            if (linea.includes('Predicción:') || linea.includes('Factores:')) {
+                html += `<div class="font-bold text-white text-xs uppercase tracking-wider text-primary/80 mt-2">
+                    ${linea}
+                </div>`;
+            } else if (linea.match(/^\d+\./)) {
+                // Es un item de la lista (ej: "1. 📈 ...")
+                html += `<div class="ml-1 py-1 text-gray-100 border-l-2 border-primary/30 pl-3">
+                    ${linea}
+                </div>`;
+            } else {
+                // Texto regular
+                html += `<div class="text-xs text-gray-400">${linea}</div>`;
+            }
+        });
+        
+        html += '</div>';
+        detalle.innerHTML = html;
+    } else {
+        // Ocultar explicaciones
+        detalle.classList.add('hidden');
+        btnVerExplicacion.textContent = '▼ Ver Explicación';
+    }
+}
+
+// ============================================================================
+// FUNCIONES DE PREDICCIÓN PARA PORTEROS
+// ============================================================================
+
+function cargarPrediccionesPorteros() {
+    // Carga predicciones de puntos para porteros del equipo
+    const porterosEnCampo = alineacionActual['Portero'] || [];
+    const porterosSuplentes = alineacionActual['Suplentes'] || [];
+    
+    const todosPorteros = porterosEnCampo.concat(
+        porterosSuplentes.filter(p => p && p.posicion === 'Portero')
+    ).filter(p => p && p.id);
+    
+    if (todosPorteros.length === 0) {
+        console.log('No hay porteros para cargar predicciones');
+        return;
+    }
+    
+    console.log(`Cargando predicciones para ${todosPorteros.length} porteros en jornada ${jornadaActual}`);
+    
+    todosPorteros.forEach(portero => {
+        if (!portero || !portero.id) return;
+        
+        const csrfToken = getCsrfToken();
+        
+        fetch('/api/predecir-portero/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                jugador_id: portero.id,
+                jornada: jornadaActual,
+                modelo: 'RF'  // Usar Random Forest
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.warn(`Respuesta error ${response.status} para portero ${portero.id}`);
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                // Buscar el elemento del jugador y actualizar predicción
+                const jugadorCard = document.querySelector(`[data-jugador-id="${portero.id}"]`);
+                if (jugadorCard) {
+                    const pElement = jugadorCard.querySelector('.prediccion-puntos');
+                    if (pElement) {
+                        pElement.textContent = `${data.prediccion.toFixed(1)}pt`;
+                        pElement.classList.remove('opacity-50');
+                        pElement.title = `Predicción para Jornada ${data.jornada} basada en datos anteriores - Modelo: ${data.modelo}`;
+                        console.log(`✓ Predicción cargada para ${portero.id}: ${data.prediccion.toFixed(1)}pt (jornada ${data.jornada})`);
+                    } else {
+                        console.warn(`Elemento .prediccion-puntos no encontrado para portero ${portero.id}`);
+                    }
+                } else {
+                    console.warn(`Card no encontrada para portero ${portero.id}`);
+                }
+            } else {
+                console.warn(`Error en predicción para ${portero.id}:`, data);
+            }
+        })
+        .catch(error => console.warn('Error prediciendo:', portero.id, error));
+    });
+}
+
+function getCsrfToken() {
+    // Obtiene el token CSRF para peticiones POST
+    let token = document.querySelector('meta[name="csrf-token"]');
+    if (token) return token.getAttribute('content');
+    
+    const name = 'csrftoken';
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function mostrarExplicacionRango(margen, prediccion, mae_value = 3.22, std_value = 2.5) {
+    /**
+     * Muestra un modal con la explicación de cómo se calcula el rango de confianza.
+     * Fórmula: Rango = [prediccion - margen, prediccion + margen]
+     * Donde: margen = √(MAE² + (std/2)²)
+     */
+    
+    // Usar valores reales del API
+    const MAE = mae_value || 3.22;
+    const std = std_value || 2.5;
+    
+    const rango_min = Math.max(0, (prediccion - margen).toFixed(2));
+    const rango_max = (prediccion + margen).toFixed(2);
+    
+    const modalHTML = `
+        <div id="modal-explicacion-rango" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div class="bg-background-dark border-2 border-primary rounded-lg max-w-2xl w-full max-h-96 overflow-y-auto p-6 space-y-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-primary">Explicación del Rango de Confianza</h3>
+                    <button onclick="document.getElementById('modal-explicacion-rango')?.remove()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+                </div>
+                
+                <div class="space-y-3 text-sm text-gray-200">
+                    <div class="bg-background-darker p-3 rounded border-l-2 border-primary">
+                        <p class="font-bold text-primary mb-2">Fórmula del Rango:</p>
+                        <p class="font-mono text-xs mb-2">Rango = Predicción ± Margen</p>
+                        <p class="font-mono text-xs mb-2">Margen = √(MAE² + (std/2)²)</p>
+                    </div>
+                    
+                    <div class="bg-background-darker p-3 rounded border-l-2 border-yellow-400">
+                        <p class="font-bold text-yellow-400 mb-2">Valores Utilizados:</p>
+                        <p class="font-mono text-xs mb-1">• MAE = ${MAE.toFixed(4)} (Error Medio Absoluto del modelo Random Forest)</p>
+                        <p class="font-mono text-xs mb-1">• std = ${std.toFixed(2)} (Desviación estándar de puntos fantasy - Temporada 25/26)</p>
+                        <p class="font-mono text-xs">• Margen = ${margen} (calculado)</p>
+                    </div>
+                    
+                    <div class="bg-background-darker p-3 rounded border-l-2 border-green-400">
+                        <p class="font-bold text-green-400 mb-2">Rango Final:</p>
+                        <p class="font-mono text-xs mb-1">Predicción: ${prediccion.toFixed(1)} pts</p>
+                        <p class="font-mono text-xs mb-1">Rango Mínimo: ${rango_min} pts</p>
+                        <p class="font-mono text-xs">Rango Máximo: ${rango_max} pts</p>
+                    </div>
+                    
+                    <div class="bg-primary/10 border-l-2 border-primary p-3 rounded text-xs">
+                        <p class="text-primary font-bold mb-1">Interpretación:</p>
+                        <p>El rendimiento real del portero probablemente estará entre <strong>${rango_min}</strong> y <strong>${rango_max}</strong> puntos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Inyectar modal en el DOM
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Cerrar modal al clickear fuera
+    document.getElementById('modal-explicacion-rango').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.remove();
+        }
+    });
+}
+
+function getCsrfToken() {
+    // Obtiene el token CSRF para peticiones POST
+    let token = document.querySelector('meta[name="csrf-token"]');
+    if (token) return token.getAttribute('content');
+    
+    const name = 'csrftoken';
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 </script>
 {% endblock %}

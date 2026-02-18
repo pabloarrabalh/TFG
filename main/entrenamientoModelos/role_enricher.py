@@ -22,20 +22,12 @@ import json
 # ============================================================================
 
 # Roles críticos para PORTEROS (GK)
+# SOLO: paradas, porterias_cero, amarillas, rojas
 ROLES_CRITICOS_GK = {
     "paradas": 1.5,              # Saves - MUY IMPORTANTE
-    "save_pct": 1.4,             # Save percentage
     "porterias_cero": 1.5,       # Clean sheets
-    "distribucion": 1.2,         # Distribution
-    "manejo": 1.3,               # Handling - CRÍTICO
-    "salidas": 1.1,              # Rushing/Distribution
-    "comando": 1.2,              # Command of Box
-    "posicionamiento": 1.0,      # Positioning
-    "minutos": 1.2,              # Minutes
-    "apariciones_suplente": 0.3, # Substitute Appearances
     "amarillas": -0.6,           # Yellow Cards
     "rojas": -1.2,               # Red Cards
-    "despejes": 1.1,             # Clearances
 }
 
 # Roles críticos para DEFENSAS (DF)
@@ -144,16 +136,55 @@ def parsear_roles_json(rol_json_str: str) -> Dict[str, tuple]:
     return roles_dict
 
 
-def calcular_score_roles(roles_dict: Dict[str, tuple], 
-                        roles_config: Dict[str, float] = None) -> float:
+def calcular_factor_posicion(posicion: int, agresivo: bool = True) -> float:
     """
-    Calcula score ponderado de roles con factor de posición.
+    Calcula factor de posición en ranking.
+    
+    Factor ponderado: cuanto mejor posición (menor número), mayor factor.
+    - Posición 1: factor = 1.0
+    - Posición 10: factor ~ 0.68 (modo agresivo) o 0.91 (modo suave)
+    - Posición 50: factor ~ 0.14 (modo agresivo) o 0.51 (modo suave)
+    
+    Modo agresivo: 1 / sqrt(posicion) → diferencia más marcada
+    Modo suave: 1 - (posicion-1)/100 → diferencia gradual
+    
+    Args:
+        posicion: Posición en ranking (1-based)
+        agresivo: True para exponencial, False para lineal
+    
+    Returns:
+        float: Factor de ponderación [0.1, 1.0]
+    """
+    if posicion <= 0:
+        return 0.1
+    
+    if agresivo:
+        # Exponencial: sqrt inverse. Posición 1 → 1.0, posición 50 → 0.14
+        factor = 1.0 / (posicion ** 0.5)
+    else:
+        # Lineal: 1 - (pos-1)/100. Posición 1 → 1.0, posición 50 → 0.51
+        factor = max(1.0 - (posicion - 1) / 100.0, 0.1)
+    
+    return max(min(factor, 1.0), 0.1)  # Clamp [0.1, 1.0]
+
+
+def calcular_score_roles(roles_dict: Dict[str, tuple], 
+                        roles_config: Dict[str, float] = None,
+                        agresivo: bool = True) -> float:
+    """
+    Calcula score ponderado de roles con factor de posición AGRESIVO.
     
     Score = suma(valor * multiplicador * factor_posicion)
     
+    El factor de posición es exponencial: 1/sqrt(posicion)
+    - Posición 1: factor = 1.0
+    - Posición 10: factor = 0.316
+    - Posición 50: factor = 0.141
+    
     Args:
-        roles_dict: Diccionario de roles parseados
+        roles_dict: Diccionario de roles parseados {rol: (posicion, valor)}
         roles_config: Configuración de multiplicadores (GK, DF, o TODOS)
+        agresivo: True para ponderación exponencial, False para lineal
     
     Returns:
         float: Score ponderado
@@ -165,7 +196,7 @@ def calcular_score_roles(roles_dict: Dict[str, tuple],
     
     for rol_clave, (posicion, valor) in roles_dict.items():
         multiplicador = roles_config.get(rol_clave, ROLES_TODOS.get(rol_clave, 0.5))
-        factor_posicion = max(1.0 - (posicion - 1) / 100.0, 0.1)
+        factor_posicion = calcular_factor_posicion(posicion, agresivo=agresivo)
         score += valor * multiplicador * factor_posicion
     
     return score
@@ -210,7 +241,7 @@ def enriquecer_dataframe_con_roles(df: pd.DataFrame,
     
     if columna_roles not in df.columns:
         if verbose:
-            print(f"⚠️  Columna '{columna_roles}' no encontrada.\n")
+            print(f"  Columna '{columna_roles}' no encontrada.\n")
         return df
     
     if verbose:
@@ -240,7 +271,7 @@ def enriquecer_dataframe_con_roles(df: pd.DataFrame,
     
     con_roles = df["num_roles"].sum()
     if verbose:
-        print(f"✓ {tipo_posicion} con roles: {con_roles} / {len(df)}")
+        print(f" {tipo_posicion} con roles: {con_roles} / {len(df)}")
     
     # Score global
     if verbose:
@@ -252,7 +283,7 @@ def enriquecer_dataframe_con_roles(df: pd.DataFrame,
     
     if con_roles > 0 and verbose:
         scores_con_roles = df[df['num_roles'] > 0]['score_roles']
-        print(f"✓ Score de roles - Media: {scores_con_roles.mean():.2f}, Std: {scores_con_roles.std():.2f}")
+        print(f" Score de roles - Media: {scores_con_roles.mean():.2f}, Std: {scores_con_roles.std():.2f}")
     
     # Elite: top 25%
     if con_roles > 0:
@@ -260,33 +291,56 @@ def enriquecer_dataframe_con_roles(df: pd.DataFrame,
         df[elite_col_name] = (df["score_roles"] >= threshold_elite).astype(int)
         elite_count = df[elite_col_name].sum()
         if verbose:
-            print(f"✓ {tipo_posicion} elite (top 25%): {elite_count}")
+            print(f" {tipo_posicion} elite (top 25%): {elite_count}")
     else:
         df[elite_col_name] = 0
     
-    # Extraer roles críticos
+    # Extraer roles críticos CON PONDERACIÓN POR POSICIÓN - OPTIMIZADO CON pd.concat
     if verbose:
-        print(f"\nExtrayendo roles críticos ({position}):")
+        print(f"\nExtrayendo roles críticos ({position}) con ponderación por posición:")
+    
+    nuevas_cols = {}
     
     for rol_clave in roles_config.keys():
-        df[f"rol_{rol_clave}_valor"] = df_temp["roles_parsed"].apply(
+        # Valor bruto
+        nuevas_cols[f"rol_{rol_clave}_valor"] = df_temp["roles_parsed"].apply(
             lambda x: x.get(rol_clave, (np.nan, np.nan))[1]
         )
-        df[f"rol_{rol_clave}_posicion"] = df_temp["roles_parsed"].apply(
+        # Posición en ranking
+        nuevas_cols[f"rol_{rol_clave}_posicion"] = df_temp["roles_parsed"].apply(
             lambda x: x.get(rol_clave, (np.nan, np.nan))[0]
         )
+        # NUEVO: Valor PONDERADO por posición (agresivo: 1/sqrt(pos))
+        def calcular_valor_ponderado(row):
+            posicion = row[f"rol_{rol_clave}_posicion"]
+            valor = row[f"rol_{rol_clave}_valor"]
+            if pd.isna(posicion) or pd.isna(valor):
+                return np.nan
+            factor = calcular_factor_posicion(int(posicion), agresivo=True)
+            return valor * factor
         
-        tiene_rol = df[f"rol_{rol_clave}_valor"].notna().sum()
+        nuevas_cols[f"rol_{rol_clave}_ponderado"] = pd.DataFrame({
+            f"rol_{rol_clave}_posicion": nuevas_cols[f"rol_{rol_clave}_posicion"],
+            f"rol_{rol_clave}_valor": nuevas_cols[f"rol_{rol_clave}_valor"]
+        }).apply(calcular_valor_ponderado, axis=1)
+        
+        tiene_rol = nuevas_cols[f"rol_{rol_clave}_valor"].notna().sum()
         if verbose and tiene_rol > 0:
-            print(f" ✓ rol_{rol_clave}: {tiene_rol} jugadores")
+            media_ponderado = nuevas_cols[f"rol_{rol_clave}_ponderado"].dropna().mean()
+            print(f"  rol_{rol_clave}: {tiene_rol} jugadores, media ponderada={media_ponderado:.2f}")
     
-    # CRÍTICO: Rellenar NaNs de roles con 0
-    rol_cols = [c for c in df.columns if c.startswith("rol_")]
-    for col in rol_cols:
-        df[col] = df[col].fillna(0)
+    # Agregar todas las columnas nuevas de una vez
+    df_nuevas_cols = pd.DataFrame(nuevas_cols, index=df.index)
+    df = pd.concat([df, df_nuevas_cols], axis=1)
+    
+    # CRÍTICO: Rellenar NaNs de roles con 0 - TAMBIÉN OPTIMIZADO
+    rol_cols = [c for c in df.columns if c.startswith("rol_") and not c.endswith("_ponderado")]
+    rol_cols_ponderados = [c for c in df.columns if c.endswith("_ponderado")]
+    
+    df[rol_cols + rol_cols_ponderados] = df[rol_cols + rol_cols_ponderados].fillna(0)
     
     if verbose:
-        print("\n✅ Enriquecimiento con roles completado\n")
+        print("\n Enriquecimiento con roles completado\n")
     
     return df
 
@@ -335,95 +389,78 @@ def crear_features_interaccion_roles(df: pd.DataFrame,
         print("=" * 80)
         print()
     
-    if position == 'GK':
-        # ===== GK INTERACTIONS =====
+    # PT = Portero en español, equivalente a GK
+    if position in ['PT']:
+        # ===== GK INTERACTIONS (SOLO: paradas, porterias_cero, rojas, amarillas) =====
         
-        # Elite paradas
-        if "es_portero_elite" in df.columns and "rol_paradas_valor" in df.columns:
+        # Elite paradas - PONDERADO por posición
+        if "es_portero_elite" in df.columns and "rol_paradas_ponderado" in df.columns:
             df["elite_paradas_interact"] = (
                 df["es_portero_elite"].fillna(0).astype(float) * 
-                df["rol_paradas_valor"].fillna(0).astype(float)
+                df["rol_paradas_ponderado"].fillna(0).astype(float)
             )
             if verbose:
-                print("✅ elite_paradas_interact")
+                print(" elite_paradas_interact (ponderado)")
         
-        # Elite manejo
-        if "es_portero_elite" in df.columns and "rol_manejo_valor" in df.columns:
-            df["elite_manejo_interact"] = (
-                df["es_portero_elite"].fillna(0).astype(float) * 
-                df["rol_manejo_valor"].fillna(0).astype(float)
-            )
-            if verbose:
-                print("✅ elite_manejo_interact")
-        
-        # Elite distribución
-        if "es_portero_elite" in df.columns and "rol_distribucion_valor" in df.columns:
-            df["elite_distribucion_interact"] = (
-                df["es_portero_elite"].fillna(0).astype(float) * 
-                df["rol_distribucion_valor"].fillna(0).astype(float)
-            )
-            if verbose:
-                print("✅ elite_distribucion_interact")
-        
-        # Porterías × eficiencia defensiva
+        # Porterías a cero eficiencia
         if "rol_porterias_cero_valor" in df.columns and "eficiencia_defensiva" in df.columns:
             df["porterias_cero_eficiencia"] = (
                 df["rol_porterias_cero_valor"].fillna(0).astype(float) * 
                 df["eficiencia_defensiva"].fillna(0).astype(float)
             )
             if verbose:
-                print("✅ porterias_cero_eficiencia")
+                print(" porterias_cero_eficiencia")
         
         # Score normalizado
         if "score_roles" in df.columns:
             df["score_roles_normalizado"] = df["score_roles"].fillna(0).astype(float)
             if verbose:
-                print("✅ score_roles_normalizado")
+                print(" score_roles_normalizado")
         
-        # Tiene rol GK core (paradas + manejo + distribución)
+        # Tiene rol GK core (paradas + porterias_cero)
         gk_core_cols = [c for c in df.columns 
-                       if any(rc in c for rc in ["paradas", "manejo", "distribucion"]) 
+                       if any(rc in c for rc in ["paradas", "porterias_cero"]) 
                        and c.endswith("_valor")]
         if gk_core_cols:
             df["tiene_rol_gk_core"] = (df[gk_core_cols] > 0).any(axis=1).astype(int)
             if verbose:
-                print(f"✅ tiene_rol_gk_core ({df['tiene_rol_gk_core'].sum()} porteros)")
+                print(f" tiene_rol_gk_core ({df['tiene_rol_gk_core'].sum()} porteros)")
     
     elif position == 'DF':
-        # ===== DF INTERACTIONS =====
+        # ===== DF INTERACTIONS (PONDERADAS POR POSICIÓN) =====
         
-        # Elite entradas
-        if "es_defensa_elite" in df.columns and "rol_entradas_valor" in df.columns:
+        # Elite entradas - PONDERADO por posición
+        if "es_defensa_elite" in df.columns and "rol_entradas_ponderado" in df.columns:
             df["elite_entradas_interact"] = (
                 df["es_defensa_elite"].fillna(0).astype(float) * 
-                df["rol_entradas_valor"].fillna(0).astype(float)
+                df["rol_entradas_ponderado"].fillna(0).astype(float)
             )
             if verbose:
-                print("✅ elite_entradas_interact")
+                print(" elite_entradas_interact (ponderado)")
         
-        # Elite intercepciones
-        if "es_defensa_elite" in df.columns and "rol_intercepciones_valor" in df.columns:
+        # Elite intercepciones - PONDERADO por posición
+        if "es_defensa_elite" in df.columns and "rol_intercepciones_ponderado" in df.columns:
             df["elite_intercepciones_interact"] = (
                 df["es_defensa_elite"].fillna(0).astype(float) * 
-                df["rol_intercepciones_valor"].fillna(0).astype(float)
+                df["rol_intercepciones_ponderado"].fillna(0).astype(float)
             )
             if verbose:
-                print("✅ elite_intercepciones_interact")
+                print(" elite_intercepciones_interact (ponderado)")
         
-        # Elite despejes
-        if "es_defensa_elite" in df.columns and "rol_despejes_valor" in df.columns:
+        # Elite despejes - PONDERADO por posición
+        if "es_defensa_elite" in df.columns and "rol_despejes_ponderado" in df.columns:
             df["elite_despejes_interact"] = (
                 df["es_defensa_elite"].fillna(0).astype(float) * 
-                df["rol_despejes_valor"].fillna(0).astype(float)
+                df["rol_despejes_ponderado"].fillna(0).astype(float)
             )
             if verbose:
-                print("✅ elite_despejes_interact")
+                print(" elite_despejes_interact (ponderado)")
         
         # Score normalizado
         if "score_roles" in df.columns:
             df["score_roles_normalizado"] = df["score_roles"].fillna(0).astype(float)
             if verbose:
-                print("✅ score_roles_normalizado")
+                print(" score_roles_normalizado")
         
         # Tiene rol defensivo core (entradas + intercepciones + despejes)
         def_core_cols = [c for c in df.columns 
@@ -432,48 +469,95 @@ def crear_features_interaccion_roles(df: pd.DataFrame,
         if def_core_cols:
             df["tiene_rol_defensivo_core"] = (df[def_core_cols] > 0).any(axis=1).astype(int)
             if verbose:
-                print(f"✅ tiene_rol_defensivo_core ({df['tiene_rol_defensivo_core'].sum()} defensas)")
+                print(f" tiene_rol_defensivo_core ({df['tiene_rol_defensivo_core'].sum()} defensas)")
         
-        # Score defensivo (solo roles defensivos core)
+        # Score defensivo (solo roles defensivos core CON PONDERACIÓN POR POSICIÓN)
         def calcular_score_defensivo(row):
             score = 0.0
             for rol_key in ["entradas", "intercepciones", "despejes"]:
-                col_valor = f"rol_{rol_key}_valor"
-                if col_valor in row.index and row[col_valor] > 0:
+                col_ponderado = f"rol_{rol_key}_ponderado"
+                if col_ponderado in row.index and row[col_ponderado] > 0:
                     multiplicador = ROLES_CRITICOS_DF.get(rol_key, 0.5)
-                    score += row[col_valor] * multiplicador
+                    score += row[col_ponderado] * multiplicador
             return score
         
         df["score_defensivo"] = df.apply(calcular_score_defensivo, axis=1)
         if verbose:
-            print("✅ score_defensivo (sum: entradas + intercepciones + despejes ponderadas)")
+            print(" score_defensivo (sum: entradas + intercepciones + despejes PONDERADOS por posición)")
     
     # ===== COMMON FOR ALL =====
     
-    # Contar roles críticos específicos
+    # Contar roles críticos específicos - OPTIMIZADO
     roles_criticos_cols = [c for c in df.columns if c.endswith("_valor")]
     if roles_criticos_cols:
-        df["num_roles_criticos"] = (df[roles_criticos_cols] > 0).sum(axis=1)
+        # Determinar roles positivos y negativos según posición
+        # PT = Portero en español, equivalente a GK
+        if position in ['GK', 'PT']:
+            roles_positivos = ["paradas", "porterias_cero"]
+            roles_negativos = ["amarillas", "rojas"]
+        elif position == 'DF':
+            roles_positivos = ["entradas", "intercepciones", "despejes", "regates_exitosos", "minutos"]
+            roles_negativos = ["amarillas", "rojas", "faltas_cometidas"]
+        else:
+            # Para ALL: asumir todo es positivo salvo amarillas/rojas
+            roles_positivos = None
+            roles_negativos = ["amarillas", "rojas"]
+        
+        # Crear todas las columnas nuevas a la vez
+        nuevas_cols_num = {}
+        
+        # Contar roles POSITIVOS
+        if roles_positivos:
+            cols_positivos = [c for c in roles_criticos_cols 
+                            if any(rp in c for rp in roles_positivos)]
+            if cols_positivos:
+                nuevas_cols_num["num_roles_positivos"] = (df[cols_positivos] > 0).sum(axis=1)
+                if verbose:
+                    print(f" num_roles_positivos ({len(cols_positivos)} roles: {roles_positivos})")
+        
+        # Contar roles NEGATIVOS
+        if roles_negativos:
+            cols_negativos = [c for c in roles_criticos_cols 
+                            if any(rn in c for rn in roles_negativos)]
+            if cols_negativos:
+                nuevas_cols_num["num_roles_negativos"] = (df[cols_negativos] > 0).sum(axis=1)
+                if verbose:
+                    print(f" num_roles_negativos ({len(cols_negativos)} roles: {roles_negativos})")
+        
+        # Total de roles críticos (positivos + negativos)
+        nuevas_cols_num["num_roles_criticos"] = (df[roles_criticos_cols] > 0).sum(axis=1)
         if verbose:
-            print(f"✅ num_roles_criticos (basado en {len(roles_criticos_cols)} roles)")
-    
-    # Ratio roles críticos
-    if "num_roles_criticos" in df.columns and "num_roles" in df.columns:
-        df["ratio_roles_criticos"] = (
-            df["num_roles_criticos"] / (df["num_roles"] + 1)
-        ).fillna(0)
-        if verbose:
-            print("✅ ratio_roles_criticos")
+            print(f" num_roles_criticos (total de {len(roles_criticos_cols)} roles)")
+        
+        # Ratio roles positivos (para normalizar: cuántos positivos de los que tiene)
+        if "num_roles_positivos" in nuevas_cols_num and "num_roles_criticos" in nuevas_cols_num:
+            nuevas_cols_num["ratio_roles_positivos"] = (
+                nuevas_cols_num["num_roles_positivos"] / (nuevas_cols_num["num_roles_criticos"] + 1)
+            ).fillna(0)
+            if verbose:
+                print(" ratio_roles_positivos (proporción de roles positivos)")
+        
+        # Ratio roles críticos (versión legacy)
+        if "num_roles_criticos" in nuevas_cols_num and "num_roles" in df.columns:
+            nuevas_cols_num["ratio_roles_criticos"] = (
+                nuevas_cols_num["num_roles_criticos"] / (df["num_roles"] + 1)
+            ).fillna(0)
+            if verbose:
+                print(" ratio_roles_criticos (legacy)")
+        
+        # Agregar todas las nuevas columnas de una vez
+        df_nuevas = pd.DataFrame(nuevas_cols_num, index=df.index)
+        df = pd.concat([df, df_nuevas], axis=1)
     
     # Tiene rol destacado genérico
     if "tiene_rol_destacado" in df.columns:
         if "num_roles" in df.columns:
             df["tiene_rol_destacado"] = (df["num_roles"] > 0).astype(int)
             if verbose:
-                print(f"✅ tiene_rol_destacado ({df['tiene_rol_destacado'].sum()} jugadores)")
+                print(f" tiene_rol_destacado ({df['tiene_rol_destacado'].sum()} jugadores)")
     
     if verbose:
-        print("\n✅ Variables de interacción creadas\n")
+        print("\n Variables de interacción creadas\n")
     
     return df
 

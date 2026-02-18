@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
 from .models import (Temporada, Jornada, ClasificacionJornada, Equipo, HistorialEquiposJugador, 
                      EquipoJugadorTemporada, Partido, EstadisticasPartidoJugador, Jugador, Calendario, Plantilla)
 from django.db.models import Sum, Count, F, Case, When, FloatField, Q, Avg
@@ -174,8 +175,29 @@ def mi_plantilla(request):
             'equipos_json': json.dumps([]),
             'plantillas': [],
             'plantilla_actual': None,
+            'jornadas': [],
+            'jornada_actual': None,
         }
         return render(request, 'mi_plantilla.html', context)
+    
+    # Obtener jornadas disponibles de la temporada
+    jornadas_qs = Jornada.objects.filter(
+        temporada=temporada_actual
+    ).order_by('numero_jornada')
+    jornadas = list(jornadas_qs.values('id', 'numero_jornada'))
+    
+    # Obtener jornada seleccionada desde GET, o la última disponible
+    jornada_param = request.GET.get('jornada')
+    if jornada_param and jornada_param.isdigit():
+        jornada_actual = Jornada.objects.filter(
+            temporada=temporada_actual,
+            numero_jornada=int(jornada_param)
+        ).first()
+    else:
+        # Por defecto la última jornada disponible
+        jornada_actual = jornadas_qs.last()
+    
+    jornada_num = jornada_actual.numero_jornada if jornada_actual else None
     
     # Obtener equipos de la temporada actual
     equipos_temporada = Equipo.objects.filter(
@@ -184,26 +206,57 @@ def mi_plantilla(request):
     
     equipos_list = [{'id': e.id, 'nombre': e.nombre} for e in equipos_temporada]
     
-    # Obtener próximos partidos de cada equipo
-    proximos_partidos = {}
-    ahora = datetime.now()
-    for equipo in equipos_temporada:
-        # Buscar el próximo partido (local o visitante) que no se haya jugado aún
-        proximo = Partido.objects.filter(
-            Q(equipo_local=equipo) | Q(equipo_visitante=equipo),
-            jornada__temporada=temporada_actual,
-            fecha_partido__gte=ahora
-        ).select_related('equipo_local', 'equipo_visitante').order_by('fecha_partido').first()
+    # Obtener partidos de la jornada seleccionada para cada equipo
+    partidos_por_jornada = {}
+    if jornada_actual:
+        partidos_jornada = Partido.objects.filter(
+            jornada=jornada_actual
+        ).select_related('equipo_local', 'equipo_visitante')
         
-        if proximo:
-            # Determinar el rival
-            rival = proximo.equipo_visitante if proximo.equipo_local == equipo else proximo.equipo_local
-            proximos_partidos[equipo.id] = {
-                'rival_id': rival.id,
-                'rival_nombre': rival.nombre
+        print(f"[DEBUG] Jornada {jornada_num}: {partidos_jornada.count()} partidos encontrados")
+        
+        for partido in partidos_jornada:
+            print(f"[DEBUG] Partido: {partido.equipo_local.nombre} vs {partido.equipo_visitante.nombre}")
+            # Almacenar el rival para cada equipo
+            partidos_por_jornada[partido.equipo_local.id] = {
+                'rival_id': partido.equipo_visitante.id,
+                'rival_nombre': partido.equipo_visitante.nombre,
+                'es_local': True
             }
-        else:
-            proximos_partidos[equipo.id] = None
+            partidos_por_jornada[partido.equipo_visitante.id] = {
+                'rival_id': partido.equipo_local.id,
+                'rival_nombre': partido.equipo_local.nombre,
+                'es_local': False
+            }
+        
+        # Si no hay partidos en tabla Partido, intentar obtener de Calendario
+        if len(partidos_por_jornada) == 0:
+            print(f"[DEBUG] Fallback: Buscando en tabla Calendario para jornada {jornada_num}")
+            from main.models import Calendario
+            
+            calendarios = Calendario.objects.filter(
+                jornada=jornada_actual
+            ).select_related('equipo_local', 'equipo_visitante')
+            
+            print(f"[DEBUG] Calendario: {calendarios.count()} registros encontrados")
+            
+            for cal in calendarios:
+                equipo_local = cal.equipo_local
+                equipo_visitante = cal.equipo_visitante
+                
+                partidos_por_jornada[equipo_local.id] = {
+                    'rival_id': equipo_visitante.id,
+                    'rival_nombre': equipo_visitante.nombre,
+                    'es_local': True
+                }
+                partidos_por_jornada[equipo_visitante.id] = {
+                    'rival_id': equipo_local.id,
+                    'rival_nombre': equipo_local.nombre,
+                    'es_local': False
+                }
+                print(f"[DEBUG] Partido añadido: {equipo_local.nombre} vs {equipo_visitante.nombre}")
+    
+    print(f"[DEBUG] Total equipos en partidos_por_jornada: {len(partidos_por_jornada)}")
     
     # Obtener los jugadores disponibles en la temporada actual, organizados por posición
     # IMPORTANT: Incluir ALL jugadores (no evitar duplicados) para que aparezcan en el buscador
@@ -233,8 +286,12 @@ def mi_plantilla(request):
         
         puntos_fantasy = stats_puntos['total_puntos'] or 0
         
-        # Obtener información del próximo rival
-        proximo_rival = proximos_partidos.get(ejecucion_temporada.equipo.id)
+        # Obtener información del rival en la jornada seleccionada
+        rival_jornada = partidos_por_jornada.get(ejecucion_temporada.equipo.id)
+        
+        if jugador.nombre in ['Aarón Escandell', 'Unai Simón']:  # DEBUG: primeros porteros
+            print(f"[DEBUG] Jugador: {jugador.nombre} (Equipo ID: {ejecucion_temporada.equipo.id}, Equipo: {ejecucion_temporada.equipo.nombre})")
+            print(f"[DEBUG]   -> rival_jornada = {rival_jornada}")
         
         if posicion in jugadores_por_posicion:
             jugadores_por_posicion[posicion].append({
@@ -245,8 +302,8 @@ def mi_plantilla(request):
                 'equipo_id': ejecucion_temporada.equipo.id,
                 'equipo_nombre': ejecucion_temporada.equipo.nombre,
                 'puntos_fantasy_25_26': puntos_fantasy,
-                'proximo_rival_id': proximo_rival['rival_id'] if proximo_rival else None,
-                'proximo_rival_nombre': proximo_rival['rival_nombre'] if proximo_rival else None
+                'proximo_rival_id': rival_jornada['rival_id'] if rival_jornada else None,
+                'proximo_rival_nombre': rival_jornada['rival_nombre'] if rival_jornada else None
             })
     
     # Cargar plantillas del usuario autenticado
@@ -293,6 +350,9 @@ def mi_plantilla(request):
         'plantillas': json.dumps(plantillas),
         'plantilla_actual': plantilla_actual,
         'plantilla_actual_id': plantilla_actual_id,
+        'jornadas': json.dumps(jornadas),
+        'jornada_actual': jornada_num,
+        'temporada_actual': temporada_actual.nombre if temporada_actual else '25/26',
     }
     
     return render(request, 'mi_plantilla.html', context)
@@ -2475,5 +2535,428 @@ def delete_favorite_team(request, fav_id):
     except EquipoFavorito.DoesNotExist:
         pass
     return redirect('perfil')
+
+
+@require_http_methods(["POST"])
+def predecir_portero_api(request):
+    """
+    API para predecir puntos fantasy de un portero para la siguiente jornada.
+    
+    Recibe JSON:
+    {
+        "jugador_id": 123 (ID de Jugador en BD),
+        "jornada": 15 (opcional),
+        "modelo": "RF" (opcional, default: 'RF')
+    }
+    
+    Retorna JSON:
+    {
+        "status": "success" o "error",
+        "jugador_id": id,
+        "prediccion": float,
+        "jornada": int,
+        "modelo": str,
+        "confianza": float,
+        "error": "descripción si hay error"
+    }
+    """
+    import json
+    import sys
+    import logging
+    from pathlib import Path
+    from main.models import Jugador
+    
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # Parsear JSON del request
+        body_data = request.body.decode('utf-8') if isinstance(request.body, bytes) else request.body
+        logger.info(f"[API] Body recibido: {body_data}")
+        
+        data = json.loads(body_data)
+        jugador_id = data.get('jugador_id')
+        jornada = data.get('jornada', None)
+        modelo_tipo = data.get('modelo', 'RF')  # Aceptar modelo del request, default RF
+        
+        logger.info(f"[API] Pidiendo predicción para jugador_id {jugador_id}, jornada {jornada}")
+        
+        if not jugador_id:
+            logger.error("[API] jugador_id requerido pero no proporcionado")
+            return JsonResponse({
+                'status': 'error',
+                'error': 'jugador_id es requerido'
+            }, status=400)
+        
+        # Obtener jugador de BD (para convertir ID a nombre)
+        try:
+            jugador = Jugador.objects.get(id=jugador_id)
+            nombre_jugador = f"{jugador.nombre} {jugador.apellido}".strip()
+            logger.info(f"[API] Jugador en BD: {nombre_jugador}")
+        except Jugador.DoesNotExist:
+            logger.error(f"[API] Jugador no encontrado en BD: {jugador_id}")
+            return JsonResponse({
+                'status': 'error',
+                'error': f'Jugador con ID {jugador_id} no encontrado'
+            }, status=404)
+        
+        # Agregar path para imports
+        entrenamientos_path = Path(__file__).parent / 'entrenamientoModelos'
+        if str(entrenamientos_path) not in sys.path:
+            sys.path.insert(0, str(entrenamientos_path))
+        
+        # Importar función de predicción
+        logger.info(f"[API] Importando módulo desde: {entrenamientos_path}")
+        from predecir_portero import predecir_puntos_portero
+        
+        # Llamar función de predicción usando NOMBRE (no ID)
+        logger.info(f"[API] Llamando predecir_puntos_portero('{nombre_jugador}', jornada={jornada}, modelo={modelo_tipo})")
+        resultado = predecir_puntos_portero(nombre_jugador, jornada, verbose=False, modelo_tipo=modelo_tipo)
+        
+        logger.info(f"[API] Resultado: {resultado}")
+        
+        # Validar resultado
+        if not isinstance(resultado, dict):
+            logger.error(f"[API] Resultado no es dict: {type(resultado)}")
+            return JsonResponse({
+                'status': 'error',
+                'error': f'Resultado inválido: {resultado}'
+            }, status=500)
+        
+        # Formatear respuesta
+        if resultado.get('error'):
+            logger.warning(f"[API] Error en predicción: {resultado.get('error')}")
+            return JsonResponse({
+                'status': 'error',
+                'error': resultado['error'],
+                'jugador_id': jugador_id
+            }, status=400)
+        else:
+            logger.info(f"[API] Predicción exitosa: {resultado.get('prediccion')} pts")
+            
+            # Preparar predicción para JSON
+            prediccion = resultado.get('prediccion')
+            prediccion_json = float(prediccion) if prediccion is not None else None
+            
+            return JsonResponse({
+                'status': 'success',
+                'jugador_id': jugador_id,
+                'jugador_nombre': nombre_jugador,
+                'prediccion': prediccion_json,
+                'puntos_reales': float(resultado['puntos_reales']) if resultado['puntos_reales'] is not None else None,
+                'puntos_reales_texto': resultado.get('puntos_reales_texto', 'Aún no jugado'),
+                'margen': float(resultado.get('margen', 0)),
+                'rango_min': float(resultado.get('rango_min')) if resultado.get('rango_min') is not None else None,
+                'rango_max': float(resultado.get('rango_max')) if resultado.get('rango_max') is not None else None,
+                'jornada': int(resultado['jornada']),
+                'modelo': resultado.get('modelo', 'Random Forest')
+            })
+    
+    except json.JSONDecodeError as e:
+        logger.error(f"[API] Error parseando JSON: {e}")
+        return JsonResponse({
+            'status': 'error',
+            'error': f'JSON inválido: {str(e)}'
+        }, status=400)
+    
+    except ImportError as e:
+        logger.error(f"[API] Error importando módulo: {e}", exc_info=True)
+        return JsonResponse({
+            'status': 'error',
+            'error': f'Error de módulo: {str(e)}'
+        }, status=500)
+    
+    except Exception as e:
+        import traceback
+        logger.error(f"[API] Error inesperado: {e}", exc_info=True)
+        return JsonResponse({
+            'status': 'error',
+            'error': str(e),
+            'traceback': traceback.format_exc() if settings.DEBUG else None
+        }, status=500)
+
+
+@csrf_exempt
+def cambiar_jornada_api(request):
+    """
+    API para cambiar de jornada dinámicamente y obtener nuevos datos de jugadores.
+    
+    Recibe JSON:
+    {
+        "jornada": 15
+    }
+    
+    Retorna JSON:
+    {
+        "status": "success" o "error",
+        "jugadores_por_posicion": { ... },
+        "jornada": int
+    }
+    """
+    import json
+    from main.models import Jugador, EquipoJugadorTemporada, Temporada, Equipo, EstadisticasPartidoJugador, Partido, Jornada
+    from django.db.models import Sum
+    
+    try:
+        # Parsear JSON
+        data = json.loads(request.body.decode('utf-8') if isinstance(request.body, bytes) else request.body)
+        nueva_jornada = data.get('jornada')
+        
+        if not nueva_jornada or not isinstance(nueva_jornada, int):
+            return JsonResponse({
+                'status': 'error',
+                'error': 'jornada debe ser un entero'
+            }, status=400)
+        
+        # Obtener temporada actual
+        temporada_actual = Temporada.objects.last()
+        if not temporada_actual:
+            return JsonResponse({
+                'status': 'error',
+                'error': 'No hay temporada disponible'
+            }, status=404)
+        
+        # Validar que la jornada existe
+        jornada_actual = Jornada.objects.filter(
+            temporada=temporada_actual,
+            numero_jornada=nueva_jornada
+        ).first()
+        
+        if not jornada_actual:
+            return JsonResponse({
+                'status': 'error',
+                'error': f'Jornada {nueva_jornada} no existe'
+            }, status=404)
+        
+        # Obtener partidos de la nueva jornada
+        partidos_por_jornada = {}
+        partidos_jornada = Partido.objects.filter(
+            jornada=jornada_actual
+        ).select_related('equipo_local', 'equipo_visitante')
+        
+        print(f"[API] Jornada {nueva_jornada}: {partidos_jornada.count()} partidos encontrados en tabla Partido")
+        
+        for partido in partidos_jornada:
+            partidos_por_jornada[partido.equipo_local.id] = {
+                'rival_id': partido.equipo_visitante.id,
+                'rival_nombre': partido.equipo_visitante.nombre,
+                'es_local': True
+            }
+            partidos_por_jornada[partido.equipo_visitante.id] = {
+                'rival_id': partido.equipo_local.id,
+                'rival_nombre': partido.equipo_local.nombre,
+                'es_local': False
+            }
+        
+        # Si no hay partidos en tabla Partido, intentar obtener de Calendario
+        if len(partidos_por_jornada) == 0:
+            print(f"[API] Fallback: Buscando en tabla Calendario para jornada {nueva_jornada}")
+            from main.models import Calendario
+            
+            calendarios = Calendario.objects.filter(
+                jornada=jornada_actual
+            ).select_related('equipo_local', 'equipo_visitante')
+            
+            print(f"[API] Calendario: {calendarios.count()} registros encontrados")
+            
+            for cal in calendarios:
+                equipo_local = cal.equipo_local
+                equipo_visitante = cal.equipo_visitante
+                
+                partidos_por_jornada[equipo_local.id] = {
+                    'rival_id': equipo_visitante.id,
+                    'rival_nombre': equipo_visitante.nombre,
+                    'es_local': True
+                }
+                partidos_por_jornada[equipo_visitante.id] = {
+                    'rival_id': equipo_local.id,
+                    'rival_nombre': equipo_local.nombre,
+                    'es_local': False
+                }
+                print(f"[API] Partido añadido: {equipo_local.nombre} vs {equipo_visitante.nombre}")
+        
+        print(f"[API] Total: {len(partidos_por_jornada)} equipos con rival asignado")
+        
+        # Obtener jugadores actualizados de la temporada
+        jugadores_temporada = EquipoJugadorTemporada.objects.filter(
+            temporada=temporada_actual
+        ).select_related('jugador', 'equipo').order_by('jugador__nombre')
+        
+        jugadores_por_posicion = {
+            'Portero': [],
+            'Defensa': [],
+            'Centrocampista': [],
+            'Delantero': []
+        }
+        
+        for ejecucion_temporada in jugadores_temporada:
+            posicion = ejecucion_temporada.posicion or 'Delantero'
+            jugador = ejecucion_temporada.jugador
+            
+            stats_puntos = EstadisticasPartidoJugador.objects.filter(
+                partido__jornada__temporada=temporada_actual,
+                jugador=jugador,
+                puntos_fantasy__lte=50
+            ).aggregate(total_puntos=Sum('puntos_fantasy'))
+            
+            puntos_fantasy = stats_puntos['total_puntos'] or 0
+            
+            # Obtener rival de la NUEVA jornada
+            rival_jornada = partidos_por_jornada.get(ejecucion_temporada.equipo.id)
+            
+            if posicion in jugadores_por_posicion:
+                jugadores_por_posicion[posicion].append({
+                    'id': jugador.id,
+                    'nombre': jugador.nombre,
+                    'apellido': jugador.apellido,
+                    'posicion': posicion,
+                    'equipo_id': ejecucion_temporada.equipo.id,
+                    'equipo_nombre': ejecucion_temporada.equipo.nombre,
+                    'puntos_fantasy_25_26': puntos_fantasy,
+                    'proximo_rival_id': rival_jornada['rival_id'] if rival_jornada else None,
+                    'proximo_rival_nombre': rival_jornada['rival_nombre'] if rival_jornada else None
+                })
+        
+        return JsonResponse({
+            'status': 'success',
+            'jornada': nueva_jornada,
+            'jugadores_por_posicion': jugadores_por_posicion
+        })
+    
+    except Exception as e:
+        import traceback
+        print(f"[API] Error en cambiar_jornada: {e}")
+        print(traceback.format_exc())
+        return JsonResponse({
+            'status': 'error',
+            'error': str(e)
+        }, status=500)
+
+
+@csrf_exempt
+def explicar_prediccion_portero_api(request):
+    """
+    API para obtener explicabilidad (XAI) de predicciones de porteros usando SHAP.
+    
+    Recibe JSON:
+    {
+        "jugador_id": 123 (ID de Jugador en BD),
+        "jornada": 15 (opcional),
+        "modelo": "RF" (opcional, default: 'RF')
+    }
+    
+    Retorna JSON:
+    {
+        "status": "success" o "error",
+        "prediccion": float,
+        "features_impacto": [
+            {"feature": str, "impacto": float, "valor": float, "direccion": str},
+            ...
+        ],
+        "explicacion_texto": str,
+        "error": str (si hay error)
+    }
+    """
+    import json
+    import sys
+    import logging
+    from pathlib import Path
+    from main.models import Jugador
+    
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # Parsear JSON del request
+        body_data = request.body.decode('utf-8') if isinstance(request.body, bytes) else request.body
+        data = json.loads(body_data)
+        jugador_id = data.get('jugador_id')
+        jornada = data.get('jornada', None)
+        modelo_tipo = data.get('modelo', 'RF')  # Aceptar modelo del request, default RF
+        
+        logger.info(f"[XAI API] Pidiendo explicación para jugador_id {jugador_id}, jornada {jornada}, modelo {modelo_tipo}")
+        
+        if not jugador_id:
+            return JsonResponse({
+                'status': 'error',
+                'error': 'jugador_id es requerido'
+            }, status=400)
+        
+        # Obtener jugador de BD (para convertir ID a nombre)
+        try:
+            jugador = Jugador.objects.get(id=jugador_id)
+            nombre_jugador = f"{jugador.nombre} {jugador.apellido}".strip()
+        except Jugador.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'error': f'Jugador con ID {jugador_id} no encontrado'
+            }, status=404)
+        
+        # Agregar path para imports
+        entrenamientos_path = Path(__file__).parent / 'entrenamientoModelos'
+        if str(entrenamientos_path) not in sys.path:
+            sys.path.insert(0, str(entrenamientos_path))
+        
+        # Importar función de explicación
+        from predecir_portero import explicar_prediccion_portero
+        
+        # Llamar función de explicación usando NOMBRE
+        logger.info(f"[XAI API] Llamando explicar_prediccion_portero('{nombre_jugador}', jornada={jornada}, modelo={modelo_tipo})")
+        resultado = explicar_prediccion_portero(nombre_jugador, jornada, modelo_tipo=modelo_tipo)
+        
+        logger.info(f"[XAI API] Resultado: {resultado}")
+        
+        # Validar resultado
+        if resultado.get('error'):
+            logger.warning(f"[XAI API] Error en explicación: {resultado.get('error')}")
+            return JsonResponse({
+                'status': 'error',
+                'error': resultado['error'],
+                'jugador_id': jugador_id
+            }, status=400)
+        else:
+            logger.info(f"[XAI API] Explicación exitosa para predicción: {resultado.get('prediccion')} pts")
+            
+            # Preparar predicción para JSON (puede ser None)
+            prediccion = resultado.get('prediccion')
+            prediccion_json = float(prediccion) if prediccion is not None else None
+            
+            return JsonResponse({
+                'status': 'success',
+                'jugador_id': jugador_id,
+                'jugador_nombre': nombre_jugador,
+                'prediccion': prediccion_json,
+                'puntos_reales': float(resultado['puntos_reales']) if resultado.get('puntos_reales') is not None else None,
+                'puntos_reales_texto': resultado.get('puntos_reales_texto', 'Aún no jugado'),
+                'margen': float(resultado.get('margen', 0)),
+                'mae_value': float(resultado.get('mae_value', 3.22)),
+                'std_value': float(resultado.get('std_value', 2.5)),
+                'rango_min': float(resultado.get('rango_min')) if resultado.get('rango_min') is not None else None,
+                'rango_max': float(resultado.get('rango_max')) if resultado.get('rango_max') is not None else None,
+                'jornada': int(resultado.get('jornada', jornada)),
+                'features_impacto': resultado.get('features_impacto', []),
+                'explicacion_texto': resultado.get('explicacion_texto', ''),
+                'error': None
+            })
+    
+    except json.JSONDecodeError as e:
+        logger.error(f"[XAI API] Error parseando JSON: {e}")
+        return JsonResponse({
+            'status': 'error',
+            'error': f'JSON inválido: {str(e)}'
+        }, status=400)
+    
+    except ImportError as e:
+        logger.error(f"[XAI API] Error importando módulo: {e}", exc_info=True)
+        return JsonResponse({
+            'status': 'error',
+            'error': f'Error de módulo: {str(e)}'
+        }, status=500)
+    
+    except Exception as e:
+        logger.error(f"[XAI API] Error general: {e}", exc_info=True)
+        return JsonResponse({
+            'status': 'error',
+            'error': f'Error: {str(e)}'
+        }, status=500)
+
 
 

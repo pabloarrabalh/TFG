@@ -34,4 +34,7 @@ urlpatterns = [
     path('api/radar/<int:jugador_id>/<str:temporada>/', api_endpoints.api_radar_jugador, name='api_radar_jugador'),
     path('api/buscar/', api_endpoints.api_buscar, name='api_buscar'),
     path('api/favoritos/toggle/', api_endpoints.api_toggle_favorito, name='api_toggle_favorito'),
+    path('api/predecir-portero/', views.predecir_portero_api, name='predecir_portero_api'),
+    path('api/explicar-prediccion/', views.explicar_prediccion_portero_api, name='explicar_prediccion_portero_api'),
+    path('api/cambiar-jornada/', views.cambiar_jornada_api, name='cambiar_jornada_api'),
 ]

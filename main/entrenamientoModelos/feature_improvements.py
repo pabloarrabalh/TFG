@@ -28,10 +28,46 @@ def eliminar_features_ruido(df: pd.DataFrame, position: str = 'ALL', verbose: bo
         'ratio_roles_criticos',      # 0 en ElasticNet
     ]
     
+    # Features NO relevantes para PORTEROS (GK): goles, asistencias, regates...
+    # SOLO columnas que existen en el CSV
+    FEATURES_RUIDO_GK = [
+        # Goles y asistencias
+        'gol_partido',
+        'asist_partido',
+        'xg_partido',
+        'xag',
+        'tiro_fallado_partido',
+        'tiro_puerta_partido',
+        'tiros',
+        
+        # Regates y conducción
+        'regates',
+        'regates_completados',
+        'regates_fallidos',
+        'conducciones',
+        'distancia_conduccion',
+        'metros_avanzados_conduccion',
+        'conducciones_progresivas',
+        
+        # Duelos aéreos y terrestres (menos relevantes para GK)
+        'duelos',
+        'duelos_ganados',
+        'duelos_perdidos',
+        'duelos_aereos_ganados',
+        'duelos_aereos_ganados_pct',
+        'duelos_aereos_perdidos',
+        
+        # Bloqueos y otros
+        'bloqueo_pase',
+        'bloqueo_tiros',
+        'bloqueos',
+        'entradas',
+    ]
+    
     features_ruido = FEATURES_RUIDO_COMUN.copy()
 
-    if position in ['GK', 'ALL']:
-        pass  # Los ruidos comunes aplican a GK
+    if position in ['GK', 'PT', 'ALL']:
+        features_ruido.extend(FEATURES_RUIDO_GK)
     
     if position in ['DF', 'ALL']:
         pass  # Los ruidos comunes aplican a DF
@@ -45,15 +81,15 @@ def eliminar_features_ruido(df: pd.DataFrame, position: str = 'ALL', verbose: bo
         if features_a_eliminar:
             print(f"\n{len(features_a_eliminar)} features a eliminar:\n")
             for f in features_a_eliminar:
-                print(f"  ❌ {f} (colinealidad/redundancia)")
+                print(f"  [X] {f} (colinealidad/redundancia)")
             print()
         else:
-            print(f"\n✓ No hay features ruido a eliminar para {position}\n")
+            print(f"\n[OK] No hay features ruido a eliminar para {position}\n")
     
     df = df.drop(columns=features_a_eliminar, errors='ignore')
     
     if verbose:
-        print(f"✅ Eliminadas {len(features_a_eliminar)} features ruido\n")
+        print(f"[OK] Eliminadas {len(features_a_eliminar)} features ruido\n")
     
     return df
 
@@ -90,7 +126,10 @@ def crear_features_fantasy_gk(df: pd.DataFrame, verbose: bool = True) -> pd.Data
     # -----------------------------------------------------------------------
     # 0. Seguridad minutos
     # -----------------------------------------------------------------------
-    df["Min_partido_safe"] = df.get("Min_partido", 1).replace(0, 0.1)
+    if "Min_partido" in df.columns:
+        df["Min_partido_safe"] = df["Min_partido"].replace(0, 0.1)
+    else:
+        df["Min_partido_safe"] = 1
 
     # -----------------------------------------------------------------------
     # 1. CLEAN SHEET PROBABILITY MEJORADA
@@ -147,8 +186,8 @@ def crear_features_fantasy_gk(df: pd.DataFrame, verbose: bool = True) -> pd.Data
         df["cs_rate_recent"] = 0.0
 
     if verbose:
-        print("✅ Clean sheet probability & rate (mejoradas)")
-        print("✅ cs_expected_points")
+        print("[OK] Clean sheet probability & rate (mejoradas)")
+        print("[OK] cs_expected_points")
 
     # -----------------------------------------------------------------------
     # 2. EFICIENCIA PER 90' (paradas y PSxG) - SIN LEAKAGE
@@ -174,8 +213,8 @@ def crear_features_fantasy_gk(df: pd.DataFrame, verbose: bool = True) -> pd.Data
         df = df.drop(columns=["psxg_per_90_temp"])
 
     if verbose:
-        print("✅ Save per 90 (roll, ewma) - Sin leakage")
-        print("✅ PSxG per 90 (roll, ewma) - Sin leakage")
+        print("[OK] Save per 90 (roll, ewma) - Sin leakage")
+        print("[OK] PSxG per 90 (roll, ewma) - Sin leakage")
 
     # -----------------------------------------------------------------------
     # 3. RESUMEN CORE DE PUNTOS ESPERADOS GK
@@ -187,7 +226,7 @@ def crear_features_fantasy_gk(df: pd.DataFrame, verbose: bool = True) -> pd.Data
     )
 
     if verbose:
-        print("✅ expected_gk_core_points (CS + saves + PSxG)")
+        print("[OK] expected_gk_core_points (CS + saves + PSxG)")
 
     return df
 
@@ -478,18 +517,18 @@ def seleccionar_features_por_correlacion(
     features_bajo_threshold = ((df_corr['abs_spearman'] > 0) & (df_corr['abs_spearman'] < threshold)).sum()
     
     if verbose:
-        print(f"\n📊 Análisis de correlación:\n")
+        print(f"\n[CHART] Analisis de correlacion:\n")
         print(f"  • Features muertos (r=0): {features_muertos}")
         print(f"  • Features bajo threshold (<{threshold}): {features_bajo_threshold}")
-        print(f"  • Features válidos (>={threshold}): {len(features_validos)}")
+        print(f"  • Features validos (>={threshold}): {len(features_validos)}")
         print(f"  • Total: {len(df_corr)}")
         
-        print(f"\n🏆 TOP 20 Features por |Spearman|:\n")
+        print(f"\n[TROPHY] TOP 20 Features por |Spearman|:\n")
         for idx, row in df_corr.head(20).iterrows():
             print(f"  {row['feature']:40s} r={row['spearman']:8.4f} (p={row['p_value']:.4f})")
     
     if verbose:
-        print(f"\n✅ Seleccionados {len(features_validos)} features válidos\n")
+        print(f"\n[OK] Seleccionados {len(features_validos)} features validos\n")
     
     return features_validos, df_corr
 
