@@ -430,7 +430,31 @@ def crear_features_rival(df):
     ]
     
     for col, default, prefix in rival_specs:
-        df, _ = crear_features_temporales(df, col, ventana_larga=vl, crear_lag=False, default_value=default, prefix=prefix, verbose=True)
+        if col in df.columns:
+            # ⚠️ IMPORTANTE: Para rival features NO usar groupby('player')
+            # Porque todos los jugadores del mismo equipo tienen el mismo rival
+            # en la misma jornada -> varianza=0 con groupby
+            # En su lugar, aplicar shift() global + rolling()
+            
+            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(default)
+            
+            # Shift GLOBAL (todos los datos, no agrupado por player)
+            df[f'{col}_shifted'] = df[col].shift()
+            
+            # Rolling con ventanas variadas
+            df[f'{prefix}_roll3'] = df[f'{col}_shifted'].rolling(3, min_periods=1).mean()
+            df[f'{prefix}_ewma3'] = df[f'{col}_shifted'].ewm(span=3, adjust=False).mean()
+            
+            df[f'{prefix}_roll5'] = df[f'{col}_shifted'].rolling(5, min_periods=1).mean()
+            df[f'{prefix}_ewma5'] = df[f'{col}_shifted'].ewm(span=5, adjust=False).mean()
+            
+            df[f'{prefix}_roll7'] = df[f'{col}_shifted'].rolling(7, min_periods=1).mean()
+            df[f'{prefix}_ewma7'] = df[f'{col}_shifted'].ewm(span=7, adjust=False).mean()
+            
+            # Cleanup temporal
+            df = df.drop(columns=[f'{col}_shifted'], errors='ignore')
+            
+            print(f"   ✅ {col} → {prefix}_roll3/5/7 + ewma3/5/7 (GLOBAL shift)")
     
     return df
 

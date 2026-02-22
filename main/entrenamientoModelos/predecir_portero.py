@@ -605,6 +605,31 @@ def predecir_puntos_portero(jugador_id, jornada_actual=None, verbose=True, model
         }
     """
     
+    # ADAPTACIÓN: Si recibimos un ID (int), convertir a nombre desde BD
+    original_jugador_id = jugador_id
+    if isinstance(jugador_id, int):
+        try:
+            import django
+            if not django.apps.apps.ready:
+                import os
+                os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+                django.setup()
+            
+            from main.models import Jugador
+            jugador = Jugador.objects.get(id=jugador_id)
+            jugador_id = f"{jugador.nombre} {jugador.apellido}".strip()
+            if verbose:
+                print(f"[INFO] Convertido ID {original_jugador_id} -> Nombre: {jugador_id}")
+        except Exception as e:
+            if verbose:
+                print(f"[WARNING] No se pudo convertir ID a nombre: {e}")
+            return {
+                'error': f'Jugador ID no encontrado: {original_jugador_id}',
+                'jugador_id': original_jugador_id,
+                'prediccion': None,
+                'jornada': None
+            }
+    
     # Cargar modelo especificado
     modelo = cargar_modelo(modelo_tipo)
     if modelo is None:
@@ -718,6 +743,10 @@ def predecir_puntos_portero(jugador_id, jornada_actual=None, verbose=True, model
         margen = margen_dict['margen']
         puntos_reales = obtener_puntos_reales_ultimo_partido(df, jugador_id, partido['jornada_prediccion'])
         
+        # Calcular rango limitado entre -10 y 30
+        rango_min = max(-10, promedio_historico - margen)
+        rango_max = min(30, promedio_historico + margen)
+        
         return {
             'jugador_id': jugador_id,
             'prediccion': round(promedio_historico, 2),
@@ -726,10 +755,12 @@ def predecir_puntos_portero(jugador_id, jornada_actual=None, verbose=True, model
             'margen': margen,
             'mae_value': margen_dict['MAE'],
             'std_value': margen_dict['std'],
-            'rango_min': round(max(0, promedio_historico - margen), 2),
-            'rango_max': round(promedio_historico + margen, 2),
+            'rango_min': round(rango_min, 2),
+            'rango_max': round(rango_max, 2),
             'jornada': partido['jornada_prediccion'],
             'modelo': 'Promedio Histórico (features incompletas)',
+            'features_impacto': [],
+            'explicacion_texto': 'Insuficientes features para generar explicación',
             'error': None
         }
     
@@ -747,10 +778,108 @@ def predecir_puntos_portero(jugador_id, jornada_actual=None, verbose=True, model
         margen_dict = calcular_margen_confianza(prediccion, df_todos)
         margen = margen_dict['margen']
         
+        # Generar explicabilidad con SHAP (si disponible)
+        top_features = []
+        explicacion_texto = ""
+        try:
+            # Intentar usar SHAP si está disponible
+            try:
+                import shap
+                if shap is None:
+                    raise ImportError("SHAP no está disponible")
+            except ImportError:
+                raise ImportError("SHAP no está disponible")
+            
+            explainer = shap.TreeExplainer(modelo)
+            shap_values = explainer.shap_values(pd.DataFrame([fila[features_disponibles]]))
+            
+            # Obtener feature importance basado en SHAP values
+            feature_importance_shap = np.abs(shap_values).mean(axis=0)
+            top_indices = np.argsort(feature_importance_shap.flatten())[-7:][::-1]
+            
+            explicacion_lines = ["Factores principales:", ""]
+            for i, idx in enumerate(top_indices):
+                feature_name = features_disponibles[idx]
+                impacto_abs = feature_importance_shap.flatten()[idx]
+                impacto_pts = float(shap_values.flatten()[idx])  # SHAP value (con signo)
+                valor = float(fila.get(feature_name, 0))
+                
+                # Determinar dirección del impacto
+                es_positivo = impacto_pts > 0
+                direccion = 'positivo' if es_positivo else 'negativo'
+                
+                try:
+                    explicacion_texto_expr = obtener_explicacion(feature_name, es_positivo)
+                except:
+                    explicacion_texto_expr = feature_name
+                
+                top_features.append({
+                    'feature': feature_name,
+                    'impacto': float(impacto_pts),  # SHAP value con signo
+                    'impacto_pts': impacto_pts,
+                    'direccion': direccion,
+                    'explicacion': explicacion_texto_expr
+                })
+                
+                # Formatear línea con SOLO impacto (sin valor)
+                signo = '+' if impacto_pts > 0 else '-' if impacto_pts < 0 else ''
+                impacto_abs = abs(impacto_pts)
+                linea = f"{i+1}. {explicacion_texto_expr} (impacto: {signo}{impacto_abs:.2f}pts)"
+                explicacion_lines.append(linea)
+            
+            explicacion_texto = "\n".join(explicacion_lines)
+        
+        except Exception as e:
+            # Fallback: generar explicaciones simples basadas en feature values
+            if verbose:
+                print(f"[WARNING] SHAP explanation failed: {e}")
+            
+            top_indices = []
+            valores_absolutos = []
+            for feature_name in features_disponibles:
+                valor = float(fila.get(feature_name, 0))
+                valores_absolutos.append((feature_name, abs(valor), valor))
+            
+            valores_absolutos.sort(key=lambda x: x[1], reverse=True)
+            
+            explicacion_lines = ["Factores principales:", ""]
+            for i, (feature_name, abs_valor, valor) in enumerate(valores_absolutos[:7]):
+                es_positivo = valor > (0.5 if 'pct' in feature_name or 'ratio' in feature_name else 1.0)
+                
+                # Calcular impacto aproximado en puntos (valor / 10 como proxy)
+                impacto_pts = valor / 10.0 if valor > 1 else valor
+                if not es_positivo:
+                    impacto_pts = -impacto_pts
+                
+                try:
+                    explicacion_texto_expr = obtener_explicacion(feature_name, es_positivo)
+                except:
+                    explicacion_texto_expr = feature_name
+                
+                top_features.append({
+                    'feature': feature_name,
+                    'impacto': impacto_pts,
+                    'impacto_pts': impacto_pts,
+                    'direccion': 'positivo' if es_positivo else 'negativo',
+                    'explicacion': explicacion_texto_expr
+                })
+                
+                # Formatear línea con SOLO impacto (sin valor)
+                signo = '+' if impacto_pts > 0 else '-' if impacto_pts < 0 else ''
+                impacto_abs = abs(impacto_pts)
+                linea = f"{i+1}. {explicacion_texto_expr} (impacto: {signo}{impacto_abs:.2f}pts)"
+                explicacion_lines.append(linea)
+            
+            explicacion_texto = "\n".join(explicacion_lines)
+        
         if verbose:
             print(f"[OK] Predicción: {prediccion:.2f} puntos")
             print(f"[OK] Puntos reales (jornada {partido['jornada_prediccion']}): {puntos_reales}")
             print(f"[OK] Margen de confianza: ±{margen}\n")
+        
+        # Calcular rango limitado entre -10 y 30
+        rango_min = max(-10, prediccion - margen)
+        rango_max = min(30, prediccion + margen)
         
         return {
             'jugador_id': jugador_id,
@@ -760,10 +889,12 @@ def predecir_puntos_portero(jugador_id, jornada_actual=None, verbose=True, model
             'margen': margen,
             'mae_value': margen_dict['MAE'],
             'std_value': margen_dict['std'],
-            'rango_min': round(max(0, prediccion - margen), 2),
-            'rango_max': round(prediccion + margen, 2),
+            'rango_min': round(rango_min, 2),
+            'rango_max': round(rango_max, 2),
             'jornada': partido['jornada_prediccion'],
             'modelo': 'Random Forest',
+            'features_impacto': top_features,
+            'explicacion_texto': explicacion_texto,
             'error': None
         }
     except Exception as e:
@@ -809,9 +940,9 @@ def explicar_prediccion_portero(jugador_id, jornada_actual=None, modelo_tipo='RF
                 'features_impacto': []
             }
         
-        # Cargar datos
-        df = cargar_datos_completos()
-        if df is None:
+        # Cargar datos (desempacar tupla correctamente)
+        df, df_todos = cargar_datos_completos()
+        if df is None or df_todos is None:
             return {
                 'error': 'Datos no disponibles',
                 'prediccion': None,
@@ -901,21 +1032,38 @@ def explicar_prediccion_portero(jugador_id, jornada_actual=None, modelo_tipo='RF
         
         # SHAP Explanation
         try:
+            # Verificar que SHAP esté disponible
+            if shap is None:
+                raise ImportError("SHAP no está disponible")
+            
             # Crear explainer (TreeExplainer para Random Forest es rápido)
             if hasattr(modelo, 'estimators_'):  # Random Forest
                 explainer = shap.TreeExplainer(modelo)
                 shap_values = explainer.shap_values(X_pred)
                 
-                # Para regresión, shap_values es simple array
-                if isinstance(shap_values, list):
-                    shap_impacts = shap_values[0][0]  # Primera predicción
-                else:
+                # Manejar diferentes formatos de retorno de SHAP
+                if isinstance(shap_values, (list, tuple)):
+                    # Si es lista o tupla, tomar el primer elemento
                     shap_impacts = shap_values[0]
+                    # Si sigue siendo un array 2D, tomar la primera fila
+                    if hasattr(shap_impacts, 'shape') and len(shap_impacts.shape) > 1:
+                        shap_impacts = shap_impacts[0]
+                else:
+                    # Si es array directo
+                    shap_impacts = shap_values
+                    if hasattr(shap_impacts, 'shape') and len(shap_impacts.shape) > 1:
+                        shap_impacts = shap_impacts[0]
             else:
                 # Fallback: usar permutation explainer
                 explainer = shap.PermutationExplainer(modelo.predict, X_pred)
                 shap_values = explainer.shap_values(X_pred)
-                shap_impacts = shap_values[0]
+                
+                if isinstance(shap_values, (list, tuple)):
+                    shap_impacts = shap_values[0]
+                    if hasattr(shap_impacts, 'shape') and len(shap_impacts.shape) > 1:
+                        shap_impacts = shap_impacts[0]
+                else:
+                    shap_impacts = shap_values[0] if hasattr(shap_values, '__len__') else shap_values
             
             # Extraer top 10 features más influyentes
             feature_impacts = []
@@ -1000,13 +1148,48 @@ def explicar_prediccion_portero(jugador_id, jornada_actual=None, modelo_tipo='RF
             }
         
         except Exception as e:
-            # Si SHAP falla, retornar predicción sin explicaciones
+            # Si SHAP falla, generar explicaciones simples basadas en feature values
             print(f"[WARNING] SHAP explanation failed: {e}")
+            
+            # Crear explicaciones simples sin SHAP - usar feature values
+            feature_impacts_fallback = []
+            explicaciones_array_fallback = []
+            explicacion_lines_fallback = [f"Predicción: {prediccion:.1f} puntos\n", "Factores principales:\n"]
+            
+            # Usar los features disponibles y sus valores
+            if 'fila' in locals() and 'features_disponibles' in locals():
+                for i, feature_name in enumerate(features_disponibles[:7]):  # Top 7
+                    valor = float(fila.get(feature_name, 0))
+                    
+                    # Determinar si es positivo o negativo basado en el rango de valores
+                    # Para la mayoría de features, valores más altos = mejores
+                    es_positivo = valor > (0.5 if 'pct' in feature_name or 'ratio' in feature_name else 1.0)
+                    
+                    explicacion_texto = obtener_explicacion(feature_name, es_positivo)
+                    feature_impacts_fallback.append({
+                        'feature': feature_name,
+                        'impacto': abs(valor),
+                        'impacto_signed': valor,
+                        'valor': valor,
+                        'direccion': 'positivo' if es_positivo else 'negativo'
+                    })
+                    
+                    linea = f"{i+1}. {explicacion_texto} (valor: {valor:.2f})"
+                    explicacion_lines_fallback.append(linea)
+                    explicaciones_array_fallback.append({
+                        'feature': feature_name,
+                        'valor': float(valor),
+                        'impacto': abs(valor),
+                        'direccion': 'positivo' if es_positivo else 'negativo',
+                        'explicacion': explicacion_texto
+                    })
+            
+            explicacion_texto_fallback = "\n".join(explicacion_lines_fallback)
             
             # Aún así retornar todos los campos necesarios
             puntos_reales = obtener_puntos_reales_ultimo_partido(df, jugador_id, jornada_actual) if 'df' in locals() else None
             puntos_reales_texto = str(puntos_reales) if puntos_reales is not None else "Aún no jugado"
-            margen_dict = calcular_margen_confianza(prediccion, df) if 'df' in locals() else {'margen': 3.8, 'MAE': 3.22, 'std': 2.5}
+            margen_dict = calcular_margen_confianza(prediccion, df_todos) if 'df_todos' in locals() else {'margen': 3.8, 'MAE': 3.22, 'std': 2.5}
             margen = margen_dict['margen']
             rango_min = max(0, prediccion - margen)
             rango_max = prediccion + margen
@@ -1023,9 +1206,9 @@ def explicar_prediccion_portero(jugador_id, jornada_actual=None, modelo_tipo='RF
                 'rango_max': round(rango_max, 2),
                 'jornada': jornada_pred,
                 'modelo': modelo_tipo,
-                'features_impacto': [],
-                'explicaciones': [],
-                'explicacion_texto': f"Predicción: {prediccion:.1f} puntos",
+                'features_impacto': feature_impacts_fallback,
+                'explicaciones': explicaciones_array_fallback,
+                'explicacion_texto': explicacion_texto_fallback,
                 'error': None
             }
     

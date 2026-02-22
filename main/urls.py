@@ -35,6 +35,7 @@ urlpatterns = [
     path('api/buscar/', api_endpoints.api_buscar, name='api_buscar'),
     path('api/favoritos/toggle/', api_endpoints.api_toggle_favorito, name='api_toggle_favorito'),
     path('api/predecir-portero/', views.predecir_portero_api, name='predecir_portero_api'),
+    path('api/predecir-jugador/', views.predecir_jugador_api, name='predecir_jugador_api'),
     path('api/explicar-prediccion/', views.explicar_prediccion_portero_api, name='explicar_prediccion_portero_api'),
     path('api/cambiar-jornada/', views.cambiar_jornada_api, name='cambiar_jornada_api'),
 ]

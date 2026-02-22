@@ -428,20 +428,43 @@ def crear_features_rival(df):
     vl = CONFIG['ventana_larga']
     
     # ✅ SAFE: Estos son datos del rival en partidos ANTERIORES
-    # crear_features_temporales() applica .shift() ANTES de rolling()
     rival_specs = [
-        ("gf_rival", 0, "opp_gf"),           # Goles a favor del rival (en partidos anteriores)
-        ("gc_rival", 0, "opp_gc"),           # Goles en contra del rival (en partidos anteriores)
-        ("racha5partidos_rival", 0.5, "opp_form"),  # Forma del rival (partidos anteriores)
+        ("gf_rival", 0, "opp_gf"),           # Goles que marca rival
+        ("gc_rival", 0, "opp_gc"),           # Goles que concede rival
+        ("racha5partidos_rival", 0.5, "opp_form"),  # Forma del rival
     ]
     
     for col, default, prefix in rival_specs:
         if col in df.columns:
+            # Si es racha, convertir a numérico primero
             if col == "racha5partidos_rival":
-                # Convertir racha a numerico
+                print(f"   Converting {col} to numeric (ratio victorias)...")
                 df[col] = df[col].apply(convertir_racha_a_numerico)
             
-            df, _ = crear_features_temporales(df, col, 3, vl, 7, crear_lag=False, default_value=default, prefix=prefix, verbose=True)
+            # ⚠️ IMPORTANTE: Para rival features NO usar groupby('player')
+            # Porque todos los jugadores del mismo equipo tienen el mismo rival
+            # en la misma jornada -> varianza=0 con groupby
+            # En su lugar, aplicar shift() global + rolling()
+            
+            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(default)
+            
+            # Shift GLOBAL (todos los datos, no agrupado por player)
+            df[f'{col}_shifted'] = df[col].shift()
+            
+            # Rolling con ventanas variadas
+            df[f'{prefix}_roll3'] = df[f'{col}_shifted'].rolling(3, min_periods=1).mean()
+            df[f'{prefix}_ewma3'] = df[f'{col}_shifted'].ewm(span=3, adjust=False).mean()
+            
+            df[f'{prefix}_roll5'] = df[f'{col}_shifted'].rolling(5, min_periods=1).mean()
+            df[f'{prefix}_ewma5'] = df[f'{col}_shifted'].ewm(span=5, adjust=False).mean()
+            
+            df[f'{prefix}_roll7'] = df[f'{col}_shifted'].rolling(7, min_periods=1).mean()
+            df[f'{prefix}_ewma7'] = df[f'{col}_shifted'].ewm(span=7, adjust=False).mean()
+            
+            # Cleanup temporal
+            df = df.drop(columns=[f'{col}_shifted'], errors='ignore')
+            
+            print(f"   ✅ {col} → {prefix}_roll3/5/7 + ewma3/5/7 (GLOBAL shift, sin groupby)")
     
     print()
     return df

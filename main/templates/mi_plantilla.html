@@ -275,8 +275,8 @@
         <div class="text-center min-w-64">
             <p class="text-gray-400 text-sm mb-2">Jornada Actual</p>
             <select id="jornada-input" 
-                   class="text-4xl font-black text-white bg-surface-darker border-2 border-primary rounded-lg px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
-                   style="font-family: 'Courier New', monospace; color-scheme: dark;"
+                   class="text-4xl font-black text-white bg-black border-2 border-primary rounded-lg px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
+                   style="font-family: 'Courier New', monospace; color-scheme: dark; background-color: #000000;"
                    onchange="cambiarJornadaPorInput(this.value)">
             </select>
             <p class="text-gray-400 text-sm mt-2">Temporada {{ temporada_actual }}</p>
@@ -371,7 +371,7 @@ const todasPlantillas = JSON.parse('{{ plantillas|escapejs }}');
 const jornadasDisponibles = JSON.parse('{{ jornadas|escapejs }}');
 let jornadaActual = {{ jornada_actual|default:'null' }}; // Jornada actual seleccionada
 
-// Inicializar select de jornadas y cargar jornada 17 por defecto
+// Inicializar select de jornadas y cargar jornada 38 por defecto + localStorage
 function inicializarJornadaSelect() {
     const selectElement = document.getElementById('jornada-input');
     if (selectElement) {
@@ -386,10 +386,17 @@ function inicializarJornadaSelect() {
             selectElement.appendChild(option);
         }
         
-        // Si jornadaActual no está definido, usar 17 por defecto
-        if (jornadaActual === null || jornadaActual === undefined) {
-            jornadaActual = 17;
+        // Intentar cargar jornada guardada en localStorage
+        const jornadaGuardada = localStorage.getItem('jornadaActual');
+        if (jornadaGuardada !== null && !isNaN(jornadaGuardada) && parseInt(jornadaGuardada) >= 1 && parseInt(jornadaGuardada) <= 38) {
+            jornadaActual = parseInt(jornadaGuardada);
+        } else if (jornadaActual === null || jornadaActual === undefined) {
+            // Si no hay jornada guardada ni en variable, usar 38 por defecto
+            jornadaActual = 38;
         }
+        
+        // Guardar jornada actual en localStorage
+        localStorage.setItem('jornadaActual', jornadaActual.toString());
         
         // Set el valor seleccionado
         selectElement.value = jornadaActual;
@@ -478,6 +485,9 @@ function cambiarJornada(delta) {
             // Actualizar jornada global
             jornadaActual = nuevaJornada;
             document.getElementById('jornada-input').value = nuevaJornada;
+            
+            // GUARDAR jornada en localStorage
+            localStorage.setItem('jornadaActual', nuevaJornada.toString());
             
             // Actualizar jugadoresDisponibles CON TODOS LOS DATOS
             Object.keys(data.jugadores_por_posicion).forEach(posicion => {
@@ -708,7 +718,10 @@ function crearJugadorCard(jugador, posicion, esVacio = false, indice = 0) {
              data-jugador-equipo="${jugador.equipo_nombre}"
              data-jugador-rival="${rivalNombre}"
              style="touch-action: none;">
-            <button class="btn-eliminar-jugador absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold transition-all pointer-events-auto" data-jugador-id="${jugador.id}" title="Eliminar jugador">
+            <button class="btn-eliminar-jugador absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold transition-all pointer-events-auto z-50" 
+                    data-jugador-id="${jugador.id}" 
+                    title="Eliminar jugador"
+                    onclick="event.stopPropagation(); event.preventDefault(); removerJugador(${jugador.id}); return false;">
                 ✕
             </button>
             <div class="size-14 bg-white/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
@@ -760,7 +773,7 @@ function renderizarCampo() {
     
     renderizarBanquillo();
     document.getElementById('formacion-display').textContent = `Formación: ${formacionActual}`;
-    cargarPrediccionesPorteros();
+    cargarPrediccionesTodosJugadores();
 }
 
 function renderizarBanquillo() {
@@ -801,7 +814,10 @@ function renderizarBanquillo() {
                      data-jugador-equipo="${suplente.equipo_nombre || 'TBD'}"
                      data-jugador-rival="${rivalNombre}"
                      style="touch-action: none;">
-                    <button class="btn-eliminar-jugador absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold transition-all pointer-events-auto" data-jugador-id="${suplente.id}" title="Eliminar jugador">
+                    <button class="btn-eliminar-jugador absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold transition-all pointer-events-auto z-50" 
+                            data-jugador-id="${suplente.id}" 
+                            title="Eliminar jugador"
+                            onclick="event.stopPropagation(); event.preventDefault(); removerJugador(${suplente.id}); return false;">
                         ✕
                     </button>
                     <div class="size-14 bg-white/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
@@ -1149,18 +1165,6 @@ document.addEventListener('click', function(event) {
         dropdown.classList.add('hidden');
     }
 });
-
-// Listener para el botón X (eliminar) - más específico
-document.addEventListener('pointerdown', function(event) {
-    const btn = event.target.closest('.btn-eliminar-jugador');
-    if (btn) {
-        event.preventDefault();
-        event.stopPropagation();
-        const jugadorId = parseInt(btn.getAttribute('data-jugador-id'));
-        removerJugador(jugadorId);
-        return;
-    }
-}, true); // Captura en fase de captura
 
 // Event delegation para botones del campo - usando click
 document.addEventListener('click', function(event) {
@@ -1949,42 +1953,59 @@ function toggleExplicacionDetalles(explicacionTexto) {
 // FUNCIONES DE PREDICCIÓN PARA PORTEROS
 // ============================================================================
 
-function cargarPrediccionesPorteros() {
-    // Carga predicciones de puntos para porteros del equipo
-    const porterosEnCampo = alineacionActual['Portero'] || [];
-    const porterosSuplentes = alineacionActual['Suplentes'] || [];
+function cargarPrediccionesTodosJugadores() {
+    // Carga predicciones de puntos para TODOS los jugadores del equipo
+    const posiciones = ['Portero', 'Defensa', 'Centrocampista', 'Delantero'];
+    const todosJugadores = [];
     
-    const todosPorteros = porterosEnCampo.concat(
-        porterosSuplentes.filter(p => p && p.posicion === 'Portero')
-    ).filter(p => p && p.id);
+    // Recolectar todos los jugadores del campo
+    posiciones.forEach(posicion => {
+        if (Array.isArray(alineacionActual[posicion])) {
+            todosJugadores.push(...alineacionActual[posicion].filter(j => j && j.id));
+        }
+    });
     
-    if (todosPorteros.length === 0) {
-        console.log('No hay porteros para cargar predicciones');
+    // Recolectar todos los suplentes
+    if (Array.isArray(alineacionActual['Suplentes'])) {
+        todosJugadores.push(...alineacionActual['Suplentes'].filter(j => j && j.id));
+    }
+    
+    if (todosJugadores.length === 0) {
+        console.log('No hay jugadores para cargar predicciones');
         return;
     }
     
-    console.log(`Cargando predicciones para ${todosPorteros.length} porteros en jornada ${jornadaActual}`);
+    console.log(`Cargando predicciones para ${todosJugadores.length} jugadores en jornada ${jornadaActual}`);
     
-    todosPorteros.forEach(portero => {
-        if (!portero || !portero.id) return;
+    todosJugadores.forEach(jugador => {
+        if (!jugador || !jugador.id) return;
         
         const csrfToken = getCsrfToken();
         
-        fetch('/api/predecir-portero/', {
+        // Mapear posición a imagen de escudo (para metadata)
+        const posicionMap = {
+            'Portero': 'PT',
+            'Defensa': 'DF',
+            'Centrocampista': 'MC',
+            'Delantero': 'DT'
+        };
+        
+        fetch('/api/predecir-jugador/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrfToken
             },
             body: JSON.stringify({
-                jugador_id: portero.id,
+                jugador_id: jugador.id,
                 jornada: jornadaActual,
+                posicion: jugador.posicion,
                 modelo: 'RF'  // Usar Random Forest
             })
         })
         .then(response => {
             if (!response.ok) {
-                console.warn(`Respuesta error ${response.status} para portero ${portero.id}`);
+                console.warn(`Respuesta error ${response.status} para jugador ${jugador.id}`);
                 throw new Error(`HTTP ${response.status}`);
             }
             return response.json();
@@ -1992,25 +2013,33 @@ function cargarPrediccionesPorteros() {
         .then(data => {
             if (data.status === 'success') {
                 // Buscar el elemento del jugador y actualizar predicción
-                const jugadorCard = document.querySelector(`[data-jugador-id="${portero.id}"]`);
+                const jugadorCard = document.querySelector(`[data-jugador-id="${jugador.id}"]`);
                 if (jugadorCard) {
                     const pElement = jugadorCard.querySelector('.prediccion-puntos');
                     if (pElement) {
-                        pElement.textContent = `${data.prediccion.toFixed(1)}pt`;
-                        pElement.classList.remove('opacity-50');
-                        pElement.title = `Predicción para Jornada ${data.jornada} basada en datos anteriores - Modelo: ${data.modelo}`;
-                        console.log(`✓ Predicción cargada para ${portero.id}: ${data.prediccion.toFixed(1)}pt (jornada ${data.jornada})`);
+                        // Validar que prediccion no sea null antes de usar toFixed
+                        if (data.prediccion !== null && data.prediccion !== undefined) {
+                            pElement.textContent = `${data.prediccion.toFixed(1)}pt`;
+                            pElement.classList.remove('opacity-50');
+                            pElement.title = `Predicción para Jornada ${data.jornada} - Posición: ${posicionMap[jugador.posicion] || jugador.posicion}`;
+                            console.log(`✓ ${posicionMap[jugador.posicion]} ${jugador.nombre}: ${data.prediccion.toFixed(1)}pt (J${data.jornada})`);
+                        } else {
+                            pElement.textContent = 'Sin datos';
+                            pElement.classList.add('opacity-50');
+                            pElement.title = `No hay suficientes datos para predicción`;
+                            console.warn(`⚠ ${posicionMap[jugador.posicion]} ${jugador.nombre}: Sin predicción (insuficientes datos)`);
+                        }
                     } else {
-                        console.warn(`Elemento .prediccion-puntos no encontrado para portero ${portero.id}`);
+                        console.warn(`Elemento .prediccion-puntos no encontrado para jugador ${jugador.id}`);
                     }
                 } else {
-                    console.warn(`Card no encontrada para portero ${portero.id}`);
+                    console.warn(`Card no encontrada para jugador ${jugador.id}`);
                 }
             } else {
-                console.warn(`Error en predicción para ${portero.id}:`, data);
+                console.warn(`Error en predicción para ${jugador.id}:`, data);
             }
         })
-        .catch(error => console.warn('Error prediciendo:', portero.id, error));
+        .catch(error => console.warn('Error prediciendo:', jugador.id, error));
     });
 }
 
@@ -2040,6 +2069,12 @@ function mostrarExplicacionRango(margen, prediccion, mae_value = 3.22, std_value
      * Fórmula: Rango = [prediccion - margen, prediccion + margen]
      * Donde: margen = √(MAE² + (std/2)²)
      */
+    
+    // Validar que prediccion sea válido
+    if (prediccion === null || prediccion === undefined || isNaN(prediccion)) {
+        console.warn('Predicción inválida para mostrar rango de confianza');
+        return;
+    }
     
     // Usar valores reales del API
     const MAE = mae_value || 3.22;

@@ -158,9 +158,18 @@ def obtener_explicacion(feature_name, es_positivo):
     Returns:
         str: Frase de explicación o feature_name si no existe
     """
+    # Manejar casos donde feature_name podría no ser un string
+    if not isinstance(feature_name, str):
+        feature_name = str(feature_name)
+    
     if feature_name not in EXPLICACIONES_FEATURES:
         return f"Factor: {feature_name}"
     
     explicaciones_dict = EXPLICACIONES_FEATURES[feature_name]
+    
+    # Asegurar que explicaciones_dict es realmente un diccionario
+    if not isinstance(explicaciones_dict, dict):
+        return f"Factor: {feature_name}"
+    
     clave = 'positivo' if es_positivo else 'negativo'
     return explicaciones_dict.get(clave, f"Factor: {feature_name}")

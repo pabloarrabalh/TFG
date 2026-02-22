@@ -44,6 +44,22 @@ ROLES_CRITICOS_DF = {
     "faltas_recibidas": 0.4,      # Fouls Drawn
 }
 
+# Roles críticos para MEDIOCAMPISTAS (MF)
+ROLES_CRITICOS_MF = {
+    "pases_clave": 1.6,           # Key Passes - MUY IMPORTANTE
+    "asistencias": 1.5,           # Assists - crítico
+    "pases_completados_pct": 1.2, # Pass Accuracy - importante
+    "regates_exitosos": 1.1,      # Successful Take-Ons - creación
+    "minutos": 1.0,               # Minutes - disponibilidad
+    "entradas": 0.8,              # Tackles - defensa
+    "intercepciones": 0.8,        # Interceptions - defensa
+    "apariciones_suplente": 0.3,  # Substitute Appearances
+    "amarillas": -0.6,            # Yellow Cards
+    "rojas": -1.2,                # Red Cards
+    "faltas_cometidas": -0.4,     # Fouls Committed
+    "faltas_recibidas": 0.4,      # Fouls Drawn
+}
+
 # Todos los roles reconocibles (genérico)
 ROLES_TODOS = {
     "goles": 1.0,
@@ -256,6 +272,10 @@ def enriquecer_dataframe_con_roles(df: pd.DataFrame,
         roles_config = ROLES_CRITICOS_DF
         elite_col_name = "es_defensa_elite"
         tipo_posicion = "Defensas"
+    elif position == 'MF':
+        roles_config = ROLES_CRITICOS_MF
+        elite_col_name = "es_mediocampista_elite"
+        tipo_posicion = "Mediocampistas"
     else:
         roles_config = ROLES_TODOS
         elite_col_name = "es_jugador_elite"
@@ -485,6 +505,56 @@ def crear_features_interaccion_roles(df: pd.DataFrame,
         if verbose:
             print(" score_defensivo (sum: entradas + intercepciones + despejes PONDERADOS por posición)")
     
+    elif position == 'MF':
+        # ===== MF INTERACTIONS (MEDIOCAMPISTAS) =====
+        
+        # Elite pases clave - PONDERADO por posición
+        if "es_mediocampista_elite" in df.columns and "rol_pases_clave_ponderado" in df.columns:
+            df["elite_pases_clave_interact"] = (
+                df["es_mediocampista_elite"].fillna(0).astype(float) * 
+                df["rol_pases_clave_ponderado"].fillna(0).astype(float)
+            )
+            if verbose:
+                print(" elite_pases_clave_interact (ponderado)")
+        
+        # Elite asistencias - PONDERADO por posición
+        if "es_mediocampista_elite" in df.columns and "rol_asistencias_ponderado" in df.columns:
+            df["elite_asistencias_interact"] = (
+                df["es_mediocampista_elite"].fillna(0).astype(float) * 
+                df["rol_asistencias_ponderado"].fillna(0).astype(float)
+            )
+            if verbose:
+                print(" elite_asistencias_interact (ponderado)")
+        
+        # Score normalizado
+        if "score_roles" in df.columns:
+            df["score_roles_normalizado"] = df["score_roles"].fillna(0).astype(float)
+            if verbose:
+                print(" score_roles_normalizado")
+        
+        # Tiene rol mediocampista core (pases_clave + asistencias)
+        mf_core_cols = [c for c in df.columns 
+                       if any(rc in c for rc in ["pases_clave", "asistencias"]) 
+                       and c.endswith("_valor")]
+        if mf_core_cols:
+            df["tiene_rol_mediocampista_core"] = (df[mf_core_cols] > 0).any(axis=1).astype(int)
+            if verbose:
+                print(f" tiene_rol_mediocampista_core ({df['tiene_rol_mediocampista_core'].sum()} mediocampistas)")
+        
+        # Score creativo (pases_clave + asistencias + regates PONDERADOS)
+        def calcular_score_creativo(row):
+            score = 0.0
+            for rol_key in ["pases_clave", "asistencias", "regates_exitosos"]:
+                col_ponderado = f"rol_{rol_key}_ponderado"
+                if col_ponderado in row.index and row[col_ponderado] > 0:
+                    multiplicador = ROLES_CRITICOS_MF.get(rol_key, 0.5)
+                    score += row[col_ponderado] * multiplicador
+            return score
+        
+        df["score_creativo"] = df.apply(calcular_score_creativo, axis=1)
+        if verbose:
+            print(" score_creativo (sum: pases_clave + asistencias + regates PONDERADOS por posición)")
+    
     # ===== COMMON FOR ALL =====
     
     # Contar roles críticos específicos - OPTIMIZADO
@@ -497,6 +567,9 @@ def crear_features_interaccion_roles(df: pd.DataFrame,
             roles_negativos = ["amarillas", "rojas"]
         elif position == 'DF':
             roles_positivos = ["entradas", "intercepciones", "despejes", "regates_exitosos", "minutos"]
+            roles_negativos = ["amarillas", "rojas", "faltas_cometidas"]
+        elif position == 'MF':
+            roles_positivos = ["pases_clave", "asistencias", "pases_completados_pct", "regates_exitosos", "minutos"]
             roles_negativos = ["amarillas", "rojas", "faltas_cometidas"]
         else:
             # Para ALL: asumir todo es positivo salvo amarillas/rojas
@@ -578,6 +651,9 @@ def resumen_roles(df: pd.DataFrame, position: str = 'ALL') -> None:
     elif position == 'DF':
         roles_mostrar = ROLES_CRITICOS_DF.keys()
         tipo_posicion = "DEFENSAS"
+    elif position == 'MF':
+        roles_mostrar = ROLES_CRITICOS_MF.keys()
+        tipo_posicion = "MEDIOCAMPISTAS"
     else:
         roles_mostrar = ROLES_TODOS.keys()
         tipo_posicion = "TODOS"

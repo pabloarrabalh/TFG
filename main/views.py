@@ -2832,6 +2832,7 @@ def cambiar_jornada_api(request):
         }, status=500)
 
 
+
 @csrf_exempt
 def explicar_prediccion_portero_api(request):
     """
@@ -2959,4 +2960,157 @@ def explicar_prediccion_portero_api(request):
         }, status=500)
 
 
-
+@csrf_exempt
+@require_http_methods(["POST"])
+def predecir_jugador_api(request):
+    """
+    API GENÉRICA para predecir puntos fantasy de CUALQUIER JUGADOR (PT, DF, MC, DT).
+    
+    Recibe JSON:
+    {
+        "jugador_id": 123,
+        "jornada": 15 (opcional),
+        "posicion": "Delantero" (opcional, se obtiene de BD si no se proporciona),
+        "modelo": "RF" (opcional, default: 'RF')
+    }
+    
+    Retorna JSON de manera similar a predecir_portero_api
+    """
+    import json
+    import logging
+    import sys
+    from pathlib import Path
+    from main.models import Jugador, EstadisticasPartidoJugador
+    
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # Parsear JSON
+        body_data = request.body.decode('utf-8') if isinstance(request.body, bytes) else request.body
+        data = json.loads(body_data)
+        
+        jugador_id = data.get('jugador_id')
+        jornada = data.get('jornada', None)
+        posicion_param = data.get('posicion')
+        modelo_tipo = data.get('modelo', 'RF')
+        
+        if not jugador_id:
+            return JsonResponse({
+                'status': 'error',
+                'error': 'jugador_id es requerido'
+            }, status=400)
+        
+        # Obtener jugador de BD
+        try:
+            jugador = Jugador.objects.get(id=jugador_id)
+            nombre_jugador = f"{jugador.nombre} {jugador.apellido}".strip()
+        except Jugador.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'error': f'Jugador no encontrado'
+            }, status=404)
+        
+        # Normalizar nombre para búsqueda en CSV
+        import unicodedata
+        nfd = unicodedata.normalize('NFD', nombre_jugador)
+        nombre_normalizado = ''.join(c for c in nfd if unicodedata.category(c) != 'Mn').lower().strip()
+        
+        # Determinar posición si no se proporciona
+        if posicion_param:
+            posicion = posicion_param
+        else:
+            # Obtener posición desde el método del modelo
+            posicion = jugador.get_posicion_mas_frecuente()
+            if not posicion:
+                # Fallback: obtener del historial de equipos o EstadisticasPartidoJugador
+                try:
+                    ult_stats = EstadisticasPartidoJugador.objects.filter(
+                        jugador=jugador
+                    ).order_by('-partido__jornada__numero').first()
+                    posicion = ult_stats.posicion if ult_stats else 'Delantero'
+                except:
+                    posicion = 'Delantero'
+        
+        logger.info(f"[API-GENERAL] Predicción para {nombre_jugador} ({posicion}), J{jornada}, modelo {modelo_tipo}")
+        
+        # Mapear posición a módulo de predicción
+        posicion_map = {
+            'Portero': 'predecir_portero',
+            'Defensa': 'predecir_defensa',
+            'Centrocampista': 'predecir_mediocampista',
+            'Delantero': 'predecir_delantero',
+            # Variantes
+            'PT': 'predecir_portero',
+            'DF': 'predecir_defensa',
+            'MC': 'predecir_mediocampista',
+            'DT': 'predecir_delantero'
+        }
+        
+        modulo_nombre = posicion_map.get(posicion, 'predecir_portero')  # Default portero
+        logger.info(f"[API-GENERAL] Usando módulo: {modulo_nombre}")
+        
+        # Agregar path para imports
+        entrenamientos_path = Path(__file__).parent / 'entrenamientoModelos'
+        if str(entrenamientos_path) not in sys.path:
+            sys.path.insert(0, str(entrenamientos_path))
+        
+        # Intentar importar el módulo correspondiente (SIN FALLBACKS)
+        try:
+            if modulo_nombre == 'predecir_portero':
+                from predecir_portero import predecir_puntos_portero as predictor_func
+            elif modulo_nombre == 'predecir_defensa':
+                from predecir_defensa import predecir_puntos_defensa as predictor_func
+            elif modulo_nombre == 'predecir_mediocampista':
+                from predecir_mediocampista import predecir_puntos_mediocampista as predictor_func
+            elif modulo_nombre == 'predecir_delantero':
+                from predecir_delantero import predecir_puntos_delantero as predictor_func
+            else:
+                return JsonResponse({
+                    'status': 'error',
+                    'error': f'Posición desconocida: {posicion}'
+                }, status=400)
+        except ImportError as e:
+            logger.error(f"[API] Error importando módulo {modulo_nombre}: {e}")
+            return JsonResponse({
+                'status': 'error',
+                'error': f'Módulo no disponible para {posicion}'
+            }, status=500)
+        
+        # Llamar función de predicción usando el nombre del jugador
+        resultado = predictor_func(nombre_jugador, jornada, verbose=False)
+        
+        if not isinstance(resultado, dict):
+            return JsonResponse({
+                'status': 'error',
+                'error': 'Resultado inválido'
+            }, status=500)
+        
+        if resultado.get('error'):
+            return JsonResponse({
+                'status': 'error',
+                'error': resultado['error'],
+                'jugador_id': jugador_id,
+                'posicion': posicion
+            }, status=400)
+        else:
+            prediccion = float(resultado.get('prediccion')) if resultado.get('prediccion') is not None else None
+            
+            return JsonResponse({
+                'status': 'success',
+                'jugador_id': jugador_id,
+                'jugador_nombre': nombre_jugador,
+                'prediccion': prediccion,
+                'jornada': int(resultado.get('jornada', jornada or 0)),
+                'posicion': posicion,
+                'modelo': resultado.get('modelo', 'Random Forest'),
+                'margen': float(resultado.get('margen', 0))
+            })
+    
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'error': 'JSON inválido'}, status=400)
+    except ImportError as e:
+        logger.error(f"[API-GENERAL] Error importando: {e}")
+        return JsonResponse({'status': 'error', 'error': f'Módulo no disponible'}, status=500)
+    except Exception as e:
+        logger.error(f"[API-GENERAL] Error: {e}", exc_info=True)
+        return JsonResponse({'status': 'error', 'error': str(e)}, status=500)

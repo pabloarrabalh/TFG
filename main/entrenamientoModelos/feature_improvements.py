@@ -475,6 +475,186 @@ def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) ->
 
 
 # ============================================================================
+# PARTE 2C: FEATURES ESPECÍFICOS PARA MEDIOCAMPISTAS (MF) - SIN LEAKAGE
+# ============================================================================
+
+def crear_features_fantasy_mediocampista(df: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
+    """
+    Crea features específicos para Fantasy Football - Mediocampistas.
+    
+    IMPORTANTE: Todos los features nuevos usan .shift() ANTES de rolling/ewma
+    para evitar data leakage.
+    
+    En FPL, mediocampista típicamente gana:
+    - Gol: +5 pts (no marcamos esto, es muy raro)
+    - Asistencia: +1 pt (no disponible en nuestro CSV)
+    - Clean sheet: +1 pt (raro si hay goles)
+    - Entrada: +1 pt
+    - Intercepción: +1 pt
+    - Crear juego: En pases clave
+    - Falta: -0.5 pts
+    - Amarilla: -1 pt
+    
+    Args:
+        df: DataFrame con datos básicos
+        verbose: Print de features creados
+        
+    Returns:
+        DataFrame enriquecido sin leakage
+    """
+    
+    if verbose:
+        print("\n" + "=" * 80)
+        print("FEATURES MEDIOCAMPISTA (FANTASY SPECIFIC)")
+        print("=" * 80)
+    
+    df = df.copy()
+    
+    # ========================================================================
+    # 1. EFICIENCIA DE PASES (Sin leakage - datos históricos)
+    # ========================================================================
+    
+    if 'pases_totales' in df.columns and 'pases_completados_pct' in df.columns:
+        df['pass_attempts_per_90'] = (
+            df['pases_totales'] / (df['min_partido'] / 90.0 + 0.1)
+        ).fillna(0)
+        
+        df['pass_accuracy_consistency'] = df.groupby('player')['pases_completados_pct'].transform(
+            lambda x: x.shift().ewm(span=5, adjust=False).mean()
+        ).fillna(50)
+        
+        if verbose:
+            print("   ✅ Pass accuracy metrics")
+    
+    # ========================================================================
+    # 2. ACTIVIDAD OFENSIVA (REGATES Y CONDUCCIONES)
+    # ========================================================================
+    
+    if 'regates' in df.columns and 'min_partido' in df.columns:
+        df['dribbles_per_90'] = (
+            df['regates'] / (df['min_partido'] / 90.0 + 0.1)
+        ).fillna(0)
+    
+    if 'conducciones' in df.columns and 'min_partido' in df.columns:
+        df['dribble_intensity'] = df.groupby('player')['conducciones'].transform(
+            lambda x: x.shift().rolling(5, min_periods=1).mean()
+        ).fillna(0)
+    
+    if 'conducciones_progresivas' in df.columns and 'min_partido' in df.columns:
+        df['progressive_action_rate'] = (
+            df['conducciones_progresivas'] / (df['min_partido'] / 90.0 + 0.1)
+        ).fillna(0)
+        
+        if verbose:
+            print("   ✅ Offensive activity metrics")
+    
+    # ========================================================================
+    # 3. DEFENSA Y RECUPERACIÓN (EQUILIBRIO)
+    # ========================================================================
+    
+    if 'entradas' in df.columns and 'intercepciones' in df.columns:
+        df['defensive_actions_total'] = df['entradas'] + df['intercepciones']
+        
+        df['defensive_contribution'] = df.groupby('player')['defensive_actions_total'].transform(
+            lambda x: x.shift().ewm(span=5, adjust=False).mean()
+        ).fillna(0)
+        
+        if verbose:
+            print("   ✅ Defensive recovery metrics")
+    
+    # ========================================================================
+    # 4. CREACIÓN DE JUEGO (IMPACTO OFENSIVO)
+    # ========================================================================
+    
+    # Equilibrio entre pases completados y actividad defensiva
+    if 'pases_totales' in df.columns and 'entradas' in df.columns:
+        df['creative_vs_defensive'] = (
+            df.groupby('player')['pases_totales'].transform(lambda x: x.shift().rolling(5, min_periods=1).mean())
+            / (df.groupby('player')['entradas'].transform(lambda x: x.shift().rolling(5, min_periods=1).mean()) + 1)
+        ).fillna(0)
+        
+        if verbose:
+            print("   ✅ Creative impact index")
+    
+    # ========================================================================
+    # 5. CONSISTENCIA (Volatility indicator - sin leakage)
+    # ========================================================================
+    
+    if 'puntos_fantasy' in df.columns or 'puntos_fantasy' in df.columns:
+        col_pf = 'puntos_fantasy'
+        col_pf = col_pf if col_pf in df.columns else 'puntos_fantasy'
+        
+        if col_pf in df.columns:
+            df['pf_volatility_5'] = df.groupby('player')[col_pf].transform(
+                lambda x: x.shift().rolling(5, min_periods=2).std()
+            ).fillna(0)
+            
+            df['pf_consistency'] = 1.0 / (1.0 + df['pf_volatility_5'])
+            
+            if verbose:
+                print("   ✅ Consistency metrics")
+    
+    # ========================================================================
+    # 6. REGATES SUCCESS RATE (Sin leakage)
+    # ========================================================================
+    
+    if 'regates_completados' in df.columns and 'regates' in df.columns:
+        total_dribbles = df['regates'] + 0.1
+        df['dribble_success_pct'] = (df['regates_completados'] / total_dribbles * 100).fillna(0)
+        
+        df['dribble_confidence'] = df.groupby('player')['dribble_success_pct'].transform(
+            lambda x: x.shift().ewm(span=5, adjust=False).mean()
+        ).fillna(50)
+        
+        if verbose:
+            print("   ✅ Dribble success metrics")
+    
+    # ========================================================================
+    # 7. OVERALL ACTIVITY INDEX (Actividad general)
+    # ========================================================================
+    
+    activity_components = []
+    
+    if 'pases_totales' in df.columns:
+        activity_components.append(df['pases_totales'])
+    
+    if 'entradas' in df.columns:
+        activity_components.append(df['entradas'])
+    
+    if 'regates' in df.columns:
+        activity_components.append(df['regates'])
+    
+    if 'conducciones' in df.columns:
+        activity_components.append(df['conducciones'])
+    
+    if activity_components:
+        df['overall_activity'] = pd.concat(activity_components, axis=1).sum(axis=1)
+        
+        if verbose:
+            print("   ✅ Overall activity index")
+    
+    # ========================================================================
+    # 8. FORM AND MINUTES (Disponibilidad x Forma)
+    # ========================================================================
+    
+    if 'minutes_pct_ewma5' in df.columns and 'pf_ewma5' in df.columns:
+        df['playing_time_form_combo'] = (
+            df['minutes_pct_ewma5'] * df['pf_ewma5']
+        ).fillna(0)
+        
+        if verbose:
+            print("   ✅ Form adaptation metrics")
+    
+    # Rellenar NaNs con 0
+    df = df.fillna(0).replace([np.inf, -np.inf], 0)
+    
+    if verbose:
+        print(f"\n✅ Fase 2 completada - Features MC creados\n")
+    
+    return df
+
+
+# ============================================================================
 # PARTE 3: SELECCIÓN DE FEATURES POR CORRELACIÓN (COMÚN)
 # ============================================================================
 
@@ -521,6 +701,18 @@ def seleccionar_features_por_correlacion(
             continue
         
         try:
+            # Debug: show diagnostics for problematic opp_form columns
+            if col in ('opp_form_roll5', 'opp_form_ewma5'):
+                vals = X.loc[mask, col]
+                try:
+                    unique = vals.nunique()
+                    std = vals.std()
+                    mn = vals.min()
+                    mx = vals.max()
+                except Exception:
+                    unique = None; std = None; mn = None; mx = None
+                print(f"[DEBUG] Col={col} mask_sum={mask.sum()} unique={unique} std={std} min={mn} max={mx}")
+
             corr, pval = spearmanr(X.loc[mask, col], y[mask])
             abs_corr = abs(corr) if not np.isnan(corr) else 0.0
             
