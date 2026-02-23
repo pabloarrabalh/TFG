@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-=e=%5h-+b5tfh3u#eudd3d50jef1mup6p0)fia9zxg-dd3)r&7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -42,11 +42,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'main',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -166,3 +168,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Autenticación
 LOGIN_URL = 'login_register'
 LOGIN_REDIRECT_URL = 'menu'
+
+# CORS / CSRF configuration for React frontend (http://localhost:5173)
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+]
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+]
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = False  # JS needs to read the CSRF token
+SESSION_COOKIE_HTTPONLY = True
+X_FRAME_OPTIONS = 'SAMEORIGIN'

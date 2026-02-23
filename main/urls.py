@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from . import api_endpoints
+from . import api_views
 
 urlpatterns = [
     path('', views.menu, name='menu'),
@@ -30,7 +31,7 @@ urlpatterns = [
     path('mi-plantilla/<int:plantilla_id>/eliminar/', views.eliminar_plantilla, name='eliminar_plantilla'),
     path('mi-plantilla/<int:plantilla_id>/renombrar/', views.renombrar_plantilla, name='renombrar_plantilla'),
     path('terms-conditions/', views.terms_conditions, name='terms_conditions'),
-    # API Endpoints
+    # API Endpoints (existing)
     path('api/radar/<int:jugador_id>/<str:temporada>/', api_endpoints.api_radar_jugador, name='api_radar_jugador'),
     path('api/buscar/', api_endpoints.api_buscar, name='api_buscar'),
     path('api/favoritos/toggle/', api_endpoints.api_toggle_favorito, name='api_toggle_favorito'),
@@ -38,4 +39,30 @@ urlpatterns = [
     path('api/predecir-jugador/', views.predecir_jugador_api, name='predecir_jugador_api'),
     path('api/explicar-prediccion/', views.explicar_prediccion_portero_api, name='explicar_prediccion_portero_api'),
     path('api/cambiar-jornada/', views.cambiar_jornada_api, name='cambiar_jornada_api'),
+
+    # ── React Frontend JSON API ──────────────────────────────────────────────
+    path('api/me/', api_views.api_me, name='api_me'),
+    path('api/auth/login/', api_views.api_login, name='api_auth_login'),
+    path('api/auth/logout/', api_views.api_logout, name='api_auth_logout'),
+    path('api/auth/register/', api_views.api_register, name='api_auth_register'),
+    path('api/menu/', api_views.api_menu, name='api_menu'),
+    path('api/clasificacion/', api_views.api_clasificacion, name='api_clasificacion'),
+    path('api/equipos/', api_views.api_equipos, name='api_equipos'),
+    path('api/equipo/<str:equipo_nombre>/', api_views.api_equipo, name='api_equipo'),
+    path('api/jugador/<int:jugador_id>/', api_views.api_jugador, name='api_jugador'),
+    path('api/perfil/', api_views.api_perfil, name='api_perfil'),
+    path('api/perfil/update/', api_views.api_update_perfil, name='api_update_perfil'),
+    path('api/perfil/status/', api_views.api_update_status, name='api_update_status'),
+    path('api/perfil/foto/', api_views.api_upload_photo, name='api_upload_photo'),
+    path('api/favoritos/', api_views.api_favoritos, name='api_favoritos'),
+    path('api/favoritos/toggle-v2/', api_views.api_toggle_favorito_v2, name='api_toggle_favorito_v2'),
+    path('api/favoritos/seleccionar/', api_views.api_select_favorites, name='api_select_favorites'),
+    path('api/favoritos/<int:fav_id>/', api_views.api_delete_favorito, name='api_delete_favorito'),
+    path('api/amigos/', api_views.api_amigos, name='api_amigos'),
+    path('api/amigos/solicitud/', api_views.api_enviar_solicitud, name='api_enviar_solicitud'),
+    path('api/amigos/aceptar/<int:solicitud_id>/', api_views.api_aceptar_solicitud, name='api_aceptar_solicitud'),
+    path('api/amigos/rechazar/<int:solicitud_id>/', api_views.api_rechazar_solicitud, name='api_rechazar_solicitud'),
+    path('api/amigos/eliminar/<int:user_id>/', api_views.api_eliminar_amigo, name='api_eliminar_amigo'),
+    path('api/mi-plantilla/', api_views.api_mi_plantilla, name='api_mi_plantilla'),
+    path('api/mi-plantilla/jugadores/', api_views.api_mi_plantilla_jugadores, name='api_mi_plantilla_jugadores'),
 ]

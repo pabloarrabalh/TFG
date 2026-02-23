@@ -24,7 +24,7 @@ if not django.apps.apps.ready:
     django.setup()
 
 from main.models import Jugador, EstadisticasPartidoJugador, Jornada, Temporada
-from explicaciones_posiciones import generar_explicaciones_features
+from explicaciones_unificadas import generar_explicaciones_features
 
 DIRECTORIO_MODELOS = Path(__file__).parent.parent.parent / "csv/csvGenerados/entrenamiento/mediocampista/modelos"
 
@@ -290,13 +290,7 @@ def predecir_puntos_mediocampista(jugador_id, jornada_actual=None, verbose=False
             pass
         
         # Generar explicaciones basadas en features usados con impacto numérico
-        explicaciones_dict = generar_explicaciones_features(
-            features, 
-            feature_names,  # Todos los features
-            posicion='MC',
-            modelo=modelo,
-            prediccion_base=prediccion
-        )
+        explicaciones_dict = generar_explicaciones_features(features)
         
         if verbose:
             print(f"✓ MC {jugador_id} J{jornada_actual}: {prediccion:.2f}pt ({features_encontrados} features)")

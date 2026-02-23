@@ -32,7 +32,7 @@ warnings.filterwarnings("ignore")
 sys.path.insert(0, os.path.dirname(__file__))
 from role_enricher import enriquecer_dataframe_con_roles, crear_features_interaccion_roles, calcular_factor_posicion
 from feature_improvements import eliminar_features_ruido, crear_features_fantasy_gk, seleccionar_features_por_correlacion
-from explicaciones_gk import obtener_explicacion, es_valor_alto, EXPLICACIONES_FEATURES
+from explicaciones_unificadas import obtener_explicacion, es_valor_alto, EXPLICACIONES_PORTERO
 
 
 # ============================================================================

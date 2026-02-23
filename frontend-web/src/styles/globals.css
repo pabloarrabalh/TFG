@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   GLOBAL BASE STYLES
+   ============================================================ */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #39ff14;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2ccb10;
+  }
+}
+
+/* ============================================================
+   REUSABLE COMPONENT CLASSES
+   ============================================================ */
+@layer components {
+  /* Glass panel (main card style) */
+  .glass-panel {
+    background: rgba(20, 20, 20, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    transform: translateX(0);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sidebar-hidden {
+    transform: translateX(-100%);
+  }
+
+  /* Hide scrollbar utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Nav active link */
+  .nav-link-active {
+    @apply bg-primary/10 text-primary border border-primary/20 font-bold;
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.1);
+  }
+
+  .nav-link {
+    @apply text-gray-400 hover:bg-white/5 hover:text-white font-medium;
+  }
+
+  /* Custom select */
+  .select-custom {
+    @apply bg-surface-dark border border-border-dark text-white px-4 py-2.5 rounded-lg
+           focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary
+           transition-all cursor-pointer;
+  }
+
+  /* Racha circles (W/D/L streaks) */
+  .racha-circle {
+    @apply inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold text-white mx-0.5;
+  }
+  .racha-g { @apply bg-green-500; }
+  .racha-e { @apply bg-yellow-500; }
+  .racha-p { @apply bg-red-500; }
+
+  /* Stat card */
+  .stat-mini {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgb(75, 85, 99);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  /* Histogram bars */
+  .histogram-bar-positive .histogram-bar-inner {
+    background: linear-gradient(180deg, rgb(52, 211, 153), rgb(16, 185, 129));
+    box-shadow: 0 0 16px rgba(52, 211, 153, 0.5);
+  }
+  .histogram-bar-negative .histogram-bar-inner {
+    background: linear-gradient(180deg, rgb(239, 68, 68), rgb(185, 28, 28));
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.5);
+  }
+
+  /* Login shake animation */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+  }
+
+  .shake { animation: shake 0.5s ease-in-out; }
+
+  /* Custom scrollbar (thin, green) */
+  .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #10b981; border-radius: 9999px; }
+  .custom-scrollbar { scrollbar-width: thin; scrollbar-color: #10b981 transparent; }
+
+  /* League table */
+  .league-table th {
+    @apply px-4 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-left border-b border-white/10;
+  }
+  .league-table td {
+    @apply px-4 py-3 text-sm border-b border-white/5 align-middle;
+  }
+  .league-table tr:last-child td { @apply border-b-0; }
+  .league-table tr:hover td { @apply bg-white/5; }
+  .league-table tr:hover td:first-child { @apply text-primary; }
+}

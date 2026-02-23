@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from .models import (Temporada, Jornada, ClasificacionJornada, Equipo, HistorialEquiposJugador, 
                      EquipoJugadorTemporada, Partido, EstadisticasPartidoJugador, Jugador, Calendario, Plantilla)
 from django.db.models import Sum, Count, F, Case, When, FloatField, Q, Avg
@@ -150,7 +151,7 @@ def menu(request):
     return render(request, 'menu.html', context)
 
 @login_required(login_url='login_register')
-@login_required(login_url='login_register')
+@xframe_options_sameorigin
 def mi_plantilla(request):
     """Vista de Mi Plantilla - Requiere autenticación"""
     import json
@@ -593,10 +594,10 @@ def get_racha_detalles(equipo, temporada, jornada_actual):
             resultado = 'V'
             titulo = f"Victoria vs {rival} {goles_propios}-{goles_rival}"
         elif goles_propios < goles_rival:
-            resultado = 'L'
+            resultado = 'D'
             titulo = f"Derrota vs {rival} {goles_propios}-{goles_rival}"
         else:
-            resultado = 'D'
+            resultado = 'E'
             titulo = f"Empate vs {rival} {goles_propios}-{goles_rival}"
         
         racha_detalles.append({
@@ -2933,7 +2934,7 @@ def explicar_prediccion_portero_api(request):
                 'rango_min': float(resultado.get('rango_min')) if resultado.get('rango_min') is not None else None,
                 'rango_max': float(resultado.get('rango_max')) if resultado.get('rango_max') is not None else None,
                 'jornada': int(resultado.get('jornada', jornada)),
-                'features_impacto': resultado.get('features_impacto', []),
+                'features_impacto': resultado.get('explicaciones', resultado.get('features_impacto', [])),
                 'explicacion_texto': resultado.get('explicacion_texto', ''),
                 'error': None
             })
@@ -2988,13 +2989,17 @@ def predecir_jugador_api(request):
         # Parsear JSON
         body_data = request.body.decode('utf-8') if isinstance(request.body, bytes) else request.body
         data = json.loads(body_data)
+        logger.info(f"[API-GENERAL] Request body: {data}")
         
         jugador_id = data.get('jugador_id')
         jornada = data.get('jornada', None)
         posicion_param = data.get('posicion')
         modelo_tipo = data.get('modelo', 'RF')
         
+        logger.info(f"[API-GENERAL] jugador_id={jugador_id}, jornada={jornada}, posicion_param={posicion_param}")
+        
         if not jugador_id:
+            logger.error(f"[API-GENERAL] jugador_id es requerido, recibido: {jugador_id}")
             return JsonResponse({
                 'status': 'error',
                 'error': 'jugador_id es requerido'
@@ -3004,7 +3009,9 @@ def predecir_jugador_api(request):
         try:
             jugador = Jugador.objects.get(id=jugador_id)
             nombre_jugador = f"{jugador.nombre} {jugador.apellido}".strip()
+            logger.info(f"[API-GENERAL] Jugador encontrado: {nombre_jugador} (id={jugador_id})")
         except Jugador.DoesNotExist:
+            logger.error(f"[API-GENERAL] Jugador no encontrado: id={jugador_id}")
             return JsonResponse({
                 'status': 'error',
                 'error': f'Jugador no encontrado'
@@ -3070,16 +3077,26 @@ def predecir_jugador_api(request):
                     'error': f'Posición desconocida: {posicion}'
                 }, status=400)
         except ImportError as e:
-            logger.error(f"[API] Error importando módulo {modulo_nombre}: {e}")
+            logger.error(f"[API-GENERAL] Error importando módulo {modulo_nombre}: {e}")
             return JsonResponse({
                 'status': 'error',
                 'error': f'Módulo no disponible para {posicion}'
             }, status=500)
         
         # Llamar función de predicción usando el nombre del jugador
-        resultado = predictor_func(nombre_jugador, jornada, verbose=False)
+        logger.info(f"[API-GENERAL] Llamando {modulo_nombre}.{predictor_func.__name__}('{nombre_jugador}', jornada={jornada})")
+        try:
+            resultado = predictor_func(nombre_jugador, jornada, verbose=False)
+            logger.info(f"[API-GENERAL] Resultado predicción: {resultado}")
+        except Exception as e:
+            logger.error(f"[API-GENERAL] Error durante predicción: {e}", exc_info=True)
+            return JsonResponse({
+                'status': 'error',
+                'error': f'Error durante predicción: {str(e)}'
+            }, status=500)
         
         if not isinstance(resultado, dict):
+            logger.error(f"[API-GENERAL] Resultado no es dict: {type(resultado)}")
             return JsonResponse({
                 'status': 'error',
                 'error': 'Resultado inválido'
@@ -3103,14 +3120,17 @@ def predecir_jugador_api(request):
                 'jornada': int(resultado.get('jornada', jornada or 0)),
                 'posicion': posicion,
                 'modelo': resultado.get('modelo', 'Random Forest'),
-                'margen': float(resultado.get('margen', 0))
+                'margen': float(resultado.get('margen', 0)),
+                'features_impacto': resultado.get('features_impacto', []),
+                'explicacion_texto': resultado.get('explicacion_texto', '')
             })
     
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
+        logger.error(f"[API-GENERAL] JSON inválido: {e}")
         return JsonResponse({'status': 'error', 'error': 'JSON inválido'}, status=400)
     except ImportError as e:
         logger.error(f"[API-GENERAL] Error importando: {e}")
         return JsonResponse({'status': 'error', 'error': f'Módulo no disponible'}, status=500)
     except Exception as e:
-        logger.error(f"[API-GENERAL] Error: {e}", exc_info=True)
+        logger.error(f"[API-GENERAL] Error general: {e}", exc_info=True)
         return JsonResponse({'status': 'error', 'error': str(e)}, status=500)

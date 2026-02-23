@@ -40,26 +40,37 @@ def shield_name(value):
     
     # Convertir a minúsculas
     shield = value.lower().strip()
-    
+
     # Remover acentos PRIMERO (antes de buscar prefijos)
     shield = ''.join(
         c for c in unicodedata.normalize('NFD', shield)
         if unicodedata.category(c) != 'Mn'
     )
     
+    # Casos específicos para equipos
+    special_cases = {
+        'atletico': 'atletico',
+        'athletic': 'athletic_club',
+        'rayo': 'rayo_vallecano',
+        'celta': 'celta',
+    }
+    for key, replacement in special_cases.items():
+        if shield.startswith(key):
+            return replacement
+
     # Remover prefijos comunes (solo "real ", NO "atletico")
     prefixes = ['fc ', 'rcd ', 'cd ', 'cf ', 'sd ', 'ef ', 'ca ', 'ud ', 'real ']
     for prefix in prefixes:
         if shield.startswith(prefix):
             shield = shield[len(prefix):]
             break
-    
+
     # Reemplazar espacios con guiones bajos
     shield = shield.replace(' ', '_')
     
     # Remover caracteres especiales (mantener solo alfanuméricos y guiones bajos)
     shield = ''.join(c if c.isalnum() or c == '_' else '' for c in shield)
-    
+
     return shield
 
 

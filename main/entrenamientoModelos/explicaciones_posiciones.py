@@ -4,36 +4,104 @@ Módulo de Explicaciones Genéricas para Defensas, Mediocampistas y Delanteros
 Define frases de explicación para features según su impacto
 """
 
-# Explicaciones genéricas para diferentes positions
+# Explicaciones detalladas para defensas
 EXPLICACIONES_FEATURES_DF = {
-    'tackles_roll5': {'alto': '📈 Ha hecho muchas entradas', 'bajo': '📉 Pocas entradas recientes'},
-    'intercepts_roll5': {'alto': '📈 Muchas intercepciones', 'bajo': '📉 Pocas intercepciones'},
-    'duels_roll5': {'alto': '📈 Muy participativo en duelos', 'bajo': '📉 Poco participativo'},
-    'clearances_roll5': {'alto': '📈 Muchos despejes defensivos', 'bajo': '📉 Pocos despejes'},
-    'defensive_actions_total': {'alto': '📈 Muchas acciones defensivas', 'bajo': '📉 Pocas acciones defensivas'},
-    'is_home': {'alto': '📈 Juega en su estadio', 'bajo': '📉 Juega fuera de casa'},
-    'minutes_pct_roll5': {'alto': '📈 Juega muchos minutos', 'bajo': '📉 Juega poco tiempo'},
+    'tackles_roll5': {
+        'alto': '💪 Está muy activo defensivamente! Ha hecho muchas entradas y recuperaciones en los últimos partidos',
+        'bajo': '⚠️ Ha estado poco activo en las recuperaciones defensivas recientemente'
+    },
+    'intercepts_roll5': {
+        'alto': '🎯 Excelente lectura defensiva! Anticipa bien los pases del rival y roba balones',
+        'bajo': '👀 No está leyendo bien el juego defensivo, se le escapan muchos balones'
+    },
+    'duels_roll5': {
+        'alto': '🥊 Es muy competitivo! Gana la mayoría de sus duelos aéreos y terrestres',
+        'bajo': '😟 Le cuesta ganar los duelos, está perdiendo muchas disputas de balón'
+    },
+    'clearances_roll5': {
+        'alto': '🚀 Despejes seguros! Es efectivo sacando el balón del área de peligro',
+        'bajo': '❌ Sus despejes no son efectivos, deja el balón cerca del área'
+    },
+    'defensive_actions_total': {
+        'alto': '🛡️ Defensivamente es un roca! Realiza muchas acciones defensivas por partido',
+        'bajo': '😴 Poco activo defensivamente, hace pocas acciones de recuperación'
+    },
+    'is_home': {
+        'alto': '🏠 Juega en su estadio! Ventaja clara, mejor ambiente y conocimiento del terreno',
+        'bajo': '🚌 Juega fuera de casa, terreno desconocido y menos apoyo'
+    },
+    'minutes_pct_roll5': {
+        'alto': '⏱️ Es indiscutible! Juega prácticamente todos los minutos disponibles',
+        'bajo': '🔄 Está compartiendo titularidad o viene con poca participación'
+    },
 }
 
+# Explicaciones detalladas para mediocampistas
 EXPLICACIONES_FEATURES_MC = {
-    'passes_roll5': {'alto': '📈 Muchos pases completados', 'bajo': '📉 Pocos pases'},
-    'pass_comp_pct_roll5': {'alto': '📈 Muy buena precisión de pases', 'bajo': '📉 Baja precisión de pases'},
-    'dribbles_roll5': {'alto': '📈 Muchos regates completados', 'bajo': '📉 Pocos regates'},
-    'tackles_roll5': {'alto': '📈 Contribuye en defensa', 'bajo': '📉 Poco aporte defensivo'},
-    'key_passes_roll5': {'alto': '📈 Muchos pases clave', 'bajo': '📉 Pocos pases clave'},
-    'is_home': {'alto': '📈 Juega en su estadio', 'bajo': '📉 Juega fuera de casa'},
-    'minutes_pct_roll5': {'alto': '📈 Juega muchos minutos', 'bajo': '📉 Juega poco tiempo'},
+    'passes_roll5': {
+        'alto': '🎮 Es un controlador del juego! Da muchos pases y domina la posesión',
+        'bajo': '🤐 Poco toque de balón, no está implicado mucho en la construcción del juego'
+    },
+    'pass_comp_pct_roll5': {
+        'alto': '✅ Muy preciso en sus pases! Completa un altísimo porcentaje de sus intentos',
+        'bajo': '❌ Baja precisión en pases, completa menos del 75% de intentos'
+    },
+    'dribbles_roll5': {
+        'alto': '🏃 Es ágil y dinámico! Completa muchos regates y progresa con el balón',
+        'bajo': '🐌 Poco regateador, opta por pasar antes que driblar'
+    },
+    'tackles_roll5': {
+        'alto': '⚔️ Contribuye mucho en defensa! Es un mediocentro completo y equilibrado',
+        'bajo': '🚫 No ayuda mucho en defensa, más ofensivo que defensivo'
+    },
+    'key_passes_roll5': {
+        'alto': '👟 Genial pasador! Crea muchas ocasiones claras para sus compañeros',
+        'bajo': '😶 Pocas asistencias, no está generando juego ofensivo'
+    },
+    'is_home': {
+        'alto': '🏠 Juega en su estadio! Mayor confianza y ambiente favorable',
+        'bajo': '🚌 Juega fuera, ambiente hostil y terreno menos conocido'
+    },
+    'minutes_pct_roll5': {
+        'alto': '⛹️ Es titular indiscutible! Juega casi todos los partidos y minutos',
+        'bajo': '⏸️ Poco tiempo de juego, comparte titularidad o está en rotación'
+    },
 }
 
+# Explicaciones detalladas para delanteros
 EXPLICACIONES_FEATURES_DT = {
-    'goals_roll5': {'alto': '📈 Goles recientes', 'bajo': '📉 Sin goles recientes'},
-    'xg_roll5': {'alto': '📈 Espera buenos disparos', 'bajo': '📉 Pocas oportunidades esperadas'},
-    'shots_roll5': {'alto': '📈 Muchos disparos', 'bajo': '📉 Pocos disparos'},
-    'shots_on_target_roll5': {'alto': '📈 Precisión en disparo', 'bajo': '📉 Baja precisión'},
-    'dribbles_roll5': {'alto': '📈 Muchos regates', 'bajo': '📉 Pocos regates'},
-    'key_passes_roll5': {'alto': '📈 Contribuye con asistencias', 'bajo': '📉 Pocas asistencias'},
-    'is_home': {'alto': '📈 Juega en su estadio', 'bajo': '📉 Juega fuera de casa'},
-    'minutes_pct_roll5': {'alto': '📈 Juega todos los minutos', 'bajo': '📉 Juega poco tiempo'},
+    'goals_roll5': {
+        'alto': '⚡ Está en racha goleadora! Ha marcado recientemente y está muy en forma',
+        'bajo': '😞 Sequía de goles, hace tiempo que no marca'
+    },
+    'xg_roll5': {
+        'alto': '🎯 Recibe muchas oportunidades claras! El equipo le genera ocasiones de calidad',
+        'bajo': '❌ Pocas oportunidades, no está recibiendo balones en zona de remate'
+    },
+    'shots_roll5': {
+        'alto': '💥 Muy intento en ataque! Tira mucho a puerta e intenta crear oportunidades',
+        'bajo': '🚫 Poco intento, no está generando suficientes remates'
+    },
+    'shots_on_target_roll5': {
+        'alto': '🎪 Puntería excelente! Sus disparos van directos a puerta',
+        'bajo': '🎲 Poca precisión, muchos disparos fuera u obstruidos'
+    },
+    'dribbles_roll5': {
+        'alto': '🌪️ Es un extremo muy diferencial! Regate y crea espacios con facilidad',
+        'bajo': '🚶 No está driblan mucho, prefiere juego más directo'
+    },
+    'key_passes_roll5': {
+        'alto': '🤝 Excelente equipo player! Genera asistencias además de goles',
+        'bajo': '🤐 Poco generador, se enfoca solo en el gol personal'
+    },
+    'is_home': {
+        'alto': '🏠 Juega en su estadio! Confianza y apoyo del público',
+        'bajo': '🚌 Juega fuera, ambiente más complicado'
+    },
+    'minutes_pct_roll5': {
+        'alto': '🔥 Titularidad asegurada! Juega prácticamente todos los minutos',
+        'bajo': '⏱️ Poco tiempo de juego, suplente o en rotación'
+    },
 }
 
 
