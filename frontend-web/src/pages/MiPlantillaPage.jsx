@@ -232,6 +232,8 @@ export default function MiPlantillaPage() {
       if (data.status === 'success') {
         setJugadoresDisponibles(data.jugadores_por_posicion)
         setJornadaActual(jornada)
+        setPredicciones({})
+        fetchingRef.current.clear()
         localStorage.setItem('jornadaActual', String(jornada))
         // Extraer equipos únicos
         const eqMap = new Map()
@@ -431,12 +433,17 @@ export default function MiPlantillaPage() {
     mostrarNotif('✓ Nueva plantilla (aún no guardada)', 'info')
   }
 
+  // Ref para rastrear qué jugadores ya tienen petición en vuelo
+  const fetchingRef = useRef(new Set())
+
   // ── Predicciones ─────────────────────────────────────────────────────────
   async function cargarPredicciones() {
-    const todos = [...POSICIONES.flatMap(p => alineacion[p] || []), ...(alineacion.Suplentes || [])].filter(Boolean)
+    const todos = [...POSICIONES.flatMap(p => alineacion[p] || [])].filter(Boolean)
     if (!todos.length) return
     for (const jug of todos) {
       if (predicciones[jug.id] !== undefined) continue
+      if (fetchingRef.current.has(jug.id)) continue
+      fetchingRef.current.add(jug.id)
       try {
         const payload = { jugador_id: jug.id, jornada: jornadaActual, posicion: jug.posicion }
         console.log('[PRED] Enviando:', payload)
@@ -452,6 +459,8 @@ export default function MiPlantillaPage() {
         else if (data.error) console.error('[PRED] Error:', data.error)
       } catch (e) {
         console.error('[PRED] Excepción:', e)
+      } finally {
+        fetchingRef.current.delete(jug.id)
       }
     }
   }
@@ -466,7 +475,7 @@ export default function MiPlantillaPage() {
         body = JSON.stringify({ jugador_id: jugador.id, jornada: jornadaActual, modelo: 'RF' })
       } else {
         url = `${BACKEND}/api/predecir-jugador/`
-        body = JSON.stringify({ jugador_id: jugador.id, jornada: jornadaActual })
+        body = JSON.stringify({ jugador_id: jugador.id, jornada: jornadaActual, posicion: jugador.posicion })
       }
       const res = await fetch(url, {
         method: 'POST',
@@ -697,8 +706,8 @@ export default function MiPlantillaPage() {
             )
           })()}
 
-          {/* ── Indicador posiciones (bottom-right) ── */}
-          <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-3 space-y-1.5">
+          {/* ── Indicador posiciones (bottom-left) ── */}
+          <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-3 space-y-1.5">
             {[...POSICIONES, 'Suplentes'].map(pos => {
               const slots = pos === 'Suplentes' ? 5 : (cfg[pos] || 1)
               const filled = (alineacion[pos] || []).filter(Boolean).length
@@ -855,25 +864,46 @@ export default function MiPlantillaPage() {
                 ) : detPrediccion != null ? (
                   <div>
                     <div className="text-2xl font-black text-yellow-400 mb-3">{Number(detPrediccion).toFixed(2)} pts</div>
-                    {detFeaturesImpacto.length > 0 && (
-                      <div>
-                        <p className="text-xs font-bold text-blue-300 mb-2 uppercase tracking-wider">Factores clave</p>
-                        <div className="space-y-1.5 max-h-52 overflow-y-auto pr-1">
-                          {detFeaturesImpacto.map((f, i) => {
-                            const signedImpact = f.direccion === 'negativo' ? -Math.abs(f.impacto) : Math.abs(f.impacto)
-                            const isPos = signedImpact >= 0
-                            return (
-                              <div key={i} className={`flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 ${isPos ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'}`}>
-                                <span className="text-white/85 text-xs leading-tight flex-1">{f.explicacion || f.feature}</span>
-                                <span className={`text-xs font-black whitespace-nowrap ${isPos ? 'text-green-400' : 'text-red-400'}`}>
-                                  {isPos ? '+' : ''}{signedImpact.toFixed(2)} pts
-                                </span>
+                    {detFeaturesImpacto.length > 0 && (() => {
+                      const positivos = detFeaturesImpacto
+                        .filter(f => (f.impacto ?? f.impacto_pts ?? 0) > 0)
+                        .sort((a, b) => Math.abs(b.impacto ?? b.impacto_pts ?? 0) - Math.abs(a.impacto ?? a.impacto_pts ?? 0))
+                        .slice(0, 3)
+                      const negativos = detFeaturesImpacto
+                        .filter(f => (f.impacto ?? f.impacto_pts ?? 0) < 0)
+                        .sort((a, b) => Math.abs(b.impacto ?? b.impacto_pts ?? 0) - Math.abs(a.impacto ?? a.impacto_pts ?? 0))
+                        .slice(0, 3)
+                      return (
+                        <div className="space-y-2">
+                          {positivos.length > 0 && (
+                            <div>
+                              <p className="text-xs font-bold text-green-400 mb-1 uppercase tracking-wider">↑ A favor</p>
+                              <div className="space-y-1">
+                                {positivos.map((f, i) => (
+                                  <div key={i} className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 bg-green-500/10 border border-green-500/20">
+                                    <span className="text-white/85 text-xs leading-tight flex-1">{f.explicacion || f.feature}</span>
+                                    <span className="text-xs font-black whitespace-nowrap text-green-400">+{Math.abs(f.impacto).toFixed(2)} pts</span>
+                                  </div>
+                                ))}
                               </div>
-                            )
-                          })}
+                            </div>
+                          )}
+                          {negativos.length > 0 && (
+                            <div>
+                              <p className="text-xs font-bold text-red-400 mb-1 uppercase tracking-wider">↓ En contra</p>
+                              <div className="space-y-1">
+                                {negativos.map((f, i) => (
+                                  <div key={i} className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 bg-red-500/10 border border-red-500/20">
+                                    <span className="text-white/85 text-xs leading-tight flex-1">{f.explicacion || f.feature}</span>
+                                    <span className="text-xs font-black whitespace-nowrap text-red-400">−{Math.abs(f.impacto).toFixed(2)} pts</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    )}
+                      )
+                    })()}
                   </div>
                 ) : predicciones[modalDet.id] != null ? (
                   <div className="text-2xl font-black text-yellow-400">{Number(predicciones[modalDet.id]).toFixed(2)} pts</div>

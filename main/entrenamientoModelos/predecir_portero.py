@@ -1113,7 +1113,7 @@ def explicar_prediccion_portero(jugador_id, jornada_actual=None, modelo_tipo='RF
                 explicaciones_array.append({
                     'feature': feature_name,
                     'valor': float(valor),
-                    'impacto': float(impacto_abs),
+                    'impacto': float(impacto_signed),
                     'direccion': direccion,
                     'explicacion': explicacion_texto_expr
                 })
@@ -1176,10 +1176,11 @@ def explicar_prediccion_portero(jugador_id, jornada_actual=None, modelo_tipo='RF
                     
                     linea = f"{i+1}. {explicacion_texto} (valor: {valor:.2f})"
                     explicacion_lines_fallback.append(linea)
+                    impacto_signed_fb = abs(valor) if es_positivo else -abs(valor)
                     explicaciones_array_fallback.append({
                         'feature': feature_name,
                         'valor': float(valor),
-                        'impacto': abs(valor),
+                        'impacto': float(impacto_signed_fb),
                         'direccion': 'positivo' if es_positivo else 'negativo',
                         'explicacion': explicacion_texto
                     })

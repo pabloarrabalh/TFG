@@ -24,7 +24,7 @@ if not django.apps.apps.ready:
     django.setup()
 
 from main.models import Jugador, EstadisticasPartidoJugador, Jornada, Temporada
-from explicaciones_unificadas import generar_explicaciones_features
+from explicaciones_unificadas import generar_explicaciones_features, preparar_features_para_explicaciones
 
 DIRECTORIO_MODELOS = Path(__file__).parent.parent.parent / "csv/csvGenerados/entrenamiento/delantero/modelos"
 
@@ -199,7 +199,7 @@ def predecir_puntos_delantero(jugador_id, jornada_actual=None, verbose=False):
         ).select_related('partido__jornada').order_by('partido__jornada__numero_jornada')
         
         if not stats_query.exists():
-            return {'error': 'Sin datos históricos', 'jugador_id': jugador_id, 'prediccion': None}
+            return {'jugador_id': jugador_id, 'prediccion': None, 'explicacion_texto': 'Sin datos históricos'}
         
         # Determinar jornada
         if jornada_actual is None:
@@ -212,7 +212,7 @@ def predecir_puntos_delantero(jugador_id, jornada_actual=None, verbose=False):
         )
         
         if not registros_hist.exists():
-            return {'error': 'Sin datos históricos para esta jornada', 'jugador_id': jugador_id, 'prediccion': None}
+            return {'jugador_id': jugador_id, 'prediccion': None, 'explicacion_texto': 'Sin datos históricos para esta jornada'}
         
         # Construir DataFrame desde BD
         data = []
@@ -233,7 +233,7 @@ def predecir_puntos_delantero(jugador_id, jornada_actual=None, verbose=False):
             })
         
         if not data:
-            return {'error': 'No hay datos para procesar', 'jugador_id': jugador_id, 'prediccion': None}
+            return {'jugador_id': jugador_id, 'prediccion': None, 'explicacion_texto': 'No hay datos para procesar'}
         
         df_dts = pd.DataFrame(data)
     
@@ -250,7 +250,7 @@ def predecir_puntos_delantero(jugador_id, jornada_actual=None, verbose=False):
     registros_hist = registros[registros['jornada'] < jornada_actual]
     
     if len(registros_hist) == 0:
-        return {'error': 'Sin datos históricos', 'jugador_id': jugador_id, 'prediccion': None}
+        return {'jugador_id': jugador_id, 'prediccion': None, 'explicacion_texto': 'Sin datos históricos'}
     
     try:
         features = construir_features_delantero_completos(registros_hist)
@@ -287,7 +287,8 @@ def predecir_puntos_delantero(jugador_id, jornada_actual=None, verbose=False):
             pass
         
         # Generar explicaciones basadas en features usados con impacto numérico
-        explicaciones_dict = generar_explicaciones_features(features)
+        features_para_explicacion = preparar_features_para_explicaciones(features)
+        explicaciones_dict = generar_explicaciones_features(features_para_explicacion)
         
         if verbose:
             print(f"✓ DT {jugador_id} J{jornada_actual}: {prediccion:.2f}pt ({features_encontrados} features)")

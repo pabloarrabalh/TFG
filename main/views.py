@@ -3084,9 +3084,9 @@ def predecir_jugador_api(request):
             }, status=500)
         
         # Llamar función de predicción usando el nombre del jugador
-        logger.info(f"[API-GENERAL] Llamando {modulo_nombre}.{predictor_func.__name__}('{nombre_jugador}', jornada={jornada})")
+        logger.info(f"[API-GENERAL] Llamando {modulo_nombre}.{predictor_func.__name__}(id={jugador_id}, nombre='{nombre_jugador}', jornada={jornada})")
         try:
-            resultado = predictor_func(nombre_jugador, jornada, verbose=False)
+            resultado = predictor_func(jugador_id, jornada, verbose=False)
             logger.info(f"[API-GENERAL] Resultado predicción: {resultado}")
         except Exception as e:
             logger.error(f"[API-GENERAL] Error durante predicción: {e}", exc_info=True)

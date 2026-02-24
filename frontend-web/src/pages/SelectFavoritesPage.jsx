@@ -93,7 +93,7 @@ export default function SelectFavoritesPage() {
                       : 'border-border-dark bg-surface-dark group-hover:border-primary/50'
                   }`}
                 >
-                  <TeamShield name={equipo.escudo || equipo.nombre} size={64} className="w-3/4 h-3/4 object-contain" />
+                  <TeamShield escudo={equipo.escudo} nombre={equipo.nombre} size={64} className="w-3/4 h-3/4 object-contain" />
                   {isFav && (
                     <div className="absolute top-2 right-2">
                       <span className="material-symbols-outlined text-primary text-lg">check_circle</span>

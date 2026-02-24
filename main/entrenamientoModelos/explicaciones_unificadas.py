@@ -247,13 +247,29 @@ def es_valor_alto(feature_name, valor):
         return valor > 1.0
 
 
+def preparar_features_para_explicaciones(data):
+    if isinstance(data, dict):
+        features_list = []
+        for feature, valor in data.items():
+            if valor is None:
+                continue
+            try:
+                valor_num = float(valor)
+            except (ValueError, TypeError):
+                continue
+            features_list.append({'feature': feature, 'valor': valor_num, 'es_alto': es_valor_alto(feature, valor_num)})
+        return features_list
+    if isinstance(data, list):
+        return data
+    return []
+
+
 def generar_explicaciones_features(features_data):
-    """
-    Genera explicaciones detalladas para los features de un predictor.
-    
+    """Genera explicaciones para los features de un predictor.
+
     Args:
         features_data: Lista de dicts con keys: feature, valor, impacto_pts, es_alto
-    
+
     Returns:
         dict: {
             'features_impacto': [list of dicts with feature, impacto, explicacion],
