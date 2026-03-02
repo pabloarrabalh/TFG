@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from . import api_endpoints
 from . import api_views
+from . import drf_views
 
 urlpatterns = [
     path('', views.menu, name='menu'),
@@ -47,6 +48,7 @@ urlpatterns = [
     path('api/auth/register/', api_views.api_register, name='api_auth_register'),
     path('api/menu/', api_views.api_menu, name='api_menu'),
     path('api/clasificacion/', api_views.api_clasificacion, name='api_clasificacion'),
+    path('api/top-jugadores-por-posicion/', api_views.api_top_jugadores_por_posicion, name='api_top_jugadores_por_posicion'),
     path('api/equipos/', api_views.api_equipos, name='api_equipos'),
     path('api/equipo/<str:equipo_nombre>/', api_views.api_equipo, name='api_equipo'),
     path('api/jugador/<int:jugador_id>/', api_views.api_jugador, name='api_jugador'),
@@ -63,6 +65,30 @@ urlpatterns = [
     path('api/amigos/aceptar/<int:solicitud_id>/', api_views.api_aceptar_solicitud, name='api_aceptar_solicitud'),
     path('api/amigos/rechazar/<int:solicitud_id>/', api_views.api_rechazar_solicitud, name='api_rechazar_solicitud'),
     path('api/amigos/eliminar/<int:user_id>/', api_views.api_eliminar_amigo, name='api_eliminar_amigo'),
+    path('api/amigos/<int:user_id>/plantillas/', api_views.api_plantillas_amigo, name='api_plantillas_amigo'),
     path('api/mi-plantilla/', api_views.api_mi_plantilla, name='api_mi_plantilla'),
     path('api/mi-plantilla/jugadores/', api_views.api_mi_plantilla_jugadores, name='api_mi_plantilla_jugadores'),
+    path('api/notificaciones/', api_views.api_notificaciones, name='api_notificaciones'),
+    path('api/notificaciones/leer-todas/', api_views.api_marcar_todas_leidas, name='api_marcar_todas_leidas'),
+    path('api/notificaciones/<int:notif_id>/leer/', api_views.api_marcar_notificacion_leida, name='api_marcar_notificacion_leida'),
+    path('api/notificaciones/<int:notif_id>/borrar/', api_views.api_borrar_notificacion, name='api_borrar_notificacion'),
+    path('api/notificaciones/borrar-todas/', api_views.api_borrar_todas_notificaciones, name='api_borrar_todas_notificaciones'),
+    path('api/perfil/preferencias-notificaciones/', api_views.api_update_preferencias_notificaciones, name='api_update_preferencias_notificaciones'),
+    path('api/plantilla/<int:plantilla_id>/privacidad/', api_views.api_toggle_privacidad_plantilla, name='api_toggle_privacidad_plantilla'),
+    path('api/plantilla/<int:plantilla_id>/predeterminada/', api_views.api_set_plantilla_predeterminada, name='api_set_plantilla_predeterminada'),
+    path('api/plantillas/privacidad/', api_views.api_mis_plantillas_privacidad, name='api_mis_plantillas_privacidad'),
+
+    # ── REST API v2 (DRF) ────────────────────────────────────────────────────
+    # Jugadores
+    path('api/v2/jugadores/', drf_views.JugadorListView.as_view(), name='v2_jugadores'),
+    path('api/v2/jugadores/<int:jugador_id>/', drf_views.JugadorDetailView.as_view(), name='v2_jugador_detail'),
+    path('api/v2/jugadores/<int:jugador_id>/predicciones/', drf_views.JugadorPrediccionesView.as_view(), name='v2_jugador_predicciones'),
+    # Equipos
+    path('api/v2/equipos/', drf_views.EquipoListView.as_view(), name='v2_equipos'),
+    path('api/v2/equipos/<str:equipo_nombre>/', drf_views.EquipoDetailView.as_view(), name='v2_equipo_detail'),
+    # Otros recursos
+    path('api/v2/clasificacion/', drf_views.clasificacion_view, name='v2_clasificacion'),
+    path('api/v2/jornadas/', drf_views.jornadas_view, name='v2_jornadas'),
+    # Predicciones (escritura autenticada)
+    path('api/v2/predicciones/', drf_views.PrediccionCreateView.as_view(), name='v2_predicciones'),
 ]

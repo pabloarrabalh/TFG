@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import apiClient from '../../services/apiClient'
+import NotificacionesBell from '../ui/NotificacionesBell'
 
 const BACKEND = 'http://localhost:8000'
 
@@ -100,8 +101,10 @@ export default function Header({ onToggleSidebar }) {
         )}
       </div>
 
-      {/* Right: user */}
-      {user ? (
+      {/* Right: bell + user */}
+      <div className="flex items-center gap-2">
+        {user && <NotificacionesBell />}
+        {user ? (
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen((o) => !o)}
@@ -142,11 +145,12 @@ export default function Header({ onToggleSidebar }) {
           )}
         </div>
       ) : (
-        <Link to="/login" className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-primary to-green-500 hover:from-green-500 hover:to-primary rounded-lg transition-all font-bold text-sm text-black shadow-neon">
-          <span className="material-symbols-outlined text-sm">login</span>
-          <span>Iniciar Sesión</span>
-        </Link>
-      )}
+          <Link to="/login" className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-primary to-green-500 hover:from-green-500 hover:to-primary rounded-lg transition-all font-bold text-sm text-black shadow-neon">
+            <span className="material-symbols-outlined text-sm">login</span>
+            <span>Iniciar Sesión</span>
+          </Link>
+        )}
+      </div>
     </header>
   )
 }

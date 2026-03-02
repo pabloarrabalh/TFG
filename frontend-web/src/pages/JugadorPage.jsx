@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import api from '../services/apiClient'
+import HelpButton from '../components/ui/HelpButton'
+import '../styles/jugador.css'
 
 // Caché de banderas
 const flagCache = JSON.parse(localStorage.getItem('flag_cache') || '{}')
@@ -64,6 +66,7 @@ export default function JugadorPage() {
   const [radarLoading, setRadarLoading] = useState(false)
   const radarContainerRef = useRef(null)
   const chartInstanceRef = useRef(null)
+  const histogramScrollRef = useRef(null)
   
   const [comparisonData, setComparisonData] = useState(null)
   const [season1, setSeason1] = useState('')
@@ -84,7 +87,7 @@ export default function JugadorPage() {
       const { data: d } = await api.get(`/api/jugador/${id}/?temporada=${temporada}`)
       setData(d)
     } catch (e) {
-      console.error('Error loading jugador:', e)
+      // Error loading jugador
     } finally {
       setLoading(false)
     }
@@ -196,15 +199,19 @@ export default function JugadorPage() {
       const response = await api.get(`/api/radar/${id}/${tempDb}/`)
       
       if (response.data && response.data.status === 'success') {
-        renderRadar(response.data.data.radar_values, response.data.data.media_general)
+        renderRadar(
+          response.data.data.radar_values,
+          response.data.data.media_general,
+          response.data.data.labels,
+        )
       }
     } catch (error) {
-      console.error('Error loading radar:', error)
+      // Error loading radar
       setRadarLoading(false)
     }
   }
 
-  const renderRadar = (radarValues, mediaGeneral) => {
+  const renderRadar = (radarValues, mediaGeneral, radarLabels) => {
     const waitForChart = () => {
       if (typeof window.Chart === 'undefined') {
         setTimeout(waitForChart, 100)
@@ -226,7 +233,7 @@ export default function JugadorPage() {
       chartInstanceRef.current = new window.Chart(ctx, {
         type: 'radar',
         data: {
-          labels: ['Ataque', 'Defensa', 'Regates', 'Pases', 'Comportamiento', 'Minutos', 'Puntos Fantasy'],
+          labels: radarLabels || ['Ataque', 'Defensa', 'Regates', 'Pases', 'Comportamiento', 'Minutos', 'Puntos Fantasy'],
           datasets: [{
             label: 'Perfil Táctico',
             data: radarValues,
@@ -330,293 +337,12 @@ export default function JugadorPage() {
     media_general = 0,
     historico = [],
     percentiles = {},
-    descripciones_roles = {}
+    descripciones_roles = {},
+    predicciones = [],
   } = data || {}
 
   return (
     <div className="p-6 space-y-6 bg-background-dark min-h-full">
-      <style>{`
-        .glass-panel {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgb(75, 85, 99);
-          border-radius: 1rem;
-          backdrop-filter: blur(10px);
-        }
-        
-        .stat-mini {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgb(75, 85, 99);
-          border-radius: 0.75rem;
-          padding: 1rem;
-          text-align: center;
-        }
-        
-        .stat-value {
-          font-size: 1.875rem;
-          font-weight: bold;
-          color: rgb(245, 245, 245);
-        }
-        
-        .stat-label {
-          color: rgb(156, 163, 175);
-          font-size: 0.75rem;
-          margin-top: 0.5rem;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-        
-        .player-badge {
-          width: 120px;
-          height: 120px;
-          border-radius: 1rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: 3px solid;
-          font-weight: 900;
-          font-size: 2.5rem;
-          background: linear-gradient(135deg, rgb(59, 130, 246), rgb(139, 92, 246));
-          border-color: #39ff14;
-          box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
-        }
-        
-        .header-gradient {
-          background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
-        }
-        
-        .posicion-badge {
-          display: inline-block;
-          background: rgba(59, 130, 246, 0.2);
-          border: 1px solid rgb(59, 130, 246);
-          color: rgb(147, 197, 253);
-          padding: 0.5rem 1rem;
-          border-radius: 0.5rem;
-          font-weight: bold;
-          font-size: 0.875rem;
-        }
-        
-        .temporada-btn {
-          padding: 0.5rem 1rem;
-          border-radius: 0.5rem;
-          border: 1px solid rgb(75, 85, 99);
-          background: rgba(255, 255, 255, 0.05);
-          color: rgb(200, 200, 200);
-          cursor: pointer;
-          transition: all 0.2s;
-          font-size: 0.875rem;
-          text-decoration: none;
-          display: inline-block;
-          font-weight: 500;
-        }
-        
-        .temporada-btn:hover {
-          background: rgba(59, 130, 246, 0.2);
-          border-color: rgb(59, 130, 246);
-          color: white;
-        }
-        
-        .temporada-btn.active {
-          background: rgb(59, 130, 246);
-          border-color: rgb(59, 130, 246);
-          color: white;
-          box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
-        }
-        
-        .table-type-btn {
-          padding: 0.5rem 1rem;
-          border-radius: 0.5rem;
-          border: 1px solid rgb(75, 85, 99);
-          background: rgba(255, 255, 255, 0.05);
-          color: rgb(200, 200, 200);
-          cursor: pointer;
-          transition: all 0.2s;
-          font-weight: 500;
-          font-size: 0.875rem;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-        
-        .table-type-btn:hover {
-          background: rgba(255, 255, 255, 0.1);
-          border-color: rgb(59, 130, 246);
-          color: white;
-        }
-        
-        .table-type-btn.active {
-          background: rgb(34, 197, 94);
-          border-color: rgb(34, 197, 94);
-          color: white;
-        }
-        
-        .historico-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-        
-        .historico-table th {
-          background: transparent;
-          border-bottom: 2px solid rgb(75, 85, 99);
-          border-top: none;
-          border-left: none;
-          border-right: none;
-          padding: 0.75rem 1rem;
-          text-align: center;
-          color: rgb(200, 200, 200);
-          font-weight: bold;
-          font-size: 0.75rem;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-        
-        .historico-table th:first-child,
-        .historico-table th:nth-child(2) {
-          text-align: left;
-        }
-        
-        .historico-table td {
-          border: none;
-          border-bottom: 1px solid rgba(75, 85, 99, 0.3);
-          padding: 0.75rem 1rem;
-          color: rgb(220, 220, 220);
-        }
-        
-        .historico-table tbody tr:hover {
-          background: rgba(59, 130, 246, 0.05);
-        }
-        
-        .historico-table tbody tr:last-child td {
-          border-bottom: 2px solid rgb(75, 85, 99);
-        }
-        
-        .histogram-chart {
-          position: relative;
-          height: 280px;
-          margin: 2rem 0;
-          padding: 3rem 1rem 2rem 1rem;
-          border-bottom: 1px solid rgb(75, 85, 99);
-          display: flex;
-          align-items: flex-end;
-          gap: 0.75rem;
-          justify-content: center;
-        }
-        
-        .histogram-bar {
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: flex-end;
-          flex: 0 1 auto;
-          cursor: pointer;
-          transition: all 0.2s;
-          min-width: 48px;
-          max-width: 64px;
-        }
-        
-        .histogram-bar-inner {
-          width: 100%;
-          border-radius: 8px 8px 0 0;
-          transition: all 0.2s;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-        }
-        
-        .histogram-bar-positive .histogram-bar-inner {
-          background: linear-gradient(180deg, rgb(52, 211, 153), rgb(16, 185, 129));
-          box-shadow: 0 0 16px rgba(52, 211, 153, 0.5);
-        }
-        
-        .histogram-bar-negative .histogram-bar-inner {
-          background: linear-gradient(180deg, rgb(248, 113, 113), rgb(239, 68, 68));
-          box-shadow: 0 0 16px rgba(248, 113, 113, 0.5);
-        }
-        
-        .histogram-bar-zero .histogram-bar-inner {
-          background: linear-gradient(180deg, rgb(234, 179, 8), rgb(202, 138, 4));
-          box-shadow: 0 0 16px rgba(234, 179, 8, 0.5);
-        }
-        
-        .histogram-bar-high .histogram-bar-inner {
-          background: linear-gradient(180deg, rgb(59, 130, 246), rgb(37, 99, 235));
-          box-shadow: 0 0 16px rgba(59, 130, 246, 0.5);
-        }
-        
-        .histogram-bar:hover .histogram-bar-inner {
-          filter: brightness(1.15);
-        }
-        
-        .histogram-bar-label {
-          position: absolute;
-          bottom: -26px;
-          font-size: 0.75rem;
-          color: rgb(156, 163, 175);
-          font-weight: 600;
-          white-space: nowrap;
-        }
-        
-        .histogram-bar-value {
-          position: absolute;
-          top: -24px;
-          font-size: 0.875rem;
-          color: white;
-          font-weight: 700;
-          background: rgba(0, 0, 0, 0.6);
-          padding: 2px 6px;
-          border-radius: 4px;
-          white-space: nowrap;
-        }
-        
-        .placeholder-box {
-          background: rgba(255, 255, 255, 0.02);
-          border: 2px dashed rgb(107, 114, 128);
-          border-radius: 0.75rem;
-          padding: 2rem;
-          text-align: center;
-          color: rgb(156, 163, 175);
-        }
-        
-        /* Stats doradas (top 10%) */
-        .stat-golden {
-          background: linear-gradient(135deg, rgba(251, 191, 36, 0.4) 0%, rgba(251, 146, 60, 0.4) 100%);
-          border: 2px solid rgba(251, 146, 60, 0.7);
-          border-left: 4px solid rgb(251, 191, 36);
-          cursor: pointer;
-          box-shadow: 0 0 16px rgba(251, 146, 60, 0.3);
-          transition: all 0.2s;
-        }
-        
-        .stat-golden:hover {
-          box-shadow: 0 0 24px rgba(251, 146, 60, 0.5);
-          transform: translateY(-2px);
-        }
-        
-        /* Popovers */
-        .role-popover, .percentile-popover {
-          position: fixed;
-          z-index: 9999;
-          background: rgba(15, 23, 42, 0.98);
-          border-radius: 0.75rem;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-          animation: fadeIn 0.2s ease;
-        }
-        
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .role-badge-btn {
-          transition: all 0.2s;
-        }
-        
-        .role-badge-btn:hover {
-          box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
-          transform: scale(1.05);
-        }
-      `}</style>
-      
       {/* HEADER CON INFO DEL JUGADOR */}
       <div className="glass-panel header-gradient rounded-2xl p-8 mb-6">
         <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
@@ -923,39 +649,135 @@ export default function JugadorPage() {
             </div>
           </div>
 
-          {/* Gráfico de últimos 12 partidos - HISTOGRAMA */}
+          {/* Gráfico de todos los partidos - HISTOGRAMA CON SCROLL */}
           <div className="glass-panel rounded-2xl p-6">
             <h3 className="text-xl font-bold text-white mb-6 uppercase tracking-wider">
               <span className="material-symbols-outlined align-middle mr-2" style={{ fontSize: '1.3rem' }}>trending_up</span>
-              Últimos 12 Partidos (Puntos Fantasy)
+              Partidos de la Temporada (Puntos Fantasy)
             </h3>
             
             {ultimos_8 && ultimos_8.length > 0 ? (
-              <div className="histogram-chart">
-                {ultimos_8.map((stat, idx) => {
-                  const maxHeight = 300
-                  const maxValue = 20
-                  const minValue = -12
-                  const heightPercent = ((stat.puntos_fantasy - minValue) / (maxValue - minValue)) * 100
-                  const heightPx = (heightPercent / 100) * maxHeight
-                  
-                  return (
-                    <div 
-                      key={idx} 
-                      className={`histogram-bar ${
-                        stat.puntos_fantasy > 10 ? 'histogram-bar-high' :
-                        stat.puntos_fantasy === 0 ? 'histogram-bar-zero' :
-                        stat.puntos_fantasy > 0 ? 'histogram-bar-positive' :
-                        'histogram-bar-negative'
-                      }`}
-                      title={`Jornada ${stat.partido?.jornada?.numero_jornada}: ${stat.puntos_fantasy} puntos`}
-                    >
-                      <div className="histogram-bar-value">{stat.puntos_fantasy}</div>
-                      <div className="histogram-bar-inner" style={{ height: `${heightPx}px` }}></div>
-                      <div className="histogram-bar-label">J{stat.partido?.jornada?.numero_jornada}</div>
-                    </div>
-                  )
-                })}
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                {/* Botón izquierda */}
+                <button
+                  onClick={() => {
+                    const container = histogramScrollRef.current
+                    if (container) {
+                      container.scrollBy({ left: -500, behavior: 'smooth' })
+                    }
+                  }}
+                  className="flex-shrink-0 bg-gradient-to-r from-primary to-primary/70 hover:from-primary/90 hover:to-primary text-white rounded-lg p-3 transition-all shadow-lg hover:shadow-xl"
+                  title="Ver partidos anteriores"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: '1.5rem' }}>navigate_before</span>
+                </button>
+
+                {/* Contenedor scrolleable */}
+                <div
+                  ref={histogramScrollRef}
+                  style={{
+                    overflowX: 'auto',
+                    overflowY: 'hidden',
+                    height: '340px',
+                    flexShrink: 0,
+                    flexGrow: 1,
+                    scrollBehavior: 'smooth',
+                    width: 0,  /* fuerza que el flex item no crezca más que su flex-grow */
+                  }}
+                >
+                  {/* envoltorio interior que sí tiene el layout del histograma */}
+                  <div
+                    className="histogram-chart"
+                    style={{ height: '320px' }}
+                  >
+                  {(() => {
+                    // Crear mapa de datos disponibles por jornada
+                    const dataMap = {}
+                    ultimos_8.forEach(stat => {
+                      const jornada = stat.partido?.jornada?.numero_jornada
+                      if (jornada) {
+                        dataMap[jornada] = stat
+                      }
+                    })
+
+                    // Encontrar rango de jornadas (primera y última)
+                    const jornadas = Object.keys(dataMap).map(Number).sort((a, b) => a - b)
+                    if (jornadas.length === 0) return null
+
+                    const minJ = jornadas[0]
+                    const maxJ = jornadas[jornadas.length - 1]
+
+                    // Generar array completo de jornadas
+                    const allJornadas = Array.from({ length: maxJ - minJ + 1 }, (_, i) => minJ + i)
+
+                    return allJornadas.map(jornada => {
+                      const stat = dataMap[jornada]
+                      const maxHeight = 230   // 320px contenedor - ~24 valor - ~22 etiqueta - gutters
+                      const maxValue = 20
+                      const minValue = -12
+
+                      if (!stat) {
+                        return (
+                          <div
+                            key={jornada}
+                            className="histogram-bar"
+                            title={`J${jornada}: sin datos`}
+                          >
+                            <div className="histogram-bar-value" style={{ color: 'rgb(107,114,128)' }}>—</div>
+                            <div
+                              className="histogram-bar-inner"
+                              style={{
+                                height: '30px',
+                                background: 'rgba(255,255,255,0.07)',
+                                borderRadius: '5px 5px 0 0',
+                                border: '1px dashed rgba(255,255,255,0.18)',
+                              }}
+                            />
+                            <div className="histogram-bar-label" style={{ color: 'rgb(107,114,128)' }}>J{jornada}</div>
+                          </div>
+                        )
+                      }
+
+                      const heightPercent = ((stat.puntos_fantasy - minValue) / (maxValue - minValue)) * 100
+                      const heightPx = Math.max(6, (heightPercent / 100) * maxHeight)
+
+                      return (
+                        <div
+                          key={jornada}
+                          className={`histogram-bar ${
+                            stat.puntos_fantasy > 10
+                              ? 'histogram-bar-high'
+                              : stat.puntos_fantasy === 0
+                              ? 'histogram-bar-zero'
+                              : stat.puntos_fantasy > 0
+                              ? 'histogram-bar-positive'
+                              : 'histogram-bar-negative'
+                          }`}
+                          title={`Jornada ${jornada}: ${stat.puntos_fantasy} puntos`}
+                        >
+                          <div className="histogram-bar-value">{stat.puntos_fantasy}</div>
+                          <div className="histogram-bar-inner" style={{ height: `${heightPx}px` }}></div>
+                          <div className="histogram-bar-label">J{jornada}</div>
+                        </div>
+                      )
+                    })
+                  })()}
+                  </div>{/* fin histogram-chart inner */}
+                </div>{/* fin scrolleable */}
+
+                {/* Botón derecha */}
+                <button
+                  onClick={() => {
+                    const container = histogramScrollRef.current
+                    if (container) {
+                      container.scrollBy({ left: 500, behavior: 'smooth' })
+                    }
+                  }}
+                  className="flex-shrink-0 bg-gradient-to-r from-primary/70 to-primary hover:from-primary hover:to-primary/90 text-white rounded-lg p-3 transition-all shadow-lg hover:shadow-xl"
+                  title="Ver próximos partidos"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: '1.5rem' }}>navigate_next</span>
+                </button>
               </div>
             ) : (
               <div className="text-center py-12 text-gray-400">
@@ -964,6 +786,141 @@ export default function JugadorPage() {
               </div>
             )}
           </div>
+
+          {/* Gráfico Predicción vs Real */}
+          <div className="glass-panel rounded-2xl p-6">
+            <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-wider">
+              <span className="material-symbols-outlined align-middle mr-2" style={{ fontSize: '1.3rem' }}>psychology</span>
+              {predicciones && predicciones.some(p => p.is_early_jornada) ? (
+                predicciones.every(p => p.is_early_jornada) ? 'Media vs Real' : 'Predicción / Media vs Real'
+              ) : 'Predicción vs Real'}
+            </h3>
+            <p className="text-xs text-gray-400 mb-4">
+              {predicciones && predicciones.some(p => p.is_early_jornada) 
+                ? 'Para jornadas 1-5: Media histórica (datos insuficientes para predicción IA). Jornadas 6+: Predicción del modelo.'
+                : 'Puntos predichos por el modelo vs. puntos reales obtenidos por jornada.'}
+            </p>
+
+            {predicciones && predicciones.length > 0 ? (
+              <>
+                {/* Leyenda */}
+                <div className="flex gap-6 mb-2 text-xs flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(180deg,rgb(167,139,250),rgb(109,40,217))' }}></div>
+                    <span className="text-gray-300">
+                      {predicciones.some(p => p.is_early_jornada) && !predicciones.every(p => p.is_early_jornada) 
+                        ? 'Predicción/Media' 
+                        : predicciones.every(p => p.is_early_jornada)
+                        ? 'Media Hist.'
+                        : 'Predicción'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(180deg,rgb(52,211,153),rgb(16,185,129))' }}></div>
+                    <span className="text-gray-300">Real (&gt;0)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(180deg,rgb(248,113,113),rgb(239,68,68))' }}></div>
+                    <span className="text-gray-300">Real (&lt;0)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm" style={{ background: 'rgba(255,255,255,0.15)', border: '1px dashed rgba(255,255,255,0.3)' }}></div>
+                    <span className="text-gray-300">Sin dato real</span>
+                  </div>
+                </div>
+                <div className="pred-chart">
+                  {predicciones.map((p, idx) => {
+                    const maxHeight = 250
+                    const maxValue = 20
+                    const minValue = -12
+                    const range = maxValue - minValue
+
+                    const predH = Math.max(4, ((p.prediccion - minValue) / range) * maxHeight)
+
+                    const realClass = p.real === null ? '' :
+                      p.real > 10 ? 'histogram-bar-high' :
+                      p.real === 0 ? 'histogram-bar-zero' :
+                      p.real > 0 ? 'histogram-bar-positive' :
+                      'histogram-bar-negative'
+
+                    const realH = p.real !== null
+                      ? Math.max(4, ((Math.max(minValue, p.real) - minValue) / range) * maxHeight)
+                      : null
+                    
+                    const label = p.is_early_jornada ? 'Media' : 'Pred'
+
+                    return (
+                      <div
+                        key={idx}
+                        className="histogram-bar"
+                        style={{ minWidth: 52 }}
+                        title={`J${p.jornada} — ${label}: ${p.prediccion.toFixed(1)} | Real: ${p.real ?? 'pendiente'}`}
+                      >
+                        {/* Valores arriba */}
+                        <div className="histogram-bar-value" style={{ fontSize: '0.68rem', display: 'flex', gap: 4 }}>
+                          <span style={{ color: p.is_early_jornada ? 'rgb(60,180,120)' : 'rgb(167,139,250)' }}>{p.prediccion.toFixed(1)}</span>
+                          {p.real !== null && <span style={{ color: 'rgb(52,211,153)' }}>{p.real}</span>}
+                        </div>
+                        {/* Barras paralelas */}
+                        <div className="histogram-bar-pred-pair">
+                          {/* Predicción / Media */}
+                          <div
+                            className="histogram-bar-pred"
+                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}
+                          >
+                            <div
+                              className="histogram-bar-inner"
+                              style={{ 
+                                width: 18, 
+                                height: predH,
+                                background: p.is_early_jornada 
+                                  ? 'linear-gradient(180deg,rgb(60,180,120),rgb(34,130,80))' 
+                                  : undefined
+                              }}
+                            />
+                          </div>
+                          {/* Real */}
+                          <div
+                            className={realClass}
+                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}
+                          >
+                            {realH !== null ? (
+                              <div
+                                className="histogram-bar-inner"
+                                style={{ width: 18, height: realH }}
+                              />
+                            ) : (
+                              <div style={{
+                                width: 18, height: 8,
+                                background: 'rgba(255,255,255,0.1)',
+                                borderRadius: '4px 4px 0 0',
+                                border: '1px dashed rgba(255,255,255,0.3)',
+                              }} />
+                            )}
+                          </div>
+                        </div>
+                        <div className="histogram-bar-label">J{p.jornada}</div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <span className="material-symbols-outlined text-3xl block mb-2">model_training</span>
+                <p className="text-sm">Aún no hay predicciones almacenadas para esta temporada.</p>
+                <p className="text-xs mt-1 text-gray-500">
+                  Las predicciones se generan automáticamente cuando se procesan estadísticas
+                  de una jornada. También puedes lanzarlas manualmente:
+                </p>
+                <code className="block mt-2 text-xs bg-black/30 rounded px-3 py-2 text-green-400 font-mono text-left">
+                  python manage.py generar_predicciones
+                </code>
+              </div>
+            )}
+          </div>
+
+
         </div>
 
         {/* DERECHA: Sidebar (col-span-4) */}
@@ -1428,6 +1385,38 @@ export default function JugadorPage() {
           </div>
         </div>
       )}
+      <HelpButton title="Guía del jugador" sections={[
+        { title: 'General', fields: [
+          { label: 'PTS', description: 'Puntos fantasy totales acumulados en la temporada o carrera.' },
+          { label: 'PJ', description: 'Partidos jugados con al menos 1 minuto disputado.' },
+          { label: 'MIN', description: 'Minutos totales jugados.' },
+          { label: 'Percentil', description: 'Posición del jugador entre el 0% y 100% respecto al resto de jugadores de su misma posición en esa stat.' },
+        ]},
+        { title: 'Ataque', fields: [
+          { label: 'xG', description: 'Expected Goals: suma de probabilidades de que cada ocasión hubiera acabado en gol.' },
+          { label: 'xAG', description: 'Expected Assisted Goals: probabilidad total de generar asistencias de gol.' },
+          { label: 'Tiros', description: 'Disparos totales realizados.' },
+          { label: 'T/Puerta', description: 'Tiros que terminaron entre los tres palos.' },
+        ]},
+        { title: 'Organización', fields: [
+          { label: 'Pases', description: 'Total de pases intentados.' },
+          { label: 'Pases %', description: 'Porcentaje de pases completados sobre el total intentado.' },
+        ]},
+        { title: 'Defensa', fields: [
+          { label: 'Entradas', description: 'Número de entradas (tackles) realizadas.' },
+          { label: 'Despejes', description: 'Balones despejados fuera del área propia.' },
+          { label: 'Duelos', description: 'Total de duelos disputados (ganados + perdidos).' },
+          { label: 'Aéreos', description: 'Duelos aéreos disputados.' },
+        ]},
+        { title: 'Portero', fields: [
+          { label: '% Paradas', description: 'Porcentaje de disparos a puerta que el portero detuvo.' },
+          { label: 'GEC', description: 'Goles en contra encajados en la temporada.' },
+        ]},
+        { title: 'Roles XAI', fields: [
+          { label: 'Rol', description: 'Papel detectado automáticamente según el perfil de juego: rematador, organizador, defensor, etc.' },
+          { label: 'Puntuación', description: 'Nivel de ajuste del jugador a ese rol (cuanto más bajo el número, más prominente el rol).' },
+        ]},
+      ]} />
     </div>
   )
 }

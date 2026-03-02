@@ -1,8 +1,23 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import api from '../services/apiClient'
 import GlassPanel from '../components/ui/GlassPanel'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import { useAuth } from '../context/AuthContext'
+import HelpButton from '../components/ui/HelpButton'
+
+const STATUS_CONFIG = {
+  active: { color: 'bg-green-500', label: 'Activo' },
+  away:   { color: 'bg-gray-500',  label: 'Ausente' },
+  dnd:    { color: 'bg-yellow-500', label: 'No molestar' },
+}
+
+const FILTROS = [
+  { key: 'todos',  label: 'Todos' },
+  { key: 'active', label: 'Activos' },
+  { key: 'away',   label: 'Ausentes' },
+  { key: 'dnd',    label: 'No molestar' },
+]
 
 function Avatar({ name, photo, size = 10 }) {
   if (photo) {
@@ -38,6 +53,8 @@ export default function AmigosPage() {
   const [data, setData] = useState({ amigos: [], solicitudes_pendientes: [], solicitudes_enviadas: [] })
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState(null)
+  const [filtro, setFiltro] = useState('todos')
+  const [busquedaAmigos, setBusquedaAmigos] = useState('')
 
   // Send request form
   const [searchUser, setSearchUser] = useState('')
@@ -65,11 +82,13 @@ export default function AmigosPage() {
   }
 
   async function sendRequest() {
-    if (!searchUser.trim()) return
+    const raw = searchUser || ''
+    const username = raw.trim().replace(/^@/, '')
+    if (!username) return
     setSending(true)
     try {
-      await api.post('/api/amigos/solicitud/', { username: searchUser.trim() })
-      flash('success', `Solicitud enviada a @${searchUser.trim()}`)
+      await api.post('/api/amigos/solicitud/', { username })
+      flash('success', `Solicitud enviada a @${username}`)
       setSearchUser('')
       await loadAmigos()
     } catch (e) {
@@ -118,12 +137,21 @@ export default function AmigosPage() {
 
   const { amigos, solicitudes_pendientes, solicitudes_enviadas } = data
 
+  // Filter + search friends list
+  const amigosFiltrados = amigos.filter(a => {
+    const matchFiltro = filtro === 'todos' || (a.estado || 'active') === filtro
+    const matchBusqueda = !busquedaAmigos.trim() ||
+      (a.first_name || '').toLowerCase().includes(busquedaAmigos.toLowerCase()) ||
+      (a.username  || '').toLowerCase().includes(busquedaAmigos.toLowerCase())
+    return matchFiltro && matchBusqueda
+  })
+
   return (
     <div className="p-6 space-y-6 max-w-5xl mx-auto">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-black text-white">Mis Amigos</h1>
-        <p className="text-gray-400 mt-1">Compara resultados y compite con tus amigos</p>
+        <p className="text-gray-400 mt-1">Busca amigos y compara plantillas con predicciones y XAI</p>
       </div>
 
       {message && (
@@ -133,15 +161,18 @@ export default function AmigosPage() {
       )}
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        {/* Left: friends list */}
+        {/* ── Left panel ── */}
         <div className="xl:col-span-5 space-y-4">
           {/* Send request */}
           <GlassPanel className="p-5">
-            <h3 className="text-base font-bold text-white mb-3">Añadir amigo</h3>
+            <h3 className="text-base font-bold text-white mb-3 flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-lg">person_add</span>
+              Añadir amigo
+            </h3>
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="Nombre de usuario..."
+                placeholder="Nombre de usuario (@username)..."
                 value={searchUser}
                 onChange={e => setSearchUser(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && sendRequest()}
@@ -150,22 +181,20 @@ export default function AmigosPage() {
               <button
                 onClick={sendRequest}
                 disabled={sending || !searchUser.trim()}
-                className="px-4 py-2 bg-primary hover:bg-primary-dark text-black rounded-xl font-bold transition-colors disabled:opacity-60 text-sm"
+                className="px-4 py-2 bg-primary hover:bg-primary-dark text-black rounded-xl font-bold transition-colors disabled:opacity-60 text-sm flex-shrink-0"
               >
-                {sending ? (
-                  <span className="material-symbols-outlined text-base animate-spin">progress_activity</span>
-                ) : (
-                  <span className="material-symbols-outlined text-base">person_add</span>
-                )}
+                {sending
+                  ? <span className="material-symbols-outlined text-base animate-spin">progress_activity</span>
+                  : <span className="material-symbols-outlined text-base">send</span>}
               </button>
             </div>
           </GlassPanel>
 
-          {/* Pending requests received */}
+          {/* Solicitudes recibidas */}
           {solicitudes_pendientes.length > 0 && (
             <GlassPanel className="p-5">
               <h3 className="text-base font-bold text-white mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-yellow-400 text-lg">notifications</span>
+                <span className="material-symbols-outlined text-yellow-400 text-lg">notifications_active</span>
                 Solicitudes recibidas
                 <span className="bg-yellow-400/20 text-yellow-400 text-xs px-2 py-0.5 rounded-full font-black">{solicitudes_pendientes.length}</span>
               </h3>
@@ -180,18 +209,12 @@ export default function AmigosPage() {
                       </div>
                     </div>
                     <div className="flex gap-1.5">
-                      <button
-                        onClick={() => accept(sol.id)}
-                        className="p-1.5 bg-green-500/20 hover:bg-green-500/40 text-green-400 rounded-lg transition-colors"
-                        title="Aceptar"
-                      >
+                      <button onClick={() => accept(sol.id)}
+                        className="p-1.5 bg-green-500/20 hover:bg-green-500/40 text-green-400 rounded-lg transition-colors" title="Aceptar">
                         <span className="material-symbols-outlined text-base">check</span>
                       </button>
-                      <button
-                        onClick={() => reject(sol.id)}
-                        className="p-1.5 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded-lg transition-colors"
-                        title="Rechazar"
-                      >
+                      <button onClick={() => reject(sol.id)}
+                        className="p-1.5 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded-lg transition-colors" title="Rechazar">
                         <span className="material-symbols-outlined text-base">close</span>
                       </button>
                     </div>
@@ -201,7 +224,7 @@ export default function AmigosPage() {
             </GlassPanel>
           )}
 
-          {/* Sent requests */}
+          {/* Solicitudes enviadas */}
           {solicitudes_enviadas.length > 0 && (
             <GlassPanel className="p-5">
               <h3 className="text-base font-bold text-white mb-3 flex items-center gap-2">
@@ -223,69 +246,102 @@ export default function AmigosPage() {
             </GlassPanel>
           )}
 
-          {/* Friends list */}
+          {/* Friends list with filter + search */}
           <GlassPanel className="overflow-hidden">
-            <div className="p-4 border-b border-white/10">
-              <h3 className="text-lg font-black text-white">
-                Amigos
-                <span className="ml-2 text-sm text-gray-400 font-normal">({amigos.length})</span>
-              </h3>
-            </div>
-
-            {amigos.length === 0 ? (
-              <div className="p-8 text-center">
-                <span className="material-symbols-outlined text-4xl text-gray-600 block mb-3">group</span>
-                <p className="text-gray-400 text-sm">Aún no tienes amigos</p>
-                <p className="text-gray-500 text-xs mt-1">Busca usuarios por nombre para añadirlos</p>
+            <div className="p-4 border-b border-white/10 space-y-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-black text-white">
+                  Amigos
+                  <span className="ml-2 text-sm text-gray-400 font-normal">({amigos.length})</span>
+                </h3>
               </div>
-            ) : (
-              <div className="divide-y divide-white/10">
-                {amigos.map((amigo, idx) => (
-                  <div key={amigo.id} className="p-4 hover:bg-white/5 transition-colors flex items-center justify-between group">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <span className="text-base font-black text-gray-400 w-5 text-center">{idx + 1}</span>
-                        <Avatar name={amigo.first_name || amigo.username} photo={amigo.profile_photo} size={10} />
-                      </div>
-                      <div>
-                        <p className="font-bold text-white text-sm">{amigo.first_name || amigo.username}</p>
-                        <p className="text-xs text-gray-400">@{amigo.username}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeAmigo(amigo.id)}
-                      className="text-gray-600 hover:text-red-400 transition-colors p-1 opacity-0 group-hover:opacity-100"
-                      title="Eliminar amigo"
-                    >
-                      <span className="material-symbols-outlined text-base">person_remove</span>
-                    </button>
-                  </div>
+              <input
+                type="text"
+                placeholder="Buscar entre tus amigos..."
+                value={busquedaAmigos}
+                onChange={e => setBusquedaAmigos(e.target.value)}
+                className="w-full px-3 py-1.5 bg-background-dark border border-border-dark text-white rounded-xl text-xs placeholder-gray-500 focus:outline-none focus:border-primary"
+              />
+              <div className="flex gap-1 flex-wrap">
+                {FILTROS.map(f => (
+                  <button key={f.key} onClick={() => setFiltro(f.key)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${filtro === f.key ? 'bg-primary text-black' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}>
+                    {f.label}
+                  </button>
                 ))}
               </div>
-            )}
+            </div>
+
+            {amigosFiltrados.length === 0
+              ? (
+                <div className="p-8 text-center">
+                  <span className="material-symbols-outlined text-4xl text-gray-600 block mb-3">group</span>
+                  <p className="text-gray-400 text-sm">
+                    {amigos.length === 0 ? 'Aún no tienes amigos' : 'Sin resultados para ese filtro'}
+                  </p>
+                </div>
+              )
+              : (
+                <div className="divide-y divide-white/10">
+                  {amigosFiltrados.map(amigo => {
+                    const st = STATUS_CONFIG[amigo.estado || 'active'] || STATUS_CONFIG.active
+                    return (
+                      <div key={amigo.id} className="p-4 hover:bg-white/5 transition-colors group">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="relative flex-shrink-0">
+                              <Avatar name={amigo.first_name || amigo.username} photo={amigo.profile_photo} size={10} />
+                              <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-surface-dark ${st.color}`} />
+                            </div>
+                            <div>
+                              <p className="font-bold text-white text-sm">{amigo.first_name || amigo.username}</p>
+                              <p className="text-xs text-gray-400">@{amigo.username} · {st.label}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            {/* Ver plantilla */}
+                            <Link to={`/amigos/${amigo.id}/plantilla`}
+                              className="p-1.5 bg-primary/20 hover:bg-primary/40 text-primary rounded-lg transition-colors" title="Ver plantilla">
+                              <span className="material-symbols-outlined text-base">groups</span>
+                            </Link>
+                            {/* Eliminar (visible on hover) */}
+                            <button onClick={() => removeAmigo(amigo.id)}
+                              className="p-1.5 text-gray-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Eliminar">
+                              <span className="material-symbols-outlined text-base">person_remove</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )
+            }
           </GlassPanel>
         </div>
 
-        {/* Right: placeholder stats / coming soon */}
-        <div className="xl:col-span-7 space-y-6">
-          {/* Coming soon banner */}
-          <GlassPanel className="p-8 text-center">
-            <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-2xl p-6 border border-purple-500/20">
-              <span className="material-symbols-outlined text-5xl text-purple-400 block mb-3">compare_arrows</span>
-              <h3 className="text-xl font-bold text-white mb-2">Comparación de ligas</h3>
-              <p className="text-gray-400 text-sm">Próximamente podrás comparar tus puntos de fantasy con los de tus amigos jornada a jornada.</p>
+        {/* ── Right panel ── */}
+        <div className="xl:col-span-7 space-y-4">
+          {/* Info */}
+          <GlassPanel className="p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="material-symbols-outlined text-primary text-2xl">groups</span>
+              <h3 className="text-lg font-bold text-white">Ver plantillas de amigos</h3>
             </div>
+            <p className="text-gray-400 text-sm mb-3">
+              Haz clic en el icono{' '}
+              <span className="inline-flex items-center gap-1 bg-primary/20 text-primary px-1.5 py-0.5 rounded text-xs">
+                <span className="material-symbols-outlined text-xs">groups</span>
+              </span>{' '}
+              junto a un amigo para ver su plantilla con predicciones y análisis XAI.
+            </p>
+            <p className="text-xs text-gray-500">
+              Solo puedes ver las plantillas que tu amigo haya marcado como públicas. Configura la privacidad desde{' '}
+              <Link to="/perfil" className="text-primary hover:underline">Mi Perfil</Link>.
+            </p>
           </GlassPanel>
 
-          <GlassPanel className="p-8 text-center">
-            <div className="bg-gradient-to-r from-yellow-500/20 to-orange-600/20 rounded-2xl p-6 border border-yellow-500/20">
-              <span className="material-symbols-outlined text-5xl text-yellow-400 block mb-3">emoji_events</span>
-              <h3 className="text-xl font-bold text-white mb-2">Logros y Logros</h3>
-              <p className="text-gray-400 text-sm">Desbloquea logros compitiendo con tus amigos. Funcionalidad en desarrollo.</p>
-            </div>
-          </GlassPanel>
-
-          {/* Summary stats */}
+          {/* Stats */}
           <div className="grid grid-cols-3 gap-4">
             <GlassPanel className="p-4 text-center">
               <div className="text-2xl font-black text-primary mb-1">{amigos.length}</div>
@@ -300,8 +356,36 @@ export default function AmigosPage() {
               <p className="text-gray-400 text-xs">Enviadas</p>
             </GlassPanel>
           </div>
+
+          {/* Quick access to friends' plantillas */}
+          {amigos.length > 0 && (
+            <GlassPanel className="p-5">
+              <h3 className="text-base font-bold text-white mb-3 flex items-center gap-2">
+                <span className="material-symbols-outlined text-lg text-primary">sports_soccer</span>
+                Acceso rápido
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                {amigos.slice(0, 6).map(amigo => (
+                  <Link key={amigo.id} to={`/amigos/${amigo.id}/plantilla`}
+                    className="flex items-center gap-3 p-3 bg-surface-dark hover:bg-white/10 border border-border-dark hover:border-primary/40 rounded-xl transition-all group">
+                    <Avatar name={amigo.first_name || amigo.username} photo={amigo.profile_photo} size={8} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-sm font-semibold truncate">{amigo.first_name || amigo.username}</p>
+                      <p className="text-xs text-gray-500 group-hover:text-primary transition-colors">Ver plantilla →</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </GlassPanel>
+          )}
         </div>
       </div>
+      <HelpButton title="Guía de Amigos" fields={[
+        { label: 'Buscar usuario', description: 'Escribe el nombre de usuario (con o sin @) para encontrar a alguien y enviarle una solicitud de amistad.' },
+        { label: 'Solicitud pendiente', description: 'Petición de amistad enviada que está esperando respuesta del otro usuario.' },
+        { label: 'Amigos', description: 'Usuarios que aceptaron tu solicitud. Puedes ver sus plantillas públicas.' },
+        { label: 'Ver plantilla', description: 'Accede a la plantilla fantasy de un amigo si la tiene configurada como pública.' },
+      ]} />
     </div>
   )
 }

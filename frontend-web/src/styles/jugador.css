@@ -1,0 +1,369 @@
+/* =============================================================================
+   JugadorPage — estilos específicos
+   Importado en JugadorPage.jsx
+   ============================================================================= */
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgb(75, 85, 99);
+  border-radius: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+.stat-mini {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgb(75, 85, 99);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: rgb(245, 245, 245);
+}
+
+.stat-label {
+  color: rgb(156, 163, 175);
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.player-badge {
+  width: 120px;
+  height: 120px;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid;
+  font-weight: 900;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, rgb(59, 130, 246), rgb(139, 92, 246));
+  border-color: #39ff14;
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+}
+
+.header-gradient {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+}
+
+.posicion-badge {
+  display: inline-block;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgb(59, 130, 246);
+  color: rgb(147, 197, 253);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+/* ── Botones de temporada ── */
+.temporada-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(75, 85, 99);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgb(200, 200, 200);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.temporada-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgb(59, 130, 246);
+  color: white;
+}
+
+.temporada-btn.active {
+  background: rgb(59, 130, 246);
+  border-color: rgb(59, 130, 246);
+  color: white;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+}
+
+/* ── Botones de tipo de tabla ── */
+.table-type-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(75, 85, 99);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgb(200, 200, 200);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table-type-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgb(59, 130, 246);
+  color: white;
+}
+
+.table-type-btn.active {
+  background: rgb(34, 197, 94);
+  border-color: rgb(34, 197, 94);
+  color: white;
+}
+
+/* ── Tabla histórico ── */
+.historico-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.historico-table th {
+  background: transparent;
+  border-bottom: 2px solid rgb(75, 85, 99);
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  color: rgb(200, 200, 200);
+  font-weight: bold;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.historico-table th:first-child,
+.historico-table th:nth-child(2) {
+  text-align: left;
+}
+
+.historico-table td {
+  border: none;
+  border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+  padding: 0.75rem 1rem;
+  color: rgb(220, 220, 220);
+}
+
+.historico-table tbody tr:hover {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.historico-table tbody tr:last-child td {
+  border-bottom: 2px solid rgb(75, 85, 99);
+}
+
+/* ── Histograma de partidos ── */
+.histogram-chart {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+  justify-content: flex-start;
+  width: max-content;
+  min-width: 100%;
+  padding: 1rem 0.5rem 0 0.5rem;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.histogram-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 52px;
+  height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 6px;
+  gap: 2px;
+}
+
+.histogram-bar-inner {
+  width: 36px;
+  border-radius: 5px 5px 0 0;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.histogram-bar-positive .histogram-bar-inner {
+  background: linear-gradient(180deg, rgb(52, 211, 153), rgb(16, 185, 129));
+  box-shadow: 0 0 16px rgba(52, 211, 153, 0.5);
+}
+
+.histogram-bar-negative .histogram-bar-inner {
+  background: linear-gradient(180deg, rgb(248, 113, 113), rgb(239, 68, 68));
+  box-shadow: 0 0 16px rgba(248, 113, 113, 0.5);
+}
+
+.histogram-bar-zero .histogram-bar-inner {
+  background: linear-gradient(180deg, rgb(234, 179, 8), rgb(202, 138, 4));
+  box-shadow: 0 0 16px rgba(234, 179, 8, 0.5);
+}
+
+.histogram-bar-high .histogram-bar-inner {
+  background: linear-gradient(180deg, rgb(59, 130, 246), rgb(37, 99, 235));
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.5);
+}
+
+.histogram-bar:hover .histogram-bar-inner {
+  filter: brightness(1.15);
+}
+
+.histogram-bar-label {
+  font-size: 0.72rem;
+  color: rgb(156, 163, 175);
+  font-weight: 600;
+  white-space: nowrap;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.histogram-bar-value {
+  font-size: 0.8rem;
+  color: white;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  margin-bottom: 3px;
+  flex-shrink: 0;
+}
+
+.histogram-bar-pred .histogram-bar-inner {
+  background: linear-gradient(180deg, rgb(167, 139, 250), rgb(109, 40, 217));
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.5);
+}
+
+/* ── Gráfico Predicción vs Real (pares de barras) ── */
+.pred-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  justify-content: flex-start;
+  height: 280px;
+  padding: 2rem 0.5rem 2rem 0.5rem;
+  border-bottom: 1px solid rgb(75, 85, 99);
+  overflow-x: auto;
+}
+
+.pred-chart .histogram-bar {
+  width: auto;
+  min-width: 52px;
+  height: auto;
+  justify-content: flex-end;
+  padding-bottom: 0;
+}
+
+/* ── Gráfico Predicción vs Real (pares de barras) ── */
+.pred-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  justify-content: flex-start;
+  height: 280px;
+  padding: 2rem 0.5rem 2rem 0.5rem;
+  border-bottom: 1px solid rgb(75, 85, 99);
+  overflow-x: auto;
+}
+
+.pred-chart .histogram-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: auto;
+  min-width: 52px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.pred-chart .histogram-bar-value {
+  position: absolute;
+  top: -24px;
+  font-size: 0.68rem;
+  color: white;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1px 3px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.pred-chart .histogram-bar-label {
+  position: absolute;
+  bottom: -26px;
+  font-size: 0.75rem;
+  color: rgb(156, 163, 175);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.histogram-bar-pred-pair {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 3px;
+  height: 100%;
+}
+
+.placeholder-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 2px dashed rgb(107, 114, 128);
+  border-radius: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+  color: rgb(156, 163, 175);
+}
+
+/* ── Stats doradas (top 10%) ── */
+.stat-golden {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.4) 0%, rgba(251, 146, 60, 0.4) 100%);
+  border: 2px solid rgba(251, 146, 60, 0.7);
+  border-left: 4px solid rgb(251, 191, 36);
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(251, 146, 60, 0.3);
+  transition: all 0.2s;
+}
+
+.stat-golden:hover {
+  box-shadow: 0 0 24px rgba(251, 146, 60, 0.5);
+  transform: translateY(-2px);
+}
+
+/* ── Popovers ── */
+.role-popover,
+.percentile-popover {
+  position: fixed;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.98);
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Role badge ── */
+.role-badge-btn {
+  transition: all 0.2s;
+}
+
+.role-badge-btn:hover {
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+  transform: scale(1.05);
+}

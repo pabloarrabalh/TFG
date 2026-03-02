@@ -103,32 +103,7 @@ def api_radar_jugador(request, jugador_id, temporada):
                 logger.error(f"Error al calcular percentil {stat_field}: {str(e)}")
                 return 50
         
-        # Calcular los 7 valores del radar EN PARALELO
-        ataque_avg = (
-            calcular_pct('gol_partido') +
-            calcular_pct('tiro_puerta_partido') +
-            calcular_pct('xg_partido')
-        ) / 3
-        
-        defensa_avg = (
-            calcular_pct('despejes') +
-            calcular_pct('entradas') +
-            calcular_pct('duelos')
-        ) / 3
-        
-        regates_avg = (
-            calcular_pct('regates_completados') +
-            calcular_pct('conducciones')
-        ) / 2
-        
-        pases_avg = (
-            calcular_pct('pases_totales') +
-            calcular_pct('asist_partido')
-        ) / 2
-        
-        comportamiento_avg = 100 - calcular_pct('amarillas')
-        
-        # Minutos y puntos normalizados
+        # Minutos y puntos normalizados (comunes a todos)
         stats_jugador = EstadisticasPartidoJugador.objects.filter(
             jugador=jugador,
             partido__jornada__temporada=temp_obj
@@ -137,29 +112,74 @@ def api_radar_jugador(request, jugador_id, temporada):
             total_puntos=Sum('puntos_fantasy'),
             partidos=Count('id', filter=Q(min_partido__gt=0))
         )
-        
+
         minutos_totales = stats_jugador['total_minutos'] or 0
         minutos_percentil = min(100, (minutos_totales / 2700) * 100) if minutos_totales > 0 else 0
-        
+
         puntos_totales = stats_jugador['total_puntos'] or 0
         partidos = stats_jugador['partidos'] or 1
         puntos_promedio = puntos_totales / partidos if partidos > 0 else 0
         puntos_percentil = min(100, (puntos_promedio / 10) * 100) if puntos_promedio > 0 else 0
-        
-        radar_values = [
-            round(ataque_avg, 1),
-            round(defensa_avg, 1),
-            round(regates_avg, 1),
-            round(pases_avg, 1),
-            round(comportamiento_avg, 1),
-            round(minutos_percentil, 1),
-            round(puntos_percentil, 1),
-        ]
-        
+
+        if posicion == 'Portero':
+            # ── PERFIL PORTERO: Pases · Minutos · Puntos · Comportamiento · Paradas · GEC · PSxG ──
+            pases_pct = calcular_pct('pases_totales')
+            comportamiento_pct = 100 - calcular_pct('amarillas')
+            paradas_pct = calcular_pct('porcentaje_paradas')
+            gec_pct = 100 - calcular_pct('goles_en_contra')  # Menos goles encajados = mejor
+            psxg_pct = calcular_pct('psxg')  # Post-shot xG: calidad de las paradas
+
+            radar_values = [
+                round(pases_pct, 1),
+                round(minutos_percentil, 1),
+                round(puntos_percentil, 1),
+                round(comportamiento_pct, 1),
+                round(paradas_pct, 1),
+                round(gec_pct, 1),
+                round(psxg_pct, 1),
+            ]
+            labels = ['Pases', 'Minutos', 'Puntos', 'Comportamiento', 'Paradas %', 'GEC', 'PSxG']
+        else:
+            # ── PERFIL JUGADOR DE CAMPO ──
+            ataque_avg = (
+                calcular_pct('gol_partido') +
+                calcular_pct('tiro_puerta_partido') +
+                calcular_pct('xg_partido')
+            ) / 3
+
+            defensa_avg = (
+                calcular_pct('despejes') +
+                calcular_pct('entradas') +
+                calcular_pct('duelos')
+            ) / 3
+
+            regates_avg = (
+                calcular_pct('regates_completados') +
+                calcular_pct('conducciones')
+            ) / 2
+
+            pases_avg = (
+                calcular_pct('pases_totales') +
+                calcular_pct('asist_partido')
+            ) / 2
+
+            comportamiento_avg = 100 - calcular_pct('amarillas')
+
+            radar_values = [
+                round(ataque_avg, 1),
+                round(defensa_avg, 1),
+                round(regates_avg, 1),
+                round(pases_avg, 1),
+                round(comportamiento_avg, 1),
+                round(minutos_percentil, 1),
+                round(puntos_percentil, 1),
+            ]
+            labels = ['Ataque', 'Defensa', 'Regate', 'Pases', 'Comportamiento', 'Minutos', 'Fantasy']
+
         media_general = sum(radar_values) / len(radar_values) if radar_values else 0
-        
-        logger.info(f"Radar generado para jugador {jugador_id} en {temporada}: {radar_values}")
-        
+
+        logger.info(f"Radar generado para jugador {jugador_id} ({posicion}) en {temporada}: {radar_values}")
+
         return JsonResponse({
             'status': 'success',
             'data': {
@@ -169,7 +189,7 @@ def api_radar_jugador(request, jugador_id, temporada):
                 'posicion': posicion,
                 'radar_values': radar_values,
                 'media_general': round(media_general, 2),
-                'labels': ['Ataque', 'Defensa', 'Regate', 'Pases', 'Comportamiento', 'Minutos', 'Fantasy']
+                'labels': labels,
             }
         }, status=200)
     
@@ -247,13 +267,32 @@ def api_buscar(request):
                 response = search_jugador.execute()
                 
                 for hit in response:
-                    resultados.append({
-                        'type': 'jugador',
-                        'id': hit.id,
-                        'nombre': f"{hit.nombre} {hit.apellido}",
-                        'posicion': getattr(hit, 'posicion', 'Desconocida'),
-                        'url': f'/jugador/{hit.id}/'
-                    })
+                    # hit.meta.id may be a name slug from old ES index — always
+                    # resolve to a reliable numeric DB id using nombre/apellido.
+                    try:
+                        hit_nombre = getattr(hit, 'nombre', '')
+                        hit_apellido = getattr(hit, 'apellido', '')
+                        # Try _source numeric id first
+                        source_id = getattr(hit, 'id', None)
+                        if source_id and str(source_id).lstrip('-').isdigit():
+                            jugador_pk = int(source_id)
+                        else:
+                            # Fall back: look up in DB by name
+                            jobj = Jugador.objects.filter(
+                                nombre=hit_nombre, apellido=hit_apellido
+                            ).values_list('id', flat=True).first()
+                            jugador_pk = jobj
+                    except Exception:
+                        jugador_pk = None
+
+                    if jugador_pk:
+                        resultados.append({
+                            'type': 'jugador',
+                            'id': jugador_pk,
+                            'nombre': f"{hit_nombre} {hit_apellido}",
+                            'posicion': getattr(hit, 'posicion', 'Desconocida'),
+                            'url': f'/jugador/{jugador_pk}/'
+                        })
             except Exception as e:
                 logger.warning(f"Error en búsqueda de jugadores: {str(e)}")
             

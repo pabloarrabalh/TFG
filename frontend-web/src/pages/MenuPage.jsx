@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import GlassPanel from '../components/ui/GlassPanel'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import TeamShield from '../components/ui/TeamShield'
+import HelpButton from '../components/ui/HelpButton'
 
 const BACKEND = 'http://localhost:8000'
 
@@ -26,7 +27,7 @@ export default function MenuPage() {
   useEffect(() => {
     apiClient.get('/api/menu/')
       .then(({ data }) => setData(data))
-      .catch(console.error)
+      .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
 
@@ -115,7 +116,7 @@ export default function MenuPage() {
               <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
                 {partidos_proxima_jornada.map((p, i) => (
                   <div key={i} className="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 hover:border-primary/50 transition-all">
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="grid items-center gap-2" style={{ gridTemplateColumns: '1fr auto 1fr' }}>
                       <Link to={`/equipo/${encodeURIComponent(p.equipo_local)}`} className="flex items-center gap-2 min-w-0 hover:text-primary transition-colors">
                         <TeamShield escudo={p.equipo_local_escudo} nombre={p.equipo_local} className="size-10 object-contain flex-shrink-0" />
                         <div className="min-w-0">
@@ -123,12 +124,12 @@ export default function MenuPage() {
                           <p className="text-xs text-gray-400">Local</p>
                         </div>
                       </Link>
-                      <div className="text-center flex-shrink-0">
+                      <div className="text-center flex-shrink-0 px-2">
                         <p className="text-xs text-gray-400 font-bold">VS</p>
                         <p className="text-xs text-primary font-bold">{formatTime(p.hora)}</p>
                         <p className="text-xs text-gray-500 font-bold">{formatDate(p.fecha)}</p>
                       </div>
-                      <Link to={`/equipo/${encodeURIComponent(p.equipo_visitante)}`} className="flex items-center gap-2 min-w-0 flex-row-reverse hover:text-primary transition-colors">
+                      <Link to={`/equipo/${encodeURIComponent(p.equipo_visitante)}`} className="flex items-center gap-2 min-w-0 flex-row-reverse hover:text-primary transition-colors justify-self-end">
                         <TeamShield escudo={p.equipo_visitante_escudo} nombre={p.equipo_visitante} className="size-10 object-contain flex-shrink-0" />
                         <div className="min-w-0">
                           <p className="font-bold text-white text-xs truncate text-right">{p.equipo_visitante}</p>
@@ -168,7 +169,7 @@ export default function MenuPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {partidos_favoritos.map((p, i) => (
                     <div key={i} className="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                      <div className="flex items-center justify-between">
+                      <div className="grid items-center gap-2" style={{ gridTemplateColumns: '1fr auto 1fr' }}>
                         <Link to={`/equipo/${encodeURIComponent(p.equipo_local)}`} className="flex items-center gap-3 hover:text-primary transition-colors">
                           <TeamShield escudo={p.equipo_local_escudo} nombre={p.equipo_local} className="size-10 object-contain" />
                           <div>
@@ -176,12 +177,12 @@ export default function MenuPage() {
                             <p className="text-xs text-gray-400">Local</p>
                           </div>
                         </Link>
-                        <div className="text-center">
+                        <div className="text-center px-2">
                           <p className="text-xs text-gray-400 font-bold">VS</p>
                           <p className="text-xs text-primary font-bold">{formatTime(p.hora)}</p>
                           <p className="text-xs text-gray-500">{formatDate(p.fecha)}</p>
                         </div>
-                        <Link to={`/equipo/${encodeURIComponent(p.equipo_visitante)}`} className="flex items-center gap-3 hover:text-primary transition-colors flex-row-reverse">
+                        <Link to={`/equipo/${encodeURIComponent(p.equipo_visitante)}`} className="flex items-center gap-3 hover:text-primary transition-colors flex-row-reverse justify-self-end">
                           <TeamShield escudo={p.equipo_visitante_escudo} nombre={p.equipo_visitante} className="size-10 object-contain" />
                           <div>
                             <p className="font-bold text-white text-sm text-right">{p.equipo_visitante}</p>
@@ -217,9 +218,9 @@ export default function MenuPage() {
             </GlassPanel>
           )}
 
-          {/* Jugadores destacados placeholder */}
+          {/* Jugadores destacados */}
           <GlassPanel className="p-6">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-6">
               <div className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl p-3">
                 <span className="material-symbols-outlined text-white text-xl font-bold">trending_up</span>
               </div>
@@ -230,13 +231,63 @@ export default function MenuPage() {
                 </p>
               </div>
             </div>
-            <div className="mt-6 text-center text-gray-500 py-6">
-              <span className="material-symbols-outlined text-3xl mb-2 block">trending_up</span>
-              <p className="text-sm">Estadísticas disponibles al inicio de la jornada</p>
-            </div>
+
+            {data?.jugadores_destacados_por_posicion && Object.keys(data.jugadores_destacados_por_posicion).some(pos => data.jugadores_destacados_por_posicion[pos].length > 0) ? (
+              <div className="space-y-6">
+                {['Portero', 'Defensa', 'Centrocampista', 'Delantero'].map((posicion) => {
+                  const jugadores = data.jugadores_destacados_por_posicion[posicion] || []
+                  if (jugadores.length === 0) return null
+                  
+                  return (
+                    <div key={posicion}>
+                      <h4 className="text-sm font-bold text-primary mb-3 uppercase">{posicion}</h4>
+                      <div className="space-y-2">
+                        {jugadores.map((jug, idx) => (
+                          <Link
+                            key={jug.id}
+                            to={`/jugador/${jug.id}`}
+                            className="flex items-center gap-3 p-3 bg-surface-dark border border-border-dark rounded-lg hover:bg-white/5 hover:border-primary/50 transition-all group"
+                          >
+                            <div className="flex-shrink-0">
+                              <TeamShield escudo={jug.equipo_escudo} nombre={jug.equipo} className="size-8 rounded-lg object-contain" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-white text-sm group-hover:text-primary transition-colors">
+                                {jug.nombre} {jug.apellido}
+                              </p>
+                              <p className="text-xs text-gray-500">{jug.equipo} • #{jug.dorsal}</p>
+                            </div>
+                            <div className="flex items-center gap-3 flex-shrink-0">
+                              <div className="text-right">
+                                <p className="text-xs text-gray-400">vs</p>
+                                <p className="text-xs font-bold text-white">{jug.proximo_rival}</p>
+                              </div>
+                              <span className="text-sm font-bold text-primary bg-primary/20 px-2.5 py-1 rounded whitespace-nowrap">
+                                {jug.prediccion} pts
+                              </span>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 py-6">
+                <span className="material-symbols-outlined text-3xl mb-2 block">trending_up</span>
+                <p className="text-sm">Estadísticas disponibles al inicio de la jornada</p>
+              </div>
+            )}
           </GlassPanel>
         </div>
       </div>
+      <HelpButton title="Guía del menú" fields={[
+        { label: 'Jornada', description: 'Jornada de liga actualmente en curso o la más reciente disputada.' },
+        { label: 'Clasificación', description: 'Top 5 de equipos por puntos en la jornada más reciente.' },
+        { label: 'Próxima jornada', description: 'Partidos programados para la siguiente jornada de liga.' },
+        { label: 'Favoritos', description: 'Partidos que involucran a los equipos marcados como favoritos.' },
+      ]} />
     </div>
   )
 }

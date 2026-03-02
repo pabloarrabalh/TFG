@@ -35,13 +35,12 @@ CONFIG = {
     'archivo': "csv/csvGenerados/players_with_features.csv",
     'ventana_corta': 3,
     'ventana_larga': 5,
-    'ventana_extra': 7,
     'columna_objetivo': "puntos_fantasy",
     'test_size': 0.2
 }
 
 
-def crear_features_temporales(df, columna, ventana_corta=3, ventana_larga=5, ventana_extra=7, 
+def crear_features_temporales(df, columna, ventana_corta=3, ventana_larga=5, 
                               default_value=0, crear_lag=False, crear_std=False, 
                               crear_volatility=False, prefix="", verbose=False):
     if columna not in df.columns:
@@ -55,8 +54,7 @@ def crear_features_temporales(df, columna, ventana_corta=3, ventana_larga=5, ven
     
     # Ventanas dinámicas basadas en la entrada
     for ventana, nombre_ventana in [(ventana_corta, str(ventana_corta)), 
-                                    (ventana_larga, str(ventana_larga)), 
-                                    (ventana_extra, str(ventana_extra))]:
+                                    (ventana_larga, str(ventana_larga))]:
         col_roll = f"{nombre_base}_roll{nombre_ventana}"
         nuevas_cols[col_roll] = df.groupby("player")[columna].transform(
             lambda x: x.shift().rolling(ventana, min_periods=1).mean()
@@ -339,7 +337,7 @@ def crear_features_mediocampistas_basicos(df):
     print("FEATURES MEDIOCAMPISTAS")
     print("=" * 80)
     
-    vc, vl, ve = CONFIG['ventana_corta'], CONFIG['ventana_larga'], CONFIG['ventana_extra']
+    vc, vl = CONFIG['ventana_corta'], CONFIG['ventana_larga']
     
     # Features mediocampistas detectados del CSV - columnas con minúsculas
     mc_specs = [
@@ -356,7 +354,7 @@ def crear_features_mediocampistas_basicos(df):
     ]
     
     for col, default, prefix in mc_specs:
-        df = crear_features_temporales(df, col, vc, vl, ve, default_value=default, prefix=prefix, verbose=True)
+        df = crear_features_temporales(df, col, vc, vl, default_value=default, prefix=prefix, verbose=True)
     
     return df
 
@@ -366,10 +364,10 @@ def crear_features_form(df):
     print("FEATURES FORM (PUNTOS FANTASY)")
     print("=" * 80)
     
-    vc, vl, ve = CONFIG['ventana_corta'], CONFIG['ventana_larga'], CONFIG['ventana_extra']
+    vc, vl = CONFIG['ventana_corta'], CONFIG['ventana_larga']
     
     if CONFIG['columna_objetivo'] in df.columns:
-        df = crear_features_temporales(df, CONFIG['columna_objetivo'], vc, vl, ve, crear_lag=True, prefix="pf", verbose=True)
+        df = crear_features_temporales(df, CONFIG['columna_objetivo'], vc, vl, crear_lag=True, prefix="pf", verbose=True)
     
     return df
 
@@ -379,16 +377,16 @@ def crear_features_disponibilidad(df):
     print("FEATURES DISPONIBILIDAD")
     print("=" * 80)
     
-    vc, vl, ve = CONFIG['ventana_corta'], CONFIG['ventana_larga'], CONFIG['ventana_extra']
+    vc, vl = CONFIG['ventana_corta'], CONFIG['ventana_larga']
     
     df["min_partido"] = pd.to_numeric(df["min_partido"], errors='coerce').fillna(45)
     df["minutes_pct_temp"] = (df["min_partido"] / 90).fillna(0).clip(0, 1)
     
-    df = crear_features_temporales(df, "minutes_pct_temp", vc, vl, ve, crear_lag=False, default_value=0, prefix="minutes_pct", verbose=True)
+    df = crear_features_temporales(df, "minutes_pct_temp", vc, vl, crear_lag=False, default_value=0, prefix="minutes_pct", verbose=True)
     
     if "titular" in df.columns:
         df["starter_temp"] = df["titular"].astype(float)
-        df = crear_features_temporales(df, "starter_temp", vc, vl, ve, crear_lag=False, default_value=0, prefix="starter_pct", verbose=True)
+        df = crear_features_temporales(df, "starter_temp", vc, vl, crear_lag=False, default_value=0, prefix="starter_pct", verbose=True)
     
     df = df.drop(columns=["minutes_pct_temp"])
     return df
@@ -656,10 +654,10 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     # 1. Random Forest
     print(" Random Forest...")
     rf_params = {
-        'n_estimators': [200, 300, 400, 500],
+        'n_estimators': [200, 300, 400],
         'max_depth': [10, 20, 30, None],
-        'min_samples_split': [2, 3, 5, 7],
-        'min_samples_leaf': [1, 2, 3, 4, 5],
+        'min_samples_split': [2, 3, 5],
+        'min_samples_leaf': [2, 3, 4, 5],
         'max_features': ['sqrt', 'log2', None]
     }
     rf_num_configs = reduce(operator.mul, [len(v) for v in rf_params.values()])

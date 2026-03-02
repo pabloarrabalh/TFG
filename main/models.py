@@ -108,26 +108,6 @@ class Jugador(models.Model):
 
 
 # ============================================================================
-# TABLA: HISTORIAL DE EQUIPOS DE JUGADORES
-# ============================================================================
-class HistorialEquiposJugador(models.Model):
-    jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE, related_name='historial_equipos')
-    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
-    temporada = models.ForeignKey(Temporada, on_delete=models.CASCADE)
-    dorsal = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(99)])  # 0 = suplente/banquillo
-    posicion_transfermarkt = models.CharField(max_length=30, choices=Posicion.choices, null=True, blank=True)
-
-    class Meta:
-        verbose_name = 'Historial Equipos Jugador'
-        verbose_name_plural = 'Historiales Equipos Jugadores'
-        unique_together = ('jugador', 'equipo', 'temporada')
-        ordering = ['temporada', 'equipo']
-
-    def __str__(self):
-        return f"{self.jugador} - {self.equipo} ({self.temporada})"
-
-
-# ============================================================================
 # TABLA: EQUIPO-JUGADOR-TEMPORADA (Plantilla jugada)
 # ============================================================================
 class EquipoJugadorTemporada(models.Model):
@@ -353,7 +333,6 @@ class RendimientoHistoricoJugador(models.Model):
     tarjetas_amarillas_total = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     tarjetas_rojas_total = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     pases_completados_total = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    goles_en_propia_puerta_total = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -374,12 +353,21 @@ class UserProfile(models.Model):
         ('away', 'Ausente'),
         ('dnd', 'No molestar'),
     ]
+    NOTIF_CHOICES = [
+        ('all', 'Todas'),
+        ('friends', 'Solo solicitudes de amistad'),
+        ('events', 'Solo eventos de jugadores'),
+        ('none', 'Ninguna'),
+    ]
     
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='profile')
     nickname = models.CharField(max_length=100, blank=True, default='')
     foto = models.FileField(upload_to='profile_pics/%Y/%m/%d/', null=True, blank=True)
     estado = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
     plantilla_guardada = models.TextField(blank=True, default='{}')  # JSON con la alineación guardada
+    preferencias_notificaciones = models.CharField(
+        max_length=10, choices=NOTIF_CHOICES, default='all'
+    )
 
     class Meta:
         verbose_name = 'Perfil de Usuario'
@@ -411,12 +399,18 @@ class EquipoFavorito(models.Model):
 # TABLA: PLANTILLAS DEL USUARIO
 # ============================================================================
 class Plantilla(models.Model):
+    PRIVACIDAD_CHOICES = [
+        ('publica', 'Pública'),
+        ('privada', 'Privada'),
+    ]
     usuario = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='plantillas')
     nombre = models.CharField(max_length=100)
     formacion = models.CharField(max_length=10, default='4-3-3')  # e.g., "4-3-3", "4-4-2"
     alineacion = models.JSONField(default=dict)  # Almacena posiciones y jugadores
     fecha_creada = models.DateTimeField(auto_now_add=True)
     fecha_modificada = models.DateTimeField(auto_now=True)
+    privacidad = models.CharField(max_length=10, choices=PRIVACIDAD_CHOICES, default='publica')
+    predeterminada = models.BooleanField(default=False)  # Solo una por usuario para notificaciones
 
     class Meta:
         verbose_name = 'Plantilla'
@@ -426,3 +420,102 @@ class Plantilla(models.Model):
 
     def __str__(self):
         return f"{self.usuario.username} - {self.nombre}"
+
+
+# ============================================================================
+# TABLA: SOLICITUDES DE AMISTAD
+# ============================================================================
+class SolicitudAmistad(models.Model):
+    ESTADO_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('aceptada', 'Aceptada'),
+        ('rechazada', 'Rechazada'),
+    ]
+    emisor = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='solicitudes_enviadas')
+    receptor = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='solicitudes_recibidas')
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='pendiente')
+    fecha_creada = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Solicitud de Amistad'
+        verbose_name_plural = 'Solicitudes de Amistad'
+        unique_together = ('emisor', 'receptor')
+        ordering = ['-fecha_creada']
+
+    def __str__(self):
+        return f"{self.emisor.username} → {self.receptor.username} ({self.estado})"
+
+
+# ============================================================================
+# TABLA: AMISTADES
+# ============================================================================
+class Amistad(models.Model):
+    usuario1 = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='amistades_como_usuario1')
+    usuario2 = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='amistades_como_usuario2')
+    fecha_creada = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Amistad'
+        verbose_name_plural = 'Amistades'
+        unique_together = ('usuario1', 'usuario2')
+        ordering = ['-fecha_creada']
+
+    def __str__(self):
+        return f"{self.usuario1.username} ↔ {self.usuario2.username}"
+
+
+# ============================================================================
+# TABLA: NOTIFICACIONES
+# ============================================================================
+class Notificacion(models.Model):
+    TIPO_CHOICES = [
+        ('solicitud_amistad', 'Solicitud de amistad'),
+        ('evento_jugador', 'Evento de jugador'),
+    ]
+    usuario = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='notificaciones')
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    titulo = models.CharField(max_length=200)
+    mensaje = models.TextField(blank=True, default='')
+    leida = models.BooleanField(default=False)
+    fecha_creada = models.DateTimeField(auto_now_add=True)
+    # Datos extra en JSON (e.g., solicitud_id, jugador_id, etc.)
+    datos = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        verbose_name = 'Notificación'
+        verbose_name_plural = 'Notificaciones'
+        ordering = ['-fecha_creada']
+
+    def __str__(self):
+        return f"[{self.tipo}] {self.usuario.username}: {self.titulo}"
+
+
+# ============================================================================
+# TABLA: PREDICCIONES DE JUGADORES
+# ============================================================================
+class PrediccionJugador(models.Model):
+    """Almacena predicciones de puntos fantasy por jugador y jornada.
+    Permite comparar prediccion vs resultado real en la vista de jugador.
+    Se recomienda DB sobre Redis porque las predicciones son datos históricos valiosos
+    (comparación pred vs real, auditoría de modelos, gráficas temporales).
+    """
+    MODELOS = [
+        ('xgb', 'XGBoost'),
+        ('rf', 'Random Forest'),
+        ('lgbm', 'LightGBM'),
+    ]
+
+    jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE, related_name='predicciones')
+    jornada = models.ForeignKey('Jornada', on_delete=models.CASCADE, related_name='predicciones_jugadores')
+    prediccion = models.FloatField(help_text='Puntos fantasy predichos')
+    modelo = models.CharField(max_length=10, choices=MODELOS, default='xgb')
+    creada_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Predicción Jugador'
+        verbose_name_plural = 'Predicciones Jugadores'
+        unique_together = [['jugador', 'jornada', 'modelo']]
+        ordering = ['-jornada__temporada__nombre', 'jornada__numero_jornada']
+
+    def __str__(self):
+        return f"{self.jugador} | J{self.jornada.numero_jornada} | {self.modelo}: {self.prediccion:.1f}"

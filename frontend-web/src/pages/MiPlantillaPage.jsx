@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect, useRef } from 'react'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
+import HelpButton from '../components/ui/HelpButton'
 
 const BACKEND = 'http://localhost:8000'
 
@@ -116,7 +117,9 @@ function PlayerCard({ jugador, posicion, indice, onOpen, onRemove, prediccion, o
         {badge.text}
       </span>
       {prediccion != null && (
-        <div className="mt-1 text-yellow-300 font-black text-sm">{Number(prediccion).toFixed(1)} pts</div>
+        <div className="mt-1 text-yellow-300 font-black text-sm">
+          {prediccion.type === 'media' ? 'Media' : 'Predicción'}: {Number(prediccion.value).toFixed(1)} pts
+        </div>
       )}
       <button
         onMouseDown={e => { e.stopPropagation(); onOpen(jugador) }}
@@ -166,7 +169,7 @@ function SuplenteCard({ jugador, indice, onOpen, onRemove, prediccion, onDragSta
         {`${jugador.nombre[0]}${jugador.apellido ? jugador.apellido[0] : ''}`.toUpperCase()}
       </div>
       <p className="font-bold text-white text-xs truncate leading-tight">{jugador.nombre} {jugador.apellido || ''}</p>
-      {prediccion != null && <div className="text-yellow-300 font-black text-xs mt-0.5">{Number(prediccion).toFixed(1)}</div>}
+      {prediccion != null && <div className="text-yellow-300 font-black text-xs mt-0.5">{prediccion.type === 'media' ? 'Media' : 'Pred'}: {Number(prediccion.value).toFixed(1)}</div>}
       <button onMouseDown={e => { e.stopPropagation(); onOpen(jugador) }} className="mt-1 text-white/60 hover:text-white text-xs underline">Ver</button>
     </div>
   )
@@ -245,7 +248,7 @@ export default function MiPlantillaPage() {
         actualizarRivalesEnAlineacion(data.jugadores_por_posicion)
       }
     } catch (e) {
-      console.error('Error cargando jornada:', e)
+      // Error cargando jornada
     } finally {
       setLoading(false)
     }
@@ -276,7 +279,7 @@ export default function MiPlantillaPage() {
         aplicarPlantilla(ps[0])
       }
     } catch (e) {
-      console.error('Error cargando plantillas:', e)
+      // Error cargando plantillas
     }
   }
 
@@ -446,7 +449,6 @@ export default function MiPlantillaPage() {
       fetchingRef.current.add(jug.id)
       try {
         const payload = { jugador_id: jug.id, jornada: jornadaActual, posicion: jug.posicion }
-        console.log('[PRED] Enviando:', payload)
         const res = await fetch(`${BACKEND}/api/predecir-jugador/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
@@ -454,11 +456,15 @@ export default function MiPlantillaPage() {
           body: JSON.stringify(payload),
         })
         const data = await res.json()
-        console.log('[PRED] Respuesta:', data)
-        if (data.prediccion != null) setPredicciones(prev => ({ ...prev, [jug.id]: data.prediccion }))
-        else if (data.error) console.error('[PRED] Error:', data.error)
+        if (data.prediccion != null) {
+          // Almacenar tanto el valor como el tipo (prediccion o media)
+          setPredicciones(prev => ({ 
+            ...prev, 
+            [jug.id]: { value: data.prediccion, type: data.type || 'prediccion' } 
+          }))
+        }
       } catch (e) {
-        console.error('[PRED] Excepción:', e)
+        // Error fetching prediction
       } finally {
         fetchingRef.current.delete(jug.id)
       }
@@ -485,7 +491,8 @@ export default function MiPlantillaPage() {
       })
       const data = await res.json()
       if (data.status === 'success') {
-        setDetPrediccion(data.prediccion)
+        // Almacenar predicción con tipo (prediccion o media)
+        setDetPrediccion({ value: data.prediccion, type: data.type || 'prediccion' })
         setDetExplicacion(data.explicacion_texto || null)
         setDetFeaturesImpacto(Array.isArray(data.features_impacto) ? data.features_impacto : [])
       }
@@ -695,7 +702,7 @@ export default function MiPlantillaPage() {
 
           {/* ── Total puntos previstos (top-left) ── */}
           {(() => {
-            const total = POSICIONES.flatMap(p => alineacion[p] || []).filter(Boolean).reduce((sum, j) => sum + (predicciones[j.id] ?? 0), 0)
+            const total = POSICIONES.flatMap(p => alineacion[p] || []).filter(Boolean).reduce((sum, j) => sum + (predicciones[j.id]?.value ?? 0), 0)
             const count = POSICIONES.flatMap(p => alineacion[p] || []).filter(Boolean).length
             return (
               <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-3 text-center">
@@ -863,7 +870,9 @@ export default function MiPlantillaPage() {
                   </div>
                 ) : detPrediccion != null ? (
                   <div>
-                    <div className="text-2xl font-black text-yellow-400 mb-3">{Number(detPrediccion).toFixed(2)} pts</div>
+                    <div className="text-2xl font-black text-yellow-400 mb-3">
+                      {detPrediccion.type === 'media' ? 'Media histórica' : 'Predicción'}: {Number(detPrediccion.value).toFixed(2)} pts
+                    </div>
                     {detFeaturesImpacto.length > 0 && (() => {
                       const positivos = detFeaturesImpacto
                         .filter(f => (f.impacto ?? f.impacto_pts ?? 0) > 0)
@@ -906,7 +915,9 @@ export default function MiPlantillaPage() {
                     })()}
                   </div>
                 ) : predicciones[modalDet.id] != null ? (
-                  <div className="text-2xl font-black text-yellow-400">{Number(predicciones[modalDet.id]).toFixed(2)} pts</div>
+                  <div className="text-2xl font-black text-yellow-400">
+                    {predicciones[modalDet.id].type === 'media' ? 'Media histórica' : 'Predicción'}: {Number(predicciones[modalDet.id].value).toFixed(2)} pts
+                  </div>
                 ) : (
                   <span className="text-xs text-gray-500">Sin predicción disponible para esta jornada</span>
                 )}
@@ -915,6 +926,19 @@ export default function MiPlantillaPage() {
           </div>
         </div>
       )}
+      <HelpButton title="Guía de Mi Plantilla" sections={[
+        { title: 'Plantilla Fantasy', fields: [
+          { label: 'Formación', description: 'Esquema táctico que determina cuántos jugadores van en cada línea (ej: 4-3-3).' },
+          { label: 'PTS Fantasy', description: 'Puntos acumulados por el jugador en la temporada según el sistema de puntuación fantasy.' },
+          { label: 'Posición', description: 'Posición habitual del jugador: Portero (PT), Defensa (DF), Centrocampista (MC) o Delantero (DL).' },
+          { label: 'Predicción', description: 'Puntuación estimada para el próximo partido basada en el modelo de IA.' },
+        ]},
+        { title: 'XAI – Explicabilidad', fields: [
+          { label: 'Importancia', description: 'Factores que más influyen en la predicción de este jugador (positivos o negativos).' },
+          { label: 'xG', description: 'Expected Goals: probabilidad estadística de marcar gol según las ocasiones generadas.' },
+          { label: 'xAG', description: 'Expected Assisted Goals: probabilidad de dar una asistencia de gol según las acciones realizadas.' },
+        ]},
+      ]} />
     </div>
   )
 }

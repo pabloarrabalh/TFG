@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.clickjacking import xframe_options_sameorigin
-from .models import (Temporada, Jornada, ClasificacionJornada, Equipo, HistorialEquiposJugador, 
+from .models import (Temporada, Jornada, ClasificacionJornada, Equipo,
                      EquipoJugadorTemporada, Partido, EstadisticasPartidoJugador, Jugador, Calendario, Plantilla)
 from django.db.models import Sum, Count, F, Case, When, FloatField, Q, Avg
 from datetime import datetime, time
@@ -887,36 +887,58 @@ def get_estadisticas_equipo_temporadas(equipo, num_temporadas=3):
     }
 
 def get_jugadores_ultimas_temporadas(equipo, num_temporadas=3):
-    """Obtiene jugadores y sus estadísticas agregadas para las últimas N temporadas"""
+    """Obtiene jugadores y sus estadísticas agregadas para las últimas N temporadas.
+    Incluye posición (más reciente), nacionalidad y puntos fantasy acumulados.
+    """
     from main.models import EstadisticasPartidoJugador, Temporada, EquipoJugadorTemporada
     from django.db.models import Sum, Q, Count
-    
-    # Obtener últimas temporadas
+
     temporadas = Temporada.objects.all().order_by('-nombre')[:num_temporadas]
-    
-    # Obtener jugadores del equipo en esas temporadas
-    eq_jug_temp = EquipoJugadorTemporada.objects.filter(
-        equipo=equipo,
-        temporada__in=temporadas
-    ).values_list('jugador_id', flat=True).distinct()
-    
-    # Obtener estadísticas de esos jugadores en esas temporadas
-    # Y que el partido sea del equipo específico (no contar goles de otros equipos)
+
+    # Mapa jugador_id -> posición/nacionalidad a partir de EquipoJugadorTemporada
+    # Ordenamos ascendente por temporada para que la más reciente quede al final (overwrites)
+    ejt_qs = (EquipoJugadorTemporada.objects
+              .filter(equipo=equipo, temporada__in=temporadas)
+              .select_related('jugador', 'temporada')
+              .order_by('temporada__nombre'))
+
+    posicion_map = {}
+    nac_map = {}
+    dorsal_map = {}  # most recent season overwrites (ascending order)
+    for ejt in ejt_qs:
+        jid = ejt.jugador_id
+        posicion_map[jid] = ejt.posicion or ''
+        nac_map[jid] = ejt.jugador.nacionalidad or ''
+        dorsal_map[jid] = ejt.dorsal
+
+    jugadores_ids = list(posicion_map.keys())
+
     jugadores_stats = EstadisticasPartidoJugador.objects.filter(
         Q(partido__equipo_local=equipo) | Q(partido__equipo_visitante=equipo),
-        jugador_id__in=eq_jug_temp,
+        jugador_id__in=jugadores_ids,
         partido__jornada__temporada__in=temporadas,
-        partido__goles_local__isnull=False
+        partido__goles_local__isnull=False,
     ).values(
-        'jugador', 'jugador__nombre', 'jugador__apellido'
+        'jugador', 'jugador__nombre', 'jugador__apellido',
     ).annotate(
         total_goles=Sum('gol_partido'),
         total_asistencias=Sum('asist_partido'),
         total_minutos=Sum('min_partido'),
-        partidos_count=Count('id')
+        total_puntos_fantasy=Sum('puntos_fantasy'),
+        partidos_count=Count('id'),
     ).order_by('-total_goles', '-total_asistencias')
-    
-    return list(jugadores_stats)
+
+    result = []
+    for js in jugadores_stats:
+        jid = js['jugador']
+        result.append({
+            **js,
+            'posicion': posicion_map.get(jid, ''),
+            'jugador__nacionalidad': nac_map.get(jid, ''),
+            'dorsal': dorsal_map.get(jid),
+            'total_puntos_fantasy': js.get('total_puntos_fantasy') or 0,
+        })
+    return result
 
 def get_informacion_equipo(equipo):
     """Obtiene información completa de un equipo: máximo goleador, asistente, máximos partidos jugados"""
@@ -1217,7 +1239,8 @@ def clasificacion(request):
             
             for stat in estadisticas:
                 # Determinar si el jugador juega en equipo local o visitante
-                es_local = stat.jugador.historial_equipos.filter(
+                es_local = EquipoJugadorTemporada.objects.filter(
+                    jugador=stat.jugador,
                     equipo=partido_cal.equipo_local,
                     temporada=temporada
                 ).exists()
@@ -2965,172 +2988,130 @@ def explicar_prediccion_portero_api(request):
 @require_http_methods(["POST"])
 def predecir_jugador_api(request):
     """
-    API GENÉRICA para predecir puntos fantasy de CUALQUIER JUGADOR (PT, DF, MC, DT).
+    API para obtener PREDICCIÓN o MEDIA de puntos fantasy.
     
     Recibe JSON:
     {
         "jugador_id": 123,
-        "jornada": 15 (opcional),
-        "posicion": "Delantero" (opcional, se obtiene de BD si no se proporciona),
+        "jornada": 15,
+        "posicion": "Delantero" (opcional),
         "modelo": "RF" (opcional, default: 'RF')
     }
     
-    Retorna JSON de manera similar a predecir_portero_api
+    Lógica:
+    1. Intenta obtener predicción existente de BD (PrediccionJugador)
+    2. Si no existe:
+       - Jornadas 1-5 (sin datos): devuelve media histórica con type='media'
+       - Jornadas > 5: devuelve error (debería haber predicción)
     """
     import json
     import logging
-    import sys
-    from pathlib import Path
-    from main.models import Jugador, EstadisticasPartidoJugador
+    from main.models import Jugador, PrediccionJugador, Jornada, Temporada, RendimientoHistoricoJugador
+    from django.db.models import Avg
     
     logger = logging.getLogger(__name__)
     
     try:
-        # Parsear JSON
         body_data = request.body.decode('utf-8') if isinstance(request.body, bytes) else request.body
         data = json.loads(body_data)
-        logger.info(f"[API-GENERAL] Request body: {data}")
         
         jugador_id = data.get('jugador_id')
-        jornada = data.get('jornada', None)
+        jornada_num = data.get('jornada')
         posicion_param = data.get('posicion')
         modelo_tipo = data.get('modelo', 'RF')
         
-        logger.info(f"[API-GENERAL] jugador_id={jugador_id}, jornada={jornada}, posicion_param={posicion_param}")
-        
-        if not jugador_id:
-            logger.error(f"[API-GENERAL] jugador_id es requerido, recibido: {jugador_id}")
+        if not jugador_id or not jornada_num:
             return JsonResponse({
                 'status': 'error',
-                'error': 'jugador_id es requerido'
+                'error': 'Se requieren jugador_id y jornada'
             }, status=400)
         
-        # Obtener jugador de BD
+        # Obtener jugador
         try:
             jugador = Jugador.objects.get(id=jugador_id)
-            nombre_jugador = f"{jugador.nombre} {jugador.apellido}".strip()
-            logger.info(f"[API-GENERAL] Jugador encontrado: {nombre_jugador} (id={jugador_id})")
         except Jugador.DoesNotExist:
-            logger.error(f"[API-GENERAL] Jugador no encontrado: id={jugador_id}")
             return JsonResponse({
                 'status': 'error',
-                'error': f'Jugador no encontrado'
+                'error': 'Jugador no encontrado'
             }, status=404)
         
-        # Normalizar nombre para búsqueda en CSV
-        import unicodedata
-        nfd = unicodedata.normalize('NFD', nombre_jugador)
-        nombre_normalizado = ''.join(c for c in nfd if unicodedata.category(c) != 'Mn').lower().strip()
+        # Obtener temporada actual
+        temporada_actual = Temporada.objects.last()
+        if not temporada_actual:
+            return JsonResponse({
+                'status': 'error',
+                'error': 'Temporada no encontrada'
+            }, status=500)
         
-        # Determinar posición si no se proporciona
-        if posicion_param:
-            posicion = posicion_param
-        else:
-            # Obtener posición desde el método del modelo
-            posicion = jugador.get_posicion_mas_frecuente()
-            if not posicion:
-                # Fallback: obtener del historial de equipos o EstadisticasPartidoJugador
-                try:
-                    ult_stats = EstadisticasPartidoJugador.objects.filter(
-                        jugador=jugador
-                    ).order_by('-partido__jornada__numero').first()
-                    posicion = ult_stats.posicion if ult_stats else 'Delantero'
-                except:
-                    posicion = 'Delantero'
-        
-        logger.info(f"[API-GENERAL] Predicción para {nombre_jugador} ({posicion}), J{jornada}, modelo {modelo_tipo}")
-        
-        # Mapear posición a módulo de predicción
-        posicion_map = {
-            'Portero': 'predecir_portero',
-            'Defensa': 'predecir_defensa',
-            'Centrocampista': 'predecir_mediocampista',
-            'Delantero': 'predecir_delantero',
-            # Variantes
-            'PT': 'predecir_portero',
-            'DF': 'predecir_defensa',
-            'MC': 'predecir_mediocampista',
-            'DT': 'predecir_delantero'
-        }
-        
-        modulo_nombre = posicion_map.get(posicion, 'predecir_portero')  # Default portero
-        logger.info(f"[API-GENERAL] Usando módulo: {modulo_nombre}")
-        
-        # Agregar path para imports
-        entrenamientos_path = Path(__file__).parent / 'entrenamientoModelos'
-        if str(entrenamientos_path) not in sys.path:
-            sys.path.insert(0, str(entrenamientos_path))
-        
-        # Intentar importar el módulo correspondiente (SIN FALLBACKS)
+        # Obtener jornada (de la temporada actual)
         try:
-            if modulo_nombre == 'predecir_portero':
-                from predecir_portero import predecir_puntos_portero as predictor_func
-            elif modulo_nombre == 'predecir_defensa':
-                from predecir_defensa import predecir_puntos_defensa as predictor_func
-            elif modulo_nombre == 'predecir_mediocampista':
-                from predecir_mediocampista import predecir_puntos_mediocampista as predictor_func
-            elif modulo_nombre == 'predecir_delantero':
-                from predecir_delantero import predecir_puntos_delantero as predictor_func
-            else:
+            jornada = Jornada.objects.filter(
+                numero_jornada=jornada_num,
+                temporada=temporada_actual
+            ).first()
+            if not jornada:
                 return JsonResponse({
                     'status': 'error',
-                    'error': f'Posición desconocida: {posicion}'
-                }, status=400)
-        except ImportError as e:
-            logger.error(f"[API-GENERAL] Error importando módulo {modulo_nombre}: {e}")
-            return JsonResponse({
-                'status': 'error',
-                'error': f'Módulo no disponible para {posicion}'
-            }, status=500)
-        
-        # Llamar función de predicción usando el nombre del jugador
-        logger.info(f"[API-GENERAL] Llamando {modulo_nombre}.{predictor_func.__name__}(id={jugador_id}, nombre='{nombre_jugador}', jornada={jornada})")
-        try:
-            resultado = predictor_func(jugador_id, jornada, verbose=False)
-            logger.info(f"[API-GENERAL] Resultado predicción: {resultado}")
+                    'error': f'Jornada {jornada_num} no encontrada en la temporada actual'
+                }, status=404)
         except Exception as e:
-            logger.error(f"[API-GENERAL] Error durante predicción: {e}", exc_info=True)
-            return JsonResponse({
-                'status': 'error',
-                'error': f'Error durante predicción: {str(e)}'
-            }, status=500)
+            logger.error(f"Error obteniendo jornada: {e}")
+            return JsonResponse({'status': 'error', 'error': 'Error obteniendo jornada'}, status=500)
         
-        if not isinstance(resultado, dict):
-            logger.error(f"[API-GENERAL] Resultado no es dict: {type(resultado)}")
-            return JsonResponse({
-                'status': 'error',
-                'error': 'Resultado inválido'
-            }, status=500)
+        nombre_jugador = f"{jugador.nombre} {jugador.apellido}".strip()
         
-        if resultado.get('error'):
+        # ── OPCIÓN 1: Buscar predicción en BD ──────────────────────────────────
+        prediccion_obj = PrediccionJugador.objects.filter(
+            jugador=jugador,
+            jornada=jornada,
+            modelo=modelo_tipo.lower()
+        ).first()
+        
+        if prediccion_obj:
+            # ✓ Predicción encontrada en BD
             return JsonResponse({
-                'status': 'error',
-                'error': resultado['error'],
+                'status': 'success',
+                'type': 'prediccion',  # Indica que es una predicción real
                 'jugador_id': jugador_id,
-                'posicion': posicion
-            }, status=400)
-        else:
-            prediccion = float(resultado.get('prediccion')) if resultado.get('prediccion') is not None else None
+                'jugador_nombre': nombre_jugador,
+                'prediccion': round(float(prediccion_obj.prediccion), 2),
+                'jornada': jornada_num,
+                'posicion': posicion_param or jugador.get_posicion_mas_frecuente() or 'Desconocida',
+                'modelo': modelo_tipo,
+                'fuente': 'prediccion_bd'
+            })
+        
+        # ── OPCIÓN 2: Para jornadas 1-5, devolver MEDIA HISTÓRICA ───────────────
+        if jornada_num <= 5:
+            # Obtener media histórica del jugador
+            media_puntos = (
+                jugador.estadisticas_partidos
+                .aggregate(media=Avg('puntos_fantasy'))['media'] or 0.0
+            )
             
             return JsonResponse({
                 'status': 'success',
+                'type': 'media',  # Indica que es una media, NO una predicción
                 'jugador_id': jugador_id,
                 'jugador_nombre': nombre_jugador,
-                'prediccion': prediccion,
-                'jornada': int(resultado.get('jornada', jornada or 0)),
-                'posicion': posicion,
-                'modelo': resultado.get('modelo', 'Random Forest'),
-                'margen': float(resultado.get('margen', 0)),
-                'features_impacto': resultado.get('features_impacto', []),
-                'explicacion_texto': resultado.get('explicacion_texto', '')
+                'prediccion': round(float(media_puntos), 2),
+                'jornada': jornada_num,
+                'posicion': posicion_param or jugador.get_posicion_mas_frecuente() or 'Desconocida',
+                'modelo': 'Media Histórica',
+                'fuente': 'media_historica',
+                'aviso': f'Jornada {jornada_num}: Sin datos suficientes para predicción. Mostrando media histórica.'
             })
+        
+        # ── OPCIÓN 3: Jornada > 5 sin predicción → Error ──────────────────────
+        return JsonResponse({
+            'status': 'error',
+            'error': f'No hay predicción para jornada {jornada_num} y es demasiado tarde para media',
+            'jugador_id': jugador_id,
+            'jornada': jornada_num
+        }, status=404)
     
-    except json.JSONDecodeError as e:
-        logger.error(f"[API-GENERAL] JSON inválido: {e}")
+    except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'error': 'JSON inválido'}, status=400)
-    except ImportError as e:
-        logger.error(f"[API-GENERAL] Error importando: {e}")
-        return JsonResponse({'status': 'error', 'error': f'Módulo no disponible'}, status=500)
     except Exception as e:
-        logger.error(f"[API-GENERAL] Error general: {e}", exc_info=True)
+        logger.error(f"Error en predecir_jugador_api: {e}", exc_info=True)
         return JsonResponse({'status': 'error', 'error': str(e)}, status=500)

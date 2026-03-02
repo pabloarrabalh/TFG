@@ -52,6 +52,9 @@ export default function EquipoPage() {
   const [loading, setLoading] = useState(true)
   const [mostrarUltimas3, setMostrarUltimas3] = useState(false)
   const [historicoOpen, setHistoricoOpen] = useState(true)
+  const POS_ORDER = ['Portero', 'Defensa', 'Centrocampista', 'Delantero']
+  const [posicionesAbiertas, setPosicionesAbiertas] = useState({ Portero: true, Defensa: true, Centrocampista: true, Delantero: true, Otros: true })
+  const togglePosicion = (pos) => setPosicionesAbiertas(prev => ({ ...prev, [pos]: !prev[pos] }))
   const [jornadaDropdownOpen, setJornadaDropdownOpen] = useState(false)
   const [analysisModalOpen, setAnalysisModalOpen] = useState(false)
 
@@ -67,7 +70,7 @@ export default function EquipoPage() {
       const { data: d } = await api.get(`/api/equipo/${encodeURIComponent(nombre)}/?${params}`)
       setData(d)
     } catch (e) {
-      console.error('Error loading equipo:', e)
+      // Error loading equipo
     } finally {
       setLoading(false)
     }
@@ -152,6 +155,24 @@ export default function EquipoPage() {
       />
     )
   }
+
+  // Top-3 para el sidebar: usa ultimas_3_jugadores cuando está ese modo activo
+  const _mapUltimas = (j) => ({
+    id: j.jugador,
+    jugador_id: j.jugador,
+    nombre: j.jugador__nombre,
+    apellido: j.jugador__apellido,
+    puntos_fantasy: j.total_puntos_fantasy || 0,
+    total_puntos_fantasy: j.total_puntos_fantasy || 0,
+    minutos: j.total_minutos || 0,
+    total_minutos: j.total_minutos || 0,
+  })
+  const sideTop3pts = (mostrarUltimas3 && ultimas_3_jugadores.length > 0)
+    ? [...ultimas_3_jugadores].map(_mapUltimas).sort((a, b) => b.puntos_fantasy - a.puntos_fantasy).slice(0, 3)
+    : top_3_puntos
+  const sideTop3min = (mostrarUltimas3 && ultimas_3_jugadores.length > 0)
+    ? [...ultimas_3_jugadores].map(_mapUltimas).sort((a, b) => b.minutos - a.minutos).slice(0, 3)
+    : top_3_minutos
 
   const renderJugadorCard = (jugador) => (
     <div key={jugador.id} className="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
@@ -342,102 +363,39 @@ export default function EquipoPage() {
             </div>
           </GlassPanel>
 
-          {/* Plantilla Últimas 3 Temporadas */}
-          {mostrarUltimas3 && ultimas_3_jugadores && ultimas_3_jugadores.length > 0 && (
-            <div className="mb-6">
-              {(() => {
-                // Consolidar por nombre, sumando estadísticas
-                const consolidated = {}
-                ultimas_3_jugadores.forEach(j => {
-                  const key = `${j.jugador__nombre}_${j.jugador__apellido}`
-                  if (!consolidated[key]) {
-                    consolidated[key] = {
-                      ...j,
-                      total_goles: j.total_goles || 0,
-                      total_asistencias: j.total_asistencias || 0,
-                      partidos_count: j.partidos_count || 0,
-                      total_minutos: j.total_minutos || 0
-                    }
-                  } else {
-                    consolidated[key].total_goles += j.total_goles || 0
-                    consolidated[key].total_asistencias += j.total_asistencias || 0
-                    consolidated[key].partidos_count += j.partidos_count || 0
-                    consolidated[key].total_minutos += j.total_minutos || 0
-                  }
-                })
-                
-                const consolidatedList = Object.values(consolidated)
-                
-                // Mapeo de posiciones a badges
-                const posicionBadgeMap = {
-                  'Portero': { bg: 'bg-yellow-500', text: 'PT' },
-                  'Defensa': { bg: 'bg-blue-500', text: 'DF' },
-                  'Centrocampista': { bg: 'bg-green-500', text: 'CM' },
-                  'Delantero': { bg: 'bg-red-500', text: 'DL' }
-                }
-                
-                return (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {consolidatedList.map((jugador, idx) => {
-                      const posicion = jugador.posicion || 'Delantero'
-                      const posBadge = posicionBadgeMap[posicion] || { bg: 'bg-gray-500', text: '?' }
-                      const pais = jugador.jugador__pais || 'ESP'
-                      const numero = jugador.jugador__numero || '1'
-                      const flagUrl = `https://flagcdn.com/${pais.toLowerCase().slice(0, 2)}.svg`
-                      
-                      return (
-                        <div key={idx} className="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                          <div className="flex items-start gap-2 mb-3">
-                            <div className={`px-2 py-1 rounded text-xs font-bold flex-shrink-0 text-white ${posBadge.bg}`}>
-                              {posBadge.text}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <a href={`/jugador/${jugador.jugador__id || idx}`} className="font-bold text-white text-xs hover:text-primary transition-colors cursor-pointer line-clamp-2">
-                                {jugador.jugador__nombre} {jugador.jugador__apellido}
-                              </a>
-                              <p className="text-xs text-gray-400 uppercase font-bold tracking-widest mt-1 flex items-center gap-2">
-                                <img src={flagUrl} alt={pais} className="h-4 w-6 object-cover rounded-sm shadow-sm inline-block" onError={e => e.target.src = 'https://flagcdn.com/es.svg'} />
-                                <span>{pais} · #{numero}</span>
-                              </p>
-                            </div>
-                          </div>
-                          
-                          <div className="grid grid-cols-3 gap-2 mb-3">
-                            <div className="text-center">
-                              <div className="text-lg font-black text-primary">{jugador.total_goles}</div>
-                              <div className="text-xs text-gray-400">GOLES</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-2xl font-black text-blue-400">{jugador.total_minutos}'</div>
-                              <div className="text-xs text-gray-400">MIN</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-lg font-black text-yellow-400">{jugador.partidos_count}</div>
-                              <div className="text-xs text-gray-400">PJ</div>
-                            </div>
-                          </div>
-                          
-                          <div className="border-t border-border-dark pt-3 space-y-2">
-                            <div className="flex justify-between items-center">
-                              <span className="text-xs text-gray-400">Partidos</span>
-                              <span className="text-xs font-bold text-white">{jugador.partidos_count}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-xs text-gray-400">Minutos</span>
-                              <span className="text-xs font-bold text-white">{jugador.total_minutos}'</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-xs text-gray-400">Asistencias</span>
-                              <span className="text-xs font-bold text-white">{jugador.total_asistencias}</span>
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )
-              })()}
-            </div>
+          {/* Últimas 3 — panel de stats resumen */}
+          {mostrarUltimas3 && ultimas_3_stats && (
+            <GlassPanel className="rounded-2xl p-6 mb-6">
+              <div className="flex items-center gap-3 mb-5">
+                <span className="material-symbols-outlined text-primary">bar_chart</span>
+                <h2 className="text-xl font-black text-white uppercase tracking-wider">
+                  ESTADÍSTICAS — ÚLTIMAS {ultimas_3_stats.temporadas?.length || 3} TEMPORADAS
+                </h2>
+              </div>
+              <div className="flex flex-wrap gap-2 mb-5">
+                {(ultimas_3_stats.temporadas || []).map(t => (
+                  <span key={t} className="bg-primary/10 border border-primary/30 text-primary text-xs font-bold px-3 py-1 rounded-full">{t.replace('_','/')}</span>
+                ))}
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="bg-surface-dark rounded-xl p-4 text-center">
+                  <div className="text-3xl font-black text-primary">{ultimas_3_stats.total_goles || 0}</div>
+                  <div className="text-xs text-gray-400 mt-1 uppercase font-bold">Goles</div>
+                </div>
+                <div className="bg-surface-dark rounded-xl p-4 text-center">
+                  <div className="text-3xl font-black text-blue-400">{ultimas_3_stats.total_asistencias || 0}</div>
+                  <div className="text-xs text-gray-400 mt-1 uppercase font-bold">Asistencias</div>
+                </div>
+                <div className="bg-surface-dark rounded-xl p-4 text-center">
+                  <div className="text-3xl font-black text-yellow-400">{ultimas_3_stats.partidos_jugados || 0}</div>
+                  <div className="text-xs text-gray-400 mt-1 uppercase font-bold">Partidos</div>
+                </div>
+                <div className="bg-surface-dark rounded-xl p-4 text-center">
+                  <div className="text-3xl font-black text-green-400">{ultimas_3_stats.temporadas?.length || 0}</div>
+                  <div className="text-xs text-gray-400 mt-1 uppercase font-bold">Temporadas</div>
+                </div>
+              </div>
+            </GlassPanel>
           )}
 
           {/* Histórico Temporadas */}
@@ -515,70 +473,92 @@ export default function EquipoPage() {
 
           {/* Plantilla Oficial */}
           <GlassPanel className="rounded-2xl p-6">
-            <h2 className="text-3xl font-black text-white mb-8">
-              PLANTILLA <span className="text-primary">OFICIAL</span>
-              {jugadores.length > 0 && ` (${jugadores.length} jugadores)`}
-            </h2>
+            {(() => {
+              // If mostrarUltimas3, map ultimas_3_jugadores to player-card format
+              let plantillaJugadores = jugadores
+              if (mostrarUltimas3 && ultimas_3_jugadores && ultimas_3_jugadores.length > 0) {
+                plantillaJugadores = ultimas_3_jugadores.map(j => ({
+                  id: j.jugador,
+                  jugador_id: j.jugador,
+                  nombre: j.jugador__nombre,
+                  apellido: j.jugador__apellido,
+                  posicion: j.posicion || '',
+                  nacionalidad: j['jugador__nacionalidad'] || '',
+                  dorsal: j.dorsal != null ? j.dorsal : '-',
+                  goles: j.total_goles || 0,
+                  asistencias: j.total_asistencias || 0,
+                  puntos_fantasy: j.total_puntos_fantasy || 0,
+                  partidos: j.partidos_count || 0,
+                  minutos: j.total_minutos || 0,
+                }))
+              }
 
-            {jugadores.length > 0 ? (
-              <div className="space-y-8">
-                {/* Porteros */}
-                {jugadoresPorPos.Portero.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
-                      <h3 className="text-lg font-black text-white uppercase tracking-wider">PORTEROS</h3>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {jugadoresPorPos.Portero.map(renderJugadorCard)}
-                    </div>
-                  </div>
-                )}
+              const VALID_POS = ['Portero', 'Defensa', 'Centrocampista', 'Delantero']
+              const byPos = {
+                Portero: plantillaJugadores.filter(j => j.posicion === 'Portero'),
+                Defensa: plantillaJugadores.filter(j => j.posicion === 'Defensa'),
+                Centrocampista: plantillaJugadores.filter(j => j.posicion === 'Centrocampista'),
+                Delantero: plantillaJugadores.filter(j => j.posicion === 'Delantero'),
+                Otros: plantillaJugadores.filter(j => !VALID_POS.includes(j.posicion)),
+              }
 
-                {/* Defensas */}
-                {jugadoresPorPos.Defensa.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
-                      <h3 className="text-lg font-black text-white uppercase tracking-wider">DEFENSAS</h3>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {jugadoresPorPos.Defensa.map(renderJugadorCard)}
-                    </div>
-                  </div>
-                )}
+              const POS_META = {
+                Portero:       { color: 'bg-yellow-500', label: 'PORTEROS',       badge: 'PT' },
+                Defensa:       { color: 'bg-blue-500',   label: 'DEFENSAS',       badge: 'DF' },
+                Centrocampista:{ color: 'bg-gray-500',   label: 'CENTROCAMPISTAS',badge: 'MC' },
+                Delantero:     { color: 'bg-red-500',    label: 'DELANTEROS',     badge: 'DT' },
+                Otros:         { color: 'bg-purple-500', label: 'OTROS',          badge: '?' },
+              }
+              const ALL_POS = [...POS_ORDER, 'Otros']
 
-                {/* Centrocampistas */}
-                {jugadoresPorPos.Centrocampista.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-4 h-4 bg-gray-500 rounded-full"></div>
-                      <h3 className="text-lg font-black text-white uppercase tracking-wider">CENTROCAMPISTAS</h3>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {jugadoresPorPos.Centrocampista.map(renderJugadorCard)}
-                    </div>
-                  </div>
-                )}
+              return (
+                <>
+                  <h2 className="text-3xl font-black text-white mb-8">
+                    PLANTILLA <span className="text-primary">{mostrarUltimas3 ? 'ÚLTIMAS 3 TEMPORADAS' : 'OFICIAL'}</span>
+                    {plantillaJugadores.length > 0 && ` (${plantillaJugadores.length} jugadores)`}
+                  </h2>
 
-                {/* Delanteros */}
-                {jugadoresPorPos.Delantero.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-4 h-4 bg-red-500 rounded-full"></div>
-                      <h3 className="text-lg font-black text-white uppercase tracking-wider">DELANTEROS</h3>
+                  {plantillaJugadores.length > 0 ? (
+                    <div className="space-y-4">
+                      {ALL_POS.map(pos => {
+                        if (!byPos[pos] || byPos[pos].length === 0) return null
+                        const meta = POS_META[pos]
+                        const isOpen = posicionesAbiertas[pos]
+                        return (
+                          <div key={pos}>
+                            {/* Collapsible header — clicking toggles */}
+                            <button
+                              onClick={() => togglePosicion(pos)}
+                              className="w-full flex items-center gap-3 mb-3 group text-left"
+                            >
+                              <div className={`w-4 h-4 ${meta.color} rounded-full flex-shrink-0`} />
+                              <h3 className="text-lg font-black text-white uppercase tracking-wider group-hover:text-primary transition-colors">
+                                {meta.label}
+                              </h3>
+                              <span className="text-xs text-gray-500 font-bold ml-1">({byPos[pos].length})</span>
+                              <span
+                                className="material-symbols-outlined text-gray-400 group-hover:text-primary transition-all ml-auto"
+                                style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s' }}
+                              >expand_more</span>
+                            </button>
+
+                            {isOpen && (
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {byPos[pos].map(jugador => renderJugadorCard(jugador))}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {jugadoresPorPos.Delantero.map(renderJugadorCard)}
+                  ) : (
+                    <div className="p-12 text-center">
+                      <p className="text-gray-400 text-lg">No hay datos de plantilla disponibles para este equipo en esta temporada.</p>
                     </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="p-12 text-center">
-                <p className="text-gray-400 text-lg">No hay datos de plantilla disponibles para este equipo en esta temporada.</p>
-              </div>
-            )}
+                  )}
+                </>
+              )
+            })()}
           </GlassPanel>
         </div>
 
@@ -648,15 +628,17 @@ export default function EquipoPage() {
           )}
 
           {/* Top 3 Fantasy */}
-          {top_3_puntos && top_3_puntos.length > 0 && jugadores.length > 0 && (
+          {sideTop3pts && sideTop3pts.length > 0 && (jugadores.length > 0 || mostrarUltimas3) && (
             <GlassPanel className="rounded-2xl p-6 mb-6">
               <div className="flex items-center gap-3 mb-4">
                 <span className="material-symbols-outlined text-primary">star</span>
-                <h3 className="text-lg font-bold text-white uppercase tracking-wider">TOP 3 FANTASY</h3>
+                <h3 className="text-lg font-bold text-white uppercase tracking-wider">
+                  TOP 3 FANTASY{mostrarUltimas3 ? ' · 3 TEMP.' : ''}
+                </h3>
               </div>
               
               <div className="space-y-2">
-                {top_3_puntos.map((jugador, idx) => (
+                {sideTop3pts.map((jugador, idx) => (
                   <div key={idx} className="flex items-center justify-between bg-surface-dark rounded-lg p-3 hover:bg-opacity-80 transition">
                     <div className="flex items-center gap-3 flex-1">
                       <div className="text-xs font-bold text-primary bg-primary/20 w-6 h-6 rounded flex items-center justify-center">
@@ -680,15 +662,17 @@ export default function EquipoPage() {
           )}
 
           {/* Top 3 Minutos */}
-          {top_3_minutos && top_3_minutos.length > 0 && jugadores.length > 0 && (
+          {sideTop3min && sideTop3min.length > 0 && (jugadores.length > 0 || mostrarUltimas3) && (
             <GlassPanel className="rounded-2xl p-6 mb-6">
               <div className="flex items-center gap-3 mb-4">
                 <span className="material-symbols-outlined text-primary">schedule</span>
-                <h3 className="text-lg font-bold text-white uppercase tracking-wider">TOP 3 MINUTOS</h3>
+                <h3 className="text-lg font-bold text-white uppercase tracking-wider">
+                  TOP 3 MINUTOS{mostrarUltimas3 ? ' · 3 TEMP.' : ''}
+                </h3>
               </div>
               
               <div className="space-y-2">
-                {top_3_minutos.map((jugador, idx) => (
+                {sideTop3min.map((jugador, idx) => (
                   <div key={idx} className="flex items-center justify-between bg-surface-dark rounded-lg p-3 hover:bg-opacity-80 transition">
                     <div className="flex items-center gap-3 flex-1">
                       <div className="text-xs font-bold text-primary bg-primary/20 w-6 h-6 rounded flex items-center justify-center">

@@ -286,9 +286,51 @@ def predecir_puntos_delantero(jugador_id, jornada_actual=None, verbose=False):
         except:
             pass
         
-        # Generar explicaciones basadas en features usados con impacto numérico
-        features_para_explicacion = preparar_features_para_explicaciones(features)
-        explicaciones_dict = generar_explicaciones_features(features_para_explicacion)
+        # Generar explicaciones con SHAP para obtener impactos con signo real
+        try:
+            import shap
+            from explicaciones_unificadas import obtener_explicacion
+            explainer = shap.TreeExplainer(modelo)
+            shap_values = explainer.shap_values(X_array)
+            shap_flat = shap_values.flatten()
+
+            feature_impacts = []
+            for i, feat_name in enumerate(feature_names):
+                if i < len(shap_flat):
+                    impacto = float(shap_flat[i])
+                    es_positivo = impacto > 0
+                    try:
+                        explicacion_txt = obtener_explicacion(feat_name, es_positivo)
+                    except Exception:
+                        explicacion_txt = feat_name
+                    feature_impacts.append({
+                        'feature': feat_name,
+                        'impacto': impacto,
+                        'impacto_pts': impacto,
+                        'direccion': 'positivo' if es_positivo else 'negativo',
+                        'explicacion': explicacion_txt,
+                    })
+
+            pos_feats = sorted([f for f in feature_impacts if f['impacto'] > 0], key=lambda x: x['impacto'], reverse=True)
+            neg_feats = sorted([f for f in feature_impacts if f['impacto'] < 0], key=lambda x: x['impacto'])
+            top_feats = pos_feats[:3] + neg_feats[:3]
+            top_feats.sort(key=lambda x: abs(x['impacto']), reverse=True)
+
+            explicacion_lines = ["Factores principales:", ""]
+            for idx_f, feat in enumerate(top_feats, 1):
+                signo = '+' if feat['impacto'] > 0 else '-'
+                linea = f"{idx_f}. {feat['explicacion']} (impacto: {signo}{abs(feat['impacto']):.2f}pts)"
+                explicacion_lines.append(linea)
+            explicacion_texto = "\n".join(explicacion_lines)
+
+            features_impacto_result = top_feats
+            explicacion_texto_result = explicacion_texto
+        except Exception:
+            # Fallback: usar explicaciones basadas en thresholds
+            features_para_explicacion = preparar_features_para_explicaciones(features)
+            explicaciones_dict = generar_explicaciones_features(features_para_explicacion)
+            features_impacto_result = explicaciones_dict.get('features_impacto', [])
+            explicacion_texto_result = explicaciones_dict.get('explicacion_texto', '')
         
         if verbose:
             print(f"✓ DT {jugador_id} J{jornada_actual}: {prediccion:.2f}pt ({features_encontrados} features)")
@@ -303,8 +345,8 @@ def predecir_puntos_delantero(jugador_id, jornada_actual=None, verbose=False):
             'jornada': jornada_actual,
             'modelo': 'Random Forest',
             'features_usados': features_encontrados,
-            'features_impacto': explicaciones_dict.get('features_impacto', []),
-            'explicacion_texto': explicaciones_dict.get('explicacion_texto', ''),
+            'features_impacto': features_impacto_result,
+            'explicacion_texto': explicacion_texto_result,
             'error': None
         }
     

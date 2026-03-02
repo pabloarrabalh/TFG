@@ -34,7 +34,7 @@ django.setup()
 
 from main.models import (
     Temporada, Equipo, EquipoTemporada, Jugador,
-    HistorialEquiposJugador, Jornada, Partido, EstadisticasPartidoJugador,
+    Jornada, Partido, EstadisticasPartidoJugador,
     ClasificacionJornada, RendimientoHistoricoJugador, EquipoJugadorTemporada,
     Calendario
 )
@@ -188,8 +188,8 @@ def obtener_o_crear_jugador(nombre_completo, posicion_csv, nacionalidad=''):
     
     return jugador
 
-def obtener_o_crear_historial(jugador, equipo, temporada, dorsal):
-    """Obtiene o crea HistorialEquiposJugador y actualiza el dorsal."""
+def obtener_o_crear_equipo_jugador_temporada(jugador, equipo, temporada, dorsal):
+    """Obtiene o crea EquipoJugadorTemporada y actualiza el dorsal."""
     # Limpiar dorsal: convertir a int, aceptar 0-99
     dorsal_limpio = 0  # Por defecto suplente/banquillo
     if pd.notna(dorsal):
@@ -199,8 +199,8 @@ def obtener_o_crear_historial(jugador, equipo, temporada, dorsal):
                 dorsal_limpio = dorsal_int
         except (ValueError, TypeError):
             pass
-    
-    historial, created = HistorialEquiposJugador.objects.get_or_create(
+
+    ejt, created = EquipoJugadorTemporada.objects.get_or_create(
         jugador=jugador,
         equipo=equipo,
         temporada=temporada,
@@ -208,13 +208,13 @@ def obtener_o_crear_historial(jugador, equipo, temporada, dorsal):
             'dorsal': dorsal_limpio
         }
     )
-    
+
     # Actualizar dorsal si ya existía y es diferente
-    if not created and historial.dorsal != dorsal_limpio:
-        historial.dorsal = dorsal_limpio
-        historial.save(update_fields=['dorsal'])
-    
-    return historial
+    if not created and ejt.dorsal != dorsal_limpio:
+        ejt.dorsal = dorsal_limpio
+        ejt.save(update_fields=['dorsal'])
+
+    return ejt
 
 def obtener_o_crear_partido(jornada, equipo_local, equipo_visitante, fecha_partido):
     """Obtiene o crea un Partido."""
@@ -410,7 +410,7 @@ def procesar_csv_partido(ruta_csv, temporada):
                 equipo = obtener_o_crear_equipo(equipo_nombre)
                 obtener_o_crear_equipo_temporada(equipo, temporada)
                 jugador = obtener_o_crear_jugador(nombre_jugador, posicion, nacionalidad)  # Pasar nacionalidad
-                obtener_o_crear_historial(jugador, equipo, temporada, dorsal)
+                obtener_o_crear_equipo_jugador_temporada(jugador, equipo, temporada, dorsal)
                 
                 stats = cargar_estadisticas_partido(row, jugador, equipo, partido)
                 contador_stats += 1
@@ -823,55 +823,54 @@ def fase_2d_cargar_rendimiento():
     
     creados = 0
     
-    jugadores = Jugador.objects.all()
+    # Obtener todos los pares (jugador, equipo, temporada) desde EquipoJugadorTemporada
+    eqt_list = EquipoJugadorTemporada.objects.all().select_related('jugador', 'equipo', 'temporada')
     
-    for jugador in jugadores:
-        historiales = jugador.historial_equipos.all()
-        
-        for historial in historiales:
-            try:
-                temporada = historial.temporada
-                equipo = historial.equipo
-                
-                stats = EstadisticasPartidoJugador.objects.filter(
-                    jugador=jugador,
-                    partido__jornada__temporada=temporada,
-                    partido__equipo_local=equipo
-                ) | EstadisticasPartidoJugador.objects.filter(
-                    jugador=jugador,
-                    partido__jornada__temporada=temporada,
-                    partido__equipo_visitante=equipo
-                )
-                
-                if not stats.exists():
-                    continue
-                
-                rendimiento, created = RendimientoHistoricoJugador.objects.update_or_create(
-                    jugador=jugador,
-                    temporada=temporada,
-                    equipo=equipo,
-                    defaults={
-                        'partidos_jugados': stats.filter(min_partido__gt=0).count(),
-                        'partidos_como_titular': stats.filter(titular=True).count(),
-                        'minutos_totales': int(stats.aggregate(Sum('min_partido'))['min_partido__sum'] or 0),
-                        'goles_temporada': int(stats.aggregate(Sum('gol_partido'))['gol_partido__sum'] or 0),
-                        'asistencias_temporada': int(stats.aggregate(Sum('asist_partido'))['asist_partido__sum'] or 0),
-                        'tarjetas_amarillas_total': int(stats.aggregate(Sum('amarillas'))['amarillas__sum'] or 0),
-                        'tarjetas_rojas_total': int(stats.aggregate(Sum('rojas'))['rojas__sum'] or 0),
-                        'pases_completados_total': int(stats.aggregate(Sum('pases_totales'))['pases_totales__sum'] or 0),
-                    }
-                )
-                
-                if created:
-                    creados += 1
-            except Exception:
+    for eqt in eqt_list:
+        try:
+            temporada = eqt.temporada
+            equipo = eqt.equipo
+            jugador = eqt.jugador
+            
+            stats = EstadisticasPartidoJugador.objects.filter(
+                jugador=jugador,
+                partido__jornada__temporada=temporada,
+                partido__equipo_local=equipo
+            ) | EstadisticasPartidoJugador.objects.filter(
+                jugador=jugador,
+                partido__jornada__temporada=temporada,
+                partido__equipo_visitante=equipo
+            )
+            
+            if not stats.exists():
                 continue
+            
+            rendimiento, created = RendimientoHistoricoJugador.objects.update_or_create(
+                jugador=jugador,
+                temporada=temporada,
+                equipo=equipo,
+                defaults={
+                    'partidos_jugados': stats.filter(min_partido__gt=0).count(),
+                    'partidos_como_titular': stats.filter(titular=True).count(),
+                    'minutos_totales': int(stats.aggregate(Sum('min_partido'))['min_partido__sum'] or 0),
+                    'goles_temporada': int(stats.aggregate(Sum('gol_partido'))['gol_partido__sum'] or 0),
+                    'asistencias_temporada': int(stats.aggregate(Sum('asist_partido'))['asist_partido__sum'] or 0),
+                    'tarjetas_amarillas_total': int(stats.aggregate(Sum('amarillas'))['amarillas__sum'] or 0),
+                    'tarjetas_rojas_total': int(stats.aggregate(Sum('rojas'))['rojas__sum'] or 0),
+                    'pases_completados_total': int(stats.aggregate(Sum('pases_totales'))['pases_totales__sum'] or 0),
+                }
+            )
+            
+            if created:
+                creados += 1
+        except Exception:
+            continue
     
     total = RendimientoHistoricoJugador.objects.count()
     print(f"[OK] Rendimiento cargado: {total} registros")
 
 def fase_2e_poblar_equipo_jugador_temporada():
-    """FASE 2e: Puebla EquipoJugadorTemporada con jugadores por temporada."""
+    """FASE 2e: Puebla EquipoJugadorTemporada con jugadores por temporada (ya creado en fase 1)."""
     print("\n" + "=" * 70)
     print("FASE 2e: POBLAR EQUIPO-JUGADOR-TEMPORADA")
     print("=" * 70)
@@ -879,27 +878,18 @@ def fase_2e_poblar_equipo_jugador_temporada():
     from django.db.models import Max
     
     temporadas = Temporada.objects.all()
-    total_creados = 0
+    total_actualizado = 0
     
     for temporada in temporadas:
-        print(f"\n[{temporada.nombre}] Procesando...")
+        print(f"\n[{temporada.nombre}] Actualizando información...")
         
-        # Obtener todos los jugadores que jugaron al menos un partido
-        jugadores_stats = (
-            EstadisticasPartidoJugador.objects
-            .filter(partido__jornada__temporada=temporada)
-            .values('jugador_id', 'jugador__nombre', 'jugador__apellido')
-            .annotate(count=Count('id'))
-            .filter(count__gt=0)
-            .distinct()
-        )
+        # Todos los EquipoJugadorTemporada ya existen, actualizar con edad y partidos
+        eqt_list = EquipoJugadorTemporada.objects.filter(temporada=temporada)
         
-        created_count = 0
         updated_count = 0
         
-        for stat in jugadores_stats:
-            jugador_id = stat['jugador_id']
-            partidos_count = stat['count']
+        for eqt in eqt_list:
+            jugador_id = eqt.jugador_id
             
             # Obtener la edad máxima de este jugador en esta temporada
             edad_max = (
@@ -908,67 +898,25 @@ def fase_2e_poblar_equipo_jugador_temporada():
                 .aggregate(max_edad=Max('edad'))['max_edad']
             )
             
-            # Obtener del historial para sacar equipo, dorsal
-            historial = (
-                HistorialEquiposJugador.objects
-                .filter(jugador_id=jugador_id, temporada=temporada)
-                .first()
+            # Contar partidos jugados
+            partidos_count = (
+                EstadisticasPartidoJugador.objects
+                .filter(jugador_id=jugador_id, partido__jornada__temporada=temporada, min_partido__gt=0)
+                .count()
             )
             
-            if historial:
-                # Crear o actualizar en EquipoJugadorTemporada
-                obj, created = EquipoJugadorTemporada.objects.update_or_create(
-                    equipo=historial.equipo,
-                    jugador_id=jugador_id,
-                    temporada=temporada,
-                    defaults={
-                        'dorsal': historial.dorsal,
-                        'edad': edad_max,
-                        'partidos_jugados': partidos_count,
-                    }
-                )
-                
-                if created:
-                    created_count += 1
-                else:
-                    updated_count += 1
-            else:
-                # Si no hay historial, obtener equipo de las estadísticas
-                try:
-                    first_stat = (
-                        EstadisticasPartidoJugador.objects
-                        .filter(jugador_id=jugador_id, partido__jornada__temporada=temporada)
-                        .select_related('partido__equipo_local', 'partido__equipo_visitante')
-                        .first()
-                    )
-                    
-                    if first_stat:
-                        # Determinar en qué equipo jugó (asumiendo equipo_local por defecto)
-                        equipo = first_stat.partido.equipo_local
-                        
-                        obj, created = EquipoJugadorTemporada.objects.update_or_create(
-                            equipo=equipo,
-                            jugador_id=jugador_id,
-                            temporada=temporada,
-                            defaults={
-                                'dorsal': 0,
-                                'edad': edad_max,
-                                'partidos_jugados': partidos_count,
-                            }
-                        )
-                        
-                        if created:
-                            created_count += 1
-                        else:
-                            updated_count += 1
-                except Exception as e:
-                    print(f"  ⚠ Error procesando jugador {jugador_id}: {str(e)}")
+            # Actualizar si hay cambios
+            if (edad_max and eqt.edad != edad_max) or eqt.partidos_jugados != partidos_count:
+                eqt.edad = edad_max
+                eqt.partidos_jugados = partidos_count
+                eqt.save(update_fields=['edad', 'partidos_jugados'])
+                updated_count += 1
         
-        print(f"  ✓ Creados: {created_count} | Actualizados: {updated_count}")
-        total_creados += created_count
+        print(f"  ✓ Actualizados: {updated_count}")
+        total_actualizado += updated_count
     
     total = EquipoJugadorTemporada.objects.count()
-    print(f"\n[OK] Plantillas por temporada cargadas: {total} registros")
+    print(f"\n[OK] Plantillas por temporada actualizadas: {total} registros")
     return total
 
 

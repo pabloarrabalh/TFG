@@ -6,10 +6,24 @@
 
 {% block content %}
 <style>
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #10b981; border-radius: 9999px; }
-    .custom-scrollbar { scrollbar-width: thin; scrollbar-color: #10b981 transparent; }
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #10b981;
+        border-radius: 9999px;
+    }
+
+    .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: #10b981 transparent;
+    }
 </style>
 <div class="p-6 space-y-6 bg-background-dark min-h-full">
     <!-- Header de Bienvenida -->
@@ -27,10 +41,12 @@
                 <div class="p-6 border-b border-white/10">
                     <div class="flex items-center justify-between gap-3 mb-4">
                         <div class="flex items-center gap-2">
-                            <img src="{% static 'logos/laliga.png' %}" alt="LaLiga" class="h-8 object-contain" onerror="this.style.display='none'">
+                            <img src="{% static 'logos/laliga.png' %}" alt="LaLiga" class="h-8 object-contain"
+                                onerror="this.style.display='none'">
                             <span class="text-sm font-bold text-white">LaLiga</span>
                         </div>
-                        <span class="text-xs text-gray-500 font-bold uppercase tracking-widest">J{{ jornada_actual.numero_jornada }}</span>
+                        <span class="text-xs text-gray-500 font-bold uppercase tracking-widest">J{{
+                            jornada_actual.numero_jornada }}</span>
                     </div>
                     <h3 class="text-xl font-black text-white">Clasificación</h3>
                 </div>
@@ -39,39 +55,48 @@
                         <thead>
                             <tr class="text-left border-b border-white/10">
                                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500">#</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500">Equipo</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center">Pts</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500">Equipo
+                                </th>
+                                <th
+                                    class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 text-center">
+                                    Pts</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for equipo_reg in clasificacion_top %}
                             <tr class="hover:bg-white/5 border-b border-white/5 group transition-colors">
-                                <td class="px-6 py-4 text-sm font-bold text-primary group-hover:text-primary">{{ equipo_reg.posicion }}</td>
+                                <td class="px-6 py-4 text-sm font-bold text-primary group-hover:text-primary">{{
+                                    equipo_reg.posicion }}</td>
                                 <td class="px-6 py-4">
-                                    <a href="{% url 'equipo' equipo_reg.equipo.nombre %}" class="flex items-center gap-3 hover:text-primary transition-colors">
-                                        <img src="{% static 'escudos/' %}{{ equipo_reg.equipo.nombre|shield_name }}.png" 
-                                             alt="{{ equipo_reg.equipo.nombre }}" 
-                                             class="size-8 rounded-lg object-contain"
-                                             onerror="this.style.display='none'">
+                                    <a href="{% url 'equipo' equipo_reg.equipo.nombre %}"
+                                        class="flex items-center gap-3 hover:text-primary transition-colors">
+                                        <img src="{% static 'escudos/' %}{{ equipo_reg.equipo.nombre|shield_name }}.png"
+                                            alt="{{ equipo_reg.equipo.nombre }}"
+                                            class="size-8 rounded-lg object-contain"
+                                            onerror="this.style.display='none'">
                                         <div>
                                             <p class="font-bold text-white text-sm">{{ equipo_reg.equipo.nombre }}</p>
                                         </div>
                                     </a>
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <span class="{% if equipo_reg.posicion == 1 %}bg-primary/20 text-primary{% else %}bg-white/20 text-white{% endif %} px-3 py-1.5 rounded-lg text-sm font-bold">{{ equipo_reg.puntos }}</span>
+                                    <span
+                                        class="{% if equipo_reg.posicion == 1 %}bg-primary/20 text-primary{% else %}bg-white/20 text-white{% endif %} px-3 py-1.5 rounded-lg text-sm font-bold">{{
+                                        equipo_reg.puntos }}</span>
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="3" class="px-6 py-8 text-center text-gray-500">No hay datos de clasificación disponibles</td>
+                                <td colspan="3" class="px-6 py-8 text-center text-gray-500">No hay datos de
+                                    clasificación disponibles</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 <div class="p-4 border-t border-white/10">
-                    <a href="{% url 'clasificacion' %}" class="flex items-center justify-center gap-2 text-primary hover:text-primary-dark transition-colors font-bold text-sm">
+                    <a href="{% url 'clasificacion' %}"
+                        class="flex items-center justify-center gap-2 text-primary hover:text-primary-dark transition-colors font-bold text-sm">
                         Ver clasificación completa
                         <span class="material-symbols-outlined text-sm">arrow_forward</span>
                     </a>
@@ -87,7 +112,8 @@
                         </div>
                         <div>
                             <h3 class="text-xl font-black text-white">Próximos Partidos</h3>
-                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">{% if proxima_jornada %}Jornada {{ proxima_jornada.numero_jornada }}{% else %}Próxima jornada{% endif %}</p>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">{% if proxima_jornada
+                                %}Jornada {{ proxima_jornada.numero_jornada }}{% else %}Próxima jornada{% endif %}</p>
                         </div>
                     </div>
                 </div>
@@ -96,30 +122,35 @@
                 {% if partidos_proxima_jornada %}
                 <div class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
                     {% for partido in partidos_proxima_jornada %}
-                    <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 hover:border-primary/50 transition-all">
-                        <div class="flex items-center justify-between gap-2">
-                            <a href="{% url 'equipo' partido.equipo_local.nombre %}" class="flex items-center gap-2 min-w-0 hover:text-primary transition-colors">
-                                <img src="{% static 'escudos/' %}{{ partido.equipo_local.nombre|shield_name }}.png" 
-                                     alt="{{ partido.equipo_local.nombre }}" 
-                                     class="size-10 object-contain flex-shrink-0"
-                                     onerror="this.style.display='none'">
+                    <div
+                        class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 hover:border-primary/50 transition-all">
+                        <div class="grid items-center gap-2" style="grid-template-columns: 1fr auto 1fr;">
+                            <a href="{% url 'equipo' partido.equipo_local.nombre %}"
+                                class="flex items-center gap-2 min-w-0 hover:text-primary transition-colors">
+                                <img src="{% static 'escudos/' %}{{ partido.equipo_local.nombre|shield_name }}.png"
+                                    alt="{{ partido.equipo_local.nombre }}" class="size-10 object-contain flex-shrink-0"
+                                    onerror="this.style.display='none'">
                                 <div class="min-w-0">
-                                    <p class="font-bold text-white text-xs truncate">{{ partido.equipo_local.nombre }}</p>
+                                    <p class="font-bold text-white text-xs truncate">{{ partido.equipo_local.nombre }}
+                                    </p>
                                     <p class="text-xs text-gray-400">Local</p>
                                 </div>
                             </a>
-                            <div class="text-center flex-shrink-0">
+                            <div class="text-center flex-shrink-0 px-2">
                                 <p class="text-xs text-gray-400 font-bold">VS</p>
-                                <p class="text-xs text-primary font-bold">{% if partido.hora %}{{ partido.hora|time:"H:i" }}{% else %}Por definir{% endif %}</p>
-                                <p class="text-xs text-gray-500 font-bold">{% if partido.fecha %}{{ partido.fecha|date:"d/m" }}{% endif %}</p>
+                                <p class="text-xs text-primary font-bold">{% if partido.hora %}{{
+                                    partido.hora|time:"H:i" }}{% else %}Por definir{% endif %}</p>
+                                <p class="text-xs text-gray-500 font-bold">{% if partido.fecha %}{{
+                                    partido.fecha|date:"d/m" }}{% endif %}</p>
                             </div>
-                            <a href="{% url 'equipo' partido.equipo_visitante.nombre %}" class="flex items-center gap-2 min-w-0 flex-row-reverse hover:text-primary transition-colors">
-                                <img src="{% static 'escudos/' %}{{ partido.equipo_visitante.nombre|shield_name }}.png" 
-                                     alt="{{ partido.equipo_visitante.nombre }}" 
-                                     class="size-10 object-contain flex-shrink-0"
-                                     onerror="this.style.display='none'">
+                            <a href="{% url 'equipo' partido.equipo_visitante.nombre %}"
+                                class="flex items-center gap-2 min-w-0 flex-row-reverse hover:text-primary transition-colors justify-self-end">
+                                <img src="{% static 'escudos/' %}{{ partido.equipo_visitante.nombre|shield_name }}.png"
+                                    alt="{{ partido.equipo_visitante.nombre }}"
+                                    class="size-10 object-contain flex-shrink-0" onerror="this.style.display='none'">
                                 <div class="min-w-0">
-                                    <p class="font-bold text-white text-xs truncate text-right">{{ partido.equipo_visitante.nombre }}</p>
+                                    <p class="font-bold text-white text-xs truncate text-right">{{
+                                        partido.equipo_visitante.nombre }}</p>
                                     <p class="text-xs text-gray-400 text-right">Visitante</p>
                                 </div>
                             </a>
@@ -147,7 +178,8 @@
                         </div>
                         <div>
                             <h3 class="text-xl font-black text-white">Tus Equipos Favoritos</h3>
-                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Próximos Partidos - Jornada {{ proxima_jornada.numero_jornada }}</p>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Próximos Partidos -
+                                Jornada {{ proxima_jornada.numero_jornada }}</p>
                         </div>
                     </div>
                 </div>
@@ -155,32 +187,36 @@
                 <!-- Lista de partidos de equipo favoritos -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {% for partido in partidos_favoritos %}
-                    <div class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                        <div class="flex items-center justify-between">
-                            <a href="{% url 'equipo' partido.equipo_local.nombre %}" class="flex items-center gap-3 hover:text-primary transition-colors">
-                                <img src="{% static 'escudos/' %}{{ partido.equipo_local.nombre|shield_name }}.png" 
-                                     alt="{{ partido.equipo_local.nombre }}" 
-                                     class="size-10 object-contain"
-                                     onerror="this.style.display='none'">
+                    <div
+                        class="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
+                        <div class="grid items-center gap-2" style="grid-template-columns: 1fr auto 1fr;">
+                            <a href="{% url 'equipo' partido.equipo_local.nombre %}"
+                                class="flex items-center gap-3 hover:text-primary transition-colors">
+                                <img src="{% static 'escudos/' %}{{ partido.equipo_local.nombre|shield_name }}.png"
+                                    alt="{{ partido.equipo_local.nombre }}" class="size-10 object-contain"
+                                    onerror="this.style.display='none'">
                                 <div>
                                     <p class="font-bold text-white text-sm">{{ partido.equipo_local.nombre }}</p>
                                     <p class="text-xs text-gray-400">Local</p>
                                 </div>
                             </a>
-                            <div class="text-center">
+                            <div class="text-center px-2">
                                 <p class="text-xs text-gray-400 font-bold">VS</p>
-                                <p class="text-xs text-primary font-bold">{% if partido.hora %}{{ partido.hora|time:"H:i" }}{% else %}Por definir{% endif %}</p>
-                                <p class="text-xs text-gray-500 font-bold">{% if partido.fecha %}{{ partido.fecha|date:"d/m" }}{% endif %}</p>
+                                <p class="text-xs text-primary font-bold">{% if partido.hora %}{{
+                                    partido.hora|time:"H:i" }}{% else %}Por definir{% endif %}</p>
+                                <p class="text-xs text-gray-500 font-bold">{% if partido.fecha %}{{
+                                    partido.fecha|date:"d/m" }}{% endif %}</p>
                             </div>
-                            <a href="{% url 'equipo' partido.equipo_visitante.nombre %}" class="flex items-center gap-3 hover:text-primary transition-colors flex-row-reverse">
+                            <a href="{% url 'equipo' partido.equipo_visitante.nombre %}"
+                                class="flex items-center gap-3 hover:text-primary transition-colors flex-row-reverse justify-self-end">
                                 <div>
-                                    <p class="font-bold text-white text-sm text-right">{{ partido.equipo_visitante.nombre }}</p>
+                                    <p class="font-bold text-white text-sm text-right">{{
+                                        partido.equipo_visitante.nombre }}</p>
                                     <p class="text-xs text-gray-400 text-right">Visitante</p>
                                 </div>
-                                <img src="{% static 'escudos/' %}{{ partido.equipo_visitante.nombre|shield_name }}.png" 
-                                     alt="{{ partido.equipo_visitante.nombre }}" 
-                                     class="size-10 object-contain"
-                                     onerror="this.style.display='none'">
+                                <img src="{% static 'escudos/' %}{{ partido.equipo_visitante.nombre|shield_name }}.png"
+                                    alt="{{ partido.equipo_visitante.nombre }}" class="size-10 object-contain"
+                                    onerror="this.style.display='none'">
                             </a>
                         </div>
                     </div>
@@ -191,7 +227,9 @@
             <div class="glass-panel rounded-2xl p-6 text-center">
                 <span class="material-symbols-outlined text-4xl text-gray-400 mb-2">favorite_border</span>
                 <p class="text-gray-400 text-sm">No tienes equipos favoritos seleccionados</p>
-                <a href="{% url 'select_favorite_teams' %}" class="text-primary hover:text-primary-dark transition-colors text-sm font-bold mt-2 inline-block">Selecciona tus favoritos</a>
+                <a href="{% url 'select_favorite_teams' %}"
+                    class="text-primary hover:text-primary-dark transition-colors text-sm font-bold mt-2 inline-block">Selecciona
+                    tus favoritos</a>
             </div>
             {% else %}
             <div class="glass-panel rounded-2xl p-6">
@@ -208,7 +246,9 @@
                 </div>
                 <div class="text-center">
                     <p class="text-gray-400 text-sm">Inicia sesión para seleccionar y ver tus equipos favoritos</p>
-                    <a href="{% url 'login_register' %}" class="text-primary hover:text-primary-dark transition-colors text-sm font-bold mt-2 inline-block">Inicia sesión / Regístrate</a>
+                    <a href="{% url 'login_register' %}"
+                        class="text-primary hover:text-primary-dark transition-colors text-sm font-bold mt-2 inline-block">Inicia
+                        sesión / Regístrate</a>
                 </div>
             </div>
             {% endif %}
@@ -222,7 +262,8 @@
                         </div>
                         <div>
                             <h3 class="text-xl font-black text-white">Jugadores Destacados</h3>
-                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Próxima Jornada - J{{ proxima_jornada.numero_jornada }}</p>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Próxima Jornada - J{{
+                                proxima_jornada.numero_jornada }}</p>
                         </div>
                     </div>
                 </div>

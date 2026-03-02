@@ -8,7 +8,7 @@ import TeamShield from '../components/ui/TeamShield'
 export default function ClasificacionPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
-  
+
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [filtrosOpen, setFiltrosOpen] = useState(true)
@@ -31,7 +31,7 @@ export default function ClasificacionPage() {
       const { data: d } = await api.get(`/api/clasificacion/?${params}`)
       setData(d)
     } catch (e) {
-      console.error('Error loading clasificacion:', e)
+      // Error loading clasificacion
     } finally {
       setLoading(false)
     }
@@ -82,11 +82,11 @@ export default function ClasificacionPage() {
 
   if (loading && !data) return <LoadingSpinner />
 
-  const { 
-    clasificacion = [], 
-    partidos_jornada = [], 
-    temporadas = [], 
-    jornadas = [], 
+  const {
+    clasificacion = [],
+    partidos_jornada = [],
+    temporadas = [],
+    jornadas = [],
     equipos_disponibles = [],
     jornada_actual = 1
   } = data || {}
@@ -117,7 +117,7 @@ export default function ClasificacionPage() {
 
       {/* Filters Panel */}
       <GlassPanel className="rounded-2xl p-6 mb-6">
-        <div 
+        <div
           className="flex items-center gap-2 cursor-pointer mb-4"
           onClick={() => setFiltrosOpen(!filtrosOpen)}
         >
@@ -237,12 +237,12 @@ export default function ClasificacionPage() {
                         >
                           <td className="px-4 py-3">
                             <div className="flex items-center justify-end gap-3">
-                              <span className={`font-bold text-sm ${equipo === p.local ? 'text-yellow-400' : 'text-white'}`}>
-                                {p.local}
+                              <span className={`font-bold text-sm ${equipo === p.equipo_local ? 'text-yellow-400' : 'text-white'}`}>
+                                {p.equipo_local}
                               </span>
                               <TeamShield
-                                escudo={p.local_escudo}
-                                nombre={p.local}
+                                escudo={p.equipo_local_escudo}
+                                nombre={p.equipo_local}
                                 className="size-8 rounded-lg object-contain"
                               />
                             </div>
@@ -257,12 +257,12 @@ export default function ClasificacionPage() {
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-3">
                               <TeamShield
-                                escudo={p.visitante_escudo}
-                                nombre={p.visitante}
+                                escudo={p.equipo_visitante_escudo}
+                                nombre={p.equipo_visitante}
                                 className="size-8 rounded-lg object-contain"
                               />
-                              <span className={`font-bold text-sm ${equipo === p.visitante ? 'text-yellow-400' : 'text-white'}`}>
-                                {p.visitante}
+                              <span className={`font-bold text-sm ${equipo === p.equipo_visitante ? 'text-yellow-400' : 'text-white'}`}>
+                                {p.equipo_visitante}
                               </span>
                             </div>
                           </td>
@@ -285,7 +285,7 @@ export default function ClasificacionPage() {
                                   {/* Local */}
                                   <div>
                                     <h5 className="text-base font-black text-white mb-4 pb-2 border-b border-primary">
-                                      {p.local}
+                                      {p.equipo_local}
                                     </h5>
                                     {p.sucesos?.goles_local?.length > 0 || p.sucesos?.amarillas_local?.length > 0 || p.sucesos?.rojas_local?.length > 0 ? (
                                       <>
@@ -337,7 +337,7 @@ export default function ClasificacionPage() {
                                   {/* Visitante */}
                                   <div>
                                     <h5 className="text-base font-black text-white mb-4 pb-2 border-b border-primary">
-                                      {p.visitante}
+                                      {p.equipo_visitante}
                                     </h5>
                                     {p.sucesos?.goles_visitante?.length > 0 || p.sucesos?.amarillas_visitante?.length > 0 || p.sucesos?.rojas_visitante?.length > 0 ? (
                                       <>
@@ -435,17 +435,16 @@ export default function ClasificacionPage() {
                       {clasificacion.map(reg => (
                         <tr
                           key={reg.posicion}
-                          className={`border-b border-white/5 hover:bg-white/5 transition-colors border-l-4 ${
-                            equipo === reg.equipo 
-                              ? 'bg-yellow-500/10 border-l-yellow-500' 
-                              : reg.posicion <= 4 
-                              ? 'border-l-blue-500'
-                              : reg.posicion <= 7
-                              ? 'border-l-orange-500'
-                              : reg.posicion <= 17
-                              ? 'border-l-gray-500'
-                              : 'border-l-red-500'
-                          }`}
+                          className={`border-b border-white/5 hover:bg-white/5 transition-colors border-l-4 ${equipo === reg.equipo
+                              ? 'bg-yellow-500/10 border-l-yellow-500'
+                              : reg.posicion <= 4
+                                ? 'border-l-blue-500'
+                                : reg.posicion <= 7
+                                  ? 'border-l-orange-500'
+                                  : reg.posicion <= 17
+                                    ? 'border-l-gray-500'
+                                    : 'border-l-red-500'
+                            }`}
                         >
                           <td className="px-4 py-3 text-center font-bold text-primary">{reg.posicion}</td>
                           <td className="px-4 py-3">
@@ -459,9 +458,8 @@ export default function ClasificacionPage() {
                                 className="size-8 rounded-lg object-contain drop-shadow-md"
                               />
                               <span
-                                className={`font-bold text-sm ${
-                                  equipo === reg.equipo ? 'text-yellow-400' : 'text-white'
-                                }`}
+                                className={`font-bold text-sm ${equipo === reg.equipo ? 'text-yellow-400' : 'text-white'
+                                  }`}
                               >
                                 {reg.equipo}
                               </span>
@@ -473,12 +471,11 @@ export default function ClasificacionPage() {
                                 reg.racha_detalles.map((detalle, idx) => (
                                   <div key={idx} className="relative inline-block racha-item group">
                                     <span
-                                      className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold text-white mx-0.5 ${
-                                        detalle.resultado === 'V' ? 'bg-green-500' :
-                                        detalle.resultado === 'E' ? 'bg-yellow-500' :
-                                        detalle.resultado === 'D' ? 'bg-red-500' :
-                                        'bg-gray-500'
-                                      }`}
+                                      className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold text-white mx-0.5 ${detalle.resultado === 'V' ? 'bg-green-500' :
+                                          detalle.resultado === 'E' ? 'bg-yellow-500' :
+                                            detalle.resultado === 'D' ? 'bg-red-500' :
+                                              'bg-gray-500'
+                                        }`}
                                     >
                                       {detalle.resultado}
                                     </span>
@@ -501,21 +498,19 @@ export default function ClasificacionPage() {
                           <td className="px-4 py-3 text-center text-gray-300">{reg.goles_favor}</td>
                           <td className="px-4 py-3 text-center text-gray-300">{reg.goles_contra}</td>
                           <td
-                            className={`px-4 py-3 text-center font-bold ${
-                              reg.diferencia_goles > 0
+                            className={`px-4 py-3 text-center font-bold ${reg.diferencia_goles > 0
                                 ? 'text-green-400'
                                 : reg.diferencia_goles < 0
-                                ? 'text-red-400'
-                                : 'text-gray-400'
-                            }`}
+                                  ? 'text-red-400'
+                                  : 'text-gray-400'
+                              }`}
                           >
                             {reg.diferencia_goles > 0 ? `+${reg.diferencia_goles}` : reg.diferencia_goles}
                           </td>
                           <td className="px-4 py-3 text-center">
                             <span
-                              className={`px-3 py-1.5 rounded-lg text-sm font-black ${
-                                reg.posicion <= 4 ? 'bg-primary/20 text-primary' : 'text-white'
-                              }`}
+                              className={`px-3 py-1.5 rounded-lg text-sm font-black ${reg.posicion <= 4 ? 'bg-primary/20 text-primary' : 'text-white'
+                                }`}
                             >
                               {reg.puntos}
                             </span>

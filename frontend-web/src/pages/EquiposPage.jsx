@@ -5,6 +5,7 @@ import GlassPanel from '../components/ui/GlassPanel'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import TeamShield from '../components/ui/TeamShield'
 import { useAuth } from '../context/AuthContext'
+import HelpButton from '../components/ui/HelpButton'
 
 export default function EquiposPage() {
   const { user } = useAuth()
@@ -15,7 +16,7 @@ export default function EquiposPage() {
   useEffect(() => {
     apiClient.get('/api/equipos/')
       .then(({ data }) => setEquipos(data.equipos || []))
-      .catch(console.error)
+      .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
 
@@ -24,7 +25,7 @@ export default function EquiposPage() {
     try {
       await apiClient.post('/api/favoritos/toggle-v2/', { equipo_id: equipoId })
       setEquipos((prev) => prev.map((e) => e.id === equipoId ? { ...e, es_favorito: !e.es_favorito } : e))
-    } catch (err) { console.error(err) }
+    } catch (err) { /* Error toggling favorito */ }
   }
 
   const filtered = equipos.filter((e) => e.nombre.toLowerCase().includes(search.toLowerCase()))
@@ -92,6 +93,12 @@ export default function EquiposPage() {
           </div>
         )}
       </div>
+      <HelpButton title="Guía de equipos" fields={[
+        { label: 'Escudo', description: 'Imagen oficial del escudo del equipo.' },
+        { label: 'Estadio', description: 'Nombre del estadio donde juega como local.' },
+        { label: 'Jugadores', description: 'Número de jugadores registrados en la plantilla para la temporada actual.' },
+        { label: '★ Favorito', description: 'Marca el equipo como favorito para acceder rápidamente a él desde el menú principal.' },
+      ]} />
     </div>
   )
 }

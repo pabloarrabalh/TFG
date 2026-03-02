@@ -35,13 +35,12 @@ CONFIG = {
     'archivo': "csv/csvGenerados/players_with_features.csv",
     'ventana_corta': 3,
     'ventana_larga': 5,
-    'ventana_extra': 7,
     'columna_objetivo': "puntos_fantasy",
     'test_size': 0.2
 }
 
 
-def crear_features_temporales(df, columna, ventana_corta=3, ventana_larga=5, ventana_extra=7, 
+def crear_features_temporales(df, columna, ventana_corta=3, ventana_larga=5, 
                               default_value=0, crear_lag=True, crear_std=False, 
                               crear_volatility=False, prefix="", verbose=False):
     if columna not in df.columns:
@@ -52,7 +51,7 @@ def crear_features_temporales(df, columna, ventana_corta=3, ventana_larga=5, ven
     features_nuevos = []
     nuevas_cols = {}
 
-    for ventana, nombre_ventana in [(ventana_corta, "3"), (ventana_larga, "5"), (ventana_extra, "7")]:
+    for ventana, nombre_ventana in [(ventana_corta, "3"), (ventana_larga, "5")]:
         col_roll = f"{nombre_base}_roll{nombre_ventana}"
         col_ewma = f"{nombre_base}_ewma{nombre_ventana}"
         
@@ -324,7 +323,7 @@ def crear_features_delanteros_basicos(df):
     print("FEATURES DELANTEROS (OFENSIVOS)")
     print("=" * 80)
     
-    vc, vl, ve = CONFIG['ventana_corta'], CONFIG['ventana_larga'], CONFIG['ventana_extra']
+    vc, vl = CONFIG['ventana_corta'], CONFIG['ventana_larga']
     
     st_specs = [
         ("gol_partido", 0, "goals"),
@@ -340,7 +339,7 @@ def crear_features_delanteros_basicos(df):
     ]
     
     for col, default, prefix in st_specs:
-        df = crear_features_temporales(df, col, vc, vl, ve, default_value=default, prefix=prefix, verbose=True)
+        df = crear_features_temporales(df, col, vc, vl, default_value=default, prefix=prefix, verbose=True)
     
     return df
 
@@ -350,10 +349,10 @@ def crear_features_form(df):
     print("FEATURES FORM (PUNTOS FANTASY)")
     print("=" * 80)
     
-    vc, vl, ve = CONFIG['ventana_corta'], CONFIG['ventana_larga'], CONFIG['ventana_extra']
+    vc, vl = CONFIG['ventana_corta'], CONFIG['ventana_larga']
     
     if CONFIG['columna_objetivo'] in df.columns:
-        df = crear_features_temporales(df, CONFIG['columna_objetivo'], vc, vl, ve, crear_lag=True, prefix="pf", verbose=True)
+        df = crear_features_temporales(df, CONFIG['columna_objetivo'], vc, vl, crear_lag=True, prefix="pf", verbose=True)
     
     return df
 
@@ -363,16 +362,16 @@ def crear_features_disponibilidad(df):
     print("FEATURES DISPONIBILIDAD")
     print("=" * 80)
     
-    vc, vl, ve = CONFIG['ventana_corta'], CONFIG['ventana_larga'], CONFIG['ventana_extra']
+    vc, vl = CONFIG['ventana_corta'], CONFIG['ventana_larga']
     
     df["min_partido"] = pd.to_numeric(df["min_partido"], errors='coerce').fillna(45)
     df["minutes_pct_temp"] = (df["min_partido"] / 90).fillna(0).clip(0, 1)
     
-    df = crear_features_temporales(df, "minutes_pct_temp", vc, vl, ve, crear_lag=False, default_value=0, prefix="minutes_pct", verbose=True)
+    df = crear_features_temporales(df, "minutes_pct_temp", vc, vl, crear_lag=False, default_value=0, prefix="minutes_pct", verbose=True)
     
     if "titular" in df.columns:
         df["starter_temp"] = df["titular"].astype(float)
-        df = crear_features_temporales(df, "starter_temp", vc, vl, ve, crear_lag=False, default_value=0, prefix="starter_pct", verbose=True)
+        df = crear_features_temporales(df, "starter_temp", vc, vl, crear_lag=False, default_value=0, prefix="starter_pct", verbose=True)
     
     df = df.drop(columns=["minutes_pct_temp"])
     return df
@@ -421,12 +420,9 @@ def crear_features_rival(df):
             df[f'{prefix}_roll5'] = df[f'{col}_shifted'].rolling(5, min_periods=1).mean()
             df[f'{prefix}_ewma5'] = df[f'{col}_shifted'].ewm(span=5, adjust=False).mean()
             
-            df[f'{prefix}_roll7'] = df[f'{col}_shifted'].rolling(7, min_periods=1).mean()
-            df[f'{prefix}_ewma7'] = df[f'{col}_shifted'].ewm(span=7, adjust=False).mean()
-            
             df = df.drop(columns=[f'{col}_shifted'], errors='ignore')
             
-            print(f"   ✅ {col} → {prefix}_roll3/5/7 + ewma3/5/7 (GLOBAL shift, sin groupby)")
+            print(f"   ✅ {col} → {prefix}_roll3/5 + ewma3/5 (GLOBAL shift, sin groupby)")
     
     print()
     return df

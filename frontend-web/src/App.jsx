@@ -15,6 +15,7 @@ const JugadorPage       = lazy(() => import('./pages/JugadorPage'))
 const MiPlantillaPage   = lazy(() => import('./pages/MiPlantillaPage'))
 const PerfilPage        = lazy(() => import('./pages/PerfilPage'))
 const AmigosPage        = lazy(() => import('./pages/AmigosPage'))
+const AmigoPlantillaPage = lazy(() => import('./pages/AmigoPlantillaPage'))
 const SelectFavoritesPage = lazy(() => import('./pages/SelectFavoritesPage'))
 const TermsPage         = lazy(() => import('./pages/TermsPage'))
 
@@ -51,6 +52,9 @@ function AppRoutes() {
         } />
         <Route path="/amigos" element={
           <Layout><ProtectedRoute><AmigosPage /></ProtectedRoute></Layout>
+        } />
+        <Route path="/amigos/:userId/plantilla" element={
+          <Layout><ProtectedRoute><AmigoPlantillaPage /></ProtectedRoute></Layout>
         } />
         <Route path="/favoritos/select" element={
           <Layout><ProtectedRoute><SelectFavoritesPage /></ProtectedRoute></Layout>

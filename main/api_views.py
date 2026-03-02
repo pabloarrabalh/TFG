@@ -16,7 +16,7 @@ from django.views.decorators.http import require_http_methods
 from .models import (
     Temporada, Jornada, Calendario, ClasificacionJornada,
     Equipo, Jugador, EquipoJugadorTemporada, EstadisticasPartidoJugador,
-    Partido, HistorialEquiposJugador,
+    Partido, PrediccionJugador,
 )
 
 from .views import (
@@ -261,13 +261,85 @@ def api_register(request):
 
 # ── 3. MENU ───────────────────────────────────────────────────────────────────
 
+def _get_jugadores_destacados_con_predicciones(temporada, proxima_jornada):
+    """
+    Retorna jugadores destacados de la próxima jornada con predicciones y próximo rival.
+    Agrupa por posición y retorna los mejores 3 por posición.
+    """
+    resultado = {}
+    
+    if not proxima_jornada or not temporada:
+        return resultado
+    
+    posiciones = ['Portero', 'Defensa', 'Centrocampista', 'Delantero']
+    
+    # Obtener predicciones para la próxima jornada
+    predicciones = (PrediccionJugador.objects
+        .filter(jornada=proxima_jornada)
+        .select_related('jugador', 'jugador__equipos_temporada')
+        .values('jugador_id', 'jugador__nombre', 'jugador__apellido')
+        .annotate(pred_promedio=Avg('prediccion'))
+        .order_by('-pred_promedio'))
+    
+    for posicion in posiciones:
+        jugadores_por_posicion = []
+        
+        for pred in predicciones:
+            jugador_id = pred['jugador_id']
+            
+            try:
+                jugador = Jugador.objects.get(pk=jugador_id)
+                ejt = EquipoJugadorTemporada.objects.filter(
+                    jugador=jugador,
+                    temporada=temporada
+                ).first()
+                
+                if not ejt or ejt.posicion != posicion:
+                    continue
+                
+                # Obtener próximo rival (equipo contrario en la próxima jornada)
+                proximo_rival = None
+                calendario = Calendario.objects.filter(
+                    jornada=proxima_jornada
+                ).filter(
+                    Q(equipo_local=ejt.equipo) | Q(equipo_visitante=ejt.equipo)
+                ).first()
+                
+                if calendario:
+                    if calendario.equipo_local == ejt.equipo:
+                        proximo_rival = calendario.equipo_visitante.nombre
+                    else:
+                        proximo_rival = calendario.equipo_local.nombre
+                
+                jugadores_por_posicion.append({
+                    'id': jugador.id,
+                    'nombre': jugador.nombre,
+                    'apellido': jugador.apellido,
+                    'posicion': posicion,
+                    'equipo': ejt.equipo.nombre,
+                    'equipo_escudo': shield_name(ejt.equipo.nombre),
+                    'dorsal': str(ejt.dorsal) if ejt.dorsal else '—',
+                    'prediccion': round(float(pred['pred_promedio']), 2),
+                    'proximo_rival': proximo_rival or '—'
+                })
+            except Exception as e:
+                logging.debug(f"Error procesando jugador {jugador_id}: {e}")
+                continue
+        
+        # Tomar top 3 por posición
+        resultado[posicion] = jugadores_por_posicion[:3]
+    
+    return resultado
+
+
 @require_http_methods(['GET'])
 def api_menu(request):
     """GET /api/menu/"""
     temporada = Temporada.objects.order_by('-nombre').first()
     if not temporada:
         return JsonResponse({'clasificacion_top': [], 'partidos_proxima_jornada': [],
-                             'partidos_favoritos': [], 'jornada_actual': None, 'proxima_jornada': None})
+                             'partidos_favoritos': [], 'jornada_actual': None, 'proxima_jornada': None,
+                             'jugadores_destacados_por_posicion': {}})
 
     jornada_actual = (
         Jornada.objects.filter(temporada=temporada, numero_jornada=17).first()
@@ -302,12 +374,16 @@ def api_menu(request):
             ).select_related('equipo_local', 'equipo_visitante'):
                 partidos_favoritos.append(_serialize_partido_calendario(p))
 
+    # Obtener jugadores destacados con predicciones
+    jugadores_destacados = _get_jugadores_destacados_con_predicciones(temporada, proxima_jornada)
+
     return JsonResponse({
         'clasificacion_top': clasificacion_top,
         'jornada_actual': {'numero': jornada_actual.numero_jornada} if jornada_actual else None,
         'proxima_jornada': {'numero': proxima_jornada.numero_jornada} if proxima_jornada else None,
         'partidos_proxima_jornada': partidos_proxima,
         'partidos_favoritos': partidos_favoritos,
+        'jugadores_destacados_por_posicion': jugadores_destacados,
     })
 
 
@@ -428,21 +504,13 @@ def api_clasificacion(request):
                                 
                                 # Determine which team this player belongs to
                                 try:
-                                    hist = HistorialEquiposJugador.objects.filter(
+                                    ejt = EquipoJugadorTemporada.objects.filter(
                                         jugador=stats.jugador,
                                         temporada=temporada
                                     ).first()
-                                    if not hist:
-                                        # Try EquipoJugadorTemporada as fallback
-                                        ejt = EquipoJugadorTemporada.objects.filter(
-                                            jugador=stats.jugador,
-                                            temporada=temporada
-                                        ).first()
-                                        if not ejt:
-                                            continue
-                                        equipo_jugador = ejt.equipo
-                                    else:
-                                        equipo_jugador = hist.equipo
+                                    if not ejt:
+                                        continue
+                                    equipo_jugador = ejt.equipo
                                 except Exception:
                                     continue
                                 
@@ -503,12 +571,12 @@ def api_clasificacion(request):
             try:
                 favoritos_ids = set(request.user.equipos_favoritos.values_list('equipo_id', flat=True))
                 favoritos_nombres = set(Equipo.objects.filter(id__in=favoritos_ids).values_list('nombre', flat=True))
-                partidos_jornada = [p for p in partidos_jornada if p['local'] in favoritos_nombres or p['visitante'] in favoritos_nombres]
+                partidos_jornada = [p for p in partidos_jornada if p['equipo_local'] in favoritos_nombres or p['equipo_visitante'] in favoritos_nombres]
             except Exception:
                 pass  # Si hay error, mostrar todos los partidos
         elif equipo_seleccionado:
             # Filtrar por equipo específico
-            partidos_jornada = [p for p in partidos_jornada if p['local'].lower() == equipo_seleccionado.lower() or p['visitante'].lower() == equipo_seleccionado.lower()]
+            partidos_jornada = [p for p in partidos_jornada if p['equipo_local'].lower() == equipo_seleccionado.lower() or p['equipo_visitante'].lower() == equipo_seleccionado.lower()]
 
         # Obtener equipos favoritos del usuario si está autenticado
         favoritos_equipos = []
@@ -677,52 +745,50 @@ def api_equipo(request, equipo_nombre):
             jugadores_agrupados[jugador_id]['total_goles'] += total_goles
             jugadores_agrupados[jugador_id]['total_asistencias'] += total_asistencias
     
-    # Si no hay suficientes jugadores, también buscar en HistorialEquiposJugador
+    # Si no hay suficientes jugadores, buscar por estadísticas directamente
     if len(jugadores_agrupados) < 10:
-        jugadores_historico = HistorialEquiposJugador.objects.filter(
-            equipo=equipo,
-            temporada=temporada
-        ).select_related('jugador')
-        
-        # Deduplicar manualmente
-        jugadores_ids_historico = set()
-        for jugador_hist in jugadores_historico:
-            jugador = jugador_hist.jugador
-            if jugador.id not in jugadores_agrupados and jugador.id not in jugadores_ids_historico:
-                jugadores_ids_historico.add(jugador.id)
-                # Obtener stats de este jugador en esa temporada
-                stats_query = EstadisticasPartidoJugador.objects.filter(
-                    jugador=jugador,
-                    partido__jornada__temporada=temporada
-                )
-                
-                if jornada_actual:
-                    stats_query = stats_query.filter(partido__jornada__numero_jornada__lte=jornada_actual)
-                
-                valid_stats = stats_query.exclude(puntos_fantasy__gt=40)
-                
-                total_goles = valid_stats.aggregate(Sum('gol_partido'))['gol_partido__sum'] or 0
-                total_asistencias = valid_stats.aggregate(Sum('asist_partido'))['asist_partido__sum'] or 0
-                total_puntos = valid_stats.aggregate(Sum('puntos_fantasy'))['puntos_fantasy__sum'] or 0
-                partidos_jugados = valid_stats.count()
-                total_minutos = valid_stats.aggregate(Sum('min_partido'))['min_partido__sum'] or 0
-                
-                if total_puntos > 0 or partidos_jugados > 0:
-                    posicion_frecuente = valid_stats.values('posicion').annotate(
-                        count=Count('id')
-                    ).order_by('-count').first()
-                    
-                    jugadores_agrupados[jugador.id] = {
-                        'obj': None,
-                        'total_goles': total_goles,
-                        'total_asistencias': total_asistencias,
-                        'total_puntos': total_puntos,
-                        'partidos_stats': partidos_jugados,
-                        'total_minutos': total_minutos,
-                        'posicion': posicion_frecuente['posicion'] if posicion_frecuente else None,
-                        'nombre': jugador.nombre,
-                        'apellido': jugador.apellido
-                    }
+        jugadores_con_stats = (
+            EstadisticasPartidoJugador.objects
+            .filter(partido__jornada__temporada=temporada)
+            .filter(
+                Q(partido__equipo_local=equipo) | Q(partido__equipo_visitante=equipo)
+            )
+            .values_list('jugador_id', flat=True)
+            .distinct()
+        )
+        for jugador_id in jugadores_con_stats:
+            if jugador_id in jugadores_agrupados:
+                continue
+            jugador = Jugador.objects.filter(id=jugador_id).first()
+            if not jugador:
+                continue
+            stats_query = EstadisticasPartidoJugador.objects.filter(
+                jugador=jugador,
+                partido__jornada__temporada=temporada
+            )
+            if jornada_actual:
+                stats_query = stats_query.filter(partido__jornada__numero_jornada__lte=jornada_actual)
+            valid_stats = stats_query.exclude(puntos_fantasy__gt=40)
+            total_goles = valid_stats.aggregate(Sum('gol_partido'))['gol_partido__sum'] or 0
+            total_asistencias = valid_stats.aggregate(Sum('asist_partido'))['asist_partido__sum'] or 0
+            total_puntos = valid_stats.aggregate(Sum('puntos_fantasy'))['puntos_fantasy__sum'] or 0
+            partidos_jugados = valid_stats.count()
+            total_minutos = valid_stats.aggregate(Sum('min_partido'))['min_partido__sum'] or 0
+            if total_puntos > 0 or partidos_jugados > 0:
+                posicion_frecuente = valid_stats.values('posicion').annotate(
+                    count=Count('id')
+                ).order_by('-count').first()
+                jugadores_agrupados[jugador.id] = {
+                    'obj': None,
+                    'total_goles': total_goles,
+                    'total_asistencias': total_asistencias,
+                    'total_puntos': total_puntos,
+                    'partidos_stats': partidos_jugados,
+                    'total_minutos': total_minutos,
+                    'posicion': posicion_frecuente['posicion'] if posicion_frecuente else None,
+                    'nombre': jugador.nombre,
+                    'apellido': jugador.apellido
+                }
     
     # Matching dorsal 0
     def similitud_nombres(n1, n2):
@@ -976,16 +1042,16 @@ def api_jugador(request, jugador_id):
         porcentaje_paradas=Avg('porcentaje_paradas'),
     )
 
-    # Últimos 12 partidos
+    # Todos los partidos (sin limite 12)
     if es_carrera:
         ultimos_12 = EstadisticasPartidoJugador.objects.filter(
             jugador=jugador
-        ).exclude(puntos_fantasy__gt=40).select_related('partido__jornada').order_by('-partido__jornada__temporada__nombre', '-partido__jornada__numero_jornada')[:12]
+        ).exclude(puntos_fantasy__gt=40).select_related('partido__jornada').order_by('-partido__jornada__temporada__nombre', '-partido__jornada__numero_jornada')
     else:
         ultimos_12 = EstadisticasPartidoJugador.objects.filter(
             jugador=jugador,
             partido__jornada__temporada=temporada
-        ).exclude(puntos_fantasy__gt=40).select_related('partido__jornada').order_by('-partido__jornada__numero_jornada')[:12]
+        ).exclude(puntos_fantasy__gt=40).select_related('partido__jornada').order_by('-partido__jornada__numero_jornada')
     
     ultimos_12_data = []
     for s in reversed(list(ultimos_12)):
@@ -1208,16 +1274,50 @@ def api_jugador(request, jugador_id):
         },
         'ultimos_8': ultimos_12_data,
         'roles': roles,
-        'es_roles_por_temporada': es_carrera,  # Flag para saber si roles están divididos por temporada
+        'es_roles_por_temporada': es_carrera,
         'historico': historico_data,
         'radar_values': [],
         'media_general': 0,
         'percentiles': percentiles,
         'descripciones_roles': DESCRIPCIONES_ROLES,
+        'predicciones': _get_predicciones_jugador(jugador, temporada if not es_carrera else None),
     })
 
 
 # ── 8. PERFIL ─────────────────────────────────────────────────────────────────
+
+def _get_predicciones_jugador(jugador, temporada):
+    """Devuelve las predicciones almacenadas de un jugador para una temporada.
+    Cada entrada combina prediccion y puntos_fantasy reales para comparar lado a lado.
+    Para jornadas 1-5, marca como early_jornada para mostrar media en lugar de predicción.
+    """
+    from .models import PrediccionJugador
+    
+    qs = PrediccionJugador.objects.filter(jugador=jugador)
+    if temporada:
+        qs = qs.filter(jornada__temporada=temporada)
+    qs = qs.select_related('jornada').order_by('jornada__temporada__nombre', 'jornada__numero_jornada')
+    
+    result = []
+    for pred in qs:
+        # Obtener puntos reales de esa jornada (si existen)
+        from django.db.models import Sum
+        real = EstadisticasPartidoJugador.objects.filter(
+            jugador=jugador,
+            partido__jornada=pred.jornada
+        ).aggregate(pts=Sum('puntos_fantasy'))['pts']
+        
+        jornada_num = pred.jornada.numero_jornada
+        
+        result.append({
+            'jornada': jornada_num,
+            'temporada': pred.jornada.temporada.nombre.replace('_', '/'),
+            'prediccion': round(pred.prediccion, 2),
+            'real': float(real) if real is not None else None,
+            'modelo': pred.modelo,
+            'is_early_jornada': jornada_num <= 5,  # Indica si es jornada 1-5
+        })
+    return result
 
 @require_http_methods(['GET'])
 def api_perfil(request):
@@ -1252,6 +1352,7 @@ def api_perfil(request):
         **profile_data,
         'favoritos': favoritos,
         'plantillas_count': plantillas_count,
+        'preferencias_notificaciones': user.profile.preferencias_notificaciones if hasattr(user, 'profile') else 'all',
     })
 
 
@@ -1263,12 +1364,24 @@ def api_update_perfil(request):
     try:
         data = json.loads(request.body)
         user = request.user
+        old_username = user.username
+        username_changed = False
         if 'first_name' in data:
             user.first_name = data['first_name']
         if 'last_name' in data:
             user.last_name = data['last_name']
         if 'email' in data:
             user.email = data['email']
+        # Handle username change if provided
+        if 'username' in data:
+            new_username = (data.get('username') or '').strip()
+            if new_username and new_username.lower() != user.username.lower():
+                # Check uniqueness (case-insensitive)
+                if User.objects.filter(username__iexact=new_username).exclude(id=user.id).exists():
+                    return JsonResponse({'error': 'Nombre de usuario ya en uso'}, status=400)
+                user.username = new_username
+                username_changed = True
+
         user.save()
         try:
             if 'nickname' in data:
@@ -1276,6 +1389,41 @@ def api_update_perfil(request):
                 user.profile.save()
         except Exception:
             pass
+        # If username changed, update cached references in notifications and messages
+        if username_changed:
+            try:
+                from .models import Notificacion
+                # Find notifications where datos contains this user's id or username
+                qs = Notificacion.objects.filter(
+                    Q(datos__emisor_id=user.id) | Q(datos__amigo_id=user.id) |
+                    Q(datos__emisor_username__iexact=old_username) | Q(datos__amigo_username__iexact=old_username)
+                )
+                for n in qs:
+                    d = n.datos or {}
+                    changed = False
+                    if d.get('emisor_id') == user.id:
+                        d['emisor_username'] = user.username
+                        d['emisor_nombre'] = user.first_name or user.username
+                        changed = True
+                    if d.get('amigo_id') == user.id:
+                        d['amigo_username'] = user.username
+                        d['amigo_nombre'] = user.first_name or user.username
+                        changed = True
+                    if d.get('amigo_username') == old_username:
+                        d['amigo_username'] = user.username
+                        changed = True
+                    if d.get('emisor_username') == old_username:
+                        d['emisor_username'] = user.username
+                        changed = True
+                    # Update message text if it references the old username
+                    if n.mensaje and ('@' + old_username) in n.mensaje:
+                        n.mensaje = n.mensaje.replace('@' + old_username, '@' + user.username)
+                        changed = True
+                    if changed:
+                        n.datos = d
+                        n.save()
+            except Exception:
+                pass
         return JsonResponse({'status': 'ok', 'user': _user_info(user)})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
@@ -1463,16 +1611,43 @@ def api_enviar_solicitud(request):
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'No autenticado'}, status=401)
     try:
-        from .models import SolicitudAmistad
+        from .models import SolicitudAmistad, Notificacion
         data = json.loads(request.body)
-        username = data.get('username', '').strip()
-        receptor = User.objects.get(username=username)
+        username_raw = data.get('username', '') or ''
+        username = username_raw.strip().lstrip('@').strip()
+        receptor = None
+        # Try case-insensitive username
+        try:
+            receptor = User.objects.get(username__iexact=username)
+        except User.DoesNotExist:
+            # Fallback: try nickname on profile
+            receptor = User.objects.filter(profile__nickname__iexact=username).first()
+            if receptor is None:
+                # Also try full username search (contains) as a last resort
+                receptor = User.objects.filter(username__icontains=username).first()
+        if receptor is None:
+            return JsonResponse({'error': 'Usuario no encontrado. Usa el nombre de usuario exacto (sin @).'}, status=404)
         if receptor == request.user:
             return JsonResponse({'error': 'No puedes enviarte una solicitud a ti mismo'}, status=400)
         sol, created = SolicitudAmistad.objects.get_or_create(emisor=request.user, receptor=receptor,
                                                                defaults={'estado': 'pendiente'})
         if not created:
             return JsonResponse({'error': 'Ya existe una solicitud pendiente'}, status=400)
+        # Create notification for receptor (if they want friend notifications)
+        pref = 'all'
+        try:
+            pref = receptor.profile.preferencias_notificaciones
+        except Exception:
+            pass
+        if pref in ('all', 'friends'):
+            Notificacion.objects.create(
+                usuario=receptor,
+                tipo='solicitud_amistad',
+                titulo=f'{request.user.first_name or request.user.username} te ha enviado una solicitud de amistad',
+                mensaje=f'@{request.user.username} quiere ser tu amigo/a.',
+                datos={'solicitud_id': sol.id, 'emisor_id': request.user.id, 'emisor_username': request.user.username,
+                       'emisor_nombre': request.user.first_name or request.user.username, 'estado': 'pendiente'},
+            )
         return JsonResponse({'status': 'ok'})
     except User.DoesNotExist:
         return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
@@ -1485,11 +1660,37 @@ def api_aceptar_solicitud(request, solicitud_id):
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'No autenticado'}, status=401)
     try:
-        from .models import SolicitudAmistad, Amistad
+        from .models import SolicitudAmistad, Amistad, Notificacion
         sol = SolicitudAmistad.objects.get(id=solicitud_id, receptor=request.user, estado='pendiente')
         sol.estado = 'aceptada'
         sol.save()
         Amistad.objects.get_or_create(usuario1=sol.emisor, usuario2=request.user)
+        # Mark notification as read and set estado to 'aceptada' for receptor's notifications
+        receptor_notifs = Notificacion.objects.filter(usuario=request.user, tipo='solicitud_amistad', datos__solicitud_id=sol.id)
+        for rn in receptor_notifs:
+            try:
+                d = rn.datos or {}
+                d['estado'] = 'aceptada'
+                rn.datos = d
+                rn.leida = True
+                rn.save()
+            except Exception:
+                rn.leida = True
+                rn.save()
+        # Notify the original sender
+        pref = 'all'
+        try:
+            pref = sol.emisor.profile.preferencias_notificaciones
+        except Exception:
+            pass
+        if pref in ('all', 'friends'):
+            Notificacion.objects.create(
+                usuario=sol.emisor,
+                tipo='solicitud_amistad',
+                titulo=f'{request.user.first_name or request.user.username} aceptó tu solicitud de amistad',
+                mensaje=f'Ya sois amigos. ¡Ahora puedes ver su plantilla!',
+                datos={'amigo_id': request.user.id, 'amigo_username': request.user.username, 'estado': 'aceptada'},
+            )
         return JsonResponse({'status': 'ok'})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
@@ -1500,10 +1701,36 @@ def api_rechazar_solicitud(request, solicitud_id):
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'No autenticado'}, status=401)
     try:
-        from .models import SolicitudAmistad
+        from .models import SolicitudAmistad, Notificacion
         sol = SolicitudAmistad.objects.get(id=solicitud_id, receptor=request.user, estado='pendiente')
         sol.estado = 'rechazada'
         sol.save()
+        # Mark any related notification as read and set estado to 'rechazada' for receptor
+        receptor_notifs = Notificacion.objects.filter(usuario=request.user, tipo='solicitud_amistad', datos__solicitud_id=sol.id)
+        for rn in receptor_notifs:
+            try:
+                d = rn.datos or {}
+                d['estado'] = 'rechazada'
+                rn.datos = d
+                rn.leida = True
+                rn.save()
+            except Exception:
+                rn.leida = True
+                rn.save()
+        # Notify the sender that their request was rejected (if they accept notifications)
+        pref = 'all'
+        try:
+            pref = sol.emisor.profile.preferencias_notificaciones
+        except Exception:
+            pass
+        if pref in ('all', 'friends'):
+            Notificacion.objects.create(
+                usuario=sol.emisor,
+                tipo='solicitud_amistad',
+                titulo=f'{request.user.first_name or request.user.username} rechazó tu solicitud de amistad',
+                mensaje=f'@{request.user.username} ha rechazado tu solicitud.',
+                datos={'solicitud_id': sol.id, 'amigo_id': request.user.id, 'amigo_username': request.user.username, 'estado': 'rechazada'},
+            )
         return JsonResponse({'status': 'ok'})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
@@ -1642,3 +1869,395 @@ def api_mi_plantilla_jugadores(request):
         })
 
     return JsonResponse({'jugadores': result})
+
+
+# ── 13. NOTIFICACIONES ────────────────────────────────────────────────────────
+
+@require_http_methods(['GET'])
+def api_notificaciones(request):
+    """GET /api/notificaciones/ - Lista notificaciones del usuario autenticado"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autenticado'}, status=401)
+    try:
+        from .models import Notificacion
+        notifs = Notificacion.objects.filter(usuario=request.user).order_by('-fecha_creada')[:50]
+        data = []
+        for n in notifs:
+            data.append({
+                'id': n.id,
+                'tipo': n.tipo,
+                'titulo': n.titulo,
+                'mensaje': n.mensaje,
+                'leida': n.leida,
+                'creada_en': n.fecha_creada.isoformat(),
+                'datos': n.datos,
+            })
+        no_leidas = Notificacion.objects.filter(usuario=request.user, leida=False).count()
+        return JsonResponse({'notificaciones': data, 'no_leidas': no_leidas})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@require_http_methods(['POST'])
+def api_marcar_notificacion_leida(request, notif_id):
+    """POST /api/notificaciones/<id>/leer/"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autenticado'}, status=401)
+    try:
+        from .models import Notificacion
+        Notificacion.objects.filter(id=notif_id, usuario=request.user).update(leida=True)
+        return JsonResponse({'status': 'ok'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@require_http_methods(['POST'])
+def api_marcar_todas_leidas(request):
+    """POST /api/notificaciones/leer-todas/"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autenticado'}, status=401)
+    try:
+        from .models import Notificacion
+        Notificacion.objects.filter(usuario=request.user, leida=False).update(leida=True)
+        return JsonResponse({'status': 'ok'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@require_http_methods(['POST'])
+def api_borrar_notificacion(request, notif_id):
+    """POST /api/notificaciones/<id>/borrar/ - Borra una notificación"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autenticado'}, status=401)
+    try:
+        from .models import Notificacion
+        Notificacion.objects.filter(id=notif_id, usuario=request.user).delete()
+        return JsonResponse({'status': 'ok'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@require_http_methods(['POST'])
+def api_borrar_todas_notificaciones(request):
+    """POST /api/notificaciones/borrar-todas/ - Borra todas las notificaciones del usuario"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autenticado'}, status=401)
+    try:
+        from .models import Notificacion
+        Notificacion.objects.filter(usuario=request.user).delete()
+        return JsonResponse({'status': 'ok'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@require_http_methods(['POST'])
+def api_update_preferencias_notificaciones(request):
+    """POST /api/perfil/preferencias-notificaciones/ {preferencia: 'all'|'friends'|'events'|'none'}"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autenticado'}, status=401)
+    try:
+        data = json.loads(request.body)
+        pref = data.get('preferencia', 'all')
+        if pref not in ('all', 'friends', 'events', 'none'):
+            return JsonResponse({'error': 'Preferencia inválida'}, status=400)
+        request.user.profile.preferencias_notificaciones = pref
+        request.user.profile.save()
+        return JsonResponse({'status': 'ok', 'preferencia': pref})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+# ── 14. PLANTILLA DE AMIGO ────────────────────────────────────────────────────
+
+@require_http_methods(['GET'])
+def api_plantillas_amigo(request, user_id):
+    """GET /api/amigos/<user_id>/plantillas/ - Obtener plantillas públicas de un amigo"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autenticado'}, status=401)
+    try:
+        from .models import Amistad, Plantilla
+        amigo = User.objects.get(id=user_id)
+        # Verify they are actually friends
+        is_friend = Amistad.objects.filter(
+            Q(usuario1=request.user, usuario2=amigo) |
+            Q(usuario1=amigo, usuario2=request.user)
+        ).exists()
+        if not is_friend:
+            return JsonResponse({'error': 'No sois amigos'}, status=403)
+        # Get amigo's public plantillas
+        plantillas = Plantilla.objects.filter(usuario=amigo, privacidad='publica')
+        data = []
+        for p in plantillas:
+            data.append({
+                'id': p.id,
+                'nombre': p.nombre,
+                'formacion': p.formacion,
+                'alineacion': p.alineacion,
+                'fecha_modificada': p.fecha_modificada.isoformat(),
+                'privacidad': p.privacidad,
+            })
+        amigo_info = _user_info(amigo)
+        return JsonResponse({
+            'amigo': {
+                'id': amigo.id,
+                'username': amigo.username,
+                'nombre': amigo.first_name,
+                'profile_photo': amigo_info.get('profile_photo'),
+            },
+            'plantillas': data,
+        })
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@require_http_methods(['POST'])
+def api_toggle_privacidad_plantilla(request, plantilla_id):
+    """POST /api/plantilla/<id>/privacidad/ - Toggle privacidad de una plantilla propia"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autenticado'}, status=401)
+    try:
+        from .models import Plantilla
+        plantilla = Plantilla.objects.get(id=plantilla_id, usuario=request.user)
+        nueva = 'privada' if plantilla.privacidad == 'publica' else 'publica'
+        plantilla.privacidad = nueva
+        plantilla.save()
+        return JsonResponse({'status': 'ok', 'privacidad': nueva})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@require_http_methods(['GET'])
+def api_mis_plantillas_privacidad(request):
+    """GET /api/plantillas/privacidad/ - Obtener privacidad de todas las plantillas del usuario"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autenticado'}, status=401)
+    try:
+        from .models import Plantilla
+        plantillas = Plantilla.objects.filter(usuario=request.user).values('id', 'nombre', 'privacidad', 'predeterminada')
+        return JsonResponse({'plantillas': list(plantillas)})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@require_http_methods(['POST'])
+def api_set_plantilla_predeterminada(request, plantilla_id):
+    """POST /api/plantilla/<id>/predeterminada/ - Establecer plantilla como predeterminada"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autenticado'}, status=401)
+    try:
+        from .models import Plantilla
+        plantilla = Plantilla.objects.get(id=plantilla_id, usuario=request.user)
+        # Quitar predeterminada de todas las otras
+        Plantilla.objects.filter(usuario=request.user).update(predeterminada=False)
+        # Establecer esta como predeterminada
+        plantilla.predeterminada = True
+        plantilla.save()
+        return JsonResponse({'status': 'ok', 'plantilla_id': plantilla_id})
+    except Plantilla.DoesNotExist:
+        return JsonResponse({'error': 'Plantilla no encontrada'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+# ============================================================================
+# UTILITY: Crear notificaciones de eventos de jugadores para plantillas predeterminadas
+# ============================================================================
+def crear_notificaciones_eventos_jugadores(jornada_num, temporada_id=None):
+    """
+    Crea notificaciones para usuarios con plantilla predeterminada cuyos jugadores
+    hayan tenido eventos relevantes (goles, asistencias, tarjetas rojas) en la jornada.
+    
+    Esta función debe ser llamada cuando se actualicen las estadísticas de una jornada.
+    """
+    from .models import (Plantilla, Notificacion, UserProfile, 
+                         EstadisticasPartidoJugador, Jugador, Temporada, Jornada)
+    from django.contrib.auth.models import User
+    
+    try:
+        # Obtener temporada actual si no se especifica
+        if not temporada_id:
+            temp = Temporada.objects.order_by('-fecha_inicio').first()
+            if not temp:
+                return {'status': 'error', 'message': 'No hay temporada activa'}
+            temporada_id = temp.id
+        
+        # Obtener jornada
+        jornada = Jornada.objects.filter(temporada_id=temporada_id, numero_jornada=jornada_num).first()
+        if not jornada:
+            return {'status': 'error', 'message': f'Jornada {jornada_num} no encontrada'}
+        
+        # Obtener usuarios con notificaciones de eventos habilitadas
+        usuarios_con_notif = User.objects.filter(
+            profile__preferencias_notificaciones__in=['all', 'events'],
+            plantillas__predeterminada=True
+        ).distinct()
+        
+        notificaciones_creadas = 0
+        
+        for usuario in usuarios_con_notif:
+            # Obtener plantilla predeterminada del usuario
+            plantilla = Plantilla.objects.filter(usuario=usuario, predeterminada=True).first()
+            if not plantilla or not plantilla.alineacion:
+                continue
+            
+            # Extraer IDs de jugadores de la alineación
+            alineacion = plantilla.alineacion
+            jugador_ids = []
+            for pos_key, jugador_data in alineacion.items():
+                if isinstance(jugador_data, dict) and 'id' in jugador_data:
+                    jugador_ids.append(jugador_data['id'])
+                elif isinstance(jugador_data, (int, str)):
+                    try:
+                        jugador_ids.append(int(jugador_data))
+                    except:
+                        pass
+            
+            if not jugador_ids:
+                continue
+            
+            # Buscar estadísticas de esos jugadores en la jornada
+            stats = EstadisticasPartidoJugador.objects.filter(
+                jugador_id__in=jugador_ids,
+                partido__jornada=jornada
+            ).select_related('jugador', 'partido')
+            
+            for stat in stats:
+                eventos = []
+                
+                # Goles
+                goles = getattr(stat, 'goles', 0) or 0
+                if goles > 0:
+                    eventos.append(f"⚽ {goles} {'gol' if goles == 1 else 'goles'}")
+                
+                # Asistencias
+                asistencias = getattr(stat, 'asistencias', 0) or 0
+                if asistencias > 0:
+                    eventos.append(f"🅰️ {asistencias} {'asistencia' if asistencias == 1 else 'asistencias'}")
+                
+                # Tarjetas rojas
+                rojas = getattr(stat, 'tarjetas_rojas', 0) or 0
+                if rojas > 0:
+                    eventos.append(f"🟥 Tarjeta roja")
+                
+                if eventos:
+                    jugador = stat.jugador
+                    titulo = f"¡Evento de {jugador.nombre}!"
+                    mensaje = f"Jornada {jornada_num}: {', '.join(eventos)}"
+                    
+                    # Crear notificación si no existe una similar reciente
+                    existe = Notificacion.objects.filter(
+                        usuario=usuario,
+                        tipo='evento_jugador',
+                        datos__contains={'jugador_id': jugador.id, 'jornada': jornada_num}
+                    ).exists()
+                    
+                    if not existe:
+                        Notificacion.objects.create(
+                            usuario=usuario,
+                            tipo='evento_jugador',
+                            titulo=titulo,
+                            mensaje=mensaje,
+                            datos={
+                                'jugador_id': jugador.id,
+                                'jugador_nombre': jugador.nombre,
+                                'jornada': jornada_num,
+                                'eventos': eventos
+                            }
+                        )
+                        notificaciones_creadas += 1
+        
+        return {'status': 'ok', 'notificaciones_creadas': notificaciones_creadas}
+    
+    except Exception as e:
+        return {'status': 'error', 'message': str(e)}
+
+
+# ── TOP JUGADORES POR POSICIÓN ──────────────────────────────────────────────
+
+def api_top_jugadores_por_posicion(request):
+    """GET /api/top-jugadores-por-posicion/?temporada=25/26
+    
+    Retorna los 3 mejores jugadores de cada posición según predicción promedio
+    de la jornada más reciente con predicciones.
+    """
+    from django.db.models import Avg, Count
+    
+    temporada_display = request.GET.get('temporada', '25/26')
+    temporada_nombre = temporada_display.replace('/', '_')
+
+    try:
+        temporada = Temporada.objects.get(nombre=temporada_nombre)
+    except Temporada.DoesNotExist:
+        temporada = Temporada.objects.order_by('-nombre').first()
+
+    if not temporada:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'No hay temporadas disponibles',
+            'jugadores_por_posicion': {}
+        })
+
+    # Encontrar la jornada más reciente con predicciones
+    ultima_jornada_pred = (PrediccionJugador.objects
+        .filter(jornada__temporada=temporada)
+        .values_list('jornada', flat=True)
+        .distinct()
+        .order_by('-jornada__numero_jornada')
+        .first())
+
+    if not ultima_jornada_pred:
+        return JsonResponse({
+            'status': 'no_predictions',
+            'message': 'Aún no hay predicciones para esta temporada',
+            'jugadores_por_posicion': {}
+        })
+
+    jornada = Jornada.objects.get(pk=ultima_jornada_pred)
+
+    posiciones = ['Portero', 'Defensa', 'Centrocampista', 'Delantero']
+    resultado = {}
+
+    for posicion in posiciones:
+        # Top 3 jugadores por predicción promedio
+        top_preds = (PrediccionJugador.objects
+            .filter(
+                jornada=jornada,
+                jugador__equipos_temporada__posicion=posicion,
+                jugador__equipos_temporada__temporada=temporada
+            )
+            .values('jugador_id', 'jugador__nombre', 'jugador__apellido')
+            .annotate(pred_promedio=Avg('prediccion'))
+            .order_by('-pred_promedio')
+            .distinct()[:3])
+
+        jugadores_list = []
+        for j in top_preds:
+            try:
+                jugador = Jugador.objects.get(pk=j['jugador_id'])
+                ejt = EquipoJugadorTemporada.objects.filter(
+                    jugador=jugador,
+                    temporada=temporada
+                ).first()
+                
+                jugadores_list.append({
+                    'id': jugador.id,
+                    'nombre': jugador.nombre,
+                    'apellido': jugador.apellido,
+                    'posicion': posicion,
+                    'prediccion': round(float(j['pred_promedio']), 2),
+                    'equipo': ejt.equipo.nombre if ejt else '—',
+                    'dorsal': str(ejt.dorsal) if ejt and ejt.dorsal else '—'
+                })
+            except Exception as e:
+                logging.debug(f"Error procesando jugador {j.get('jugador_id')}: {e}")
+
+        resultado[posicion] = jugadores_list
+
+    return JsonResponse({
+        'status': 'ok',
+        'temporada': temporada_display,
+        'jornada': jornada.numero_jornada,
+        'jugadores_por_posicion': resultado
+    })

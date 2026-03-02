@@ -4,6 +4,7 @@ import api from '../services/apiClient'
 import GlassPanel from '../components/ui/GlassPanel'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import TeamShield from '../components/ui/TeamShield'
+import HelpButton from '../components/ui/HelpButton'
 
 export default function SelectFavoritesPage() {
   const navigate = useNavigate()
@@ -23,12 +24,11 @@ export default function SelectFavoritesPage() {
         api.get('/api/equipos/'),
         api.get('/api/favoritos/'),
       ])
-      console.log('Equipos response:', eqRes.data)
       setEquipos(eqRes.data.equipos || [])
       const favIds = new Set((favRes.data.favoritos || []).map(f => f.equipo_id))
       setFavoritos(favIds)
     } catch (err) {
-      console.error('Error loading data:', err)
+      // Error loading data
     } finally {
       setLoading(false)
     }
@@ -118,6 +118,10 @@ export default function SelectFavoritesPage() {
           Continuar
         </button>
       </div>
+      <HelpButton title="Selección de favoritos" fields={[
+        { label: 'Equipo favorito', description: 'Selecciona hasta un equipo favorito. Sus partidos aparecerán destacados en el menú principal.' },
+        { label: 'Continuar', description: 'Guarda tu selección y accede a la aplicación.' },
+      ]} />
     </div>
   )
 }

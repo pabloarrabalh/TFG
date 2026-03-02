@@ -1,6 +1,8 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from django.db import transaction
 import logging
+import threading
 
 logger = logging.getLogger(__name__)
 
@@ -80,3 +82,95 @@ def save_user_profile(sender, instance, **kwargs):
     """Guarda el UserProfile cuando se guarda el usuario"""
     if hasattr(instance, 'profile'):
         instance.profile.save()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AUTO-PREDICCIÓN: cuando se guardan stats de un jugador, genera predicción
+# en segundo plano si todavía no existe para esa jornada.
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _generar_prediccion_background(jugador_id, jornada_id, posicion):
+    """Ejecuta en un hilo demonio: predice puntos y guarda en PrediccionJugador."""
+    import sys
+    from pathlib import Path
+
+    try:
+        from main.models import PrediccionJugador, Jornada
+
+        jornada = Jornada.objects.get(pk=jornada_id)
+
+        # Saltar si ya existe
+        if PrediccionJugador.objects.filter(
+            jugador_id=jugador_id, jornada=jornada, modelo='rf'
+        ).exists():
+            return
+
+        # Cargar predictor según posición
+        entrenamientos_path = Path(__file__).resolve().parent / 'entrenamientoModelos'
+        if str(entrenamientos_path) not in sys.path:
+            sys.path.insert(0, str(entrenamientos_path))
+
+        posicion_map = {
+            'Portero':        ('predecir_portero',      'predecir_puntos_portero'),
+            'Defensa':        ('predecir_defensa',       'predecir_puntos_defensa'),
+            'Centrocampista': ('predecir_mediocampista', 'predecir_puntos_mediocampista'),
+            'Delantero':      ('predecir_delantero',     'predecir_puntos_delantero'),
+        }
+        mod_nombre, func_nombre = posicion_map.get(
+            posicion, ('predecir_delantero', 'predecir_puntos_delantero')
+        )
+
+        import importlib
+        mod = importlib.import_module(mod_nombre)
+        func = getattr(mod, func_nombre)
+
+        resultado = func(jugador_id, jornada.numero_jornada, verbose=False)
+        if not isinstance(resultado, dict) or resultado.get('error'):
+            return
+
+        pts = resultado.get('prediccion', resultado.get('puntos_predichos'))
+        if pts is None:
+            return
+
+        PrediccionJugador.objects.update_or_create(
+            jugador_id=jugador_id,
+            jornada=jornada,
+            modelo='rf',
+            defaults={'prediccion': float(pts)},
+        )
+        logger.debug(f"[AutoPredicción] J{jugador_id} J{jornada.numero_jornada}: {pts:.2f} pts guardados")
+
+    except Exception as exc:
+        logger.debug(f"[AutoPredicción] error para jugador {jugador_id}: {exc}")
+
+
+try:
+    from main.models import EstadisticasPartidoJugador
+
+    @receiver(post_save, sender=EstadisticasPartidoJugador)
+    def auto_generar_prediccion(sender, instance, created, **kwargs):
+        """
+        Cuando se guarda una estadística de partido, lanza en segundo plano
+        la predicción para ese jugador+jornada si todavía no existe.
+        Solo actúa en registros nuevos para no ralentizar updates masivos.
+        """
+        if not created:
+            return
+
+        jugador_id = instance.jugador_id
+        jornada_id = instance.partido.jornada_id
+        posicion = instance.posicion or ''
+
+        # Esperar a que la transacción termine antes de lanzar el hilo
+        def _lanzar():
+            t = threading.Thread(
+                target=_generar_prediccion_background,
+                args=(jugador_id, jornada_id, posicion),
+                daemon=True,
+            )
+            t.start()
+
+        transaction.on_commit(_lanzar)
+
+except Exception:
+    logger.info("AutoPredicción: EstadisticasPartidoJugador no disponible aún")
