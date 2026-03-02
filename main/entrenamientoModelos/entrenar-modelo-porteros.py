@@ -1,5 +1,5 @@
 import warnings
-warnings.filterwarnings("ignore", category=UserWarning, module="sklearn.utils.parallel")
+warnings.filterwarnings("ignore", message=".*sklearn.utils.parallel.delayed.*", category=UserWarning)
 import pickle
 import json
 from pathlib import Path
@@ -640,11 +640,11 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     
     print(" Random Forest...")
     rf_params = {
-        'n_estimators': [200, 300, 400, 500],
-        'max_depth': [10, 20, 30, None],
+        'n_estimators': [200, 300, 400],
+        'max_depth': [10, 20, 30, ],
         'min_samples_split': [2, 3, 5, 7],
-        'min_samples_leaf': [1, 2, 3, 4, 5],
-        'max_features': ['sqrt', 'log2', None]
+        'min_samples_leaf': [ 2, 3, 4, 5],
+        'max_features': ['sqrt', 'log2']
     }
     rf_num_configs = reduce(operator.mul, [len(v) for v in rf_params.values()])
     print(f"   {rf_num_configs} configs")

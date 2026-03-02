@@ -297,6 +297,7 @@ def enriquecer_dataframe_con_roles(df: pd.DataFrame,
         roles_config = ROLES_CRITICOS_DT
         elite_col_name = "es_delantero_elite"
         tipo_posicion = "Delanteros"
+    else:
         roles_config = ROLES_TODOS
         elite_col_name = "es_jugador_elite"
         tipo_posicion = "Jugadores"
