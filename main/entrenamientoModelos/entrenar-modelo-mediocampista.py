@@ -410,49 +410,55 @@ def crear_features_rival(df):
     print("=" * 80)
     print("FEATURES RIVAL (HISTÓRICOS CON SHIFT - SIN LEAKAGE)")
     print("=" * 80)
-    
-    vl = CONFIG['ventana_larga']
-    
-    # ✅ SAFE: Estos son datos del rival en partidos ANTERIORES
+
+    # Calcular opp_form desde GF/GC reales (no desde racha de victorias)
+    # Normalizado a [0, 1]: 0.5 neutro, >0.5 rival en buena forma, <0.5 rival en mala forma
+    if "gf_rival" in df.columns and "gc_rival" in df.columns:
+        gf = pd.to_numeric(df["gf_rival"], errors='coerce').fillna(0)
+        gc = pd.to_numeric(df["gc_rival"], errors='coerce').fillna(0)
+        total = (gf + gc).clip(lower=1)
+        df["opp_form_raw"] = np.clip(((gf - gc) / total + 1) / 2, 0.0, 1.0)
+        print("   Calculando opp_form desde GF/GC reales del rival")
+    else:
+        print("   ERROR: sin columnas gf_rival/gc_rival en el CSV")
+        df["opp_form_raw"] = 0.5
+
+    # SAFE: datos del rival en partidos ANTERIORES (shift evita leakage)
     rival_specs = [
-        ("gf_rival", 0, "opp_gf"),           # Goles que marca rival
-        ("gc_rival", 0, "opp_gc"),           # Goles que concede rival
-        ("racha5partidos_rival", 0.5, "opp_form"),  # Forma del rival
+        ("gf_rival",     0.0, "opp_gf"),
+        ("gc_rival",     0.0, "opp_gc"),
+        ("opp_form_raw", 0.5, "opp_form"),
     ]
-    
+
     for col, default, prefix in rival_specs:
-        if col in df.columns:
-            # Si es racha, convertir a numérico primero
-            if col == "racha5partidos_rival":
-                print(f"   Converting {col} to numeric (ratio victorias)...")
-                df[col] = df[col].apply(convertir_racha_a_numerico)
-            
-            # ⚠️ IMPORTANTE: Para rival features NO usar groupby('player')
-            # Porque todos los jugadores del mismo equipo tienen el mismo rival
-            # en la misma jornada -> varianza=0 con groupby
-            # En su lugar, aplicar shift() global + rolling()
-            
-            # No rellenar NaNs antes - dejar naturales para que rolling/ewm los maneje
-            df[col] = pd.to_numeric(df[col], errors='coerce')
-            
-            # Shift GLOBAL (todos los datos, no agrupado por player)
-            df[f'{col}_shifted'] = df[col].shift()
-            
-            # Rolling con ventanas variadas
-            df[f'{prefix}_roll3'] = df[f'{col}_shifted'].rolling(3, min_periods=1).mean()
-            df[f'{prefix}_ewma3'] = df[f'{col}_shifted'].ewm(span=3, adjust=False).mean()
-            
-            df[f'{prefix}_roll5'] = df[f'{col}_shifted'].rolling(5, min_periods=1).mean()
-            df[f'{prefix}_ewma5'] = df[f'{col}_shifted'].ewm(span=5, adjust=False).mean()
-            
-            df[f'{prefix}_roll7'] = df[f'{col}_shifted'].rolling(7, min_periods=1).mean()
-            df[f'{prefix}_ewma7'] = df[f'{col}_shifted'].ewm(span=7, adjust=False).mean()
-            
-            # Cleanup temporal
-            df = df.drop(columns=[f'{col}_shifted'], errors='ignore')
-            
-            print(f"   ✅ {col} → {prefix}_roll3/5/7 + ewma3/5/7 (GLOBAL shift, sin groupby)")
-    
+        if col not in df.columns:
+            continue
+
+        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(default)
+
+        if df[col].nunique() <= 1:
+            print(f"   AVISO: {col} es constante ({df[col].iloc[0]:.3f})")
+
+        if "equipo_propio" in df.columns:
+            df[f'{col}_shifted'] = df.groupby('equipo_propio')[col].shift(1)
+        else:
+            df[f'{col}_shifted'] = df[col].shift(1)
+
+        df[f'{col}_shifted'] = df[f'{col}_shifted'].fillna(default)
+
+        df[f'{prefix}_roll3'] = df[f'{col}_shifted'].rolling(3, min_periods=1).mean()
+        df[f'{prefix}_ewma3'] = df[f'{col}_shifted'].ewm(span=3, adjust=False).mean()
+
+        df[f'{prefix}_roll5'] = df[f'{col}_shifted'].rolling(5, min_periods=1).mean()
+        df[f'{prefix}_ewma5'] = df[f'{col}_shifted'].ewm(span=5, adjust=False).mean()
+
+        df[f'{prefix}_roll7'] = df[f'{col}_shifted'].rolling(7, min_periods=1).mean()
+        df[f'{prefix}_ewma7'] = df[f'{col}_shifted'].ewm(span=7, adjust=False).mean()
+
+        df = df.drop(columns=[f'{col}_shifted'], errors='ignore')
+
+        print(f"   OK {col} → {prefix}_roll3/5/7 + ewma3/5/7 (shift por equipo, sin leakage)")
+
     print()
     return df
 
@@ -533,8 +539,8 @@ def integrar_roles(df):
     print("=" * 80)
     print("ROLES FBREF")
     print("=" * 80)
-    df = enriquecer_dataframe_con_roles(df, position="MF", columna_roles="roles")
-    df = crear_features_interaccion_roles(df, position="MF", columna_objetivo=CONFIG['columna_objetivo'])
+    df = enriquecer_dataframe_con_roles(df, position="MC", columna_roles="roles")
+    df = crear_features_interaccion_roles(df, position="MC", columna_objetivo=CONFIG['columna_objetivo'])
     print(" Roles OK\n")
     return df
 
@@ -544,7 +550,7 @@ def aplicar_mejoras(df):
     print("MEJORAS")
     print("=" * 80)
     antes = len(df.columns)
-    df = eliminar_features_ruido(df, position="MF", verbose=True)
+    df = eliminar_features_ruido(df, position="MC", verbose=True)
     print(f"Sin ruido: {antes}  {len(df.columns)}")
     
     antes = len(df.columns)

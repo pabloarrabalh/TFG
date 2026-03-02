@@ -422,40 +422,56 @@ def crear_features_contexto(df):
 def crear_features_rival(df):
     print(" Features Rival...")
     vl = CONFIG['ventana_larga']
-    
+
+    # Calcular opp_form desde GF/GC reales (no desde racha de victorias)
+    # Normalizado a [0, 1]: 0.5 neutro, >0.5 rival en buena forma, <0.5 rival en mala forma
+    if "gf_rival" in df.columns and "gc_rival" in df.columns:
+        gf = pd.to_numeric(df["gf_rival"], errors='coerce').fillna(0)
+        gc = pd.to_numeric(df["gc_rival"], errors='coerce').fillna(0)
+        total = (gf + gc).clip(lower=1)
+        df["opp_form_raw"] = np.clip(((gf - gc) / total + 1) / 2, 0.0, 1.0)
+        print("   Calculando opp_form desde GF/GC reales del rival")
+    else:
+        print("   ERROR: sin columnas gf_rival/gc_rival en el CSV")
+        df["opp_form_raw"] = 0.5
+
     rival_specs = [
-        ("gf_rival", 0, "opp_gf"),
-        ("gc_rival", 0, "opp_gc"),
-        ("racha_rival_ratio_victorias", 0.5, "opp_form"),
+        ("gf_rival",      0.0, "opp_gf"),
+        ("gc_rival",      0.0, "opp_gc"),
+        ("opp_form_raw",  0.5, "opp_form"),
     ]
-    
+
     for col, default, prefix in rival_specs:
-        if col in df.columns:
-            # ⚠️ IMPORTANTE: Para rival features NO usar groupby('player')
-            # Porque todos los jugadores del mismo equipo tienen el mismo rival
-            # en la misma jornada -> varianza=0 con groupby
-            # En su lugar, aplicar shift() global + rolling()
-            
-            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(default)
-            
-            # Shift GLOBAL (todos los datos, no agrupado por player)
-            df[f'{col}_shifted'] = df[col].shift()
-            
-            # Rolling con ventanas variadas
-            df[f'{prefix}_roll3'] = df[f'{col}_shifted'].rolling(3, min_periods=1).mean()
-            df[f'{prefix}_ewma3'] = df[f'{col}_shifted'].ewm(span=3, adjust=False).mean()
-            
-            df[f'{prefix}_roll5'] = df[f'{col}_shifted'].rolling(5, min_periods=1).mean()
-            df[f'{prefix}_ewma5'] = df[f'{col}_shifted'].ewm(span=5, adjust=False).mean()
-            
-            df[f'{prefix}_roll7'] = df[f'{col}_shifted'].rolling(7, min_periods=1).mean()
-            df[f'{prefix}_ewma7'] = df[f'{col}_shifted'].ewm(span=7, adjust=False).mean()
-            
-            # Cleanup temporal
-            df = df.drop(columns=[f'{col}_shifted'], errors='ignore')
-            
-            print(f"   ✅ {col} → {prefix}_roll3/5/7 + ewma3/5/7 (GLOBAL shift)")
-    
+        if col not in df.columns:
+            continue
+
+        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(default)
+
+        # Verificar varianza real
+        if df[col].nunique() <= 1:
+            print(f"   AVISO: {col} es constante ({df[col].iloc[0]:.3f})")
+
+        # Shift groupby equipo para mantener coherencia temporal sin leakage
+        if "equipo_propio" in df.columns:
+            df[f'{col}_shifted'] = df.groupby('equipo_propio')[col].shift(1)
+        else:
+            df[f'{col}_shifted'] = df[col].shift(1)
+
+        df[f'{col}_shifted'] = df[f'{col}_shifted'].fillna(default)
+
+        df[f'{prefix}_roll3'] = df[f'{col}_shifted'].rolling(3, min_periods=1).mean()
+        df[f'{prefix}_ewma3'] = df[f'{col}_shifted'].ewm(span=3, adjust=False).mean()
+
+        df[f'{prefix}_roll5'] = df[f'{col}_shifted'].rolling(5, min_periods=1).mean()
+        df[f'{prefix}_ewma5'] = df[f'{col}_shifted'].ewm(span=5, adjust=False).mean()
+
+        df[f'{prefix}_roll7'] = df[f'{col}_shifted'].rolling(7, min_periods=1).mean()
+        df[f'{prefix}_ewma7'] = df[f'{col}_shifted'].ewm(span=7, adjust=False).mean()
+
+        df = df.drop(columns=[f'{col}_shifted'], errors='ignore')
+
+        print(f"   OK {col} → {prefix}_roll3/5/7 + ewma3/5/7")
+
     return df
 
 
@@ -580,6 +596,11 @@ def definir_variables_finales(df):
         
         # CONTEXT
         "is_home",
+
+        # RIVAL (forma real calculada desde GF/GC, con shift para no leakage)
+        "opp_gf_roll5", "opp_gf_ewma5",
+        "opp_gc_roll5", "opp_gc_ewma5",
+        "opp_form_roll5", "opp_form_ewma5",
         
         # ODDS - NUEVAS VARIABLES DE MERCADO
         "odds_prob_win",

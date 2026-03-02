@@ -21,7 +21,7 @@ from sklearn.base import clone
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from role_enricher import enriquecer_dataframe_con_roles, crear_features_interaccion_roles
-from feature_improvements import eliminar_features_ruido, crear_features_fantasy_mediocampista, seleccionar_features_por_correlacion
+from feature_improvements import eliminar_features_ruido, crear_features_fantasy_delantero, seleccionar_features_por_correlacion
 
 DIRECTORIO_SALIDA = Path("csv/csvGenerados/entrenamiento/delantero")
 DIRECTORIO_IMAGENES = DIRECTORIO_SALIDA / "imagenes"
@@ -395,35 +395,55 @@ def crear_features_rival(df):
     print("=" * 80)
     print("FEATURES RIVAL (HISTÓRICOS CON SHIFT - SIN LEAKAGE)")
     print("=" * 80)
-    
-    vl = CONFIG['ventana_larga']
-    
+
+    # Calcular opp_form desde GF/GC reales (no desde racha de victorias)
+    # Normalizado a [0, 1]: 0.5 neutro, >0.5 rival en buena forma, <0.5 rival en mala forma
+    if "gf_rival" in df.columns and "gc_rival" in df.columns:
+        gf = pd.to_numeric(df["gf_rival"], errors='coerce').fillna(0)
+        gc = pd.to_numeric(df["gc_rival"], errors='coerce').fillna(0)
+        total = (gf + gc).clip(lower=1)
+        df["opp_form_raw"] = np.clip(((gf - gc) / total + 1) / 2, 0.0, 1.0)
+        print("   Calculando opp_form desde GF/GC reales del rival")
+    else:
+        print("   ERROR: sin columnas gf_rival/gc_rival en el CSV")
+        df["opp_form_raw"] = 0.5
+
+    # SAFE: datos del rival en partidos ANTERIORES (shift evita leakage)
     rival_specs = [
-        ("gf_rival", 0, "opp_gf"),
-        ("gc_rival", 0, "opp_gc"),
-        ("racha5partidos_rival", 0, "opp_form"),
+        ("gf_rival",     0.0, "opp_gf"),
+        ("gc_rival",     0.0, "opp_gc"),
+        ("opp_form_raw", 0.5, "opp_form"),
     ]
-    
+
     for col, default, prefix in rival_specs:
-        if col in df.columns:
-            if col == "racha5partidos_rival":
-                print(f"   Converting {col} to numeric (ratio victorias)...")
-                df[col] = df[col].apply(convertir_racha_a_numerico)
-            
-            df[col] = pd.to_numeric(df[col], errors='coerce')
-            
-            df[f'{col}_shifted'] = df[col].shift()
-            
-            df[f'{prefix}_roll3'] = df[f'{col}_shifted'].rolling(3, min_periods=1).mean()
-            df[f'{prefix}_ewma3'] = df[f'{col}_shifted'].ewm(span=3, adjust=False).mean()
-            
-            df[f'{prefix}_roll5'] = df[f'{col}_shifted'].rolling(5, min_periods=1).mean()
-            df[f'{prefix}_ewma5'] = df[f'{col}_shifted'].ewm(span=5, adjust=False).mean()
-            
-            df = df.drop(columns=[f'{col}_shifted'], errors='ignore')
-            
-            print(f"   ✅ {col} → {prefix}_roll3/5 + ewma3/5 (GLOBAL shift, sin groupby)")
-    
+        if col not in df.columns:
+            continue
+
+        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(default)
+
+        if df[col].nunique() <= 1:
+            print(f"   AVISO: {col} es constante ({df[col].iloc[0]:.3f})")
+
+        if "equipo_propio" in df.columns:
+            df[f'{col}_shifted'] = df.groupby('equipo_propio')[col].shift(1)
+        else:
+            df[f'{col}_shifted'] = df[col].shift(1)
+
+        df[f'{col}_shifted'] = df[f'{col}_shifted'].fillna(default)
+
+        df[f'{prefix}_roll3'] = df[f'{col}_shifted'].rolling(3, min_periods=1).mean()
+        df[f'{prefix}_ewma3'] = df[f'{col}_shifted'].ewm(span=3, adjust=False).mean()
+
+        df[f'{prefix}_roll5'] = df[f'{col}_shifted'].rolling(5, min_periods=1).mean()
+        df[f'{prefix}_ewma5'] = df[f'{col}_shifted'].ewm(span=5, adjust=False).mean()
+
+        df[f'{prefix}_roll7'] = df[f'{col}_shifted'].rolling(7, min_periods=1).mean()
+        df[f'{prefix}_ewma7'] = df[f'{col}_shifted'].ewm(span=7, adjust=False).mean()
+
+        df = df.drop(columns=[f'{col}_shifted'], errors='ignore')
+
+        print(f"   OK {col} → {prefix}_roll3/5/7 + ewma3/5/7 (shift por equipo, sin leakage)")
+
     print()
     return df
 
@@ -487,23 +507,23 @@ def integrar_roles(df):
     print("=" * 80)
     print("ROLES FBREF")
     print("=" * 80)
-    df = enriquecer_dataframe_con_roles(df, position="FW", columna_roles="roles")
-    df = crear_features_interaccion_roles(df, position="FW", columna_objetivo=CONFIG['columna_objetivo'])
+    df = enriquecer_dataframe_con_roles(df, position="DT", columna_roles="roles")
+    df = crear_features_interaccion_roles(df, position="DT", columna_objetivo=CONFIG['columna_objetivo'])
     print(" Roles OK\n")
     return df
 
 
 def aplicar_mejoras(df):
     print("=" * 80)
-    print("MEJORAS")
+    print("MEJORAS (DELANTERO)")
     print("=" * 80)
     antes = len(df.columns)
-    df = eliminar_features_ruido(df, position="FW", verbose=True)
-    print(f"Sin ruido: {antes}  {len(df.columns)}")
-    
+    df = eliminar_features_ruido(df, position="DT", verbose=True)
+    print(f"Sin ruido: {antes} → {len(df.columns)}")
+
     antes = len(df.columns)
-    df = crear_features_fantasy_mediocampista(df, verbose=True)
-    print(f"Finales: {antes}  {len(df.columns)}\n")
+    df = crear_features_fantasy_delantero(df, verbose=True)
+    print(f"Finales: {antes} → {len(df.columns)}\n")
     return df
 
 
@@ -598,11 +618,11 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     # 1. Random Forest
     print(" Random Forest...")
     rf_params = {
-        'n_estimators': [200, 300, 400, 500],
-        'max_depth': [10, 20, 30, None],
+        'n_estimators': [200, 300, 400],
+        'max_depth': [10, 20, 30, ],
         'min_samples_split': [2, 3, 5, 7],
-        'min_samples_leaf': [1, 2, 3, 4, 5],
-        'max_features': ['sqrt', 'log2', None]
+        'min_samples_leaf': [ 2, 3, 4, 5],
+        'max_features': ['sqrt', 'log2']
     }
     rf_num_configs = reduce(operator.mul, [len(v) for v in rf_params.values()])
     print(f"   {rf_num_configs} configs")
@@ -722,7 +742,25 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     for name, model in models_dict.items():
         with open(DIRECTORIO_MODELOS / f"best_model_delantero_{name.lower()}.pkl", "wb") as f:
             pickle.dump(model, f)
-            
+
+    # Guardar también el RF con nombre genérico (para carga automática)
+    with open(DIRECTORIO_MODELOS / "best_model_RF.pkl", "wb") as f:
+        pickle.dump(rf_best, f)
+
+    # Guardar hiperparámetros como JSON (igual que porteros)
+    params_dict = {
+        'RF': rf_gs.best_params_,
+        'XGB': xgb_gs.best_params_,
+        'Ridge': ridge_gs.best_params_,
+        'ElasticNet': elastic_gs.best_params_,
+    }
+    for name, params in params_dict.items():
+        with open(DIRECTORIO_MODELOS / f"best_model_params_{name}.json", 'w') as f:
+            json.dump(params, f, indent=2)
+
+    print(f"✅ Parámetros RF guardados en {DIRECTORIO_MODELOS / 'best_model_params_RF.json'}")
+    print(f"✅ MAE RF: {mae_rf:.4f} | MAE XGB: {mae_xgb:.4f}")
+
     return df_resultados
 
 

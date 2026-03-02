@@ -27,50 +27,67 @@ def eliminar_features_ruido(df: pd.DataFrame, position: str = 'ALL', verbose: bo
         'elite_entradas_interact',   # 0 en ElasticNet
         'ratio_roles_criticos',      # 0 en ElasticNet
     ]
-    
-    # Features NO relevantes para PORTEROS (GK): goles, asistencias, regates...
-    # SOLO columnas que existen en el CSV
+
+    # ── PORTEROS: eliminar todo lo ofensivo de campo ──────────────────────
     FEATURES_RUIDO_GK = [
-        # Goles y asistencias
-        'gol_partido',
-        'asist_partido',
-        'xg_partido',
-        'xag',
-        'tiro_fallado_partido',
-        'tiro_puerta_partido',
-        'tiros',
-        
-        # Regates y conducción
-        'regates',
-        'regates_completados',
-        'regates_fallidos',
-        'conducciones',
-        'distancia_conduccion',
-        'metros_avanzados_conduccion',
-        'conducciones_progresivas',
-        
-        # Duelos aéreos y terrestres (menos relevantes para GK)
-        'duelos',
-        'duelos_ganados',
-        'duelos_perdidos',
-        'duelos_aereos_ganados',
-        'duelos_aereos_ganados_pct',
-        'duelos_aereos_perdidos',
-        
-        # Bloqueos y otros
-        'bloqueo_pase',
-        'bloqueo_tiros',
-        'bloqueos',
-        'entradas',
+        'gol_partido', 'asist_partido', 'xg_partido', 'xag',
+        'tiro_fallado_partido', 'tiro_puerta_partido', 'tiros',
+        'regates', 'regates_completados', 'regates_fallidos',
+        'conducciones', 'distancia_conduccion',
+        'metros_avanzados_conduccion', 'conducciones_progresivas',
+        'duelos', 'duelos_ganados', 'duelos_perdidos',
+        'duelos_aereos_ganados', 'duelos_aereos_ganados_pct', 'duelos_aereos_perdidos',
+        'bloqueo_pase', 'bloqueo_tiros', 'bloqueos', 'entradas',
     ]
-    
+
+    # ── DEFENSAS: eliminar features de portero y stats puramente ofensivos ─
+    FEATURES_RUIDO_DF = [
+        # GK-specific raw
+        'porcentaje_paradas', 'psxg', 'goles_en_contra',
+        # Rolling/ewma GK que no deben crearse para DF pero por si acaso
+        'save_pct_roll3', 'save_pct_roll5', 'save_pct_ewma3', 'save_pct_ewma5',
+        'psxg_roll3', 'psxg_roll5', 'psxg_ewma3', 'psxg_ewma5',
+        # Ofensivos puros irrelevantes para défensa
+        'xg_partido', 'xag', 'tiro_fallado_partido', 'tiro_puerta_partido',
+        'gol_partido', 'asist_partido',
+    ]
+
+    # ── MEDIOCAMPISTAS: eliminar features exclusivos de portero ───────────
+    FEATURES_RUIDO_MF = [
+        'porcentaje_paradas', 'psxg', 'goles_en_contra',
+        'save_pct_roll3', 'save_pct_roll5', 'save_pct_ewma3', 'save_pct_ewma5',
+        'psxg_roll3', 'psxg_roll5', 'psxg_ewma3', 'psxg_ewma5',
+        'save_per_90_ewma5', 'psxg_per_90_ewma5', 'expected_gk_core_points',
+        'cs_expected_points',
+    ]
+
+    # ── DELANTEROS: eliminar features de portero y defensivos específicos ─
+    FEATURES_RUIDO_FW = [
+        # GK-specific
+        'porcentaje_paradas', 'psxg', 'goles_en_contra',
+        'save_pct_roll3', 'save_pct_roll5', 'save_pct_ewma3', 'save_pct_ewma5',
+        'psxg_roll3', 'psxg_roll5', 'psxg_ewma3', 'psxg_ewma5',
+        'save_per_90_ewma5', 'psxg_per_90_ewma5', 'expected_gk_core_points',
+        'cs_expected_points',
+        # Defensivos puros que no aportan al ST
+        'despejes', 'bloqueos', 'bloqueo_pase', 'bloqueo_tiros',
+        'duelos_aereos_ganados', 'duelos_aereos_ganados_pct', 'duelos_aereos_perdidos',
+        # Rolls defensivos generados por error para FW
+        'clearances_roll3', 'clearances_roll5', 'clearances_ewma3', 'clearances_ewma5',
+        'def_actions_ewma5', 'cs_activity_alignment', 'cs_rate_recent',
+    ]
+
     features_ruido = FEATURES_RUIDO_COMUN.copy()
 
-    if position in ['GK', 'PT', 'ALL']:
+    if position in ['GK', 'PT']:
         features_ruido.extend(FEATURES_RUIDO_GK)
-    
-    if position in ['DF', 'ALL']:
-        pass  # Los ruidos comunes aplican a DF
+    elif position == 'DF':
+        features_ruido.extend(FEATURES_RUIDO_DF)
+    elif position == 'MC':
+        features_ruido.extend(FEATURES_RUIDO_MF)
+    elif position == 'DT':
+        features_ruido.extend(FEATURES_RUIDO_FW)
+    # ALL: solo los comunes
     
     features_a_eliminar = [f for f in features_ruido if f in df.columns]
     
@@ -651,6 +668,167 @@ def crear_features_fantasy_mediocampista(df: pd.DataFrame, verbose: bool = True)
     if verbose:
         print(f"\n✅ Fase 2 completada - Features MC creados\n")
     
+    return df
+
+
+# ============================================================================
+# PARTE 2D: FEATURES ESPECÍFICOS PARA DELANTEROS (FW/ST) - SIN LEAKAGE
+# ============================================================================
+
+def crear_features_fantasy_delantero(df: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
+    """
+    Crea features específicos para Fantasy Football - Delanteros (ST/FW).
+
+    En Fantasy, un delantero gana puntos principalmente por:
+    - Goles (+4 pts o más)
+    - Tiros a puerta (señal de implicación ofensiva)
+    - xG acumulado (intención goleadora)
+    - Regates y conducciones progresivas (creación)
+    - Minutos jugados (disponibilidad)
+
+    Todos los features usan .shift() para evitar data leakage.
+
+    Args:
+        df: DataFrame con datos básicos de delanteros
+        verbose: Print de features creados
+
+    Returns:
+        DataFrame enriquecido sin leakage
+    """
+
+    if verbose:
+        print("\n" + "=" * 80)
+        print("FEATURES DELANTERO (FANTASY SPECIFIC - ST/FW)")
+        print("=" * 80)
+
+    df = df.copy()
+
+    # ========================================================================
+    # 1. EFICIENCIA GOLEADORA (xG vs Goles reales)
+    # ========================================================================
+
+    if 'xg_partido' in df.columns and 'gol_partido' in df.columns:
+        df['xg_partido'] = pd.to_numeric(df['xg_partido'], errors='coerce').fillna(0)
+        df['gol_partido'] = pd.to_numeric(df['gol_partido'], errors='coerce').fillna(0)
+
+        # Over/under-performance vs xG en ventana reciente
+        df['xg_overperformance'] = df.groupby('player').apply(
+            lambda x: (x['gol_partido'] - x['xg_partido']).shift().rolling(5, min_periods=1).mean()
+        ).reset_index(level=0, drop=True).fillna(0)
+
+        if verbose:
+            print("   ✅ xg_overperformance (goles - xG rolling5) - Sin leakage")
+
+    # ========================================================================
+    # 2. CONVERSIÓN DE TIROS (precisión finalizadora)
+    # ========================================================================
+
+    if 'tiros' in df.columns and 'gol_partido' in df.columns:
+        df['tiros'] = pd.to_numeric(df['tiros'], errors='coerce').fillna(0)
+        df['gol_partido'] = pd.to_numeric(df['gol_partido'], errors='coerce').fillna(0)
+
+        # Ratio goles/tiro en los últimos 5 partidos
+        df['shot_conversion_ewma5'] = df.groupby('player').apply(
+            lambda g: (g['gol_partido'] / (g['tiros'] + 0.1)).shift().ewm(span=5, adjust=False).mean()
+        ).reset_index(level=0, drop=True).fillna(0)
+
+        if verbose:
+            print("   ✅ shot_conversion_ewma5 (goles/tiro) - Sin leakage")
+
+    # ========================================================================
+    # 3. PRESIÓN OFENSIVA (tiros + xG combinados)
+    # ========================================================================
+
+    if 'shots_roll5' in df.columns and 'xg_roll5' in df.columns:
+        df['offensive_pressure_score'] = (
+            df['shots_roll5'] * 0.4 + df['xg_roll5'] * 0.6
+        ).fillna(0)
+
+        if verbose:
+            print("   ✅ offensive_pressure_score (shots*0.4 + xg*0.6)")
+
+    # ========================================================================
+    # 4. CONSISTENCIA GOLEADORA
+    # ========================================================================
+
+    if 'goals_roll5' in df.columns and 'goals_ewma5' in df.columns:
+        # Si roll5 y ewma5 son similares → racha estable, no un pico aislado
+        df['scoring_stability'] = 1.0 / (
+            1.0 + (df['goals_roll5'] - df['goals_ewma5']).abs().fillna(0)
+        )
+
+        if verbose:
+            print("   ✅ scoring_stability (consistencia goleadora)")
+
+    # ========================================================================
+    # 5. EFICIENCIA POR MINUTO JUGADO
+    # ========================================================================
+
+    if 'xg_roll5' in df.columns and 'minutes_pct_ewma5' in df.columns:
+        df['xg_per_minute_ewma'] = (
+            df['xg_roll5'] / (df['minutes_pct_ewma5'] + 0.1)
+        ).fillna(0)
+
+        if verbose:
+            print("   ✅ xg_per_minute_ewma (xG por minuto disponible)")
+
+    if 'goals_roll5' in df.columns and 'minutes_pct_ewma5' in df.columns:
+        df['goals_per_minute_ewma'] = (
+            df['goals_roll5'] / (df['minutes_pct_ewma5'] + 0.1)
+        ).fillna(0)
+
+        if verbose:
+            print("   ✅ goals_per_minute_ewma (goles por minuto disponible)")
+
+    # ========================================================================
+    # 6. AMENAZA PROGRESIVA (conducciones + regates hacia portería)
+    # ========================================================================
+
+    if 'prog_dribbles_roll5' in df.columns and 'prog_dist_roll5' in df.columns:
+        df['progressive_threat'] = (
+            df['prog_dribbles_roll5'] * 0.5 + df['prog_dist_roll5'] * 0.01
+        ).fillna(0)
+
+        if verbose:
+            print("   ✅ progressive_threat (conducciones + distancia progresiva)")
+
+    # ========================================================================
+    # 7. MOMENTUM GOLEADOR (tendencia reciente vs media larga)
+    # ========================================================================
+
+    if 'goals_ewma3' in df.columns and 'goals_ewma5' in df.columns:
+        # Positivo: está marcando más que su media
+        df['scoring_momentum'] = (df['goals_ewma3'] - df['goals_ewma5']).fillna(0)
+
+        if verbose:
+            print("   ✅ scoring_momentum (ewma3 - ewma5, tendencia)")
+
+    if 'xg_ewma3' in df.columns and 'xg_ewma5' in df.columns:
+        df['xg_momentum'] = (df['xg_ewma3'] - df['xg_ewma5']).fillna(0)
+
+        if verbose:
+            print("   ✅ xg_momentum (tendencia xG reciente)")
+
+    # ========================================================================
+    # 8. VOLATILIDAD DE PUNTOS (riesgo/beneficio ST)
+    # ========================================================================
+
+    if 'puntos_fantasy' in df.columns:
+        df['pf_volatility_fw'] = df.groupby('player')['puntos_fantasy'].transform(
+            lambda x: x.shift().rolling(5, min_periods=2).std()
+        ).fillna(0)
+
+        df['pf_consistency_fw'] = 1.0 / (1.0 + df['pf_volatility_fw'])
+
+        if verbose:
+            print("   ✅ pf_volatility_fw / pf_consistency_fw (estabilidad ST)")
+
+    # Rellenar NaNs con 0
+    df = df.fillna(0).replace([np.inf, -np.inf], 0)
+
+    if verbose:
+        print(f"\n✅ Features delantero creados correctamente\n")
+
     return df
 
 

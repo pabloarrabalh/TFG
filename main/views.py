@@ -2630,7 +2630,7 @@ def predecir_portero_api(request):
         
         # Importar función de predicción
         logger.info(f"[API] Importando módulo desde: {entrenamientos_path}")
-        from predecir_portero import predecir_puntos_portero
+        from predecir import predecir_puntos_portero
         
         # Llamar función de predicción usando NOMBRE (no ID)
         logger.info(f"[API] Llamando predecir_puntos_portero('{nombre_jugador}', jornada={jornada}, modelo={modelo_tipo})")
@@ -2921,7 +2921,7 @@ def explicar_prediccion_portero_api(request):
             sys.path.insert(0, str(entrenamientos_path))
         
         # Importar función de explicación
-        from predecir_portero import explicar_prediccion_portero
+        from predecir import explicar_prediccion_portero
         
         # Llamar función de explicación usando NOMBRE
         logger.info(f"[XAI API] Llamando explicar_prediccion_portero('{nombre_jugador}', jornada={jornada}, modelo={modelo_tipo})")
