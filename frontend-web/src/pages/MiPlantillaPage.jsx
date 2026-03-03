@@ -190,6 +190,19 @@ export default function MiPlantillaPage() {
   const [notif, setNotif] = useState(null)
   const [predicciones, setPredicciones] = useState({})
   const [showFormDropdown, setShowFormDropdown] = useState(false)
+  const [actualizandoPredicciones, setActualizandoPredicciones] = useState(false)
+
+  // Selector de modelos por posición
+  const [modelosPorPos, setModelosPorPos] = useState({
+    Portero: 'Random Forest',          // Solo Random Forest
+    Defensa: 'Random Forest',          // Solo Random Forest
+    Centrocampista: 'Ridge', // Ridge o Baseline
+    Delantero: 'Ridge',     // Ridge o ElasticNet
+  })
+  const [showModelDropdown, setShowModelDropdown] = useState(null) // null | posicion
+
+  // Modal de confirmación
+  const [modalConfirm, setModalConfirm] = useState(null)  // { titulo, mensaje, onConfirm, onCancel }
 
   // Modales
   const [modalSel, setModalSel] = useState(null)   // { posicion, esSuplente, indice }
@@ -211,16 +224,28 @@ export default function MiPlantillaPage() {
   // Drag & drop
   const dragRef = useRef(null)
   const [dropTarget, setDropTarget] = useState(null)
+  const modelosPrevRef = useRef(null)
 
   // ── Init ──────────────────────────────────────────────────────────────────
   useEffect(() => {
     loadJornada(18).then(() => loadPlantillas())
+    modelosPrevRef.current = modelosPorPos
   }, [])
 
-  // Cargar predicciones al cambiar alineación
+  // Cargar predicciones al cambiar alineación o jornada
   useEffect(() => {
     cargarPredicciones()
-  }, [alineacion, jornadaActual])
+  }, [alineacion, jornadaActual, modelosPorPos])
+
+  // Mostrar aviso cuando cambian los modelos
+  useEffect(() => {
+    if (modelosPrevRef.current && JSON.stringify(modelosPrevRef.current) !== JSON.stringify(modelosPorPos)) {
+      setActualizandoPredicciones(true)
+      const timer = setTimeout(() => setActualizandoPredicciones(false), 3000)
+      modelosPrevRef.current = modelosPorPos
+      return () => clearTimeout(timer)
+    }
+  }, [modelosPorPos])
 
   // ── API helpers ──────────────────────────────────────────────────────────
   async function loadJornada(jornada) {
@@ -443,14 +468,30 @@ export default function MiPlantillaPage() {
   async function cargarPredicciones() {
     const todos = [...POSICIONES.flatMap(p => alineacion[p] || [])].filter(Boolean)
     if (!todos.length) return
+    
+    // Mapeo de nombres mostrados a códigos de backend
+    const mapModeloBackend = {
+      'Random Forest': 'RF',
+      'Ridge': 'Ridge',
+      'ElasticNet': 'ElasticNet',
+      'Baseline': 'Baseline',
+    }
+    
     for (const jug of todos) {
-      if (predicciones[jug.id] !== undefined) continue
       if (fetchingRef.current.has(jug.id)) continue
       fetchingRef.current.add(jug.id)
       try {
         // Usar /api/explicar-prediccion/ (recalcula siempre, igual que el modal)
-        // Esto asegura que las cards y el modal muestren los MISMOS puntos
-        const payload = { jugador_id: jug.id, jornada: jornadaActual, posicion: jug.posicion }
+        // Con el modelo seleccionado para esa posición
+        const modeloUI = modelosPorPos[jug.posicion] || 'Random Forest'
+        const modeloBackend = mapModeloBackend[modeloUI] || 'RF'
+        
+        const payload = { 
+          jugador_id: jug.id, 
+          jornada: jornadaActual, 
+          posicion: jug.posicion,
+          modelo: modeloBackend
+        }
         const res = await fetch(`${BACKEND}/api/explicar-prediccion/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
@@ -476,12 +517,21 @@ export default function MiPlantillaPage() {
     setModalDet(jugador); setDetPrediccion(null); setDetExplicacion(null); setDetFeaturesImpacto([])
     setDetLoadingPred(true)
     try {
+      // Mapeo de nombres mostrados a códigos de backend
+      const mapModeloBackend = {
+        'Random Forest': 'RF',
+        'Ridge': 'Ridge',
+        'ElasticNet': 'ElasticNet',
+        'Baseline': 'Baseline',
+      }
       // Endpoint unificado XAI para TODAS las posiciones (PT, DF, MC, DT)
+      const modeloUI = modelosPorPos[jugador.posicion] || 'Random Forest'
+      const modeloBackend = mapModeloBackend[modeloUI] || 'RF'
       const res = await fetch(`${BACKEND}/api/explicar-prediccion/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         credentials: 'include',
-        body: JSON.stringify({ jugador_id: jugador.id, jornada: jornadaActual, posicion: jugador.posicion }),
+        body: JSON.stringify({ jugador_id: jugador.id, jornada: jornadaActual, posicion: jugador.posicion, modelo: modeloBackend }),
       })
       const data = await res.json()
       if (data.status === 'success') {
@@ -601,6 +651,14 @@ export default function MiPlantillaPage() {
     <div className="p-6 space-y-4 bg-background-dark min-h-full" onClick={() => setShowFormDropdown(false)}>
       <Notificacion notif={notif} onDone={() => setNotif(null)} />
 
+      {/* Aviso de actualización azul */}
+      {actualizandoPredicciones && (
+        <div className="fixed top-6 left-6 px-4 py-3 rounded-lg bg-blue-600 text-white shadow-lg z-[9998] flex items-center gap-2 animate-pulse">
+          <span className="inline-block w-2 h-2 bg-white rounded-full animate-bounce"></span>
+          <span className="text-sm font-bold">Actualizando predicciones...</span>
+        </div>
+      )}
+
       {/* ── Cabecera ── */}
       <div className="glass-panel rounded-2xl p-5 relative z-[100]">
         <div className="flex flex-wrap items-center gap-3">
@@ -662,6 +720,84 @@ export default function MiPlantillaPage() {
         <button onClick={() => cambiarJornada(1)} disabled={jornadaActual >= 38} className="px-3 py-1.5 bg-surface-dark border border-border-dark text-white rounded-lg hover:bg-primary/20 font-bold disabled:opacity-40">
           <span className="material-symbols-outlined text-lg">chevron_right</span>
         </button>
+      </div>
+
+      {/* ── Selector de modelos por posición ── */}
+      <div className="glass-panel rounded-2xl p-4 relative z-[9999]" onClick={e => e.stopPropagation()}>
+        <h3 className="text-sm font-black text-white mb-3 flex items-center gap-2">
+          <span className="material-symbols-outlined text-base text-primary">tune</span>
+          Modelos por Posición
+        </h3>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            { pos: 'Portero', opciones: ['Random Forest'] },
+            { pos: 'Defensa', opciones: ['Random Forest'] },
+            { pos: 'Centrocampista', opciones: ['Ridge', 'Baseline'] },
+            { pos: 'Delantero', opciones: ['Ridge', 'ElasticNet'] },
+          ].map(({ pos, opciones }) => (
+            <div key={pos} className="relative">
+              <button 
+                onClick={e => { e.stopPropagation(); setShowModelDropdown(showModelDropdown === pos ? null : pos) }}
+                className={`w-full px-3 py-2 rounded-lg font-bold text-xs transition-all text-center border ${
+                  showModelDropdown === pos 
+                    ? 'bg-primary/20 border-primary text-primary' 
+                    : 'bg-surface-dark border-border-dark text-white hover:bg-primary/10'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-1">
+                  <span className="truncate">{pos}</span>
+                  <span className="material-symbols-outlined text-sm">arrow_drop_down</span>
+                </div>
+                <div className="text-xs text-gray-300 mt-0.5">{modelosPorPos[pos]}</div>
+              </button>
+              {showModelDropdown === pos && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-surface-dark border border-border-dark rounded-lg shadow-2xl z-[10001] py-1">
+                  {opciones.map(opt => (
+                    <button
+                      key={opt}
+                      onClick={() => {
+                        // Lógica de confirmación según posición y modelo
+                        if (pos === 'Centrocampista' && opt === 'Baseline') {
+                          setModalConfirm({
+                            titulo: 'Cambiar a Baseline',
+                            mensaje: 'Se usará la media histórica de puntos del jugador en lugar de predicción con IA.',
+                            onConfirm: () => {
+                              setModelosPorPos(prev => ({ ...prev, [pos]: opt }))
+                              setShowModelDropdown(null)
+                              setModalConfirm(null)
+                            },
+                            onCancel: () => setModalConfirm(null)
+                          })
+                        } else if (pos === 'Delantero' && opt === 'ElasticNet' && modelosPorPos[pos] === 'Ridge') {
+                          setModalConfirm({
+                            titulo: 'Cambiar a ElasticNet',
+                            mensaje: 'La predicción con ElasticNet es algo peor que Ridge (MAE más alto). ¿Aceptas el cambio?',
+                            onConfirm: () => {
+                              setModelosPorPos(prev => ({ ...prev, [pos]: opt }))
+                              setShowModelDropdown(null)
+                              setModalConfirm(null)
+                            },
+                            onCancel: () => setModalConfirm(null)
+                          })
+                        } else {
+                          setModelosPorPos(prev => ({ ...prev, [pos]: opt }))
+                          setShowModelDropdown(null)
+                        }
+                      }}
+                      className={`block w-full text-left px-3 py-2 text-xs transition-colors whitespace-nowrap ${
+                        modelosPorPos[pos] === opt 
+                          ? 'bg-primary/30 text-primary font-bold border-l-2 border-primary' 
+                          : 'text-white hover:bg-white/10'
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ── Campo ── */}
@@ -863,13 +999,23 @@ export default function MiPlantillaPage() {
                   </div>
                 ) : detPrediccion != null ? (
                   <div>
-                    <div className="text-2xl font-black text-yellow-400 mb-1">
-                      {detPrediccion.type === 'media' ? 'Media histórica' : 'Predicción'}: {Number(detPrediccion.value).toFixed(2)} pts
-                    </div>
-                    {detPrediccion.modelo && (
-                      <p className="text-xs text-gray-500 mb-3">Modelo: {detPrediccion.modelo}</p>
+                    {detPrediccion.type === 'media' ? (
+                      <div className="bg-blue-500/20 border border-blue-500/40 rounded-lg p-3 mb-3">
+                        <p className="text-xs font-bold text-blue-300 mb-1">📊 MEDIA HISTÓRICA</p>
+                        <div className="text-2xl font-black text-blue-400">{Number(detPrediccion.value).toFixed(2)} pts</div>
+                        <p className="text-xs text-blue-200/70 mt-1">Promedio de puntos en partidos anteriores sin IA</p>
+                      </div>
+                    ) : (
+                      <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-lg p-3 mb-3">
+                        <p className="text-xs font-bold text-yellow-300 mb-1">🤖 PREDICCIÓN CON IA</p>
+                        <div className="text-2xl font-black text-yellow-400">{Number(detPrediccion.value).toFixed(2)} pts</div>
+                        <p className="text-xs text-yellow-200/70 mt-1">Estimación basada en modelo de machine learning</p>
+                      </div>
                     )}
-                    {detFeaturesImpacto.length > 0 && (() => {
+                    {detPrediccion.modelo && (
+                      <p className="text-xs text-gray-400 mb-3">Modelo: <span className="text-primary font-bold">{detPrediccion.modelo}</span></p>
+                    )}
+                    {detPrediccion.type !== 'media' && detFeaturesImpacto.length > 0 && (() => {
                       const getImpacto = f => f.impacto_pts ?? f.impacto ?? 0
                       const positivos = detFeaturesImpacto
                         .filter(f => getImpacto(f) > 0)
@@ -927,6 +1073,31 @@ export default function MiPlantillaPage() {
           </div>
         </div>
       )}
+      
+      {/* Modal de confirmación */}
+      {modalConfirm && (
+        <div className="fixed inset-0 bg-black/70 z-[9999] flex items-center justify-center p-4" onClick={() => setModalConfirm(null)}>
+          <div className="bg-surface-dark border border-border-dark rounded-2xl w-full max-w-sm p-6" onClick={e => e.stopPropagation()}>
+            <h2 className="text-lg font-black text-white mb-3">{modalConfirm.titulo}</h2>
+            <p className="text-gray-300 text-sm mb-6 leading-relaxed">{modalConfirm.mensaje}</p>
+            <div className="flex gap-3">
+              <button 
+                onClick={modalConfirm.onCancel}
+                className="flex-1 px-4 py-2.5 bg-surface-dark border border-border-dark text-white rounded-lg text-sm hover:bg-white/5 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={modalConfirm.onConfirm}
+                className="flex-1 px-4 py-2.5 bg-primary text-black rounded-lg font-bold text-sm hover:bg-primary-dark transition-colors"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <HelpButton title="Guía de Mi Plantilla" sections={[
         { title: 'Plantilla Fantasy', fields: [
           { label: 'Formación', description: 'Esquema táctico que determina cuántos jugadores van en cada línea (ej: 4-3-3).' },

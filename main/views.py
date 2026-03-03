@@ -2866,7 +2866,7 @@ def explicar_prediccion_portero_api(request):
         jugador_id: int  (ID de Jugador en BD)
         jornada:    int  (opcional)
         posicion:   str  (opcional; auto-detectada si no se pasa)
-        modelo:     str  (opcional; se ignora, el módulo elige automáticamente)
+        modelo:     str  (opcional: 'RF', 'Ridge', 'ElasticNet', 'Baseline' para MC)
 
     Retorna:
         status, prediccion, features_impacto, explicacion_texto, modelo, …
@@ -2885,8 +2885,9 @@ def explicar_prediccion_portero_api(request):
         jugador_id   = data.get('jugador_id')
         jornada      = data.get('jornada', None)
         posicion_raw = data.get('posicion', None)   # 'Portero','Defensa','Centrocampista','Delantero' o código
+        modelo_tipo  = data.get('modelo', None)     # 'RF', 'Ridge', 'ElasticNet', 'Baseline'
 
-        logger.info(f"[XAI API] jugador_id={jugador_id} jornada={jornada} posicion={posicion_raw}")
+        logger.info(f"[XAI API] jugador_id={jugador_id} jornada={jornada} posicion={posicion_raw} modelo={modelo_tipo}")
 
         if not jugador_id:
             return JsonResponse({'status': 'error', 'error': 'jugador_id es requerido'}, status=400)
@@ -2918,8 +2919,8 @@ def explicar_prediccion_portero_api(request):
 
         from predecir import predecir_puntos
 
-        logger.info(f"[XAI API] predecir_puntos({jugador_id!r}, {posicion_code!r}, {jornada})")
-        resultado = predecir_puntos(jugador_id, posicion_code, jornada, verbose=False)
+        logger.info(f"[XAI API] predecir_puntos({jugador_id!r}, {posicion_code!r}, {jornada}, modelo_tipo={modelo_tipo})")
+        resultado = predecir_puntos(jugador_id, posicion_code, jornada, verbose=False, modelo_tipo=modelo_tipo)
         logger.info(f"[XAI API] resultado={resultado}")
 
         if resultado.get('error'):

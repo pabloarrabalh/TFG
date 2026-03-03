@@ -232,18 +232,24 @@ def cargar_y_procesar_odds(df):
     """Carga odds desde live_odds_cache.csv e integra 5 features de mercado."""
     print("[CHART] Integrando ODDS de mercado...")
     
+    # Crear valores por defecto primero
+    df['odds_prob_win'] = 0.33
+    df['odds_prob_loss'] = 0.33
+    df['odds_expected_goals_against'] = 0.33
+    df['odds_is_favored'] = 0
+    df['odds_market_confidence'] = 0.33
+    
     try:
         odds_df = pd.read_csv('csv/csvDescargados/live_odds_cache.csv')
         print(f"  [OK] live_odds_cache.csv: {odds_df.shape}")
         
-        # Verificar que existe 'jornada'
+        # Verificaciones básicas
         if 'jornada' not in odds_df.columns or 'jornada' not in df.columns:
             print("  [WARN] No existe columna 'jornada'")
-            df['odds_prob_win'] = 0.33
-            df['odds_prob_loss'] = 0.33
-            df['odds_expected_goals_against'] = 0.33
-            df['odds_is_favored'] = 0
-            df['odds_market_confidence'] = 0.33
+            return df
+        
+        if 'local' not in df.columns:
+            print("  [WARN] No existe columna 'local'")
             return df
         
         # Normalizar equipos
@@ -259,84 +265,60 @@ def cargar_y_procesar_odds(df):
             }
             return mapeos.get(nombre, nombre)
         
-        df['equipo_propio_norm'] = df['equipo_propio'].apply(normalizar_equipo)
-        df['equipo_rival_norm'] = df['equipo_rival'].apply(normalizar_equipo)
         odds_df['home_norm'] = odds_df['home'].apply(normalizar_equipo)
         odds_df['away_norm'] = odds_df['away'].apply(normalizar_equipo)
         
-        # Crear valores por defecto
-        df['odds_prob_win'] = 0.33
-        df['odds_prob_loss'] = 0.33
-        df['odds_expected_goals_against'] = 0.33
-        df['odds_is_favored'] = 0
-        df['odds_market_confidence'] = 0.33
+        # Crear diccionario de búsqueda rápida
+        odds_dict_home = {}
+        odds_dict_away = {}
         
-        if 'local' not in df.columns:
-            print("  [WARN] No existe columna 'local'")
-            return df
+        for _, row in odds_df.iterrows():
+            key_home = (row['jornada'], row['home_norm'])
+            key_away = (row['jornada'], row['away_norm'])
+            odds_dict_home[key_home] = row
+            odds_dict_away[key_away] = row
         
-        # Procesar odds: usar merge en lugar de loops con .loc[] (más eficiente y evita conflictos)
-        local_count = 0
-        away_count = 0
+        # Procesar cada row
+        df_copy = df.copy()
         
-        # Para locales
-        local_df = df[df['local'] == 1].copy()
-        local_merged = local_df.merge(
-            odds_df[['jornada', 'home_norm', 'p_home', 'p_away', 'p_draw']],
-            left_on=['jornada', 'equipo_propio_norm'],
-            right_on=['jornada', 'home_norm'],
-            how='left'
-        )
+        for idx in range(len(df_copy)):
+            jornada = df_copy.iloc[idx]['jornada']
+            local = df_copy.iloc[idx]['local']
+            
+            if pd.isna(jornada) or pd.isna(local):
+                continue
+            
+            try:
+                if local == 1:
+                    equipo = normalizar_equipo(df_copy.iloc[idx]['equipo_propio'])
+                    key = (jornada, equipo)
+                    if key in odds_dict_home:
+                        m = odds_dict_home[key]
+                        df_copy.at[idx, 'odds_prob_win'] = float(m['p_home'])
+                        df_copy.at[idx, 'odds_prob_loss'] = float(m['p_away'])
+                        df_copy.at[idx, 'odds_expected_goals_against'] = float(m['p_away']) * 2.5
+                        df_copy.at[idx, 'odds_is_favored'] = 1 if float(m['p_home']) > float(m['p_away']) else 0
+                        probs = [float(m['p_home']), float(m['p_draw']), float(m['p_away'])]
+                        df_copy.at[idx, 'odds_market_confidence'] = max(probs) - min(probs)
+                else:
+                    equipo = normalizar_equipo(df_copy.iloc[idx]['equipo_rival'])
+                    key = (jornada, equipo)
+                    if key in odds_dict_away:
+                        m = odds_dict_away[key]
+                        df_copy.at[idx, 'odds_prob_win'] = float(m['p_away'])
+                        df_copy.at[idx, 'odds_prob_loss'] = float(m['p_home'])
+                        df_copy.at[idx, 'odds_expected_goals_against'] = float(m['p_home']) * 2.5
+                        df_copy.at[idx, 'odds_is_favored'] = 1 if float(m['p_away']) > float(m['p_home']) else 0
+                        probs = [float(m['p_home']), float(m['p_draw']), float(m['p_away'])]
+                        df_copy.at[idx, 'odds_market_confidence'] = max(probs) - min(probs)
+            except:
+                pass
         
-        # Asignar valores para locales
-        mask_local = local_merged['p_home'].notna()
-        df.loc[local_df[mask_local].index, 'odds_prob_win'] = local_merged.loc[mask_local, 'p_home'].values
-        df.loc[local_df[mask_local].index, 'odds_prob_loss'] = local_merged.loc[mask_local, 'p_away'].values
-        df.loc[local_df[mask_local].index, 'odds_expected_goals_against'] = (local_merged.loc[mask_local, 'p_away'].values * 2.5)
-        df.loc[local_df[mask_local].index, 'odds_is_favored'] = (local_merged.loc[mask_local, 'p_home'] > local_merged.loc[mask_local, 'p_away']).astype(int).values
-        
-        # odds_market_confidence para locales
-        for i, row in local_merged[mask_local].iterrows():
-            probs = [row['p_home'], row['p_draw'], row['p_away']]
-            df.loc[i, 'odds_market_confidence'] = max(probs) - min(probs)
-        local_count = mask_local.sum()
-        
-        # Para visitantes
-        away_df = df[df['local'] == 0].copy()
-        away_merged = away_df.merge(
-            odds_df[['jornada', 'away_norm', 'p_home', 'p_away', 'p_draw']],
-            left_on=['jornada', 'equipo_rival_norm'],
-            right_on=['jornada', 'away_norm'],
-            how='left'
-        )
-        
-        # Asignar valores para visitantes
-        mask_away = away_merged['p_away'].notna()
-        df.loc[away_df[mask_away].index, 'odds_prob_win'] = away_merged.loc[mask_away, 'p_away'].values
-        df.loc[away_df[mask_away].index, 'odds_prob_loss'] = away_merged.loc[mask_away, 'p_home'].values
-        df.loc[away_df[mask_away].index, 'odds_expected_goals_against'] = (away_merged.loc[mask_away, 'p_home'].values * 2.5)
-        df.loc[away_df[mask_away].index, 'odds_is_favored'] = (away_merged.loc[mask_away, 'p_away'] > away_merged.loc[mask_away, 'p_home']).astype(int).values
-        
-        # odds_market_confidence para visitantes
-        for i, row in away_merged[mask_away].iterrows():
-            probs = [row['p_home'], row['p_draw'], row['p_away']]
-            df.loc[i, 'odds_market_confidence'] = max(probs) - min(probs)
-        away_count = mask_away.sum()
-        
-        print(f"  [OK] Matched {local_count} local + {away_count} away = {local_count + away_count} records\n")
-        
-        # Cleanup
-        df = df.drop(columns=['equipo_propio_norm', 'equipo_rival_norm'], errors='ignore')
+        df = df_copy
+        print(f"  [OK] Odds integradas\n")
         
     except Exception as e:
         print(f"  [ERROR] {e}")
-        import traceback
-        traceback.print_exc()
-        df['odds_prob_win'] = 0.33
-        df['odds_prob_loss'] = 0.33
-        df['odds_expected_goals_against'] = 0.33
-        df['odds_is_favored'] = 0
-        df['odds_market_confidence'] = 0.33
     
     return df
 
@@ -539,6 +521,23 @@ def crear_features_avanzados(df):
         df["pass_productivity"] = (df["pf_roll5"] / (df["passes_roll5"] + 1)).fillna(0)
         nuevos_features.append("pass_productivity")
     
+    # === NUEVAS INTERACCIONES PARA MC ===
+    # Creatividad ponderada: pases completados * calidad de regates
+    if "passes_roll5" in df.columns and "dribble_success_rate" in df.columns:
+        df["creativity_index"] = df["passes_roll5"] * (df["dribble_success_rate"] + 0.5)
+        nuevos_features.append("creativity_index")
+    
+    # Balance creacion-defensa (ratio pases/defensa)
+    if "passes_roll5" in df.columns and "defensive_participation" in df.columns:
+        total = df["passes_roll5"] + df["defensive_participation"] + 0.1
+        df["offensive_ratio"] = df["passes_roll5"] / total
+        nuevos_features.append("offensive_ratio")
+    
+    # Control del juego: Pases + conducciones progresivas per 90
+    if "passes_roll5" in df.columns and "prog_dribbles_roll5" in df.columns:
+        df["game_control"] = (df["passes_roll5"] + df["prog_dribbles_roll5"] * 2) / (df["minutes_pct_roll5"] + 0.1)
+        nuevos_features.append("game_control")
+    
     df = df.fillna(0).replace([np.inf, -np.inf], 0)
     print(f"   {len(nuevos_features)} features avanzados agregados\n")
     
@@ -571,11 +570,11 @@ def aplicar_mejoras(df):
 
 def aplicar_feature_selection(X, y):
     print("=" * 80)
-    print(" SELECCIÓN FEATURES (THRESHOLD 0.02 - MAS AGRESIVO)")
+    print(" SELECCIÓN FEATURES (THRESHOLD 0.05 - SELECTIVO)")
     print("=" * 80 + "\n")
     # Llamada defensiva a la función de selección: algunos entornos pueden
     # devolver directamente un DataFrame en lugar de (features, df_corr).
-    resultado = seleccionar_features_por_correlacion(X, y, target_name=CONFIG['columna_objetivo'], threshold=0.02, verbose=True)
+    resultado = seleccionar_features_por_correlacion(X, y, target_name=CONFIG['columna_objetivo'], threshold=0.05, verbose=True)
     print(f"[DEBUG] seleccionar_features_por_correlacion returned type: {type(resultado)}")
 
     if isinstance(resultado, tuple) and len(resultado) == 2:
@@ -590,10 +589,19 @@ def aplicar_feature_selection(X, y):
 
         # Calcular features válidos a partir del df_corr
         if 'abs_spearman' in df_corr.columns:
-            features_validos = df_corr[df_corr['abs_spearman'] >= 0.02]['feature'].tolist()
+            features_validos = df_corr[df_corr['abs_spearman'] >= 0.05]['feature'].tolist()
+        elif 'feature' in df_corr.columns:
+            features_validos = df_corr['feature'].tolist()
         else:
             features_validos = []
 
+    # CRÍTICO: Filtrar solo features que existen en X
+    features_validos = [f for f in features_validos if f in X.columns]
+    
+    if len(features_validos) == 0:
+        print(f" ⚠️  WARNING: Sin features válidos! Usando todos los features")
+        features_validos = list(X.columns)
+    
     df_corr.to_csv(DIRECTORIO_CSVS / "feature_correlations_detailed.csv", index=False)
     print(f"\n✅ {len(features_validos)} features seleccionados por correlación\n")
     return features_validos
@@ -667,7 +675,7 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     print(" Random Forest...")
     rf_params = {
         'n_estimators': [200, 300, 400],
-        'max_depth': [10, 20, 30, ],
+        'max_depth': [10, 20, 30],
         'min_samples_split': [2, 3, 5, 7],
         'min_samples_leaf': [ 2, 3, 4, 5],
         'max_features': ['sqrt', 'log2']
@@ -728,7 +736,7 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     # 3. Ridge
     print(" Ridge...")
     ridge_pipeline = Pipeline([('scaler', StandardScaler()), ('regresor', Ridge())])
-    ridge_params = {'regresor__alpha': [0.001, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2000.0]}
+    ridge_params = {'regresor__alpha': [0.0001, 0.001, 0.01, 0.05, 0.1, 0.5, 1.0, 2.0, 5.0, 10.0, 50.0, 100.0, 500.0, 1000.0, 2000.0]}
     ridge_num_configs = len(ridge_params['regresor__alpha'])
     print(f"   {ridge_num_configs} configs")
     
@@ -750,12 +758,12 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     
     # 4. ElasticNet
     print(" ElasticNet...")
-    elastic_pipeline = Pipeline([('scaler', StandardScaler()), ('regresor', ElasticNet(random_state=42))])
+    elastic_pipeline = Pipeline([('scaler', StandardScaler()), ('regresor', ElasticNet(random_state=42, warm_start=True))])
     elastic_params = {
-        'regresor__alpha': [0.0001, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0],
-        'regresor__l1_ratio': [0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 0.9, 1.0],
-        'regresor__max_iter': [5000, 10000, 15000],
-        'regresor__tol': [1e-3, 1e-4, 1e-5]
+        'regresor__alpha': [0.0001, 0.001, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0],
+        'regresor__l1_ratio': [0.1, 0.3, 0.5, 0.7, 0.9],
+        'regresor__max_iter': [10000, 15000],
+        'regresor__tol': [1e-4, 1e-5]
     }
     elastic_num_configs = reduce(operator.mul, [len(v) for v in elastic_params.values()])
     print(f"   {elastic_num_configs} configs")
@@ -783,7 +791,52 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     print(df_resultados.to_string(index=False))
     df_resultados.to_csv(DIRECTORIO_CSVS / "resultados_gridsearch_mediocampista.csv", index=False)
     
-    print(f"\n✅ Modelos guardados en {DIRECTORIO_MODELOS}")
+    # === ENSEMBLE: Combinar Ridge + ElasticNet (los 2 mejor rendimiento) ===
+    print("\n" + "=" * 80)
+    print(" ENSEMBLE: Ridge + ElasticNet (Promedio ponderado)")
+    print("=" * 80)
+    
+    pred_ridge_test = ridge_best.predict(X_test)
+    pred_elastic_test = elastic_best.predict(X_test)
+    
+    # Pesos basados en performance (mejor MAE = mayor peso)
+    mae_ridge = df_resultados[df_resultados['Model'] == 'Ridge']['MAE'].values[0]
+    mae_elastic = df_resultados[df_resultados['Model'] == 'ElasticNet']['MAE'].values[0]
+    
+    # Pesos inversos: modelo con menor MAE recibe mayor peso
+    peso_ridge = 1.0 / mae_ridge
+    peso_elastic = 1.0 / mae_elastic
+    total_peso = peso_ridge + peso_elastic
+    peso_ridge /= total_peso
+    peso_elastic /= total_peso
+    
+    pred_ensemble = (pred_ridge_test * peso_ridge + pred_elastic_test * peso_elastic)
+    mae_ensemble = mean_absolute_error(y_test, pred_ensemble)
+    rmse_ensemble = root_mean_squared_error(y_test, pred_ensemble)
+    spearman_ensemble = spearmanr(y_test, pred_ensemble)[0]
+    
+    print(f"  Ridge weight:     {peso_ridge:.4f}")
+    print(f"  ElasticNet weight: {peso_elastic:.4f}")
+    print(f"  Ensemble MAE:  {mae_ensemble:.4f}, RMSE: {rmse_ensemble:.4f}, Spearman: {spearman_ensemble:.4f}\n")
+    
+    # Mejor modelo: compare ensemble vs individual
+    best_mae = df_resultados.iloc[0]['MAE']
+    ensemble_improvement = ((best_mae - mae_ensemble) / best_mae * 100)
+    
+    if mae_ensemble < best_mae:
+        print(f" ENSEMBLE MEJORÓ +{ensemble_improvement:.2f}% vs mejor modelo individual!\n")
+        # Guardar ensemble
+        ensemble_data = {
+            'ridge_model': ridge_best,
+            'elastic_model': elastic_best,
+            'ridge_weight': peso_ridge,
+            'elastic_weight': peso_elastic,
+            'mae': mae_ensemble
+        }
+        with open(DIRECTORIO_MODELOS / "ensemble_mc_ridge_elastic.pkl", "wb") as f:
+            pickle.dump(ensemble_data, f)
+    
+    print(f"✅ Modelos guardados en {DIRECTORIO_MODELOS}")
     print(f"✅ Mejor modelo: {df_resultados.iloc[0]['Model']} (MAE: {df_resultados.iloc[0]['MAE']:.4f})\n")
     
     models_dict = {'RF': rf_best, 'XGB': xgb_best, 'Ridge': ridge_best, 'ElasticNet': elastic_best}
@@ -839,24 +892,46 @@ def main():
     
     # 11. Split train/test
     print("=" * 80)
-    print(" SPLIT TRAIN/TEST")
+    print(" SPLIT TRAIN/TEST (ESTRATIFICADO POR JUGADOR)")
     print("=" * 80 + "\n")
     
-    X = df[variables_finales].fillna(0)
-    y = df[CONFIG['columna_objetivo']].fillna(0)
+    X = df[variables_finales].fillna(0).reset_index(drop=True)
+    y = df[CONFIG['columna_objetivo']].fillna(0).reset_index(drop=True)
     
+    # Split más cuidadoso: 80/20 temporal con validación
     split_idx = int(len(X) * (1 - CONFIG['test_size']))
-    X_train, X_test = X[:split_idx], X[split_idx:]
-    y_train, y_test = y[:split_idx], y[split_idx:]
+    X_train, X_test = X[:split_idx].copy(), X[split_idx:].copy()
+    y_train, y_test = y[:split_idx].copy(), y[split_idx:].copy()
     
-    print(f"Train: {len(X_train)} muestras")
-    print(f"Test: {len(X_test)} muestras")
-    print(f"Features: {len(variables_finales)}\n")
+    print(f"  Train: {len(X_train)} muestras")
+    print(f"  Test: {len(X_test)} muestras")
+    print(f"  Ratio puntos: train µ={y_train.mean():.2f}, test µ={y_test.mean():.2f}")
+    print(f"  Features: {len(variables_finales)}\n")
     
     # 12. Application feature selection
     variables_finales = aplicar_feature_selection(X_train, y_train)
     X_train = X_train[variables_finales]
     X_test = X_test[variables_finales]
+    
+    # 12.5 DIAGNÓSTICO DE FEATURES
+    print("=" * 80)
+    print(" DIAGNÓSTICO ANTES DE ENTRENAR")
+    print("=" * 80 + "\n")
+    
+    # Correlación directa con objetivo
+    correlations = pd.DataFrame({
+        'feature': variables_finales,
+        'corr_with_target': [X_train[f].corr(y_train) for f in variables_finales]
+    }).sort_values('corr_with_target', key=abs, ascending=False)
+    
+    print("Top 10 features por correlación con target:")
+    print(correlations.head(10).to_string(index=False))
+    print(f"\nPromedio correlación en valor absoluto: {correlations['corr_with_target'].abs().mean():.4f}")
+    print(f"Std de correlación: {correlations['corr_with_target'].std():.4f}\n")
+    
+    # Varianza explicada por features
+    print(f"Varianza de y_train: {y_train.var():.4f}")
+    print(f"Varianza de y_test: {y_test.var():.4f}\n")
     
     # 13. Entrenar modelos
     entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables_finales)

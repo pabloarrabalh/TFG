@@ -144,13 +144,16 @@ def crear_features_temporales_serie(series, vc=3, vl=5, ve=7):
     return features
 
 
-def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=False):
+def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=False, modelo_tipo=None):
     """
     Pipeline común para DF, MC, DT:
     1. Carga datos históricos desde BD
     2. Construye features
-    3. Predice con modelo RF
+    3. Predice con modelo RF o devuelve baseline
     4. Genera explicaciones SHAP
+    
+    Args:
+        modelo_tipo: str - 'RF', 'Ridge', 'ElasticNet', 'Baseline' (MC solo), None (usa default)
     """
     _django_setup()
     try:
@@ -158,7 +161,65 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
     except Exception as e:
         return {'error': f'Django no disponible: {e}', 'jugador_id': jugador_id, 'prediccion': None}
 
-    modelo, tipo_modelo = cargar_modelo(posicion_code)
+    # Si es baseline para MC, calcular media y retornar
+    if modelo_tipo == 'Baseline' and posicion_code == 'MC':
+        try:
+            if isinstance(jugador_id, int):
+                jugador = Jugador.objects.get(id=jugador_id)
+                nombre_jugador = f"{jugador.nombre} {jugador.apellido}".strip()
+            else:
+                nombre_norm = normalizar_nombre(str(jugador_id))
+                jugador = None
+                for j in Jugador.objects.all():
+                    if nombre_norm in normalizar_nombre(f"{j.nombre} {j.apellido}"):
+                        jugador = j
+                        nombre_jugador = f"{j.nombre} {j.apellido}".strip()
+                        break
+                if not jugador:
+                    return {'error': f'Jugador no encontrado: {jugador_id}', 'jugador_id': jugador_id, 'prediccion': None}
+            
+            stats_qs = (EstadisticasPartidoJugador.objects
+                        .filter(jugador=jugador)
+                        .select_related('partido__jornada'))
+            
+            if not stats_qs.exists():
+                return {'jugador_id': jugador_id, 'prediccion': None, 'explicacion_texto': 'Sin datos históricos'}
+            
+            if jornada_actual is None:
+                jornada_actual = stats_qs.last().partido.jornada.numero_jornada + 1
+            jornada_actual = int(jornada_actual)
+            
+            stats_hist = stats_qs.filter(partido__jornada__numero_jornada__lt=jornada_actual)
+            if not stats_hist.exists():
+                return {'jugador_id': jugador_id, 'prediccion': None, 'explicacion_texto': 'Sin datos anteriores'}
+            
+            media_pts = float(stats_hist.aggregate(media=Avg('puntos_fantasy'))['media'] or 0.0)
+            
+            puntos_reales = None
+            try:
+                stat_j = stats_qs.filter(partido__jornada__numero_jornada=jornada_actual).first()
+                if stat_j:
+                    puntos_reales = stat_j.puntos_fantasy
+            except Exception:
+                pass
+            
+            return {
+                'status': 'success',
+                'jugador_id': jugador_id,
+                'posicion': posicion_code,
+                'prediccion': round(media_pts, 2),
+                'puntos_reales': round(float(puntos_reales), 2) if puntos_reales is not None else None,
+                'puntos_reales_texto': f"{round(float(puntos_reales), 2)}" if puntos_reales is not None else "Aún no jugado",
+                'jornada': jornada_actual,
+                'modelo': 'Baseline (Media)',
+                'features_impacto': [],
+                'explicacion_texto': f'Media histórica de {media_pts:.2f} pts basada en {stats_hist.count()} partidos anteriores',
+                'error': None,
+            }
+        except Exception as e:
+            return {'error': f'Error calculando baseline: {e}', 'jugador_id': jugador_id, 'prediccion': None}
+
+    modelo, tipo_modelo = cargar_modelo(posicion_code, modelo_tipo)
     if modelo is None:
         return {'error': f'Modelo {posicion_code} no disponible', 'jugador_id': jugador_id, 'prediccion': None}
     nombre_modelo_legible = NOMBRE_MODELO_LEGIBLE.get(tipo_modelo, tipo_modelo)
@@ -822,7 +883,7 @@ _POSICION_MAP = {
 }
 
 
-def predecir_puntos(jugador_id, posicion, jornada_actual=None, verbose=False):
+def predecir_puntos(jugador_id, posicion, jornada_actual=None, verbose=False, modelo_tipo=None):
     """
     Punto de entrada unificado para predecir puntos fantasy.
 
@@ -831,6 +892,7 @@ def predecir_puntos(jugador_id, posicion, jornada_actual=None, verbose=False):
         posicion: str - 'PT','DF','MC','DT' o nombres completos españoles/ingleses
         jornada_actual: int (opcional; si None usa la última disponible + 1)
         verbose: bool - mostrar info detallada
+        modelo_tipo: str - 'RF', 'Ridge', 'ElasticNet', 'Baseline' (MC solo), None (usa default)
 
     Returns:
         dict con keys:
@@ -843,11 +905,11 @@ def predecir_puntos(jugador_id, posicion, jornada_actual=None, verbose=False):
     if pos_code == 'PT':
         return _predecir_portero(jugador_id, jornada_actual, verbose)
     elif pos_code == 'DF':
-        return _predecir_desde_db(jugador_id, 'DF', jornada_actual, verbose)
+        return _predecir_desde_db(jugador_id, 'DF', jornada_actual, verbose, modelo_tipo)
     elif pos_code == 'MC':
-        return _predecir_desde_db(jugador_id, 'MC', jornada_actual, verbose)
+        return _predecir_desde_db(jugador_id, 'MC', jornada_actual, verbose, modelo_tipo)
     elif pos_code == 'DT':
-        return _predecir_desde_db(jugador_id, 'DT', jornada_actual, verbose)
+        return _predecir_desde_db(jugador_id, 'DT', jornada_actual, verbose, modelo_tipo)
     else:
         return {
             'error': f'Posición no reconocida: {posicion}',

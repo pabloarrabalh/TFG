@@ -1,0 +1,12 @@
+=================================================================
+ANÁLISIS DE RENDIMIENTO POR POSICIÓN
+Criterio: BUENO = supera baseline naive | ACEPTABLE = hasta 10% peor
+=================================================================
+Defensa         MAE=2.6895  mejora=+0.6%     🟢 BUENO               baseline=2.7044
+Mediocampista   MAE=2.7102  mejora=-14.9%    🔴 MALO                baseline=2.3585
+Delantero       MAE=2.8584  mejora=-9.1%     🟡 ACEPTABLE           baseline=2.6203
+Portero         MAE=3.2145  mejora=-2.5%     🟡 ACEPTABLE           baseline=3.1368
+-----------------------------------------------------------------
+MAE global promedio : 2.8682
+MAE mín / máx       : 2.6895 / 3.2145
+=================================================================
