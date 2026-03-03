@@ -1,6 +1,5 @@
 .venv311/
 .venv/
-.venv311/
 venv/
 
 __pycache__/
@@ -8,3 +7,10 @@ __pycache__/
 .env
 .node_modules/*
 node_modules/
+
+# Logs
+*.log
+logs/
+
+# Test outputs
+scripts/test_output.txt
