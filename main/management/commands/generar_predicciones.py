@@ -115,24 +115,19 @@ class Command(BaseCommand):
         if str(entrenamientos_path) not in sys.path:
             sys.path.insert(0, str(entrenamientos_path))
 
-        predictores = {}
-        for pos, mod_nombre, func_nombre in [
-            ('Portero',        'predecir_portero',       'predecir_puntos_portero'),
-            ('Defensa',        'predecir_defensa',        'predecir_puntos_defensa'),
-            ('Centrocampista', 'predecir_mediocampista',  'predecir_puntos_mediocampista'),
-            ('Delantero',      'predecir_delantero',      'predecir_puntos_delantero'),
-        ]:
-            try:
-                import importlib
-                mod = importlib.import_module(mod_nombre)
-                predictores[pos] = getattr(mod, func_nombre)
-                self.stdout.write(f"  ✓ {pos}: módulo cargado")
-            except Exception as e:
-                self.stdout.write(self.style.WARNING(f"  ✗ {pos}: no disponible ({e})"))
-
-        if not predictores:
-            self.stderr.write(self.style.ERROR("Ningún módulo de predicción disponible"))
+        import importlib
+        try:
+            _predecir_mod = importlib.import_module('predecir')
+            _predecir_puntos = getattr(_predecir_mod, 'predecir_puntos')
+            self.stdout.write("  ✓ Módulo unificado 'predecir' cargado")
+        except Exception as e:
+            self.stderr.write(self.style.ERROR(f"No se pudo cargar el módulo de predicción: {e}"))
             return
+
+        _POS_CODE = {
+            'Portero': 'PT', 'Defensa': 'DF',
+            'Centrocampista': 'MC', 'Delantero': 'DT',
+        }
 
         # ── Predecir ────────────────────────────────────────────────────────
         ok = error = skip = 0
@@ -142,10 +137,7 @@ class Command(BaseCommand):
         def predecir_uno(jugador_id, posicion):
             """Wrapper que llama al predictor correcto (sin guardar)."""
             from main.models import PrediccionJugador
-            pos = posicion if posicion in predictores else 'Delantero'
-            func = predictores.get(pos)
-            if not func:
-                return 'skip', None
+            pos_code = _POS_CODE.get(posicion, 'DT')
 
             # Saltar si ya existe y no --force
             if not options['force']:
@@ -158,7 +150,7 @@ class Command(BaseCommand):
                     return 'skip', None
 
             try:
-                resultado = func(jugador_id, jornada.numero_jornada, verbose=False)
+                resultado = _predecir_puntos(jugador_id, pos_code, jornada.numero_jornada, verbose=False)
                 if not isinstance(resultado, dict) or resultado.get('error'):
                     return 'error', None
 

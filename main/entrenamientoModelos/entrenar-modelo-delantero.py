@@ -266,41 +266,53 @@ def cargar_y_procesar_odds(df):
             print("  [WARN] No existe columna 'local'")
             return df
         
+        # Procesar odds: usar merge en lugar de loops con .loc[] (más eficiente y evita conflictos)
         local_count = 0
-        local_mask = df['local'] == 1
-        for idx in df[local_mask].index:
-            jornada = df.loc[idx, 'jornada']
-            equipo = df.loc[idx, 'equipo_propio_norm']
-            
-            match = odds_df[(odds_df['jornada'] == jornada) & (odds_df['home_norm'] == equipo)]
-            if not match.empty:
-                p_win = match.iloc[0]['p_home']
-                p_loss = match.iloc[0]['p_away']
-                
-                df.loc[idx, 'odds_prob_win'] = p_win
-                df.loc[idx, 'odds_prob_loss'] = p_loss
-                df.loc[idx, 'odds_expected_goals_against'] = p_loss * 2.5
-                df.loc[idx, 'odds_is_favored'] = 1 if p_win > p_loss else 0
-                df.loc[idx, 'odds_market_confidence'] = max(p_win, match.iloc[0].get('p_draw', 0.33), p_loss) - min(p_win, match.iloc[0].get('p_draw', 0.33), p_loss)
-                local_count += 1
-        
         away_count = 0
-        away_mask = df['local'] == 0
-        for idx in df[away_mask].index:
-            jornada = df.loc[idx, 'jornada']
-            equipo = df.loc[idx, 'equipo_rival_norm']
-            
-            match = odds_df[(odds_df['jornada'] == jornada) & (odds_df['away_norm'] == equipo)]
-            if not match.empty:
-                p_win = match.iloc[0]['p_away']
-                p_loss = match.iloc[0]['p_home']
-                
-                df.loc[idx, 'odds_prob_win'] = p_win
-                df.loc[idx, 'odds_prob_loss'] = p_loss
-                df.loc[idx, 'odds_expected_goals_against'] = p_loss * 2.5
-                df.loc[idx, 'odds_is_favored'] = 1 if p_win > p_loss else 0
-                df.loc[idx, 'odds_market_confidence'] = max(p_win, match.iloc[0].get('p_draw', 0.33), p_loss) - min(p_win, match.iloc[0].get('p_draw', 0.33), p_loss)
-                away_count += 1
+        
+        # Para locales
+        local_df = df[df['local'] == 1].copy()
+        local_merged = local_df.merge(
+            odds_df[['jornada', 'home_norm', 'p_home', 'p_away', 'p_draw']],
+            left_on=['jornada', 'equipo_propio_norm'],
+            right_on=['jornada', 'home_norm'],
+            how='left'
+        )
+        
+        # Asignar valores para locales
+        mask_local = local_merged['p_home'].notna()
+        df.loc[local_df[mask_local].index, 'odds_prob_win'] = local_merged.loc[mask_local, 'p_home'].values
+        df.loc[local_df[mask_local].index, 'odds_prob_loss'] = local_merged.loc[mask_local, 'p_away'].values
+        df.loc[local_df[mask_local].index, 'odds_expected_goals_against'] = (local_merged.loc[mask_local, 'p_away'].values * 2.5)
+        df.loc[local_df[mask_local].index, 'odds_is_favored'] = (local_merged.loc[mask_local, 'p_home'] > local_merged.loc[mask_local, 'p_away']).astype(int).values
+        
+        # odds_market_confidence para locales
+        for i, row in local_merged[mask_local].iterrows():
+            probs = [row['p_home'], row['p_draw'], row['p_away']]
+            df.loc[i, 'odds_market_confidence'] = max(probs) - min(probs)
+        local_count = mask_local.sum()
+        
+        # Para visitantes
+        away_df = df[df['local'] == 0].copy()
+        away_merged = away_df.merge(
+            odds_df[['jornada', 'away_norm', 'p_home', 'p_away', 'p_draw']],
+            left_on=['jornada', 'equipo_rival_norm'],
+            right_on=['jornada', 'away_norm'],
+            how='left'
+        )
+        
+        # Asignar valores para visitantes
+        mask_away = away_merged['p_away'].notna()
+        df.loc[away_df[mask_away].index, 'odds_prob_win'] = away_merged.loc[mask_away, 'p_away'].values
+        df.loc[away_df[mask_away].index, 'odds_prob_loss'] = away_merged.loc[mask_away, 'p_home'].values
+        df.loc[away_df[mask_away].index, 'odds_expected_goals_against'] = (away_merged.loc[mask_away, 'p_home'].values * 2.5)
+        df.loc[away_df[mask_away].index, 'odds_is_favored'] = (away_merged.loc[mask_away, 'p_away'] > away_merged.loc[mask_away, 'p_home']).astype(int).values
+        
+        # odds_market_confidence para visitantes
+        for i, row in away_merged[mask_away].iterrows():
+            probs = [row['p_home'], row['p_draw'], row['p_away']]
+            df.loc[i, 'odds_market_confidence'] = max(probs) - min(probs)
+        away_count = mask_away.sum()
         
         print(f"  [OK] Matched {local_count} local + {away_count} away = {local_count + away_count} records\n")
         
@@ -594,7 +606,7 @@ def definir_variables_finales(df):
         "opp_form_roll5", "opp_form_ewma5",
         
         # ROLES
-        "num_roles", "score_roles", "tiene_rol_destacado",
+        "tiene_rol_delantero_core",  # Solo este feature
         
         # FEATURES AVANZADOS
         "shot_efficiency", "shot_accuracy", "offensive_threat",

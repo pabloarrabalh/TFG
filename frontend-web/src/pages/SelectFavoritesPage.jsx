@@ -25,7 +25,13 @@ export default function SelectFavoritesPage() {
         api.get('/api/favoritos/'),
       ])
       setEquipos(eqRes.data.equipos || [])
-      const favIds = new Set((favRes.data.favoritos || []).map(f => f.equipo_id))
+      // El endpoint devuelve todos los equipos con booleano es_favorito
+      // Filtrar solo los que tienen es_favorito: true y mapear sus ids
+      const favIds = new Set(
+        (favRes.data.favoritos || [])
+          .filter(f => f.es_favorito)
+          .map(f => f.id)
+      )
       setFavoritos(favIds)
     } catch (err) {
       // Error loading data

@@ -2860,128 +2860,96 @@ def cambiar_jornada_api(request):
 @csrf_exempt
 def explicar_prediccion_portero_api(request):
     """
-    API para obtener explicabilidad (XAI) de predicciones de porteros usando SHAP.
-    
-    Recibe JSON:
-    {
-        "jugador_id": 123 (ID de Jugador en BD),
-        "jornada": 15 (opcional),
-        "modelo": "RF" (opcional, default: 'RF')
-    }
-    
-    Retorna JSON:
-    {
-        "status": "success" o "error",
-        "prediccion": float,
-        "features_impacto": [
-            {"feature": str, "impacto": float, "valor": float, "direccion": str},
-            ...
-        ],
-        "explicacion_texto": str,
-        "error": str (si hay error)
-    }
+    API UNIFICADA para obtener predicción + explicabilidad (XAI/SHAP) de cualquier jugador.
+
+    Acepta:
+        jugador_id: int  (ID de Jugador en BD)
+        jornada:    int  (opcional)
+        posicion:   str  (opcional; auto-detectada si no se pasa)
+        modelo:     str  (opcional; se ignora, el módulo elige automáticamente)
+
+    Retorna:
+        status, prediccion, features_impacto, explicacion_texto, modelo, …
     """
     import json
     import sys
     import logging
     from pathlib import Path
     from main.models import Jugador
-    
+
     logger = logging.getLogger(__name__)
-    
+
     try:
-        # Parsear JSON del request
         body_data = request.body.decode('utf-8') if isinstance(request.body, bytes) else request.body
         data = json.loads(body_data)
-        jugador_id = data.get('jugador_id')
-        jornada = data.get('jornada', None)
-        modelo_tipo = data.get('modelo', 'RF')  # Aceptar modelo del request, default RF
-        
-        logger.info(f"[XAI API] Pidiendo explicación para jugador_id {jugador_id}, jornada {jornada}, modelo {modelo_tipo}")
-        
+        jugador_id   = data.get('jugador_id')
+        jornada      = data.get('jornada', None)
+        posicion_raw = data.get('posicion', None)   # 'Portero','Defensa','Centrocampista','Delantero' o código
+
+        logger.info(f"[XAI API] jugador_id={jugador_id} jornada={jornada} posicion={posicion_raw}")
+
         if not jugador_id:
-            return JsonResponse({
-                'status': 'error',
-                'error': 'jugador_id es requerido'
-            }, status=400)
-        
-        # Obtener jugador de BD (para convertir ID a nombre)
+            return JsonResponse({'status': 'error', 'error': 'jugador_id es requerido'}, status=400)
+
+        # Obtener jugador
         try:
             jugador = Jugador.objects.get(id=jugador_id)
             nombre_jugador = f"{jugador.nombre} {jugador.apellido}".strip()
         except Jugador.DoesNotExist:
-            return JsonResponse({
-                'status': 'error',
-                'error': f'Jugador con ID {jugador_id} no encontrado'
-            }, status=404)
-        
-        # Agregar path para imports
+            return JsonResponse({'status': 'error', 'error': f'Jugador {jugador_id} no encontrado'}, status=404)
+
+        # Resolver posición: parámetro → BD → fallback
+        MAP_POS = {
+            'portero': 'PT', 'pt': 'PT', 'gk': 'PT',
+            'defensa': 'DF', 'df': 'DF', 'defensor': 'DF',
+            'centrocampista': 'MC', 'mediocampista': 'MC', 'mc': 'MC', 'mf': 'MC',
+            'delantero': 'DT', 'dt': 'DT', 'fw': 'DT', 'st': 'DT',
+        }
+        if posicion_raw:
+            posicion_code = MAP_POS.get(str(posicion_raw).lower(), str(posicion_raw).upper())
+        else:
+            pos_bd = getattr(jugador, 'posicion', None) or ''
+            posicion_code = MAP_POS.get(str(pos_bd).lower(), 'DT')
+
+        # Setup path
         entrenamientos_path = Path(__file__).parent / 'entrenamientoModelos'
         if str(entrenamientos_path) not in sys.path:
             sys.path.insert(0, str(entrenamientos_path))
-        
-        # Importar función de explicación
-        from predecir import explicar_prediccion_portero
-        
-        # Llamar función de explicación usando NOMBRE
-        logger.info(f"[XAI API] Llamando explicar_prediccion_portero('{nombre_jugador}', jornada={jornada}, modelo={modelo_tipo})")
-        resultado = explicar_prediccion_portero(nombre_jugador, jornada, modelo_tipo=modelo_tipo)
-        
-        logger.info(f"[XAI API] Resultado: {resultado}")
-        
-        # Validar resultado
+
+        from predecir import predecir_puntos
+
+        logger.info(f"[XAI API] predecir_puntos({jugador_id!r}, {posicion_code!r}, {jornada})")
+        resultado = predecir_puntos(jugador_id, posicion_code, jornada, verbose=False)
+        logger.info(f"[XAI API] resultado={resultado}")
+
         if resultado.get('error'):
-            logger.warning(f"[XAI API] Error en explicación: {resultado.get('error')}")
-            return JsonResponse({
-                'status': 'error',
-                'error': resultado['error'],
-                'jugador_id': jugador_id
-            }, status=400)
-        else:
-            logger.info(f"[XAI API] Explicación exitosa para predicción: {resultado.get('prediccion')} pts")
-            
-            # Preparar predicción para JSON (puede ser None)
-            prediccion = resultado.get('prediccion')
-            prediccion_json = float(prediccion) if prediccion is not None else None
-            
-            return JsonResponse({
-                'status': 'success',
-                'jugador_id': jugador_id,
-                'jugador_nombre': nombre_jugador,
-                'prediccion': prediccion_json,
-                'puntos_reales': float(resultado['puntos_reales']) if resultado.get('puntos_reales') is not None else None,
-                'puntos_reales_texto': resultado.get('puntos_reales_texto', 'Aún no jugado'),
-                'margen': float(resultado.get('margen', 0)),
-                'mae_value': float(resultado.get('mae_value', 3.22)),
-                'std_value': float(resultado.get('std_value', 2.5)),
-                'rango_min': float(resultado.get('rango_min')) if resultado.get('rango_min') is not None else None,
-                'rango_max': float(resultado.get('rango_max')) if resultado.get('rango_max') is not None else None,
-                'jornada': int(resultado.get('jornada', jornada)),
-                'features_impacto': resultado.get('explicaciones', resultado.get('features_impacto', [])),
-                'explicacion_texto': resultado.get('explicacion_texto', ''),
-                'error': None
-            })
-    
+            return JsonResponse({'status': 'error', 'error': resultado['error'], 'jugador_id': jugador_id}, status=400)
+
+        prediccion = resultado.get('prediccion')
+        return JsonResponse({
+            'status': 'success',
+            'jugador_id': jugador_id,
+            'jugador_nombre': nombre_jugador,
+            'posicion': posicion_code,
+            'prediccion': float(prediccion) if prediccion is not None else None,
+            'puntos_reales': float(resultado['puntos_reales']) if resultado.get('puntos_reales') is not None else None,
+            'puntos_reales_texto': resultado.get('puntos_reales_texto', 'Aún no jugado'),
+            'jornada': int(resultado.get('jornada', jornada or 0)),
+            'modelo': resultado.get('modelo', ''),
+            'features_impacto': resultado.get('features_impacto', []),
+            'explicacion_texto': resultado.get('explicacion_texto', ''),
+            'error': None,
+        })
+
     except json.JSONDecodeError as e:
-        logger.error(f"[XAI API] Error parseando JSON: {e}")
-        return JsonResponse({
-            'status': 'error',
-            'error': f'JSON inválido: {str(e)}'
-        }, status=400)
-    
+        return JsonResponse({'status': 'error', 'error': f'JSON inválido: {e}'}, status=400)
     except ImportError as e:
-        logger.error(f"[XAI API] Error importando módulo: {e}", exc_info=True)
-        return JsonResponse({
-            'status': 'error',
-            'error': f'Error de módulo: {str(e)}'
-        }, status=500)
-    
+        return JsonResponse({'status': 'error', 'error': f'Error de módulo: {e}'}, status=500)
     except Exception as e:
-        logger.error(f"[XAI API] Error general: {e}", exc_info=True)
-        return JsonResponse({
-            'status': 'error',
-            'error': f'Error: {str(e)}'
-        }, status=500)
+        import traceback
+        logger.error(f"[XAI API] Error inesperado: {e}", exc_info=True)
+        return JsonResponse({'status': 'error', 'error': str(e),
+                             'traceback': traceback.format_exc() if settings.DEBUG else None}, status=500)
 
 
 @csrf_exempt

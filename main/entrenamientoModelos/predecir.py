@@ -71,33 +71,62 @@ def normalizar_nombre(nombre):
     return ''.join(c for c in nfd if unicodedata.category(c) != 'Mn').lower().strip()
 
 
-def cargar_modelo(posicion, modelo_tipo='RF'):
-    """Carga el mejor modelo RF de una posición."""
+# Modelo elegido por posición según resultados de entrenamiento:
+#   PT → Random Forest  (mejor MAE en porteros)
+#   DF → Random Forest  (mejor MAE en defensas)
+#   MC → Ridge          (mejor MAE en mediocampistas)
+#   DT → Ridge          (mejor MAE en delanteros)
+MODELO_POR_POSICION = {
+    'PT': 'RF',
+    'DF': 'RF',
+    'MC': 'Ridge',
+    'DT': 'Ridge',
+}
+
+NOMBRE_MODELO_LEGIBLE = {
+    'RF':    'Random Forest',
+    'Ridge': 'Ridge Regression',
+}
+
+
+def cargar_modelo(posicion, modelo_tipo=None):
+    """Carga el modelo óptimo para una posición.
+    Si modelo_tipo es None, usa MODELO_POR_POSICION.
+    """
+    if modelo_tipo is None:
+        modelo_tipo = MODELO_POR_POSICION.get(posicion, 'RF')
+
     directorio = DIRECTORIOS_MODELOS.get(posicion)
     if directorio is None:
-        return None
+        return None, modelo_tipo
+
+    # Candidatos ordenados por prioridad según posición y tipo
     candidatos = {
-        'PT': ['best_model_RF.pkl', 'best_model_rf.pkl', 'best_model_portero_rf.pkl'],
-        'DF': ['best_model_RF.pkl', 'best_model_rf.pkl', 'best_model_defensa_rf.pkl'],
-        'MC': ['best_model_RF.pkl', 'best_model_rf.pkl', 'best_model_mc_rf.pkl', 'best_model_mediocampista_rf.pkl'],
-        'DT': ['best_model_RF.pkl', 'best_model_rf.pkl', 'best_model_delantero_rf.pkl', 'best_model_dt_rf.pkl'],
+        ('PT', 'RF'):    ['best_model_RF.pkl', 'best_model_rf.pkl', 'best_model_portero_rf.pkl'],
+        ('DF', 'RF'):    ['best_model_RF.pkl', 'best_model_rf.pkl', 'best_model_defensa_rf.pkl'],
+        ('MC', 'Ridge'): ['best_model_mc_ridge.pkl', 'best_model_Ridge.pkl', 'best_model_ridge.pkl'],
+        ('MC', 'RF'):    ['best_model_mc_rf.pkl', 'best_model_RF.pkl'],
+        ('DT', 'Ridge'): ['best_model_delantero_ridge.pkl', 'best_model_Ridge.pkl', 'best_model_ridge.pkl'],
+        ('DT', 'RF'):    ['best_model_delantero_rf.pkl', 'best_model_RF.pkl'],
     }
-    for nombre in candidatos.get(posicion, []):
+    key = (posicion, modelo_tipo)
+    lista = candidatos.get(key, ['best_model_RF.pkl'])
+    for nombre in lista:
         path = directorio / nombre
         if path.exists():
             try:
                 with open(path, 'rb') as f:
-                    return pickle.load(f)
+                    return pickle.load(f), modelo_tipo
             except Exception:
                 continue
     # Fallback: primer .pkl disponible
-    for archivo in directorio.glob("*.pkl"):
+    for archivo in sorted(directorio.glob('*.pkl')):
         try:
             with open(archivo, 'rb') as f:
-                return pickle.load(f)
+                return pickle.load(f), modelo_tipo
         except Exception:
             continue
-    return None
+    return None, modelo_tipo
 
 
 def crear_features_temporales_serie(series, vc=3, vl=5, ve=7):
@@ -129,9 +158,10 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
     except Exception as e:
         return {'error': f'Django no disponible: {e}', 'jugador_id': jugador_id, 'prediccion': None}
 
-    modelo = cargar_modelo(posicion_code)
+    modelo, tipo_modelo = cargar_modelo(posicion_code)
     if modelo is None:
         return {'error': f'Modelo {posicion_code} no disponible', 'jugador_id': jugador_id, 'prediccion': None}
+    nombre_modelo_legible = NOMBRE_MODELO_LEGIBLE.get(tipo_modelo, tipo_modelo)
 
     try:
         # Resolver jugador
@@ -209,7 +239,7 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
         explicacion_texto = formatear_explicaciones_texto(impacts, prediccion)
 
         if verbose:
-            print(f"✓ {posicion_code} {jugador_id} J{jornada_actual}: {prediccion:.2f}pt")
+            print(f"✓ {posicion_code} ({nombre_modelo_legible}) {jugador_id} J{jornada_actual}: {prediccion:.2f}pt")
 
         return {
             'status': 'success',
@@ -219,7 +249,7 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
             'puntos_reales': round(float(puntos_reales), 2) if puntos_reales is not None else None,
             'puntos_reales_texto': f"{round(float(puntos_reales), 2)}" if puntos_reales is not None else "Aún no jugado",
             'jornada': jornada_actual,
-            'modelo': 'Random Forest',
+            'modelo': nombre_modelo_legible,
             'features_impacto': impacts[:7],
             'explicacion_texto': explicacion_texto,
             'error': None,
@@ -232,8 +262,18 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
 def _stats_a_dataframe(stats_hist, nombre_jugador, jugador, posicion_code):
     """Convierte queryset de EstadisticasPartidoJugador a lista de dicts."""
     data = []
-    equipo_ids = jugador.historial_equipos.values_list('equipo_id', flat=True)
-    ultimo_equipo_id = equipo_ids.last() if equipo_ids.exists() else None
+    # Obtener el equipo del último partido del jugador
+    last_stat = stats_hist.last()
+    ultimo_equipo_id = None
+    if last_stat:
+        # Determinar si fue local o visitante
+        if last_stat.partido.equipo_local.jugadores_temporada.filter(jugador=jugador).exists():
+            ultimo_equipo_id = last_stat.partido.equipo_local_id
+        elif last_stat.partido.equipo_visitante.jugadores_temporada.filter(jugador=jugador).exists():
+            ultimo_equipo_id = last_stat.partido.equipo_visitante_id
+        else:
+            # Fallback: asumir local
+            ultimo_equipo_id = last_stat.partido.equipo_local_id
 
     for stat in stats_hist:
         partido = stat.partido
@@ -255,20 +295,26 @@ def _stats_a_dataframe(stats_hist, nombre_jugador, jugador, posicion_code):
             'duelos_aereos_perdidos': stat.duelos_aereos_perdidos or 0,
             'bloqueos': stat.bloqueos or 0,
             # Ofensivos
-            'gol_partido': stat.goles or 0,
-            'xg_partido': stat.xg or 0,
+            'gol_partido': stat.gol_partido or 0,
+            'xg_partido': stat.xg_partido or 0,
             'tiros': stat.tiros or 0,
-            'tiro_puerta_partido': stat.tiros_a_puerta or 0,
+            'tiro_puerta_partido': stat.tiro_puerta_partido or 0,
             'regates': stat.regates or 0,
             'regates_completados': stat.regates_completados or 0,
             'conducciones_progresivas': stat.conducciones_progresivas or 0,
             'metros_avanzados_conduccion': stat.metros_avanzados_conduccion or 0,
-            'pases_clave': stat.pases_clave or 0,
-            # MC
+            # MC / Comunes
             'pases_totales': stat.pases_totales or 0,
             'pases_completados_pct': stat.pases_completados_pct or 0,
             'conducciones': stat.conducciones or 0,
-            'regates_fallidos': 0,
+            'regates_fallidos': stat.regates_fallidos or 0,
+            # Portero
+            'goles_en_contra': stat.goles_en_contra or 0,
+            'porcentaje_paradas': stat.porcentaje_paradas or 0,
+            'psxg': stat.psxg or 0,
+            # Tarjetas
+            'amarillas': stat.amarillas or 0,
+            'rojas': stat.rojas or 0,
             # Roles
             'roles': stat.roles if hasattr(stat, 'roles') and stat.roles else [],
         }
@@ -544,9 +590,10 @@ def _predecir_portero(jugador_id, jornada_actual=None, verbose=False):
     """
     Predicción de portero usando CSV (lógica extraída de predecir_portero.py).
     """
-    modelo = cargar_modelo('PT')
+    modelo, tipo_modelo_pt = cargar_modelo('PT')
     if modelo is None:
         return {'error': 'Modelo PT no disponible', 'jugador_id': jugador_id, 'prediccion': None}
+    nombre_modelo_pt = NOMBRE_MODELO_LEGIBLE.get(tipo_modelo_pt, tipo_modelo_pt)
 
     df_pt, df_todos = _cargar_csv_portero()
     if df_pt is None:
@@ -619,7 +666,7 @@ def _predecir_portero(jugador_id, jornada_actual=None, verbose=False):
         explicacion_texto = formatear_explicaciones_texto(impacts, prediccion)
 
         if verbose:
-            print(f"✓ PT {jugador_id} J{jornada_actual}: {prediccion:.2f}pt")
+            print(f"✓ PT ({nombre_modelo_pt}) {jugador_id} J{jornada_actual}: {prediccion:.2f}pt")
 
         return {
             'status': 'success',
@@ -629,7 +676,7 @@ def _predecir_portero(jugador_id, jornada_actual=None, verbose=False):
             'puntos_reales': round(puntos_reales, 2) if puntos_reales is not None else None,
             'puntos_reales_texto': f"{round(puntos_reales, 2)}" if puntos_reales is not None else "Aún no jugado",
             'jornada': jornada_actual,
-            'modelo': 'Random Forest',
+            'modelo': nombre_modelo_pt,
             'features_impacto': impacts[:7],
             'explicacion_texto': explicacion_texto,
             'error': None,

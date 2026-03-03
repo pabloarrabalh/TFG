@@ -384,6 +384,43 @@ def obtener_explicacion(feature_name, es_positivo):
     return EXPLICACIONES_FEATURES[feature_name].get(clave, f"Factor: {feature_name}")
 
 
+def obtener_ambas_explicaciones(feature_name):
+    """
+    Retorna AMBAS explicaciones (positiva y negativa) para un feature.
+
+    Args:
+        feature_name: Nombre del feature
+
+    Returns:
+        dict: { 'positivo': str, 'negativo': str }
+    """
+    if not isinstance(feature_name, str):
+        feature_name = str(feature_name)
+    feature_name = feature_name.strip()
+
+    if feature_name not in EXPLICACIONES_FEATURES:
+        # Try prefix match
+        for key in EXPLICACIONES_FEATURES:
+            base = key.rsplit('_', 1)[0]
+            feat_base = feature_name.rsplit('_', 1)[0]
+            if base == feat_base:
+                explicaciones = EXPLICACIONES_FEATURES[key]
+                return {
+                    'positivo': explicaciones.get('positivo', f"Factor {feature_name} aumenta"),
+                    'negativo': explicaciones.get('negativo', f"Factor {feature_name} disminuye")
+                }
+        return {
+            'positivo': f"Factor: {feature_name} (impacto positivo)",
+            'negativo': f"Factor: {feature_name} (impacto negativo)"
+        }
+
+    explicaciones = EXPLICACIONES_FEATURES[feature_name]
+    return {
+        'positivo': explicaciones.get('positivo', f"Factor {feature_name} aumenta"),
+        'negativo': explicaciones.get('negativo', f"Factor {feature_name} disminuye")
+    }
+
+
 def es_valor_alto(feature_name, valor):
     """
     Determina si un valor de feature es considerado 'alto' (positivo).
@@ -407,7 +444,7 @@ def es_valor_alto(feature_name, valor):
         return valor < 0.5
 
     if feature_name == 'num_roles_criticos':
-        return valor >= 3
+        return valor >= 2
     elif 'pct' in feature_name.lower() or 'ratio' in feature_name.lower():
         return valor > 0.5
     else:
@@ -524,34 +561,34 @@ def generar_explicaciones_features(features_data):
     }
 
 
-def generar_explicaciones_shap(modelo, X_pred_df, features_disponibles, verbose=False):
-    """
-    Genera explicaciones SHAP para una predicción.
-    Funciona con Random Forest y XGBoost.
-
-    Args:
-        modelo: Modelo entrenado (RF, XGB)
-        X_pred_df: DataFrame con una fila (features para predicción)
-        features_disponibles: Lista de nombres de features
-        verbose: Imprimir detalles
-
-    Returns:
-        list: Lista de dicts {feature, impacto_pts, es_alto, explicacion}
-    """
-    if shap_lib is None:
-        if verbose:
-            print("[XAI] SHAP no disponible, usando feature importance")
-        return _generar_explicaciones_feature_importance(modelo, X_pred_df, features_disponibles)
-
+def _es_pipeline_lineal(modelo):
+    """Detecta si el modelo es un Pipeline sklearn con un estimador lineal."""
     try:
-        if hasattr(modelo, 'estimators_'):  # Random Forest
-            explainer = shap_lib.TreeExplainer(modelo)
-        else:
-            explainer = shap_lib.TreeExplainer(modelo)
+        from sklearn.pipeline import Pipeline
+        return isinstance(modelo, Pipeline)
+    except ImportError:
+        return False
 
-        shap_values = explainer.shap_values(X_pred_df)
 
-        # Normalizar forma del array SHAP (puede ser lista o array)
+def _shap_para_pipeline_lineal(modelo, X_pred_df, features_disponibles, verbose=False):
+    """
+    SHAP para Pipeline(StandardScaler + Ridge/ElasticNet).
+    Usa LinearExplainer sobre el estimador final, con X escalado.
+    """
+    try:
+        scaler  = modelo.named_steps.get('scaler', None)
+        regresor = modelo.named_steps.get('regresor', None)
+        if scaler is None or regresor is None:
+            raise ValueError("Pipeline sin 'scaler' o 'regresor'")
+
+        X_scaled = scaler.transform(X_pred_df)
+
+        # Datos de fondo para el explainer (media de entrenamiento escalada = 0 por definición del scaler)
+        background = np.zeros((1, X_scaled.shape[1]))
+
+        explainer  = shap_lib.LinearExplainer(regresor, background, feature_perturbation='interventional')
+        shap_values = explainer.shap_values(X_scaled)
+
         if isinstance(shap_values, (list, tuple)):
             shap_impacts = shap_values[0]
         else:
@@ -560,40 +597,126 @@ def generar_explicaciones_shap(modelo, X_pred_df, features_disponibles, verbose=
         if hasattr(shap_impacts, 'shape') and len(shap_impacts.shape) > 1:
             shap_impacts = shap_impacts[0]
 
-        # Construir lista de impactos
         feature_impacts = []
         for i, fname in enumerate(features_disponibles):
             if i >= len(shap_impacts):
                 break
             impacto = float(shap_impacts[i])
-            valor = float(X_pred_df.iloc[0][fname]) if fname in X_pred_df.columns else 0.0
+            valor   = float(X_pred_df.iloc[0][fname]) if fname in X_pred_df.columns else 0.0
             es_alto = impacto > 0
+            ambas_explicaciones = obtener_ambas_explicaciones(fname)
             feature_impacts.append({
                 'feature': fname,
                 'valor': valor,
                 'impacto_pts': impacto,
                 'es_alto': es_alto,
-                'explicacion': obtener_explicacion(fname, es_alto)
+                'explicacion': obtener_explicacion(fname, es_alto),
+                'explicacion_positiva': ambas_explicaciones['positivo'],
+                'explicacion_negativa': ambas_explicaciones['negativo']
             })
+
+        # Filtrar features redundantes de roles: mantener solo num_roles_criticos
+        ROLES_REDUNDANTES = {
+            'num_roles_positivos', 'num_roles_negativos',
+            'score_roles_normalizado', 'ratio_roles_positivos'
+        }
+        feature_impacts = [f for f in feature_impacts if f['feature'] not in ROLES_REDUNDANTES]
 
         feature_impacts.sort(key=lambda x: abs(x['impacto_pts']), reverse=True)
         return feature_impacts[:10]
 
     except Exception as e:
         if verbose:
-            print(f"[XAI] SHAP falló ({e}), usando feature importance")
+            print(f"[XAI] LinearExplainer falló ({e}), usando coeficientes")
+        return _generar_explicaciones_feature_importance(modelo, X_pred_df, features_disponibles)
+
+
+def generar_explicaciones_shap(modelo, X_pred_df, features_disponibles, verbose=False):
+    """
+    Genera explicaciones SHAP para una predicción.
+    Soporta Random Forest, XGBoost y Pipeline(Scaler+Ridge/ElasticNet).
+
+    Args:
+        modelo: Modelo entrenado (RF, XGB, Pipeline con Ridge/ElasticNet)
+        X_pred_df: DataFrame con una fila (features para predicción)
+        features_disponibles: Lista de nombres de features
+        verbose: Imprimir detalles
+
+    Returns:
+        list: Lista de dicts {feature, valor, impacto_pts, es_alto, explicacion, explicacion_positiva, explicacion_negativa}
+    """
+    if shap_lib is None:
+        if verbose:
+            print("[XAI] SHAP no disponible, usando feature importance")
+        return _generar_explicaciones_feature_importance(modelo, X_pred_df, features_disponibles)
+
+    # Pipeline lineal (Ridge, ElasticNet con StandardScaler)
+    if _es_pipeline_lineal(modelo):
+        return _shap_para_pipeline_lineal(modelo, X_pred_df, features_disponibles, verbose)
+
+    # Árbol (Random Forest, XGBoost, GradientBoosting…)
+    try:
+        explainer   = shap_lib.TreeExplainer(modelo)
+        shap_values = explainer.shap_values(X_pred_df)
+
+        # Normalizar forma del array SHAP (regresión puede devolver lista)
+        if isinstance(shap_values, (list, tuple)):
+            shap_impacts = shap_values[0]
+        else:
+            shap_impacts = shap_values
+
+        if hasattr(shap_impacts, 'shape') and len(shap_impacts.shape) > 1:
+            shap_impacts = shap_impacts[0]
+
+        feature_impacts = []
+        for i, fname in enumerate(features_disponibles):
+            if i >= len(shap_impacts):
+                break
+            impacto = float(shap_impacts[i])
+            valor   = float(X_pred_df.iloc[0][fname]) if fname in X_pred_df.columns else 0.0
+            es_alto = impacto > 0
+            ambas_explicaciones = obtener_ambas_explicaciones(fname)
+            feature_impacts.append({
+                'feature': fname,
+                'valor': valor,
+                'impacto_pts': impacto,
+                'es_alto': es_alto,
+                'explicacion': obtener_explicacion(fname, es_alto),
+                'explicacion_positiva': ambas_explicaciones['positivo'],
+                'explicacion_negativa': ambas_explicaciones['negativo']
+            })
+
+        # Filtrar features redundantes de roles: mantener solo num_roles_criticos
+        ROLES_REDUNDANTES = {
+            'num_roles_positivos', 'num_roles_negativos',
+            'score_roles_normalizado', 'ratio_roles_positivos'
+        }
+        feature_impacts = [f for f in feature_impacts if f['feature'] not in ROLES_REDUNDANTES]
+
+        feature_impacts.sort(key=lambda x: abs(x['impacto_pts']), reverse=True)
+        return feature_impacts[:10]
+
+    except Exception as e:
+        if verbose:
+            print(f"[XAI] TreeExplainer falló ({e}), usando feature importance")
         return _generar_explicaciones_feature_importance(modelo, X_pred_df, features_disponibles)
 
 
 def _generar_explicaciones_feature_importance(modelo, X_pred_df, features_disponibles):
     """
-    Fallback: usa feature importance o valor absoluto del feature para explicar.
+    Fallback: usa feature importance o coeficientes para explicar.
+    Compatible con Random Forest, XGBoost, Pipeline(Scaler+Ridge/ElasticNet).
     """
     try:
-        if hasattr(modelo, 'feature_importances_'):
-            importances = modelo.feature_importances_
-        elif hasattr(modelo, 'coef_'):
-            importances = np.abs(modelo.coef_)
+        # Extraer el estimador interno si es un Pipeline
+        estimador = modelo
+        if _es_pipeline_lineal(modelo):
+            estimador = modelo.named_steps.get('regresor', modelo)
+
+        if hasattr(estimador, 'feature_importances_'):
+            importances = estimador.feature_importances_
+        elif hasattr(estimador, 'coef_'):
+            importances = np.abs(estimador.coef_).flatten()
         else:
             importances = np.ones(len(features_disponibles))
 
@@ -605,13 +728,23 @@ def _generar_explicaciones_feature_importance(modelo, X_pred_df, features_dispon
             importance = float(importances[i]) if i < len(importances) else 0.0
             es_alto = es_valor_alto(fname, valor)
             impacto = importance * (1 if es_alto else -1)
+            ambas_explicaciones = obtener_ambas_explicaciones(fname)
             feature_impacts.append({
                 'feature': fname,
                 'valor': valor,
                 'impacto_pts': impacto,
                 'es_alto': es_alto,
-                'explicacion': obtener_explicacion(fname, es_alto)
+                'explicacion': obtener_explicacion(fname, es_alto),
+                'explicacion_positiva': ambas_explicaciones['positivo'],
+                'explicacion_negativa': ambas_explicaciones['negativo']
             })
+
+        # Filtrar features redundantes de roles: mantener solo num_roles_criticos
+        ROLES_REDUNDANTES = {
+            'num_roles_positivos', 'num_roles_negativos',
+            'score_roles_normalizado', 'ratio_roles_positivos'
+        }
+        feature_impacts = [f for f in feature_impacts if f['feature'] not in ROLES_REDUNDANTES]
 
         feature_impacts.sort(key=lambda x: abs(x['impacto_pts']), reverse=True)
         return feature_impacts[:10]

@@ -148,7 +148,9 @@ export default function AmigoPlantillaPage() {
       if (fetchingRef.current.has(jug.id)) return
       fetchingRef.current.add(jug.id)
       try {
-        const resp = await fetch(`${BACKEND}/api/predecir-jugador/`, {
+        // Usar /api/explicar-prediccion/ (recalcula siempre, igual que el modal)
+        // Esto asegura que las cards y el modal muestren los MISMOS puntos
+        const resp = await fetch(`${BACKEND}/api/explicar-prediccion/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
           credentials: 'include',

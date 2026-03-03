@@ -110,21 +110,17 @@ def _generar_prediccion_background(jugador_id, jornada_id, posicion):
         if str(entrenamientos_path) not in sys.path:
             sys.path.insert(0, str(entrenamientos_path))
 
-        posicion_map = {
-            'Portero':        ('predecir_portero',      'predecir_puntos_portero'),
-            'Defensa':        ('predecir_defensa',       'predecir_puntos_defensa'),
-            'Centrocampista': ('predecir_mediocampista', 'predecir_puntos_mediocampista'),
-            'Delantero':      ('predecir_delantero',     'predecir_puntos_delantero'),
-        }
-        mod_nombre, func_nombre = posicion_map.get(
-            posicion, ('predecir_delantero', 'predecir_puntos_delantero')
-        )
-
         import importlib
-        mod = importlib.import_module(mod_nombre)
-        func = getattr(mod, func_nombre)
+        mod = importlib.import_module('predecir')
+        func = getattr(mod, 'predecir_puntos')
 
-        resultado = func(jugador_id, jornada.numero_jornada, verbose=False)
+        pos_code_map = {
+            'Portero': 'PT', 'Defensa': 'DF',
+            'Centrocampista': 'MC', 'Delantero': 'DT',
+        }
+        pos_code = pos_code_map.get(posicion, 'DT')
+
+        resultado = func(jugador_id, pos_code, jornada.numero_jornada, verbose=False)
         if not isinstance(resultado, dict) or resultado.get('error'):
             return
 

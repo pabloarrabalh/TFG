@@ -448,8 +448,10 @@ export default function MiPlantillaPage() {
       if (fetchingRef.current.has(jug.id)) continue
       fetchingRef.current.add(jug.id)
       try {
+        // Usar /api/explicar-prediccion/ (recalcula siempre, igual que el modal)
+        // Esto asegura que las cards y el modal muestren los MISMOS puntos
         const payload = { jugador_id: jug.id, jornada: jornadaActual, posicion: jug.posicion }
-        const res = await fetch(`${BACKEND}/api/predecir-jugador/`, {
+        const res = await fetch(`${BACKEND}/api/explicar-prediccion/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
           credentials: 'include',
@@ -457,10 +459,9 @@ export default function MiPlantillaPage() {
         })
         const data = await res.json()
         if (data.prediccion != null) {
-          // Almacenar tanto el valor como el tipo (prediccion o media)
           setPredicciones(prev => ({ 
             ...prev, 
-            [jug.id]: { value: data.prediccion, type: data.type || 'prediccion' } 
+            [jug.id]: { value: data.prediccion, type: 'prediccion' } 
           }))
         }
       } catch (e) {
@@ -475,24 +476,16 @@ export default function MiPlantillaPage() {
     setModalDet(jugador); setDetPrediccion(null); setDetExplicacion(null); setDetFeaturesImpacto([])
     setDetLoadingPred(true)
     try {
-      let url, body
-      if (jugador.posicion === 'Portero') {
-        url = `${BACKEND}/api/explicar-prediccion/`
-        body = JSON.stringify({ jugador_id: jugador.id, jornada: jornadaActual, modelo: 'RF' })
-      } else {
-        url = `${BACKEND}/api/predecir-jugador/`
-        body = JSON.stringify({ jugador_id: jugador.id, jornada: jornadaActual, posicion: jugador.posicion })
-      }
-      const res = await fetch(url, {
+      // Endpoint unificado XAI para TODAS las posiciones (PT, DF, MC, DT)
+      const res = await fetch(`${BACKEND}/api/explicar-prediccion/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         credentials: 'include',
-        body,
+        body: JSON.stringify({ jugador_id: jugador.id, jornada: jornadaActual, posicion: jugador.posicion }),
       })
       const data = await res.json()
       if (data.status === 'success') {
-        // Almacenar predicción con tipo (prediccion o media)
-        setDetPrediccion({ value: data.prediccion, type: data.type || 'prediccion' })
+        setDetPrediccion({ value: data.prediccion, type: data.type || 'prediccion', modelo: data.modelo })
         setDetExplicacion(data.explicacion_texto || null)
         setDetFeaturesImpacto(Array.isArray(data.features_impacto) ? data.features_impacto : [])
       }
@@ -870,17 +863,21 @@ export default function MiPlantillaPage() {
                   </div>
                 ) : detPrediccion != null ? (
                   <div>
-                    <div className="text-2xl font-black text-yellow-400 mb-3">
+                    <div className="text-2xl font-black text-yellow-400 mb-1">
                       {detPrediccion.type === 'media' ? 'Media histórica' : 'Predicción'}: {Number(detPrediccion.value).toFixed(2)} pts
                     </div>
+                    {detPrediccion.modelo && (
+                      <p className="text-xs text-gray-500 mb-3">Modelo: {detPrediccion.modelo}</p>
+                    )}
                     {detFeaturesImpacto.length > 0 && (() => {
+                      const getImpacto = f => f.impacto_pts ?? f.impacto ?? 0
                       const positivos = detFeaturesImpacto
-                        .filter(f => (f.impacto ?? f.impacto_pts ?? 0) > 0)
-                        .sort((a, b) => Math.abs(b.impacto ?? b.impacto_pts ?? 0) - Math.abs(a.impacto ?? a.impacto_pts ?? 0))
+                        .filter(f => getImpacto(f) > 0)
+                        .sort((a, b) => Math.abs(getImpacto(b)) - Math.abs(getImpacto(a)))
                         .slice(0, 3)
                       const negativos = detFeaturesImpacto
-                        .filter(f => (f.impacto ?? f.impacto_pts ?? 0) < 0)
-                        .sort((a, b) => Math.abs(b.impacto ?? b.impacto_pts ?? 0) - Math.abs(a.impacto ?? a.impacto_pts ?? 0))
+                        .filter(f => getImpacto(f) < 0)
+                        .sort((a, b) => Math.abs(getImpacto(b)) - Math.abs(getImpacto(a)))
                         .slice(0, 3)
                       return (
                         <div className="space-y-2">
@@ -889,9 +886,11 @@ export default function MiPlantillaPage() {
                               <p className="text-xs font-bold text-green-400 mb-1 uppercase tracking-wider">↑ A favor</p>
                               <div className="space-y-1">
                                 {positivos.map((f, i) => (
-                                  <div key={i} className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 bg-green-500/10 border border-green-500/20">
-                                    <span className="text-white/85 text-xs leading-tight flex-1">{f.explicacion || f.feature}</span>
-                                    <span className="text-xs font-black whitespace-nowrap text-green-400">+{Math.abs(f.impacto).toFixed(2)} pts</span>
+                                  <div key={i} className="rounded-lg px-2.5 py-2 bg-green-500/10 border border-green-500/20">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className="text-white/85 text-xs leading-tight font-semibold flex-1">{f.explicacion_positiva || f.explicacion || f.feature}</span>
+                                      <span className="text-xs font-black whitespace-nowrap text-green-400">+{Math.abs(getImpacto(f)).toFixed(2)} pts</span>
+                                    </div>
                                   </div>
                                 ))}
                               </div>
@@ -902,9 +901,11 @@ export default function MiPlantillaPage() {
                               <p className="text-xs font-bold text-red-400 mb-1 uppercase tracking-wider">↓ En contra</p>
                               <div className="space-y-1">
                                 {negativos.map((f, i) => (
-                                  <div key={i} className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 bg-red-500/10 border border-red-500/20">
-                                    <span className="text-white/85 text-xs leading-tight flex-1">{f.explicacion || f.feature}</span>
-                                    <span className="text-xs font-black whitespace-nowrap text-red-400">−{Math.abs(f.impacto).toFixed(2)} pts</span>
+                                  <div key={i} className="rounded-lg px-2.5 py-2 bg-red-500/10 border border-red-500/20">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className="text-white/85 text-xs leading-tight font-semibold flex-1">{f.explicacion_negativa || f.explicacion || f.feature}</span>
+                                      <span className="text-xs font-black whitespace-nowrap text-red-400">−{Math.abs(getImpacto(f)).toFixed(2)} pts</span>
+                                    </div>
                                   </div>
                                 ))}
                               </div>
