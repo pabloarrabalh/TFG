@@ -1,8 +1,33 @@
 from django.urls import path
 from . import views
 from . import api_endpoints
-from . import api_views
+from . import api_views  # legacy proxy – kept for backwards compat
 from . import drf_views
+
+# ── DRF API v1 views ────────────────────────────────────────────────────────
+from .api_auth import MeView, LoginView, LogoutView, RegisterView
+from .api_menu import MenuView
+from .api_clasificacion import ClasificacionView
+from .api_equipo import EquipoListView, EquipoDetailView
+from .api_jugador import JugadorDetailView, TopJugadoresPorPosicionView
+from .api_perfil import (
+    PerfilView, UpdatePerfilView, UpdateStatusView,
+    UploadPhotoView, UpdatePreferenciasNotificacionesView,
+)
+from .api_favoritos import FavoritosView, ToggleFavoritoView, DeleteFavoritoView
+from .api_amigos import (
+    AmigosView, EnviarSolicitudView, AceptarSolicitudView,
+    RechazarSolicitudView, EliminarAmigoView, PlantillasAmigoView,
+)
+from .api_plantilla_api import (
+    MiPlantillaView, MiPlantillaJugadoresView,
+    TogglePrivacidadPlantillaView, SetPlantillaPredeterminadaView,
+    MisPlantillasPrivacidadView,
+)
+from .api_notificaciones import (
+    NotificacionesView, MarcarNotificacionLeidaView, MarcarTodasLeidasView,
+    BorrarNotificacionView, BorrarTodasNotificacionesView,
+)
 
 urlpatterns = [
     path('', views.menu, name='menu'),
@@ -41,42 +66,42 @@ urlpatterns = [
     path('api/explicar-prediccion/', views.explicar_prediccion_portero_api, name='explicar_prediccion_portero_api'),
     path('api/cambiar-jornada/', views.cambiar_jornada_api, name='cambiar_jornada_api'),
 
-    # ── React Frontend JSON API ──────────────────────────────────────────────
-    path('api/me/', api_views.api_me, name='api_me'),
-    path('api/auth/login/', api_views.api_login, name='api_auth_login'),
-    path('api/auth/logout/', api_views.api_logout, name='api_auth_logout'),
-    path('api/auth/register/', api_views.api_register, name='api_auth_register'),
-    path('api/menu/', api_views.api_menu, name='api_menu'),
-    path('api/clasificacion/', api_views.api_clasificacion, name='api_clasificacion'),
-    path('api/top-jugadores-por-posicion/', api_views.api_top_jugadores_por_posicion, name='api_top_jugadores_por_posicion'),
-    path('api/equipos/', api_views.api_equipos, name='api_equipos'),
-    path('api/equipo/<str:equipo_nombre>/', api_views.api_equipo, name='api_equipo'),
-    path('api/jugador/<int:jugador_id>/', api_views.api_jugador, name='api_jugador'),
-    path('api/perfil/', api_views.api_perfil, name='api_perfil'),
-    path('api/perfil/update/', api_views.api_update_perfil, name='api_update_perfil'),
-    path('api/perfil/status/', api_views.api_update_status, name='api_update_status'),
-    path('api/perfil/foto/', api_views.api_upload_photo, name='api_upload_photo'),
-    path('api/favoritos/', api_views.api_favoritos, name='api_favoritos'),
-    path('api/favoritos/toggle-v2/', api_views.api_toggle_favorito_v2, name='api_toggle_favorito_v2'),
-    path('api/favoritos/seleccionar/', api_views.api_select_favorites, name='api_select_favorites'),
-    path('api/favoritos/<int:fav_id>/', api_views.api_delete_favorito, name='api_delete_favorito'),
-    path('api/amigos/', api_views.api_amigos, name='api_amigos'),
-    path('api/amigos/solicitud/', api_views.api_enviar_solicitud, name='api_enviar_solicitud'),
-    path('api/amigos/aceptar/<int:solicitud_id>/', api_views.api_aceptar_solicitud, name='api_aceptar_solicitud'),
-    path('api/amigos/rechazar/<int:solicitud_id>/', api_views.api_rechazar_solicitud, name='api_rechazar_solicitud'),
-    path('api/amigos/eliminar/<int:user_id>/', api_views.api_eliminar_amigo, name='api_eliminar_amigo'),
-    path('api/amigos/<int:user_id>/plantillas/', api_views.api_plantillas_amigo, name='api_plantillas_amigo'),
-    path('api/mi-plantilla/', api_views.api_mi_plantilla, name='api_mi_plantilla'),
-    path('api/mi-plantilla/jugadores/', api_views.api_mi_plantilla_jugadores, name='api_mi_plantilla_jugadores'),
-    path('api/notificaciones/', api_views.api_notificaciones, name='api_notificaciones'),
-    path('api/notificaciones/leer-todas/', api_views.api_marcar_todas_leidas, name='api_marcar_todas_leidas'),
-    path('api/notificaciones/<int:notif_id>/leer/', api_views.api_marcar_notificacion_leida, name='api_marcar_notificacion_leida'),
-    path('api/notificaciones/<int:notif_id>/borrar/', api_views.api_borrar_notificacion, name='api_borrar_notificacion'),
-    path('api/notificaciones/borrar-todas/', api_views.api_borrar_todas_notificaciones, name='api_borrar_todas_notificaciones'),
-    path('api/perfil/preferencias-notificaciones/', api_views.api_update_preferencias_notificaciones, name='api_update_preferencias_notificaciones'),
-    path('api/plantilla/<int:plantilla_id>/privacidad/', api_views.api_toggle_privacidad_plantilla, name='api_toggle_privacidad_plantilla'),
-    path('api/plantilla/<int:plantilla_id>/predeterminada/', api_views.api_set_plantilla_predeterminada, name='api_set_plantilla_predeterminada'),
-    path('api/plantillas/privacidad/', api_views.api_mis_plantillas_privacidad, name='api_mis_plantillas_privacidad'),
+    # ── REST API v1 (DRF) ─────────────────────────────────────────────────────
+    path('api/me/', MeView.as_view(), name='api_me'),
+    path('api/auth/login/', LoginView.as_view(), name='api_auth_login'),
+    path('api/auth/logout/', LogoutView.as_view(), name='api_auth_logout'),
+    path('api/auth/register/', RegisterView.as_view(), name='api_auth_register'),
+    path('api/menu/', MenuView.as_view(), name='api_menu'),
+    path('api/clasificacion/', ClasificacionView.as_view(), name='api_clasificacion'),
+    path('api/top-jugadores-por-posicion/', TopJugadoresPorPosicionView.as_view(), name='api_top_jugadores_por_posicion'),
+    path('api/equipos/', EquipoListView.as_view(), name='api_equipos'),
+    path('api/equipo/<str:equipo_nombre>/', EquipoDetailView.as_view(), name='api_equipo'),
+    path('api/jugador/<int:jugador_id>/', JugadorDetailView.as_view(), name='api_jugador'),
+    path('api/perfil/', PerfilView.as_view(), name='api_perfil'),
+    path('api/perfil/update/', UpdatePerfilView.as_view(), name='api_update_perfil'),
+    path('api/perfil/status/', UpdateStatusView.as_view(), name='api_update_status'),
+    path('api/perfil/foto/', UploadPhotoView.as_view(), name='api_upload_photo'),
+    path('api/perfil/preferencias-notificaciones/', UpdatePreferenciasNotificacionesView.as_view(), name='api_update_preferencias_notificaciones'),
+    path('api/favoritos/', FavoritosView.as_view(), name='api_favoritos'),
+    path('api/favoritos/toggle-v2/', ToggleFavoritoView.as_view(), name='api_toggle_favorito_v2'),
+    path('api/favoritos/seleccionar/', FavoritosView.as_view(), name='api_select_favorites'),
+    path('api/favoritos/<int:fav_id>/', DeleteFavoritoView.as_view(), name='api_delete_favorito'),
+    path('api/amigos/', AmigosView.as_view(), name='api_amigos'),
+    path('api/amigos/solicitud/', EnviarSolicitudView.as_view(), name='api_enviar_solicitud'),
+    path('api/amigos/aceptar/<int:solicitud_id>/', AceptarSolicitudView.as_view(), name='api_aceptar_solicitud'),
+    path('api/amigos/rechazar/<int:solicitud_id>/', RechazarSolicitudView.as_view(), name='api_rechazar_solicitud'),
+    path('api/amigos/eliminar/<int:user_id>/', EliminarAmigoView.as_view(), name='api_eliminar_amigo'),
+    path('api/amigos/<int:user_id>/plantillas/', PlantillasAmigoView.as_view(), name='api_plantillas_amigo'),
+    path('api/mi-plantilla/', MiPlantillaView.as_view(), name='api_mi_plantilla'),
+    path('api/mi-plantilla/jugadores/', MiPlantillaJugadoresView.as_view(), name='api_mi_plantilla_jugadores'),
+    path('api/notificaciones/', NotificacionesView.as_view(), name='api_notificaciones'),
+    path('api/notificaciones/leer-todas/', MarcarTodasLeidasView.as_view(), name='api_marcar_todas_leidas'),
+    path('api/notificaciones/<int:notif_id>/leer/', MarcarNotificacionLeidaView.as_view(), name='api_marcar_notificacion_leida'),
+    path('api/notificaciones/<int:notif_id>/borrar/', BorrarNotificacionView.as_view(), name='api_borrar_notificacion'),
+    path('api/notificaciones/borrar-todas/', BorrarTodasNotificacionesView.as_view(), name='api_borrar_todas_notificaciones'),
+    path('api/plantilla/<int:plantilla_id>/privacidad/', TogglePrivacidadPlantillaView.as_view(), name='api_toggle_privacidad_plantilla'),
+    path('api/plantilla/<int:plantilla_id>/predeterminada/', SetPlantillaPredeterminadaView.as_view(), name='api_set_plantilla_predeterminada'),
+    path('api/plantillas/privacidad/', MisPlantillasPrivacidadView.as_view(), name='api_mis_plantillas_privacidad'),
 
     # ── REST API v2 (DRF) ────────────────────────────────────────────────────
     # Jugadores

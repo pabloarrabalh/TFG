@@ -11,33 +11,32 @@ logger = logging.getLogger(__name__)
 ELASTICSEARCH_AVAILABLE = False
 
 try:
-    from elasticsearch_dsl import Document, Text, Keyword, Integer, connections
-    from elasticsearch import Elasticsearch
+    from opensearchpy import OpenSearch
     from .models import Jugador, Equipo
     
     # Obtener configuración de variables de entorno
-    es_host = os.getenv('ELASTICSEARCH_HOST')
-    es_api_key = os.getenv('ELASTICSEARCH_API_KEY')
+    es_host = os.getenv('OPENSEARCH_HOST', 'localhost:9200')
+    es_user = os.getenv('OPENSEARCH_USER', 'admin')
+    es_password = os.getenv('OPENSEARCH_PASSWORD', 'admin')
     
-    # Configurar conexión a Elasticsearch
+    # Configurar conexión a OpenSearch
+    opensearch_client = None
     try:
-        if es_api_key and es_host:
-            # Conexión con API key (para Elastic Cloud)
-            connections.create_connection(
-                alias='default',
-                hosts=[es_host],
-                api_key=es_api_key,
-                verify_certs=True
-            )
-            logger.info(f"Conectado a Elasticsearch en {es_host} (con API Key)")
-            ELASTICSEARCH_AVAILABLE = True
-        else:
-            logger.warning("Falta ELASTICSEARCH_HOST o ELASTICSEARCH_API_KEY en .env")
-            ELASTICSEARCH_AVAILABLE = False
+        opensearch_client = OpenSearch(
+            hosts=[es_host],
+            http_auth=(es_user, es_password),
+            use_ssl=True,
+            verify_certs=False,
+            request_timeout=30
+        )
+        # Probar conexión
+        opensearch_client.info()
+        logger.info(f"Conectado a OpenSearch en {es_host}")
+        ELASTICSEARCH_AVAILABLE = True
     except Exception as e:
         ELASTICSEARCH_AVAILABLE = False
-        logger.warning(f"No se pudo conectar a Elasticsearch: {str(e)}")
-        logger.warning("La busqueda por elasticsearch no estara disponible")
+        logger.warning(f"No se pudo conectar a OpenSearch: {str(e)}")
+        logger.warning("La busqueda por OpenSearch no estara disponible")
 
 except ImportError:
     logger.warning("elasticsearch-dsl no esta instalado. Ejecuta: pip install -r requirements.txt")
@@ -45,61 +44,76 @@ except ImportError:
 
 
 if ELASTICSEARCH_AVAILABLE:
-    class JugadorDocument(Document):
-        """Documento de Elasticsearch para búsqueda de jugadores"""
-        id = Integer()
-        nombre_completo = Text(analyzer='spanish')
-        nombre = Text(analyzer='spanish')
-        apellido = Text(analyzer='spanish')
-        nacionalidad = Keyword()
-        posicion = Keyword()
-        
-        class Index:
-            name = 'jugadores'
-            settings = {
-                'analysis': {
-                    'analyzer': {
-                        'spanish': {
-                            'type': 'standard',
-                            'stopwords': '_spanish_'
-                        }
+    # Mappings para indexing en OpenSearch
+    JUGADORES_MAPPING = {
+        "settings": {
+            "index.number_of_shards": 1,
+            "index.number_of_replicas": 0,
+            "analysis": {
+                "analyzer": {
+                    "spanish": {
+                        "type": "standard",
+                        "stopwords": "_spanish_"
                     }
                 }
             }
-
-    class EquipoDocument(Document):
-        """Documento de Elasticsearch para búsqueda de equipos"""
-        id = Integer()
-        nombre = Text(analyzer='spanish')
-        estadio = Text(analyzer='spanish')
-        
-        class Index:
-            name = 'equipos'
-            settings = {
-                'analysis': {
-                    'analyzer': {
-                        'spanish': {
-                            'type': 'standard',
-                            'stopwords': '_spanish_'
-                        }
+        },
+        "mappings": {
+            "properties": {
+                "id": {"type": "integer"},
+                "nombre_completo": {"type": "text", "analyzer": "spanish"},
+                "nombre": {"type": "text", "analyzer": "spanish"},
+                "apellido": {"type": "text", "analyzer": "spanish"},
+                "nacionalidad": {"type": "keyword"},
+                "posicion": {"type": "keyword"}
+            }
+        }
+    }
+    
+    EQUIPOS_MAPPING = {
+        "settings": {
+            "index.number_of_shards": 1,
+            "index.number_of_replicas": 0,
+            "analysis": {
+                "analyzer": {
+                    "spanish": {
+                        "type": "standard",
+                        "stopwords": "_spanish_"
                     }
                 }
             }
+        },
+        "mappings": {
+            "properties": {
+                "id": {"type": "integer"},
+                "nombre": {"type": "text", "analyzer": "spanish"},
+                "estadio": {"type": "text", "analyzer": "spanish"}
+            }
+        }
+    }
 
     def indexar_jugadores():
-        """Indexa todos los jugadores en Elasticsearch"""
+        """Indexa todos los jugadores en OpenSearch"""
         try:
+            if not opensearch_client:
+                logger.error("OpenSearch client no disponible")
+                return
+            
             from .models import Jugador
-            from elasticsearch import helpers
+            import json
             
             print("\nIndexando jugadores...")
             
-            # Intentar init() pero ignorar errores en serverless mode
+            # Crear índice si no existe
             try:
-                JugadorDocument.init()
+                opensearch_client.indices.create(
+                    index='jugadores',
+                    body=JUGADORES_MAPPING,
+                    ignore=400
+                )
+                logger.info("Índice 'jugadores' creado o ya existe")
             except Exception as e:
-                if '410' not in str(e):
-                    logger.warning(f"Error en init (puede ser serverless): {str(e)}")
+                logger.warning(f"Error creando índice: {str(e)}")
             
             jugadores = Jugador.objects.all()
             total = jugadores.count()
@@ -109,13 +123,18 @@ if ELASTICSEARCH_AVAILABLE:
                 logger.warning("No hay jugadores para indexar")
                 return
             
-            # Usar bulk para indexar más rápido
-            docs = []
+            # Bulk indexing
+            operations = []
             contador = 0
             
             for jugador in jugadores:
+                # Acción de index
+                operations.append(json.dumps({
+                    "index": {"_index": "jugadores", "_id": jugador.id}
+                }))
+                
+                # Documento
                 doc = {
-                    '_id': jugador.id,
                     'id': jugador.id,
                     'nombre_completo': f"{jugador.nombre} {jugador.apellido}",
                     'nombre': jugador.nombre,
@@ -123,42 +142,28 @@ if ELASTICSEARCH_AVAILABLE:
                     'nacionalidad': jugador.nacionalidad,
                     'posicion': jugador.get_posicion_mas_frecuente() or 'Desconocida'
                 }
-                docs.append(doc)
+                operations.append(json.dumps(doc))
                 contador += 1
                 
                 # Indexar en lotes de 100
                 if contador % 100 == 0:
                     try:
-                        actions = [
-                            {
-                                '_index': 'jugadores',
-                                '_id': d['_id'],
-                                '_source': {k: v for k, v in d.items() if k != '_id'}
-                            }
-                            for d in docs
-                        ]
-                        from elasticsearch_dsl import connections
-                        client = connections.get_connection()
-                        helpers.bulk(client, actions, raise_on_error=False)
+                        body = '\n'.join(operations) + '\n'
+                        response = opensearch_client.bulk(body=body)
+                        if response.get('errors'):
+                            logger.warning(f"Algunos documentos fallaron en bulk: {response}")
                         print(f"Indexados {contador}/{total} jugadores...")
                     except Exception as e:
                         logger.error(f"Error en bulk indexing: {str(e)}")
-                    docs = []
+                    operations = []
             
             # Indexar los restantes
-            if docs:
+            if operations:
                 try:
-                    actions = [
-                        {
-                            '_index': 'jugadores',
-                            '_id': d['_id'],
-                            '_source': {k: v for k, v in d.items() if k != '_id'}
-                        }
-                        for d in docs
-                    ]
-                    from elasticsearch_dsl import connections
-                    client = connections.get_connection()
-                    helpers.bulk(client, actions, raise_on_error=False)
+                    body = '\n'.join(operations) + '\n'
+                    response = opensearch_client.bulk(body=body)
+                    if response.get('errors'):
+                        logger.warning(f"Algunos documentos fallaron: {response}")
                 except Exception as e:
                     logger.error(f"Error en bulk indexing final: {str(e)}")
             
@@ -169,19 +174,27 @@ if ELASTICSEARCH_AVAILABLE:
             print(f"Error indexando jugadores: {str(e)}\n")
 
     def indexar_equipos():
-        """Indexa todos los equipos en Elasticsearch"""
+        """Indexa todos los equipos en OpenSearch"""
         try:
+            if not opensearch_client:
+                logger.error("OpenSearch client no disponible")
+                return
+            
             from .models import Equipo
-            from elasticsearch import helpers
+            import json
             
             print("Indexando equipos...")
             
-            # Intentar init() pero ignorar errores en serverless mode
+            # Crear índice si no existe
             try:
-                EquipoDocument.init()
+                opensearch_client.indices.create(
+                    index='equipos',
+                    body=EQUIPOS_MAPPING,
+                    ignore=400
+                )
+                logger.info("Índice 'equipos' creado o ya existe")
             except Exception as e:
-                if '410' not in str(e):
-                    logger.warning(f"Error en init (puede ser serverless): {str(e)}")
+                logger.warning(f"Error creando índice: {str(e)}")
             
             equipos = Equipo.objects.all()
             total = equipos.count()
@@ -191,53 +204,44 @@ if ELASTICSEARCH_AVAILABLE:
                 logger.warning("No hay equipos para indexar")
                 return
             
-            # Usar bulk para indexar más rápido
-            docs = []
+            # Bulk indexing
+            operations = []
             contador = 0
             
             for equipo in equipos:
+                # Acción de index
+                operations.append(json.dumps({
+                    "index": {"_index": "equipos", "_id": equipo.id}
+                }))
+                
+                # Documento
                 doc = {
-                    '_id': equipo.id,
                     'id': equipo.id,
                     'nombre': equipo.nombre,
                     'estadio': equipo.estadio or 'Desconocido'
                 }
-                docs.append(doc)
+                operations.append(json.dumps(doc))
                 contador += 1
                 
-                # Indexar en lotes
+                # Indexar en lotes de 100
                 if contador % 100 == 0:
                     try:
-                        actions = [
-                            {
-                                '_index': 'equipos',
-                                '_id': d['_id'],
-                                '_source': {k: v for k, v in d.items() if k != '_id'}
-                            }
-                            for d in docs
-                        ]
-                        from elasticsearch_dsl import connections
-                        client = connections.get_connection()
-                        helpers.bulk(client, actions, raise_on_error=False)
+                        body = '\n'.join(operations) + '\n'
+                        response = opensearch_client.bulk(body=body)
+                        if response.get('errors'):
+                            logger.warning(f"Algunos documentos fallaron en bulk: {response}")
                         print(f"Indexados {contador}/{total} equipos...")
                     except Exception as e:
                         logger.error(f"Error en bulk indexing: {str(e)}")
-                    docs = []
+                    operations = []
             
             # Indexar los restantes
-            if docs:
+            if operations:
                 try:
-                    actions = [
-                        {
-                            '_index': 'equipos',
-                            '_id': d['_id'],
-                            '_source': {k: v for k, v in d.items() if k != '_id'}
-                        }
-                        for d in docs
-                    ]
-                    from elasticsearch_dsl import connections
-                    client = connections.get_connection()
-                    helpers.bulk(client, actions, raise_on_error=False)
+                    body = '\n'.join(operations) + '\n'
+                    response = opensearch_client.bulk(body=body)
+                    if response.get('errors'):
+                        logger.warning(f"Algunos documentos fallaron: {response}")
                 except Exception as e:
                     logger.error(f"Error en bulk indexing final: {str(e)}")
             
@@ -254,18 +258,14 @@ if ELASTICSEARCH_AVAILABLE:
         logger.info("Indexación completada")
 
 else:
-    # Stubs cuando Elasticsearch no está disponible
-    class JugadorDocument:
-        pass
-    
-    class EquipoDocument:
-        pass
+    # Stubs cuando OpenSearch no está disponible
+    opensearch_client = None
     
     def indexar_jugadores():
-        logger.error("Elasticsearch no esta disponible. Instalalo para usar busqueda.")
+        logger.error("OpenSearch no esta disponible. Instalalo ejecutando: pip install -r requirements.txt")
     
     def indexar_equipos():
-        logger.error("Elasticsearch no esta disponible. Instalalo para usar busqueda.")
+        logger.error("OpenSearch no esta disponible. Instalalo ejecutando: pip install -r requirements.txt")
     
     def reindexar_todo():
-        logger.error("Elasticsearch no esta disponible. Instalalo para usar busqueda.")
+        logger.error("OpenSearch no esta disponible. Instalalo ejecutando: pip install -r requirements.txt")

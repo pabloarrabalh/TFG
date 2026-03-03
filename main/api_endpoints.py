@@ -206,7 +206,7 @@ def api_radar_jugador(request, jugador_id, temporada):
 def api_buscar(request):
     """
     GET /api/buscar/?q=QUERY
-    Busca jugadores y equipos usando Elasticsearch
+    Busca jugadores y equipos usando OpenSearch
     Requiere al menos 3 caracteres
     Retorna máximo 5 resultados
     """
@@ -221,116 +221,155 @@ def api_buscar(request):
             }, status=400)
         
         try:
-            from main.elasticsearch_docs import ELASTICSEARCH_AVAILABLE
+            from main.elasticsearch_docs import opensearch_client, ELASTICSEARCH_AVAILABLE
             
-            if not ELASTICSEARCH_AVAILABLE:
+            if not ELASTICSEARCH_AVAILABLE or not opensearch_client:
                 return JsonResponse({
                     'status': 'error',
-                    'message': 'Elasticsearch no está disponible',
+                    'message': 'OpenSearch no está disponible',
                     'results': []
                 }, status=503)
-            
-            from elasticsearch_dsl import connections, Q, Search
         except ImportError as e:
-            logger.error(f"Error importando elasticsearch: {str(e)}")
+            logger.error(f"Error importando OpenSearch: {str(e)}")
             return JsonResponse({
                 'status': 'error',
-                'message': 'Elasticsearch no está configurado',
+                'message': 'OpenSearch no está configurado',
                 'results': []
             }, status=503)
         
         resultados = []
         
         try:
-            client = connections.get_connection()
-            from elasticsearch_dsl import Q
-            
-            # Búsqueda de jugadores - Usar prefix query para encontrar desde primeras letras
+            # Búsqueda de jugadores con multi_match y fuzziness
             try:
-                search_jugador = Search(using=client, index='jugadores')
+                search_body_jugador = {
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "match": {
+                                        "nombre_completo": {
+                                            "query": query,
+                                            "fuzziness": "AUTO",
+                                            "boost": 5
+                                        }
+                                    }
+                                },
+                                {
+                                    "match": {
+                                        "nombre": {
+                                            "query": query,
+                                            "fuzziness": "AUTO",
+                                            "boost": 4
+                                        }
+                                    }
+                                },
+                                {
+                                    "match": {
+                                        "apellido": {
+                                            "query": query,
+                                            "fuzziness": "AUTO",
+                                            "boost": 4
+                                        }
+                                    }
+                                }
+                            ],
+                            "minimum_should_match": 1
+                        }
+                    },
+                    "size": 5
+                }
                 
-                # Query con prefix: busca coincidencias desde el inicio
-                q = Q('bool', should=[
-                    # Búsqueda por prefijo (lo más importante)
-                    Q('prefix', nombre_completo={'value': query.lower(), 'boost': 5}),
-                    Q('prefix', nombre={'value': query.lower(), 'boost': 4}),
-                    Q('prefix', apellido={'value': query.lower(), 'boost': 4}),
-                    # Búsqueda exacta como respaldo
-                    Q('match', nombre_completo={'query': query, 'boost': 3}),
-                    Q('match', nombre={'query': query, 'boost': 2}),
-                    Q('match', apellido={'query': query, 'boost': 2}),
-                    # Fuzzy como último recurso
-                    Q('match', nombre_completo={'query': query, 'fuzziness': 1, 'boost': 1}),
-                ], minimum_should_match=1)
+                response = opensearch_client.search(
+                    index='jugadores',
+                    body=search_body_jugador
+                )
                 
-                search_jugador = search_jugador.query(q)[:5]
-                response = search_jugador.execute()
-                
-                for hit in response:
-                    # hit.meta.id may be a name slug from old ES index — always
-                    # resolve to a reliable numeric DB id using nombre/apellido.
+                for hit in response['hits']['hits']:
+                    source = hit['_source']
                     try:
-                        hit_nombre = getattr(hit, 'nombre', '')
-                        hit_apellido = getattr(hit, 'apellido', '')
-                        # Try _source numeric id first
-                        source_id = getattr(hit, 'id', None)
+                        hit_nombre = source.get('nombre', '')
+                        hit_apellido = source.get('apellido', '')
+                        source_id = source.get('id')
+                        
                         if source_id and str(source_id).lstrip('-').isdigit():
                             jugador_pk = int(source_id)
                         else:
-                            # Fall back: look up in DB by name
+                            # Buscar en BD por nombre
                             jobj = Jugador.objects.filter(
                                 nombre=hit_nombre, apellido=hit_apellido
                             ).values_list('id', flat=True).first()
                             jugador_pk = jobj
-                    except Exception:
-                        jugador_pk = None
-
-                    if jugador_pk:
-                        resultados.append({
-                            'type': 'jugador',
-                            'id': jugador_pk,
-                            'nombre': f"{hit_nombre} {hit_apellido}",
-                            'posicion': getattr(hit, 'posicion', 'Desconocida'),
-                            'url': f'/jugador/{jugador_pk}/'
-                        })
+                        
+                        if jugador_pk:
+                            resultados.append({
+                                'type': 'jugador',
+                                'id': jugador_pk,
+                                'nombre': f"{hit_nombre} {hit_apellido}",
+                                'posicion': source.get('posicion', 'Desconocida'),
+                                'url': f'/jugador/{jugador_pk}/'
+                            })
+                    except Exception as e:
+                        logger.warning(f"Error procesando resultado de jugador: {str(e)}")
             except Exception as e:
-                logger.warning(f"Error en búsqueda de jugadores: {str(e)}")
+                logger.warning(f"Error en búsqueda de jugadores OpenSearch: {str(e)}")
             
             # Búsqueda de equipos
             try:
-                # Obtener la temporada actual (últimaDisponible)
+                # Obtener la temporada actual (última disponible)
                 temporadas = Temporada.objects.all().order_by('-nombre')
                 temporada_actual = temporadas.first().nombre if temporadas.exists() else '25_26'
                 
-                search_equipo = Search(using=client, index='equipos')
+                search_body_equipo = {
+                    "query": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "match": {
+                                        "nombre": {
+                                            "query": query,
+                                            "fuzziness": "AUTO",
+                                            "boost": 5
+                                        }
+                                    }
+                                },
+                                {
+                                    "match": {
+                                        "estadio": {
+                                            "query": query,
+                                            "fuzziness": "AUTO",
+                                            "boost": 2
+                                        }
+                                    }
+                                }
+                            ],
+                            "minimum_should_match": 1
+                        }
+                    },
+                    "size": 5
+                }
                 
-                q_equipo = Q('bool', should=[
-                    # Búsqueda por prefijo
-                    Q('prefix', nombre={'value': query.lower(), 'boost': 5}),
-                    Q('prefix', estadio={'value': query.lower(), 'boost': 2}),
-                    # Búsqueda exacta
-                    Q('match', nombre={'query': query, 'boost': 3}),
-                    Q('match', estadio={'query': query, 'boost': 1}),
-                ], minimum_should_match=1)
+                response = opensearch_client.search(
+                    index='equipos',
+                    body=search_body_equipo
+                )
                 
-                search_equipo = search_equipo.query(q_equipo)[:5]
-                response = search_equipo.execute()
-                
-                for hit in response:
+                for hit in response['hits']['hits']:
+                    source = hit['_source']
                     resultados.append({
                         'type': 'equipo',
-                        'id': hit.id,
-                        'nombre': hit.nombre,
-                        'url': f'/equipo/{hit.nombre}/{temporada_actual}/'
+                        'id': source.get('id'),
+                        'nombre': source.get('nombre'),
+                        'url': f'/equipo/{source.get("nombre")}/{temporada_actual}/'
                     })
             except Exception as e:
-                logger.warning(f"Error en búsqueda de equipos: {str(e)}")
+                logger.warning(f"Error en búsqueda de equipos OpenSearch: {str(e)}")
         
         except Exception as e:
-            logger.error(f"Error obteniendo conexión: {str(e)}")
+            logger.error(f"Error en búsqueda OpenSearch: {str(e)}")
             return JsonResponse({
                 'status': 'error',
-                'message': 'Error conectando a Elasticsearch',
+                'message': 'Error conectando a OpenSearch',
                 'results': []
             }, status=503)
         
