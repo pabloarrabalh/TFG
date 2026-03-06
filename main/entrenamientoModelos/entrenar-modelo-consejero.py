@@ -1,33 +1,3 @@
-"""
-Entrena un modelo de clasificación para el Consejero de Fantasy.
-
-Para cada jugador en cada jornada, a partir de sus estadísticas recientes
-predice si en los próximos 3 partidos rendirá por encima, en la media o
-por debajo de la media de su posición.
-
-Label:
-  0 = vender  (rendimiento futuro < 85% media posición)
-  1 = mantener (85% – 115%)
-  2 = fichar  (> 115% media posición)
-
-Features (todas computables desde la BD en inferencia):
-  pf_last3       – media puntos últimos 3 partidos
-  pf_last5       – media puntos últimos 5 partidos
-  min_last3      – media minutos últimos 3 partidos
-  starter_rate3  – ratio de titularidades últimos 3 partidos
-  form_trend     – pf_last3 − pf_last5 (momentum)
-  vs_pos_avg     – pf_last3 − media posición en la temporada
-  posicion_enc   – PT=0, DF=1, MC=2, DT=3
-
-Output:
-  csv/csvGenerados/entrenamiento/consejero/
-    modelo_consejero.pkl     – Pipeline (scaler + RF)
-    features_consejero.json  – nombre de las features en orden
-    label_map.json           – mapping int → string
-    metricas_consejero.json  – accuracy, matriz de confusión, etc.
-    pos_avgs.json            – medias por posición y temporada (para inferencia)
-    imagenes/                – confusion matrix + feature importance + SHAP summary
-"""
 import warnings
 warnings.filterwarnings("ignore")
 
