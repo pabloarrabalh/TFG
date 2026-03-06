@@ -15,7 +15,8 @@ import os
 from dotenv import load_dotenv
 
 # Cargar variables de entorno
-load_dotenv()
+load_dotenv()             # carga .env si existe
+load_dotenv('.env.local', override=True)  # sobreescribe con .env.local (desarrollo local)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,12 +31,14 @@ SECRET_KEY = 'django-insecure-=e=%5h-+b5tfh3u#eudd3d50jef1mup6p0)fia9zxg-dd3)r&7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+_extra_hosts = [h for h in os.environ.get('EXTRA_ALLOWED_HOSTS', '').split(',') if h]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend'] + _extra_hosts
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'channels',
     'main',
 ]
 
@@ -91,32 +95,30 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    }
+}
 
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# PostgreSQL siempre (no SQLite)
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'laliga'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
+        'CONN_MAX_AGE': 600,
     }
 }
-
-# PostgreSQL configuration (commented out for now)
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'laliga',
-#         'USER': 'user1',
-#         'PASSWORD': 'user1',
-#         'HOST': 'localhost',  # o filess host
-#         'PORT': '5432',
-#         'OPTIONS': {
-#             'client_encoding': 'UTF8',
-#         },
-#     }
-# }
 
 
 
@@ -166,8 +168,8 @@ CACHES = {
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-import os
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
@@ -186,14 +188,14 @@ LOGIN_REDIRECT_URL = 'menu'
 
 # CORS / CSRF configuration for React frontend (http://localhost:5173)
 CORS_ALLOW_CREDENTIALS = True
+_extra_cors = [o for o in os.environ.get('EXTRA_CORS_ORIGINS', '').split(',') if o]
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
-]
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-]
+    'http://localhost',
+    'http://localhost:80',
+] + _extra_cors
+CSRF_TRUSTED_ORIGINS = list(CORS_ALLOWED_ORIGINS)
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_HTTPONLY = False  # JS needs to read the CSRF token

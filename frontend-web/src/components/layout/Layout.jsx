@@ -2,6 +2,31 @@ import { useState, useEffect } from 'react'
 import Header from './Header'
 import Sidebar from './Sidebar'
 
+function GlobalToasts() {
+  const [toasts, setToasts] = useState([])
+  useEffect(() => {
+    const handler = (e) => {
+      const { msg, tipo = 'info' } = e.detail
+      const id = Date.now() + Math.random()
+      setToasts(prev => [...prev, { id, msg, tipo }])
+      setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4500)
+    }
+    window.addEventListener('globalNotif', handler)
+    return () => window.removeEventListener('globalNotif', handler)
+  }, [])
+  if (!toasts.length) return null
+  const cls = (tipo) => tipo === 'success' ? 'bg-green-600' : tipo === 'error' ? 'bg-red-600' : tipo === 'warning' ? 'bg-yellow-600' : 'bg-blue-600'
+  return (
+    <div className="fixed top-20 left-6 z-[999999] pointer-events-none flex flex-col gap-3 max-w-sm">
+      {toasts.map(t => (
+        <div key={t.id} className={`px-4 py-3 rounded-xl text-white shadow-2xl font-semibold text-sm pointer-events-auto break-words ${cls(t.tipo)}`}>
+          {t.msg}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 const LS_KEY = 'sidebarHidden'
 
 export default function Layout({ children }) {
@@ -37,6 +62,7 @@ export default function Layout({ children }) {
 
   return (
     <div className="flex flex-col h-screen bg-background-dark">
+      <GlobalToasts />
       <Header onToggleSidebar={toggleSidebar} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar open={sidebarOpen} onClose={closeSidebar} />

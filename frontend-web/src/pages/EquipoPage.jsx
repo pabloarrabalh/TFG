@@ -52,14 +52,16 @@ export default function EquipoPage() {
   const [loading, setLoading] = useState(true)
   const [mostrarUltimas3, setMostrarUltimas3] = useState(false)
   const [historicoOpen, setHistoricoOpen] = useState(true)
+  const [mostrarPartidosPasados, setMostrarPartidosPasados] = useState(false)
   const POS_ORDER = ['Portero', 'Defensa', 'Centrocampista', 'Delantero']
   const [posicionesAbiertas, setPosicionesAbiertas] = useState({ Portero: true, Defensa: true, Centrocampista: true, Delantero: true, Otros: true })
   const togglePosicion = (pos) => setPosicionesAbiertas(prev => ({ ...prev, [pos]: !prev[pos] }))
   const [jornadaDropdownOpen, setJornadaDropdownOpen] = useState(false)
   const [analysisModalOpen, setAnalysisModalOpen] = useState(false)
+  const [pastSeasonModalOpen, setPastSeasonModalOpen] = useState(false)
 
   const temporada = searchParams.get('temporada') || '25/26'
-  const jornada = searchParams.get('jornada') || null
+  const jornada = searchParams.get('jornada') || localStorage.getItem('jornada_global') || null
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -87,6 +89,39 @@ export default function EquipoPage() {
     document.addEventListener('click', handleClickOutside)
     return () => document.removeEventListener('click', handleClickOutside)
   }, [])
+
+  // Sync jornada from sidebar (localStorage + event)
+  useEffect(() => {
+    if (!searchParams.get('jornada')) {
+      const saved = localStorage.getItem('jornada_global')
+      if (saved) {
+        const newParams = new URLSearchParams(searchParams)
+        newParams.set('jornada', saved)
+        setSearchParams(newParams, { replace: true })
+      }
+    }
+  }, []) // Only on mount
+
+  useEffect(() => {
+    const handleJornadaChange = (e) => {
+      const newJornada = e.detail.jornada
+      const newParams = new URLSearchParams(searchParams)
+      newParams.set('jornada', newJornada)
+      setSearchParams(newParams)
+    }
+    window.addEventListener('jornadaChanged', handleJornadaChange)
+    return () => window.removeEventListener('jornadaChanged', handleJornadaChange)
+  }, [searchParams, setSearchParams])
+
+  // Auto-redirect to the most recent season with players when the current season has none
+  useEffect(() => {
+    if (!data || data.jugadores?.length > 0 || !data.suggested_temporada) return
+    const tempDisplay = data.suggested_temporada.replace('_', '/')
+    if (tempDisplay === temporada) return
+    const newParams = new URLSearchParams(searchParams)
+    newParams.set('temporada', tempDisplay)
+    setSearchParams(newParams, { replace: true })
+  }, [data]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading && !data) return <LoadingSpinner />
 
@@ -126,7 +161,12 @@ export default function EquipoPage() {
   const handleTemporadaChange = (tempNombre) => {
     // Convertir 25_26 a 25/26 para la URL
     const tempDisplay = tempNombre.replace('_', '/')
-    navigate(`/equipo/${encodeURIComponent(nombre)}?temporada=${tempDisplay}`)
+    // Preserve the current jornada so próximo partido works in past seasons too
+    const currentJornada = searchParams.get('jornada') || localStorage.getItem('jornada_global')
+    const url = currentJornada
+      ? `/equipo/${encodeURIComponent(nombre)}?temporada=${tempDisplay}&jornada=${currentJornada}`
+      : `/equipo/${encodeURIComponent(nombre)}?temporada=${tempDisplay}`
+    navigate(url)
   }
 
   const groupByPosicion = (jugs) => {
@@ -315,43 +355,6 @@ export default function EquipoPage() {
                   {temp.display}
                 </button>
               ))}
-              
-              {/* Selector de Jornada (solo si no está en "Últimas 3") */}
-              {!mostrarUltimas3 && jornadas_disponibles && jornadas_disponibles.length > 0 && (
-                <div className="flex items-center gap-2 bg-surface-dark border border-border-dark rounded-lg px-4 py-3">
-                  <button
-                    onClick={() => cambiarJornada(-1)}
-                    disabled={jornada_actual <= jornada_min}
-                    className="p-1 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-base">chevron_left</span>
-                  </button>
-                  
-                  <select
-                    value={jornada_actual}
-                    onChange={(e) => {
-                      const newParams = new URLSearchParams(searchParams)
-                      newParams.set('jornada', e.target.value)
-                      setSearchParams(newParams)
-                    }}
-                    className="bg-background-dark border border-border-dark text-white px-3 py-1 rounded font-bold cursor-pointer text-sm focus:outline-none focus:border-primary"
-                  >
-                    {jornadas_disponibles.map(j => (
-                      <option key={j.numero} value={j.numero}>
-                        Jornada {j.numero}
-                      </option>
-                    ))}
-                  </select>
-                  
-                  <button
-                    onClick={() => cambiarJornada(1)}
-                    disabled={jornada_actual >= jornada_max}
-                    className="p-1 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-base">chevron_right</span>
-                  </button>
-                </div>
-              )}
               
               <button
                 onClick={() => setMostrarUltimas3(!mostrarUltimas3)}
@@ -566,12 +569,12 @@ export default function EquipoPage() {
         <div className="xl:col-span-3">
           {/* Mensaje si no hay jugadores */}
           {jugadores.length === 0 && equipo.nombre && (
-            <GlassPanel className="rounded-2xl p-6 mb-6 bg-red-500/10 border-red-500/30">
-              <div className="text-center">
-                <span className="material-symbols-outlined text-red-500 text-5xl mb-3">error</span>
-                <h3 className="text-lg font-bold text-red-500 mb-2">Equipo no disponible</h3>
-                <p className="text-gray-400 text-sm">
-                  {equipo.nombre} no participó en Primera División durante la temporada {temporada_actual || temporada}
+            <GlassPanel className="rounded-2xl p-6 mb-6 bg-yellow-500/10 border-yellow-500/30">
+              <div className="text-center space-y-2">
+                <span className="material-symbols-outlined text-yellow-500 text-5xl mb-3">info</span>
+                <h3 className="text-lg font-bold text-yellow-600 mb-2">No disponible en LaLiga</h3>
+                <p className="text-gray-300 text-sm mb-3">
+                  Actualmente no está en LaLiga, revise la clasificación de la LigaHipermotion
                 </p>
               </div>
             </GlassPanel>
@@ -585,39 +588,74 @@ export default function EquipoPage() {
                 <h3 className="text-lg font-bold text-white uppercase tracking-wider">PRÓXIMO ENCUENTRO</h3>
               </div>
               
-              {proximo_partido && rival_info ? (
-                <div className="text-center p-6 bg-surface-dark rounded-2xl space-y-4">
-                  <div className="flex flex-col items-center gap-2 mb-2">
-                    <TeamShield
-                      escudo={rival_info.escudo}
-                      nombre={rival_info.nombre}
-                      className="w-24 h-24 object-contain"
-                    />
-                    <h4 className="text-lg font-bold text-white text-center">{rival_info.nombre}</h4>
-                  </div>
-                  
-                  {proximo_partido.fecha_partido ? (
-                    <div className="text-primary font-bold">
-                      {new Date(proximo_partido.fecha_partido).toLocaleDateString('es-ES', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
+              {proximo_partido && rival_info && (temporada === '25/26' || mostrarPartidosPasados) ? (
+                <div className="space-y-3">
+                  {temporada !== '25/26' && mostrarPartidosPasados && (
+                    <div className="flex items-start gap-2 p-3 bg-yellow-950/30 border border-yellow-600/50 rounded-lg">
+                      <span className="material-symbols-outlined text-yellow-400 text-sm flex-shrink-0 mt-0.5">info</span>
+                      <p className="text-yellow-300 text-xs">
+                        Este partido ya se ha jugado en una temporada pasada
+                      </p>
                     </div>
-                  ) : (
-                    <div className="text-gray-400">Horario por confirmar</div>
                   )}
                   
-                  <div className="border-t border-border-dark pt-4 mt-4">
-                    <button
-                      onClick={() => setAnalysisModalOpen(true)}
-                      className="w-full bg-primary hover:bg-primary-dark text-black px-4 py-2 rounded-lg font-bold uppercase tracking-wider transition-all text-sm flex items-center justify-center gap-2"
-                    >
-                      VER ANÁLISIS
-                      <span className="material-symbols-outlined text-base">arrow_forward</span>
-                    </button>
+                  <div className="text-center p-6 bg-surface-dark rounded-2xl space-y-4">
+                    <div className="flex flex-col items-center gap-2 mb-2">
+                      <TeamShield
+                        escudo={rival_info.escudo}
+                        nombre={rival_info.nombre}
+                        className="w-24 h-24 object-contain"
+                      />
+                      <h4 className="text-lg font-bold text-white text-center">{rival_info.nombre}</h4>
+                    </div>
+                    
+                    {proximo_partido.fecha_partido ? (
+                      <div className="text-primary font-bold">
+                        {new Date(proximo_partido.fecha_partido).toLocaleDateString('es-ES', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </div>
+                    ) : (
+                      <div className="text-gray-400">Horario por confirmar</div>
+                    )}
+                    
+                    <div className="border-t border-border-dark pt-4 mt-4">
+                      <button
+                        onClick={() => setAnalysisModalOpen(true)}
+                        className="w-full bg-primary hover:bg-primary-dark text-black px-4 py-2 rounded-lg font-bold uppercase tracking-wider transition-all text-sm flex items-center justify-center gap-2"
+                      >
+                        VER ANÁLISIS
+                        <span className="material-symbols-outlined text-base">arrow_forward</span>
+                      </button>
+                    </div>
                   </div>
+                  
+                  {temporada !== '25/26' && mostrarPartidosPasados && (
+                    <button
+                      onClick={() => setMostrarPartidosPasados(false)}
+                      className="w-full bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg font-bold uppercase tracking-wider transition-all text-xs"
+                    >
+                      Ocultar Historial
+                    </button>
+                  )}
+                </div>
+              ) : temporada !== '25/26' && !mostrarPartidosPasados && proximo_partido ? (
+                // Temporada pasada con próximo partido pero oculto - mostrar botón
+                <div className="text-center p-6 bg-surface-dark rounded-2xl space-y-4">
+                  <span className="material-symbols-outlined text-yellow-500 text-4xl block mb-3">info</span>
+                  <h4 className="text-lg font-bold text-white mb-2">Consultar Temporada Pasada</h4>
+                  <p className="text-gray-400 text-sm mb-4">
+                    Los próximos partidos disponibles corresponden a una temporada anterior. ¿Deseas consultarlos?
+                  </p>
+                  <button
+                    onClick={() => setPastSeasonModalOpen(true)}
+                    className="w-full bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg font-bold uppercase tracking-wider transition-all text-sm"
+                  >
+                    Ver Próximos Partidos
+                  </button>
                 </div>
               ) : (
                 <div className="text-center p-6 bg-surface-dark rounded-2xl">
@@ -969,6 +1007,47 @@ export default function EquipoPage() {
                 className="px-6 py-2 rounded-lg border border-border-dark text-white hover:bg-white/5 transition-all font-bold"
               >
                 Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Confirmar consulta de temporada pasada */}
+      {pastSeasonModalOpen && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-surface-dark rounded-2xl border border-border-dark max-w-md w-full p-6 shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="material-symbols-outlined text-yellow-500 text-3xl">info</span>
+              <h3 className="text-xl font-black text-white">Temporada Anterior</h3>
+            </div>
+            
+            <p className="text-gray-300 mb-6 text-sm">
+              Estás consultando datos de una temporada anterior ({temporada}). 
+              Los partidos que se muestren ya se han jugado y los resultados son históricos.
+            </p>
+            
+            <div className="bg-yellow-950/30 border border-yellow-600/50 rounded-lg p-4 mb-6">
+              <p className="text-yellow-300 text-xs">
+                <span className="font-bold">⚠️ Nota:</span> Esta información es histórica y no afecta a la temporada actual.
+              </p>
+            </div>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPastSeasonModalOpen(false)}
+                className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-bold transition-all text-sm"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  setMostrarPartidosPasados(true)
+                  setPastSeasonModalOpen(false)
+                }}
+                className="flex-1 px-4 py-2 bg-primary hover:bg-primary/80 text-black rounded-lg font-bold transition-all text-sm"
+              >
+                Entendido, Ver Partido
               </button>
             </div>
           </div>

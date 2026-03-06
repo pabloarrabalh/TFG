@@ -631,7 +631,7 @@ def _cargar_csv_portero():
     if _CSV_PORTERO_CACHE is not None:
         return _CSV_PORTERO_CACHE
     try:
-        df = pd.read_csv(CONFIG['archivo_csv'])
+        df = pd.read_csv(CONFIG['archivo_csv'], encoding='utf-8-sig', on_bad_lines='skip')
         temp_cols = [c for c in df.columns if 'temporada' in c.lower()]
         if temp_cols:
             df = df[df[temp_cols[0]] == '25_26'].copy()

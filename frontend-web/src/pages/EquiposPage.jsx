@@ -33,6 +33,7 @@ export default function EquiposPage() {
   if (loading) return <LoadingSpinner />
 
   return (
+    <>
     <div className="p-6 bg-background-dark min-h-full">
       <div className="mb-8">
         <h2 className="text-3xl font-black text-white mb-2">Equipos</h2>
@@ -68,15 +69,17 @@ export default function EquiposPage() {
               {user && (
                 <button
                   onClick={() => toggleFavorito(eq.id)}
-                  className={`flex-shrink-0 ml-2 p-2 rounded-lg transition-all ${eq.es_favorito ? 'text-red-500 hover:text-red-400 bg-red-500/10' : 'text-gray-500 hover:text-red-400 hover:bg-red-500/10'}`}
+                  className="flex-shrink-0 ml-2 p-2 rounded-lg transition-all hover:scale-110"
                   title={eq.es_favorito ? 'Quitar de favoritos' : 'Añadir a favoritos'}
                 >
-                  <span className="material-symbols-outlined text-lg">{eq.es_favorito ? 'favorite' : 'favorite_border'}</span>
+                  <span className={`material-symbols-outlined text-lg transition-colors ${eq.es_favorito ? 'text-red-500' : 'text-gray-400 hover:text-red-400'}`} style={eq.es_favorito ? { fontVariationSettings: "'FILL' 1" } : {}}>favorite</span>
                 </button>
               )}
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500 font-medium">{eq.jugadores_count} jugadores</span>
+              <span className="text-xs text-gray-500 font-medium">
+                {eq.jugadores_count > 0 ? `${eq.jugadores_count} jugadores` : 'Disputando LaLiga Hypermotion'}
+              </span>
               <Link
                 to={`/equipo/${encodeURIComponent(eq.nombre)}`}
                 className="text-xs text-primary font-bold hover:text-primary-dark transition-colors flex items-center gap-1"
@@ -94,11 +97,11 @@ export default function EquiposPage() {
         )}
       </div>
       <HelpButton title="Guía de equipos" fields={[
-        { label: 'Escudo', description: 'Imagen oficial del escudo del equipo.' },
-        { label: 'Estadio', description: 'Nombre del estadio donde juega como local.' },
         { label: 'Jugadores', description: 'Número de jugadores registrados en la plantilla para la temporada actual.' },
-        { label: '★ Favorito', description: 'Marca el equipo como favorito para acceder rápidamente a él desde el menú principal.' },
+        { label: 'Favorito', description: 'Marca el equipo como favorito para acceder rápidamente a él desde el menú principal.' },
       ]} />
+      
     </div>
-  )
+    </>
+    )
 }

@@ -39,6 +39,31 @@ export default function ClasificacionPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
+  // Inicializar jornada desde localStorage si no está en searchParams (solo al montar)
+  useEffect(() => {
+    if (!jornada) {
+      const saved = localStorage.getItem('jornada_global')
+      if (saved) {
+        const newParams = new URLSearchParams(searchParams)
+        newParams.set('jornada', saved)
+        setSearchParams(newParams, { replace: true })
+      }
+    }
+  }, []) // Empty dependencies - solo al montar
+
+  // Escuchar cambios de jornada desde el sidebar
+  useEffect(() => {
+    const handleJornadaChange = (e) => {
+      const newJornada = e.detail.jornada
+      const newParams = new URLSearchParams(searchParams)
+      newParams.set('jornada', newJornada)
+      setSearchParams(newParams)
+    }
+    
+    window.addEventListener('jornadaChanged', handleJornadaChange)
+    return () => window.removeEventListener('jornadaChanged', handleJornadaChange)
+  }, [searchParams, setSearchParams])
+
   const handleTemporadaChange = (e) => {
     const newParams = new URLSearchParams(searchParams)
     newParams.set('temporada', e.target.value)
@@ -188,42 +213,21 @@ export default function ClasificacionPage() {
         )}
       </GlassPanel>
 
-      {/* Jornada Navigation + Matches */}
+      {/* Jornada Header + Matches */}
       <GlassPanel className="rounded-2xl p-6 mb-6">
-        <div className="flex items-center justify-center gap-4 mb-6">
-          <button
-            onClick={() => cambiarJornada(-1)}
-            className="w-10 h-10 rounded-lg bg-surface-dark border border-border-dark text-primary hover:border-primary hover:bg-surface-dark/80 transition-all flex items-center justify-center font-bold"
-          >
-            <span className="material-symbols-outlined">chevron_left</span>
-          </button>
-
-          <div className="text-center">
-            <h3 className="text-2xl font-black text-white">Jornada {currentJornada}</h3>
-          </div>
-
-          <button
-            onClick={() => cambiarJornada(1)}
-            className="w-10 h-10 rounded-lg bg-surface-dark border border-border-dark text-primary hover:border-primary hover:bg-surface-dark/80 transition-all flex items-center justify-center font-bold"
-          >
-            <span className="material-symbols-outlined">chevron_right</span>
-          </button>
+        <div
+          className="flex items-center justify-center gap-3 mb-4 cursor-pointer select-none"
+          onClick={() => setPartidosOpen(!partidosOpen)}
+        >
+          <h3 className="text-2xl font-black text-white">Jornada {currentJornada}</h3>
+          <span className={`material-symbols-outlined text-white transition-transform ${partidosOpen ? '' : '-rotate-90'}`}>
+            expand_more
+          </span>
         </div>
 
         {/* Matches Table */}
-        {partidos_jornada.length > 0 && (
-          <div className="border-t border-border-dark pt-6" id="partidos-section">
-            <div
-              className="flex items-center gap-2 cursor-pointer mb-4 justify-center"
-              onClick={() => setPartidosOpen(!partidosOpen)}
-            >
-              <span className={`material-symbols-outlined text-white transition-transform ${partidosOpen ? '' : '-rotate-90'}`}>
-                expand_more
-              </span>
-              <h4 className="text-lg font-bold text-white">Partidos</h4>
-            </div>
-
-            {partidosOpen && (
+        {partidosOpen && partidos_jornada.length > 0 && (
+          <div className="border-t border-border-dark pt-4" id="partidos-section">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <tbody>
@@ -294,7 +298,7 @@ export default function ClasificacionPage() {
                                             <p className="text-xs font-bold text-green-400 mb-2 uppercase tracking-wider">Goles</p>
                                             <ul className="text-sm text-white space-y-1">
                                               {p.sucesos.goles_local.map((s, j) => (
-                                                <li key={j} className="text-green-300 font-semibold">
+                                                <li key={`gol-local-${i}-${j}`} className="text-green-300 font-semibold">
                                                   <span className="text-gray-500 mr-2">Minuto {s.minuto}'</span>
                                                   {s.nombre}
                                                 </li>
@@ -307,7 +311,7 @@ export default function ClasificacionPage() {
                                             <p className="text-xs font-bold text-yellow-400 mb-2 uppercase tracking-wider">Amarillas</p>
                                             <ul className="text-sm text-white space-y-1">
                                               {p.sucesos.amarillas_local.map((s, j) => (
-                                                <li key={j} className="text-yellow-300 font-semibold">
+                                                <li key={`amarilla-local-${i}-${j}`} className="text-yellow-300 font-semibold">
                                                   <span className="text-gray-500 mr-2">Minuto {s.minuto}'</span>
                                                   {s.nombre}
                                                 </li>
@@ -320,7 +324,7 @@ export default function ClasificacionPage() {
                                             <p className="text-xs font-bold text-red-400 mb-2 uppercase tracking-wider">Rojas</p>
                                             <ul className="text-sm text-white space-y-1">
                                               {p.sucesos.rojas_local.map((s, j) => (
-                                                <li key={j} className="text-red-300 font-semibold">
+                                                <li key={`roja-local-${i}-${j}`} className="text-red-300 font-semibold">
                                                   <span className="text-gray-500 mr-2">Minuto {s.minuto}'</span>
                                                   {s.nombre}
                                                 </li>
@@ -346,7 +350,7 @@ export default function ClasificacionPage() {
                                             <p className="text-xs font-bold text-green-400 mb-2 uppercase tracking-wider">Goles</p>
                                             <ul className="text-sm text-white space-y-1">
                                               {p.sucesos.goles_visitante.map((s, j) => (
-                                                <li key={j} className="text-green-300 font-semibold">
+                                                <li key={`gol-visitante-${i}-${j}`} className="text-green-300 font-semibold">
                                                   <span className="text-gray-500 mr-2">Minuto {s.minuto}'</span>
                                                   {s.nombre}
                                                 </li>
@@ -359,7 +363,7 @@ export default function ClasificacionPage() {
                                             <p className="text-xs font-bold text-yellow-400 mb-2 uppercase tracking-wider">Amarillas</p>
                                             <ul className="text-sm text-white space-y-1">
                                               {p.sucesos.amarillas_visitante.map((s, j) => (
-                                                <li key={j} className="text-yellow-300 font-semibold">
+                                                <li key={`amarilla-visitante-${i}-${j}`} className="text-yellow-300 font-semibold">
                                                   <span className="text-gray-500 mr-2">Minuto {s.minuto}'</span>
                                                   {s.nombre}
                                                 </li>
@@ -372,7 +376,7 @@ export default function ClasificacionPage() {
                                             <p className="text-xs font-bold text-red-400 mb-2 uppercase tracking-wider">Rojas</p>
                                             <ul className="text-sm text-white space-y-1">
                                               {p.sucesos.rojas_visitante.map((s, j) => (
-                                                <li key={j} className="text-red-300 font-semibold">
+                                                <li key={`roja-visitante-${i}-${j}`} className="text-red-300 font-semibold">
                                                   <span className="text-gray-500 mr-2">Minuto {s.minuto}'</span>
                                                   {s.nombre}
                                                 </li>
@@ -395,7 +399,6 @@ export default function ClasificacionPage() {
                   </tbody>
                 </table>
               </div>
-            )}
           </div>
         )}
 

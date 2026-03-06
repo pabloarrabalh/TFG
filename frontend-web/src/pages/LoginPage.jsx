@@ -14,7 +14,7 @@ export default function LoginPage() {
   const [showLoginPwd, setShowLoginPwd] = useState(false)
 
   // Register state
-  const [regData, setRegData] = useState({ first_name: '', last_name: '', email: '', username: '', password1: '', password2: '' })
+  const [regData, setRegData] = useState({ first_name: '', last_name: '', email: '', username: '', nickname: '', password1: '', password2: '' })
   const [regErrors, setRegErrors] = useState({})
   const [regLoading, setRegLoading] = useState(false)
   const [showRegPwd, setShowRegPwd] = useState(false)
@@ -224,6 +224,20 @@ export default function LoginPage() {
                     />
                   </div>
                   {regErrors.username && <p className="text-red-400 text-xs">{regErrors.username}</p>}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-gray-300">Apodo (Nickname)</label>
+                  <div className="relative flex items-center group/input">
+                    <span className="material-symbols-outlined absolute left-4 text-gray-500 group-focus-within/input:text-primary transition-colors select-none text-[20px]">badge</span>
+                    <input
+                      type="text" placeholder="Tu apodo único" required
+                      value={regData.nickname}
+                      onChange={(e) => setRegData({ ...regData, nickname: e.target.value })}
+                      className="w-full rounded-lg border border-border-dark bg-background-dark px-4 py-3 pl-11 text-sm text-white placeholder-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                    />
+                  </div>
+                  {regErrors.nickname && <p className="text-red-400 text-xs">{regErrors.nickname}</p>}
                 </div>
 
                 <div className="flex flex-col gap-2">

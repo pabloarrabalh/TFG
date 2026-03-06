@@ -14,3 +14,5 @@ logs/
 
 # Test outputs
 scripts/test_output.txt
+
+opensearch-3.5.0/

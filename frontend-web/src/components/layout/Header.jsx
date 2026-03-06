@@ -51,7 +51,7 @@ export default function Header({ onToggleSidebar }) {
     : null
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between h-16 px-6 bg-surface-dark/80 backdrop-blur-md border-b border-border-dark shrink-0">
+    <header className="sticky top-0 z-[100002] flex items-center justify-between h-16 px-6 bg-surface-dark/80 backdrop-blur-md border-b border-border-dark shrink-0">
       {/* Left: hamburger + brand */}
       <div className="flex items-center gap-4">
         <button
@@ -127,7 +127,7 @@ export default function Header({ onToggleSidebar }) {
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 bg-surface-dark border border-border-dark rounded-xl shadow-2xl overflow-hidden z-50 py-1">
+            <div className="absolute right-0 top-full mt-2 w-56 bg-surface-dark border border-border-dark rounded-xl shadow-2xl overflow-hidden z-[100003] py-1">
               <Link to="/perfil" onClick={() => setDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 hover:bg-surface-dark-lighter text-gray-300 hover:text-white transition-colors">
                 <span className="material-symbols-outlined text-lg">person</span>
                 <span className="text-sm font-medium">Mi perfil</span>

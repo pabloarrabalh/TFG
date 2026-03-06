@@ -12,6 +12,7 @@ const ClasificacionPage = lazy(() => import('./pages/ClasificacionPage'))
 const EquiposPage       = lazy(() => import('./pages/EquiposPage'))
 const EquipoPage        = lazy(() => import('./pages/EquipoPage'))
 const JugadorPage       = lazy(() => import('./pages/JugadorPage'))
+const EstadisticasPage  = lazy(() => import('./pages/EstadisticasPage'))
 const MiPlantillaPage   = lazy(() => import('./pages/MiPlantillaPage'))
 const PerfilPage        = lazy(() => import('./pages/PerfilPage'))
 const AmigosPage        = lazy(() => import('./pages/AmigosPage'))
@@ -42,6 +43,7 @@ function AppRoutes() {
         <Route path="/equipo/:nombre" element={<Layout><EquipoPage /></Layout>} />
         <Route path="/jugador" element={<Layout><JugadorPage /></Layout>} />
         <Route path="/jugador/:id" element={<Layout><JugadorPage /></Layout>} />
+        <Route path="/estadisticas" element={<Layout><EstadisticasPage /></Layout>} />
 
         {/* Protected routes */}
         <Route path="/mi-plantilla" element={

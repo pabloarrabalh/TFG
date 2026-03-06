@@ -64,6 +64,7 @@ export default function JugadorPage() {
   const [compareModalOpen, setCompareModalOpen] = useState(false)
   const [radarGenerated, setRadarGenerated] = useState(false)
   const [radarLoading, setRadarLoading] = useState(false)
+  const [radarMediaGeneral, setRadarMediaGeneral] = useState(0)
   const radarContainerRef = useRef(null)
   const chartInstanceRef = useRef(null)
   const histogramScrollRef = useRef(null)
@@ -71,7 +72,15 @@ export default function JugadorPage() {
   const [comparisonData, setComparisonData] = useState(null)
   const [season1, setSeason1] = useState('')
   const [season2, setSeason2] = useState('')
-  const [domain, setDomain] = useState('todo')
+  const [domain, setDomain] = useState('general')
+  
+  // Estados para expandir/colapsar secciones de defensa
+  const [expandDuelosTotales, setExpandDuelosTotales] = useState(false)
+  const [expandDuelosAereos, setExpandDuelosAereos] = useState(false)
+
+  // AI Insight
+  const [insights, setInsights] = useState([])
+  const [insightsLoading, setInsightsLoading] = useState(false)
   
   // Estados para popovers
   const [rolePopover, setRolePopover] = useState(null)
@@ -94,6 +103,17 @@ export default function JugadorPage() {
   }, [id, temporada])
 
   useEffect(() => { fetchData() }, [fetchData])
+
+  // Cargar insights cuando los datos del jugador están listos
+  useEffect(() => {
+    if (!data) return
+    setInsightsLoading(true)
+    fetch(`http://localhost:8000/api/jugador-insight/?jugador_id=${id}&temporada=${encodeURIComponent(temporada)}`)
+      .then(r => r.json())
+      .then(d => setInsights(d.insights || []))
+      .catch(() => setInsights([]))
+      .finally(() => setInsightsLoading(false))
+  }, [data, id, temporada])
 
   // Cargar Chart.js dinámicamente
   useEffect(() => {
@@ -212,6 +232,9 @@ export default function JugadorPage() {
   }
 
   const renderRadar = (radarValues, mediaGeneral, radarLabels) => {
+    // Guardar el media_general en estado
+    setRadarMediaGeneral(mediaGeneral || 0)
+    
     const waitForChart = () => {
       if (typeof window.Chart === 'undefined') {
         setTimeout(waitForChart, 100)
@@ -285,11 +308,25 @@ export default function JugadorPage() {
   const executeComparison = () => {
     if (!season1 || !season2 || !data) return
     
+    // Reset expand states when executing comparison
+    setExpandDuelosTotales(false)
+    setExpandDuelosAereos(false)
+    
     const historicoData = data.historico || []
     
+    // Nuevos dominios expandidos
+    const dominioFields = {
+      'general': ['puntos_totales', 'pj', 'minutos', 'puntos_por_partido'],
+      'ataque': ['goles', 'tiros', 'tiros_puerta', 'xg'],
+      'pase': ['asistencias', 'xag', 'pases', 'pases_accuracy'],
+      'regates': ['regates_completados', 'regates_fallidos', 'conducciones', 'conducciones_progresivas'],
+      'defensa': ['entradas', 'despejes', 'duelos_totales', 'duelos_ganados', 'duelos_perdidos', 'duelos_aereos_ganados', 'duelos_aereos_perdidos'],
+    }
+    
     const getSeasonStats = (season) => {
+      let aggregated = {}
       if (season === 'total') {
-        return historicoData.reduce((acc, row) => {
+        aggregated = historicoData.reduce((acc, row) => {
           Object.keys(row).forEach(key => {
             if (typeof row[key] === 'number') {
               acc[key] = (acc[key] || 0) + row[key]
@@ -297,8 +334,18 @@ export default function JugadorPage() {
           })
           return acc
         }, {})
+      } else {
+        aggregated = historicoData.find(r => r.temporada === season) || {}
       }
-      return historicoData.find(r => r.temporada === season) || {}
+      
+      // Always include key fields
+      const fieldsToShow = dominioFields[domain] || Object.keys(aggregated)
+      return Object.keys(aggregated).reduce((acc, key) => {
+        if (fieldsToShow.includes(key) || key === 'temporada' || key === 'equipo' || key === 'minutos' || key === 'pj') {
+          acc[key] = aggregated[key]
+        }
+        return acc
+      }, {})
     }
     
     const stats1 = getSeasonStats(season1)
@@ -588,18 +635,67 @@ export default function JugadorPage() {
                       <span className="text-sm text-gray-300">Entradas</span>
                       <span className="text-lg font-bold text-white">{stats.defensa?.entradas || 0}</span>
                     </div>
+                    
                     <div className="flex justify-between items-center bg-white/5 border border-white/10 rounded-lg px-4 py-2">
-                      <span className="text-sm text-gray-300">Despeje</span>
+                      <span className="text-sm text-gray-300">Despejes</span>
                       <span className="text-lg font-bold text-white">{stats.defensa?.despejes || 0}</span>
                     </div>
-                    <div className="flex justify-between items-center bg-white/5 border border-white/10 rounded-lg px-4 py-2">
+                    
+                    {/* Duelos Totales - Botón Colapsable */}
+                    <button
+                      onClick={() => setExpandDuelosTotales(!expandDuelosTotales)}
+                      className="w-full flex justify-between items-center bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg px-4 py-2 transition-colors"
+                    >
                       <span className="text-sm text-gray-300">Duelos Totales</span>
-                      <span className="text-lg font-bold text-white">{stats.defensa?.duelos_totales || 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-white/5 border border-white/10 rounded-lg px-4 py-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold text-white">{stats.defensa?.duelos_totales || 0}</span>
+                        <span className={`material-symbols-outlined text-sm transition-transform ${expandDuelosTotales ? 'rotate-180' : ''}`}>expand_more</span>
+                      </div>
+                    </button>
+                    
+                    {expandDuelosTotales && (
+                      <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 ml-2 space-y-2">
+                        <p className="text-xs text-gray-400 font-bold">Detalle de Duelos</p>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-300">Ganados</span>
+                          <span className="text-lg font-bold text-green-400">{stats.defensa?.duelos_ganados || 0}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-300">Perdidos</span>
+                          <span className="text-lg font-bold text-red-400">{stats.defensa?.duelos_perdidos || 0}</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Duelos Aéreos - Botón Colapsable */}
+                    <button
+                      onClick={() => setExpandDuelosAereos(!expandDuelosAereos)}
+                      className="w-full flex justify-between items-center bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg px-4 py-2 transition-colors"
+                    >
                       <span className="text-sm text-gray-300">Duelos Aéreos</span>
-                      <span className="text-lg font-bold text-white">{stats.defensa?.duelos_aereos_totales || 0}</span>
-                    </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold text-white">{stats.defensa?.duelos_aereos_totales || 0}</span>
+                        <span className={`material-symbols-outlined text-sm transition-transform ${expandDuelosAereos ? 'rotate-180' : ''}`}>expand_more</span>
+                      </div>
+                    </button>
+                    
+                    {expandDuelosAereos && (
+                      <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 ml-2 space-y-2">
+                        <p className="text-xs text-gray-400 font-bold">Detalle de Duelos Aéreos</p>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-300">Ganados</span>
+                          <span className="text-lg font-bold text-green-400">{stats.defensa?.duelos_aereos_ganados || 0}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-300">Perdidos</span>
+                          <span className="text-lg font-bold text-red-400">{stats.defensa?.duelos_aereos_perdidos || 0}</span>
+                        </div>
+                        <div className="flex justify-between items-center pt-2 border-t border-white/10">
+                          <span className="text-sm text-gray-400">Iguales</span>
+                          <span className="text-lg font-bold text-gray-300">{(stats.defensa?.duelos_aereos_totales || 0) - (stats.defensa?.duelos_aereos_ganados || 0) - (stats.defensa?.duelos_aereos_perdidos || 0)}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -787,7 +883,8 @@ export default function JugadorPage() {
             )}
           </div>
 
-          {/* Gráfico Predicción vs Real */}
+          {/* Gráfico Predicción vs Real - Solo para temporada actual */}
+          {temporada === '25/26' && (
           <div className="glass-panel rounded-2xl p-6">
             <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-wider">
               <span className="material-symbols-outlined align-middle mr-2" style={{ fontSize: '1.3rem' }}>psychology</span>
@@ -807,102 +904,115 @@ export default function JugadorPage() {
                 <div className="flex gap-6 mb-2 text-xs flex-wrap">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(180deg,rgb(167,139,250),rgb(109,40,217))' }}></div>
-                    <span className="text-gray-300">
-                      {predicciones.some(p => p.is_early_jornada) && !predicciones.every(p => p.is_early_jornada) 
-                        ? 'Predicción/Media' 
-                        : predicciones.every(p => p.is_early_jornada)
-                        ? 'Media Hist.'
-                        : 'Predicción'}
-                    </span>
+                    <span className="text-gray-300">Predicción</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(180deg,rgb(52,211,153),rgb(16,185,129))' }}></div>
-                    <span className="text-gray-300">Real (&gt;0)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(180deg,rgb(248,113,113),rgb(239,68,68))' }}></div>
-                    <span className="text-gray-300">Real (&lt;0)</span>
+                    <div className="w-3 h-3 rounded-sm" style={{ background: 'linear-gradient(180deg,rgb(156,163,175),rgb(107,114,128))' }}></div>
+                    <span className="text-gray-300">Media</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-sm" style={{ background: 'rgba(255,255,255,0.15)', border: '1px dashed rgba(255,255,255,0.3)' }}></div>
-                    <span className="text-gray-300">Sin dato real</span>
+                    <span className="text-gray-300">Sin datos (no disputado)</span>
                   </div>
                 </div>
                 <div className="pred-chart">
-                  {predicciones.map((p, idx) => {
-                    const maxHeight = 250
-                    const maxValue = 20
-                    const minValue = -12
-                    const range = maxValue - minValue
+                  {(() => {
+                    // Fill jornada gaps so skipped jornadas still render
+                    const predMap = {}
+                    predicciones.forEach(p => { predMap[p.jornada] = p })
+                    const jornNums = predicciones.map(p => p.jornada).sort((a, b) => a - b)
+                    const minJ = jornNums[0], maxJ = jornNums[jornNums.length - 1]
+                    const allPreds = Array.from({ length: maxJ - minJ + 1 }, (_, i) => {
+                      const j = minJ + i
+                      return predMap[j] || { jornada: j, prediccion: null, real: null, is_early_jornada: j <= 5 }
+                    })
 
-                    const predH = Math.max(4, ((p.prediccion - minValue) / range) * maxHeight)
+                    return allPreds.map(p => {
+                      const maxHeight = 250
+                      const maxValue = 20
+                      const minValue = -12
+                      const range = maxValue - minValue
 
-                    const realClass = p.real === null ? '' :
-                      p.real > 10 ? 'histogram-bar-high' :
-                      p.real === 0 ? 'histogram-bar-zero' :
-                      p.real > 0 ? 'histogram-bar-positive' :
-                      'histogram-bar-negative'
+                      const predH = p.prediccion !== null
+                        ? Math.max(4, ((p.prediccion - minValue) / range) * maxHeight)
+                        : null
 
-                    const realH = p.real !== null
-                      ? Math.max(4, ((Math.max(minValue, p.real) - minValue) / range) * maxHeight)
-                      : null
-                    
-                    const label = p.is_early_jornada ? 'Media' : 'Pred'
+                      const realClass = p.real === null ? '' :
+                        p.real > 10 ? 'histogram-bar-high' :
+                        p.real === 0 ? 'histogram-bar-zero' :
+                        p.real > 0 ? 'histogram-bar-positive' :
+                        'histogram-bar-negative'
 
-                    return (
-                      <div
-                        key={idx}
-                        className="histogram-bar"
-                        style={{ minWidth: 52 }}
-                        title={`J${p.jornada} — ${label}: ${p.prediccion.toFixed(1)} | Real: ${p.real ?? 'pendiente'}`}
-                      >
-                        {/* Valores arriba */}
-                        <div className="histogram-bar-value" style={{ fontSize: '0.68rem', display: 'flex', gap: 4 }}>
-                          <span style={{ color: p.is_early_jornada ? 'rgb(60,180,120)' : 'rgb(167,139,250)' }}>{p.prediccion.toFixed(1)}</span>
-                          {p.real !== null && <span style={{ color: 'rgb(52,211,153)' }}>{p.real}</span>}
-                        </div>
-                        {/* Barras paralelas */}
-                        <div className="histogram-bar-pred-pair">
-                          {/* Predicción / Media */}
-                          <div
-                            className="histogram-bar-pred"
-                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}
-                          >
-                            <div
-                              className="histogram-bar-inner"
-                              style={{ 
-                                width: 18, 
-                                height: predH,
-                                background: p.is_early_jornada 
-                                  ? 'linear-gradient(180deg,rgb(60,180,120),rgb(34,130,80))' 
-                                  : undefined
-                              }}
-                            />
-                          </div>
-                          {/* Real */}
-                          <div
-                            className={realClass}
-                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}
-                          >
-                            {realH !== null ? (
-                              <div
-                                className="histogram-bar-inner"
-                                style={{ width: 18, height: realH }}
-                              />
-                            ) : (
-                              <div style={{
-                                width: 18, height: 8,
-                                background: 'rgba(255,255,255,0.1)',
-                                borderRadius: '4px 4px 0 0',
-                                border: '1px dashed rgba(255,255,255,0.3)',
-                              }} />
+                      const realH = p.real !== null
+                        ? Math.max(4, ((Math.max(minValue, p.real) - minValue) / range) * maxHeight)
+                        : null
+
+                      const label = p.is_early_jornada ? 'Media' : 'Pred'
+                      const predGradient = p.is_early_jornada
+                        ? 'linear-gradient(180deg,rgb(156,163,175),rgb(107,114,128))'
+                        : 'linear-gradient(180deg,rgb(167,139,250),rgb(109,40,217))'
+                      const predLabelColor = p.is_early_jornada ? 'rgb(156,163,175)' : 'rgb(167,139,250)'
+
+                      return (
+                        <div
+                          key={p.jornada}
+                          className="histogram-bar"
+                          style={{ minWidth: 52 }}
+                          title={`J${p.jornada} — ${label}: ${p.prediccion !== null ? p.prediccion.toFixed(1) : '—'} | Real: ${p.real ?? 'pendiente'}`}
+                        >
+                          {/* Valores arriba */}
+                          <div className="histogram-bar-value" style={{ fontSize: '0.68rem', display: 'flex', gap: 4 }}>
+                            {p.prediccion !== null && (
+                              <span style={{ color: predLabelColor }}>{p.prediccion.toFixed(1)}</span>
                             )}
+                            {p.real !== null && <span style={{ color: 'rgb(52,211,153)' }}>{p.real}</span>}
                           </div>
+                          {/* Barras paralelas */}
+                          <div className="histogram-bar-pred-pair">
+                            {/* Predicción / Media */}
+                            <div
+                              className="histogram-bar-pred"
+                              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}
+                            >
+                              {predH !== null ? (
+                                <div
+                                  className="histogram-bar-inner"
+                                  style={{ width: 18, height: predH, background: predGradient }}
+                                />
+                              ) : (
+                                <div style={{
+                                  width: 18, height: 8,
+                                  background: 'rgba(255,255,255,0.07)',
+                                  borderRadius: '4px 4px 0 0',
+                                  border: '1px dashed rgba(255,255,255,0.18)',
+                                }} />
+                              )}
+                            </div>
+                            {/* Real */}
+                            <div
+                              className={realClass}
+                              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}
+                            >
+                              {realH !== null ? (
+                                <div
+                                  className="histogram-bar-inner"
+                                  style={{ width: 18, height: realH }}
+                                />
+                              ) : (
+                                <div style={{
+                                  width: 18, height: 8,
+                                  background: 'rgba(255,255,255,0.1)',
+                                  borderRadius: '4px 4px 0 0',
+                                  border: '1px dashed rgba(255,255,255,0.3)',
+                                }} />
+                              )}
+                            </div>
+                          </div>
+                          <div className="histogram-bar-label">J{p.jornada}</div>
                         </div>
-                        <div className="histogram-bar-label">J{p.jornada}</div>
-                      </div>
-                    )
-                  })}
+                      )
+                    })
+                  })()}
                 </div>
               </>
             ) : (
@@ -919,7 +1029,7 @@ export default function JugadorPage() {
               </div>
             )}
           </div>
-
+          )}
 
         </div>
 
@@ -960,7 +1070,7 @@ export default function JugadorPage() {
               {radarGenerated && (
                 <div className="text-center w-full">
                   <p className="text-xs text-gray-400">
-                    Percentil promedio: <span className="text-white font-bold">{media_general || 0}</span>
+                    Percentil promedio: <span className="text-white font-bold">{radarMediaGeneral || 0}</span>
                   </p>
                 </div>
               )}
@@ -1034,10 +1144,30 @@ export default function JugadorPage() {
               <span className="material-symbols-outlined align-middle mr-2" style={{ fontSize: '1.2rem' }}>psychology</span>
               AI Insight
             </h3>
-            <div className="placeholder-box">
-              <span className="material-symbols-outlined text-4xl block mb-2">insights</span>
-              <p className="text-sm">Análisis en desarrollo</p>
-            </div>
+            {insightsLoading ? (
+              <div className="flex flex-col items-center gap-2 py-6 text-gray-400">
+                <div className="animate-spin">
+                  <span className="material-symbols-outlined text-primary" style={{ fontSize: '2rem' }}>hourglass_top</span>
+                </div>
+                <p className="text-xs">Analizando al jugador...</p>
+              </div>
+            ) : insights.length > 0 ? (
+              <div className="space-y-3">
+                {insights.map((ins, idx) => (
+                  <div
+                    key={idx}
+                    className="flex gap-3 items-start bg-white/5 border border-white/10 rounded-xl px-4 py-3"
+                  >
+                    <p className="text-sm text-gray-200 leading-relaxed">{ins.texto}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-2 py-6 text-gray-500">
+                <span className="material-symbols-outlined text-3xl">insights</span>
+                <p className="text-xs">No procede por sus estadísticas. ¡Revisa otros jugadores para probar esta funcionalidad!</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -1221,7 +1351,11 @@ export default function JugadorPage() {
                 Comparar <span className="text-primary">Temporadas</span>
               </h3>
               <button 
-                onClick={() => setCompareModalOpen(false)}
+                onClick={() => {
+                  setCompareModalOpen(false)
+                  setExpandDuelosTotales(false)
+                  setExpandDuelosAereos(false)
+                }}
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 <span className="material-symbols-outlined" style={{ fontSize: '1.5rem' }}>close</span>
@@ -1234,7 +1368,7 @@ export default function JugadorPage() {
                 <select 
                   value={season1}
                   onChange={(e) => setSeason1(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-darker border border-border-dark/50 rounded-lg text-white focus:border-primary focus:outline-none"
+                  className="w-full px-3 py-2 bg-black border border-border-dark/50 rounded-lg text-white focus:border-primary focus:outline-none"
                 >
                   <option value="">Selecciona una temporada</option>
                   {historico.map((row, idx) => (
@@ -1249,7 +1383,7 @@ export default function JugadorPage() {
                 <select 
                   value={season2}
                   onChange={(e) => setSeason2(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-darker border border-border-dark/50 rounded-lg text-white focus:border-primary focus:outline-none"
+                  className="w-full px-3 py-2 bg-black border border-border-dark/50 rounded-lg text-white focus:border-primary focus:outline-none"
                 >
                   <option value="">Selecciona una temporada</option>
                   {historico.map((row, idx) => (
@@ -1264,12 +1398,11 @@ export default function JugadorPage() {
                 <select 
                   value={domain}
                   onChange={(e) => setDomain(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-darker border border-border-dark/50 rounded-lg text-white focus:border-primary focus:outline-none"
+                  className="w-full px-3 py-2 bg-black border border-border-dark/50 rounded-lg text-white focus:border-primary focus:outline-none"
                 >
-                  <option value="todo">Todo</option>
                   <option value="general">General</option>
-                  <option value="definicio">Definición</option>
-                  <option value="organizacion">Organización</option>
+                  <option value="ataque">Ataque</option>
+                  <option value="pase">Pase y Asistencias</option>
                   <option value="regates">Regates</option>
                   <option value="defensa">Defensa</option>
                 </select>
@@ -1284,35 +1417,172 @@ export default function JugadorPage() {
             </button>
 
             {comparisonData ? (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b-2 border-primary/50">
-                      <th className="text-left px-4 py-2 text-gray-300 font-bold">Estadística</th>
-                      <th className="text-center px-4 py-2 text-primary font-bold">{comparisonData.season1}</th>
-                      <th className="text-center px-4 py-2 text-primary font-bold">{comparisonData.season2}</th>
-                      <th className="text-center px-4 py-2 text-yellow-400 font-bold">Diferencia</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.keys(comparisonData.stats1).filter(k => typeof comparisonData.stats1[k] === 'number').map((key, idx) => {
-                      const val1 = comparisonData.stats1[key] || 0
-                      const val2 = comparisonData.stats2[key] || 0
-                      const diff = val2 - val1
-                      
-                      return (
-                        <tr key={idx} className="border-b border-border-dark/30 hover:bg-white/5 transition-colors">
-                          <td className="px-4 py-2 text-gray-300">{key.replace(/_/g, ' ')}</td>
-                          <td className="px-4 py-2 text-center text-white font-bold">{val1}</td>
-                          <td className="px-4 py-2 text-center text-white font-bold">{val2}</td>
-                          <td className={`px-4 py-2 text-center font-bold ${diff > 0 ? 'text-green-400' : diff < 0 ? 'text-red-400' : 'text-gray-400'}`}>
-                            {diff > 0 ? '+' : ''}{diff}
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
+              <div className="space-y-6">
+                {/* Helper para obtener nombre amigable de campo */}
+                {(() => {
+                  const getFieldLabel = (field) => {
+                    const labels = {
+                      'puntos_totales': 'Puntos Fantasy',
+                      'pj': 'Partidos',
+                      'minutos': 'Minutos',
+                      'puntos_por_partido': 'Puntos/PJ',
+                      'goles': 'Goles',
+                      'tiros': 'Tiros',
+                      'tiros_puerta': 'Tiros a Puerta',
+                      'xg': 'xG (Goles Esperados)',
+                      'asistencias': 'Asistencias',
+                      'xag': 'xAG (Asistencias Esperadas)',
+                      'pases': 'Pases Totales',
+                      'pases_accuracy': 'Precisión Pases',
+                      'regates_completados': 'Regates Exitosos',
+                      'regates_fallidos': 'Regates Fallidos',
+                      'conducciones': 'Conducciones',
+                      'conducciones_progresivas': 'Conducciones Progresivas',
+                      'entradas': 'Entradas',
+                      'despejes': 'Despejes',
+                      'duelos_totales': 'Duelos Totales',
+                      'duelos_ganados': 'Duelos Ganados',
+                      'duelos_perdidos': 'Duelos Perdidos',
+                      'duelos_aereos_ganados': 'Duelos Aéreos Ganados',
+                      'duelos_aereos_perdidos': 'Duelos Aéreos Perdidos',
+                    }
+                    return labels[field] || field.replace(/_/g, ' ')
+                  }
+
+                  const getEstatDisplay = (field, val1, val2) => {
+                    const minutos1 = comparisonData.stats1.minutos || 1
+                    const minutos2 = comparisonData.stats2.minutos || 1
+                    const per90Stats = ['goles', 'tiros', 'tiros_puerta', 'xg', 'asistencias', 'xag', 'pases', 'regates_completados', 'regates_fallidos', 'conducciones', 'conducciones_progresivas', 'entradas', 'despejes', 'duelos_totales', 'duelos_aereos_ganados', 'duelos_aereos_perdidos']
+                    
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-300">{comparisonData.season1}</span>
+                          <span className="text-white font-bold">{val1.toFixed(2)}</span>
+                          {per90Stats.includes(field) && <span className="text-gray-400 text-xs">{(val1 / (minutos1 / 90)).toFixed(2)}/90min</span>}
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-300">{comparisonData.season2}</span>
+                          <span className="text-white font-bold">{val2.toFixed(2)}</span>
+                          {per90Stats.includes(field) && <span className="text-gray-400 text-xs">{(val2 / (minutos2 / 90)).toFixed(2)}/90min</span>}
+                        </div>
+                        <div className={`flex justify-between items-center pt-2 border-t border-border-dark/50 ${(val2 - val1) > 0 ? 'text-green-400' : (val2 - val1) < 0 ? 'text-red-400' : 'text-gray-400'}`}>
+                          <span className="text-xs uppercase">Diferencia</span>
+                          <span className="font-bold">{(val2 - val1) > 0 ? '+' : ''}{(val2 - val1).toFixed(2)}</span>
+                        </div>
+                      </div>
+                    )
+                  }
+
+                  const statsByDomain = {
+                    'general': ['puntos_totales', 'pj', 'minutos', 'puntos_por_partido'],
+                    'ataque': ['goles', 'tiros', 'tiros_puerta', 'xg'],
+                    'pase': ['asistencias', 'xag', 'pases', 'pases_accuracy'],
+                    'regates': ['regates_completados', 'regates_fallidos', 'conducciones', 'conducciones_progresivas'],
+                    'defensa': ['entradas', 'despejes', 'duelos_totales', 'duelos_ganados', 'duelos_perdidos', 'duelos_aereos_ganados', 'duelos_aereos_perdidos'],
+                  }
+
+                  const statsToShow = statsByDomain[domain] || statsByDomain.general
+
+                  return (
+                    <>
+                      {statsToShow.map((field) => {
+                        if (!(field in comparisonData.stats1)) return null
+                        const val1 = comparisonData.stats1[field] || 0
+                        const val2 = comparisonData.stats2[field] || 0
+
+                        // Duelos Totales colapsable
+                        if (field === 'duelos_totales' && domain === 'defensa') {
+                          return (
+                            <div key="duelos-totales-group" className="bg-surface-dark rounded-xl p-4 border border-border-dark/50">
+                              <button
+                                onClick={() => setExpandDuelosTotales(!expandDuelosTotales)}
+                                className="w-full flex items-center justify-between text-white font-bold hover:text-primary transition-colors"
+                              >
+                                <span className="flex items-center gap-2">
+                                  <span className="material-symbols-outlined text-lg">expand_more</span>
+                                  Duelos Totales
+                                </span>
+                                <span className={`text-gray-400 transition-transform ${expandDuelosTotales ? 'rotate-180' : ''}`}>
+                                  <span className="material-symbols-outlined">expand_more</span>
+                                </span>
+                              </button>
+
+                              {expandDuelosTotales && (
+                                <div className="mt-4 space-y-3 pt-4 border-t border-border-dark/50">
+                                  <div className="bg-black/30 rounded-lg p-3">
+                                    <p className="text-xs text-gray-400 font-bold mb-2 uppercase">Duelos Ganados</p>
+                                    {getEstatDisplay('duelos_ganados', comparisonData.stats1.duelos_ganados || 0, comparisonData.stats2.duelos_ganados || 0)}
+                                  </div>
+                                  <div className="bg-black/30 rounded-lg p-3">
+                                    <p className="text-xs text-gray-400 font-bold mb-2 uppercase">Duelos Perdidos</p>
+                                    {getEstatDisplay('duelos_perdidos', comparisonData.stats1.duelos_perdidos || 0, comparisonData.stats2.duelos_perdidos || 0)}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )
+                        }
+
+                        // Duelos Aéreos colapsable
+                        if (field === 'duelos_aereos_ganados' && domain === 'defensa') {
+                          return (
+                            <div key="duelos-aereos-group" className="bg-surface-dark rounded-xl p-4 border border-border-dark/50">
+                              <button
+                                onClick={() => setExpandDuelosAereos(!expandDuelosAereos)}
+                                className="w-full flex items-center justify-between text-white font-bold hover:text-primary transition-colors"
+                              >
+                                <span className="flex items-center gap-2">
+                                  <span className="material-symbols-outlined text-lg">expand_more</span>
+                                  Duelos Aéreos
+                                </span>
+                                <span className={`text-gray-400 transition-transform ${expandDuelosAereos ? 'rotate-180' : ''}`}>
+                                  <span className="material-symbols-outlined">expand_more</span>
+                                </span>
+                              </button>
+
+                              {expandDuelosAereos && (
+                                <div className="mt-4 space-y-3 pt-4 border-t border-border-dark/50">
+                                  <div className="bg-black/30 rounded-lg p-3">
+                                    <p className="text-xs text-gray-400 font-bold mb-2 uppercase">Duelos Aéreos Ganados</p>
+                                    {getEstatDisplay('duelos_aereos_ganados', val1, val2)}
+                                  </div>
+                                  <div className="bg-black/30 rounded-lg p-3">
+                                    <p className="text-xs text-gray-400 font-bold mb-2 uppercase">Duelos Aéreos Perdidos</p>
+                                    {getEstatDisplay('duelos_aereos_perdidos', comparisonData.stats1.duelos_aereos_perdidos || 0, comparisonData.stats2.duelos_aereos_perdidos || 0)}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )
+                        }
+
+                        // Despejes colapsable
+                        if (field === 'despejes' && domain === 'defensa') {
+                          return (
+                            <div key="despejes-group" className="bg-surface-dark rounded-xl p-4 border border-border-dark/50">
+                              <p className="text-xs text-gray-400 font-bold mb-3 uppercase">Despejes</p>
+                              {getEstatDisplay(field, val1, val2)}
+                            </div>
+                          )
+                        }
+
+                        // Omitir duelos totales perdidos/ganados si ya se mostró en la sección colapsable
+                        if ((field === 'duelos_ganados' || field === 'duelos_perdidos') && domain === 'defensa') return null
+                        
+                        // Omitir duelos aéreos perdidos si ya se mostró en la sección colapsable
+                        if (field === 'duelos_aereos_perdidos' && domain === 'defensa') return null
+
+                        return (
+                          <div key={field} className="bg-surface-dark rounded-xl p-4 border border-border-dark/50">
+                            <p className="text-xs text-gray-400 font-bold mb-3 uppercase">{getFieldLabel(field)}</p>
+                            {getEstatDisplay(field, val1, val2)}
+                          </div>
+                        )
+                      })}
+                    </>
+                  )
+                })()}
               </div>
             ) : (
               <div className="text-center py-8 text-gray-400">

@@ -226,6 +226,27 @@ def obtener_o_crear_partido(jornada, equipo_local, equipo_visitante, fecha_parti
     )
     return partido
 
+def _puntos_fantasy_sin_outlier(row, jugador, umbral=40, fallback=6):
+    """
+    Devuelve el valor de puntos_fantasy a guardar.
+    Si el valor del CSV supera el umbral (outlier), usa la moda histórica
+    del jugador en la BD (excluyendo outliers). Si no hay historial, devuelve fallback.
+    """
+    raw = int(row['puntos_fantasy']) if pd.notna(row.get('puntos_fantasy')) else 0
+    if raw <= umbral:
+        return raw
+    # Valor anómalo: usar la moda histórica del jugador (sin outliers)
+    moda = (
+        EstadisticasPartidoJugador.objects
+        .filter(jugador=jugador, puntos_fantasy__lte=umbral)
+        .values('puntos_fantasy')
+        .annotate(cnt=Count('id'))
+        .order_by('-cnt', 'puntos_fantasy')
+        .first()
+    )
+    return moda['puntos_fantasy'] if moda else fallback
+
+
 def cargar_estadisticas_partido(row, jugador, equipo, partido):
     """Crea o actualiza EstadisticasPartidoJugador desde una fila del CSV."""
     # Convertir posición de código (PT/DF/MC/DT) a nombre completo (Portero/Defensa/...)
@@ -265,7 +286,7 @@ def cargar_estadisticas_partido(row, jugador, equipo, partido):
             'goles_en_contra': int(row['goles_en_contra']) if pd.notna(row['goles_en_contra']) else 0,
             'porcentaje_paradas': float(row['porcentaje_paradas']) if pd.notna(row['porcentaje_paradas']) else 0.0,
             'psxg': float(row['psxg']) if pd.notna(row['psxg']) else 0.0,
-            'puntos_fantasy': int(row['puntos_fantasy']) if pd.notna(row['puntos_fantasy']) else 0,
+            'puntos_fantasy': _puntos_fantasy_sin_outlier(row, jugador),
             'entradas': int(row['entradas']) if pd.notna(row['entradas']) else 0,
             'duelos': int(row['duelos']) if pd.notna(row['duelos']) else 0,
             'duelos_ganados': int(row['duelos_ganados']) if pd.notna(row['duelos_ganados']) else 0,
@@ -374,10 +395,12 @@ def buscar_jugador_partido(nombre_csv, equipo, partido):
 
 def procesar_csv_partido(ruta_csv, temporada):
     """Procesa un CSV de partido y carga los datos."""
+    import logging
+    _log = logging.getLogger(__name__)
     try:
         df = pd.read_csv(ruta_csv, encoding='utf-8-sig')
     except Exception as e:
-        print(f"  ❌ Error leyendo CSV {ruta_csv}: {e}")
+        _log.debug("Error leyendo CSV %s: %s", ruta_csv, e)
         return False
     
     if df.empty:
@@ -414,16 +437,12 @@ def procesar_csv_partido(ruta_csv, temporada):
                 
                 stats = cargar_estadisticas_partido(row, jugador, equipo, partido)
                 contador_stats += 1
-            except Exception as e:
-                print(f"  ❌ Error procesando fila {idx} en {ruta_csv}: {e}")
+            except Exception:
                 continue
-        
-        if contador_stats == 0:
-            print(f"  [WARN] {ruta_csv}: 0 estadísticas guardadas (df tiene {len(df)} filas)")
         
         return True
     except Exception as e:
-        print(f"  [ERROR] Error procesando partido en {ruta_csv}: {e}")
+        _log.debug("Error procesando partido en %s: %s", ruta_csv, e)
         return False
 
 
@@ -431,11 +450,10 @@ def fase_0a_crear_todas_las_jornadas():
     """
     FASE 0a: Crea TODAS las jornadas (1-38) para cada temporada.
     Se ejecuta PRIMERO para que existan las jornadas aunque no haya partidos jugados aún.
-    Esto permite luego asignar el calendario completo a la BD.
     """
-    print("\n" + "=" * 70)
-    print("FASE 0a: CREAR TODAS LAS JORNADAS (1-38 POR TEMPORADA)")
-    print("=" * 70)
+    import logging
+    _log = logging.getLogger(__name__)
+    _log.info("[FASE 0a] Creando jornadas...")
     
     temporadas_to_create = [
         ('23_24', 'Temporada 23/24'),
@@ -444,24 +462,14 @@ def fase_0a_crear_todas_las_jornadas():
     ]
     
     for temp_codigo, temp_nombre in temporadas_to_create:
-        # Obtener o crear la temporada
         temporada, created = Temporada.objects.get_or_create(nombre=temp_codigo)
-        
-        # Crear jornadas 1-38
-        created_count = 0
         for num_jornada in range(1, 39):
-            jornada, was_created = Jornada.objects.get_or_create(
+            Jornada.objects.get_or_create(
                 temporada=temporada,
                 numero_jornada=num_jornada,
                 defaults={'fecha_inicio': None, 'fecha_fin': None}
             )
-            if was_created:
-                created_count += 1
-        
-        print(f"  ✓ {temp_codigo}: {created_count} jornadas creadas ({38 - created_count} ya existían)")
-    
-    total_jornadas = Jornada.objects.count()
-    print(f"\n[OK] Total jornadas en BD: {total_jornadas}")
+    _log.info("[FASE 0a] Jornadas OK: %d en BD", Jornada.objects.count())
 
 
 def fase_0_scrapear_plantillas_y_estadios():
@@ -471,9 +479,9 @@ def fase_0_scrapear_plantillas_y_estadios():
     Se ejecuta DESPUÉS de crear las jornadas para asegurar que todos los equipos
     tienen estadios actualizados en el modelo Equipo.
     """
-    print("\n" + "=" * 70)
-    print("FASE 0: SCRAPEAR PLANTILLAS Y ACTUALIZAR ESTADIOS (MÚLTIPLES TEMPORADAS)")
-    print("=" * 70)
+    import logging
+    _log = logging.getLogger(__name__)
+    _log.info("[FASE 0] Scrapando plantillas Transfermarkt...")
     
     # Definir temporadas a scrapear: temporada_display, saison_id, temporada_codigo
     temporadas_to_scrap = [
@@ -486,47 +494,20 @@ def fase_0_scrapear_plantillas_y_estadios():
     
     try:
         for temporada_display, saison_id, temporada_codigo in temporadas_to_scrap:
-            print(f"\n{'-' * 70}")
-            print(f"Scrapando Transfermarkt Temporada {temporada_display} (saison_id={saison_id})")
-            print(f"{'-' * 70}")
-            
-            # Paso 1: Descargar clasificación para obtener hrefs de todos los equipos
-            print(f"\n[0.1] Descargando clasificación de La Liga {temporada_display}...")
             BASE_URL = "https://www.transfermarkt.es/laliga/spieltagtabelle/wettbewerb/ES1"
             headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-            
             try:
-                resp = requests.get(
-                    f"{BASE_URL}?saison_id={saison_id}",
-                    headers=headers,
-                    timeout=15
-                )
-                
+                resp = requests.get(f"{BASE_URL}?saison_id={saison_id}", headers=headers, timeout=15)
                 if resp.status_code != 200:
-                    print(f"[WARN] Error descargando clasificación: Status {resp.status_code}")
                     continue
-                
-                print("[OK] Clasificación descargada correctamente")
-            except Exception as e:
-                print(f"[WARN] Error descargando clasificación: {e}")
+            except Exception:
                 continue
             
-            # Paso 2: Extraer hrefs de todos los equipos
-            print(f"\n[0.2] Extrayendo URLs de plantillas de todos los equipos...")
             equipos_href = extraer_hrefs_equipos_desde_clasificacion(resp.text)
-            
             if not equipos_href:
-                print("[WARN] No se encontraron equipos en la clasificación")
                 continue
             
-            print(f"[OK] Se encontraron {len(equipos_href)} equipos")
-            
-            # Paso 3: Scrapear plantillas para esta temporada
-            # Actualizar estadios directamente desde los equipos descargados
-            # Sin generar CSVs de nacionalidad que no se usan
-            print(f"\n[0.3] Actualizando estadios desde Transfermarkt para {temporada_display}...")
-            
-            for idx, (equipo_norm, href) in enumerate(equipos_href.items(), 1):
+            for equipo_norm, href in equipos_href.items():
                 try:
                     html = obtener_plantilla_equipo(href, saison_id=saison_id, delay_min=1, delay_max=2)
                     if html:
@@ -539,38 +520,22 @@ def fase_0_scrapear_plantillas_y_estadios():
                                 equipo_obj.save()
                 except Exception:
                     pass
-            
-            print(f"\n✓ Temporada {temporada_display} completada")
-        
-        # Mostrar resumen final de cobertura de estadios
-        print("\n" + "=" * 70)
-        print("RESUMEN FASE 0 - COBERTURA DE ESTADIOS EN BD:")
-        print("=" * 70)
         
         equipos_con_estadio = Equipo.objects.exclude(estadio__exact='').count()
         equipos_total = Equipo.objects.count()
-        
-        print(f"\n📊 Estadios en BD:")
-        print(f"   • Total equipos: {equipos_total}")
-        print(f"   • Con estadio: {equipos_con_estadio}")
-        print(f"   • Cobertura: {100*equipos_con_estadio/equipos_total:.1f}%")
-        
-        print("\n[OK] Fase 0 completada exitosamente")
+        _log.info("[FASE 0] Estadios: %d/%d equipos", equipos_con_estadio, equipos_total)
         return True
         
     except Exception as e:
-        print(f"[ERROR] Error en Fase 0: {e}")
-        import traceback
-        traceback.print_exc()
-        print("\n[WARN] Fase 0 falló - continuando sin actualizar estadios")
+        _log.warning("[FASE 0] Falló - continuando: %s", e)
         return False
 
 
 def fase_1_cargar_partidos_y_estadisticas():
     """FASE 1: Carga partidos y estadísticas iniciales."""
-    print("\n" + "=" * 70)
-    print("FASE 1: CARGAR PARTIDOS Y ESTADISTICAS")
-    print("=" * 70)
+    import logging
+    _log = logging.getLogger(__name__)
+    _log.info("[FASE 1] Cargando partidos y estadísticas...")
     
     temporadas_map = {
         'temporada_23_24': '23_24',
@@ -578,8 +543,6 @@ def fase_1_cargar_partidos_y_estadisticas():
         'temporada_25_26': '25_26',
     }
     
-    # Crear temporadas
-    print("\n[TEMPORADAS] Creando...")
     temp_23_24 = obtener_o_crear_temporada('23_24')
     temp_24_25 = obtener_o_crear_temporada('24_25')
     temp_25_26 = obtener_o_crear_temporada('25_26')
@@ -595,8 +558,6 @@ def fase_1_cargar_partidos_y_estadisticas():
     
     total_csvs = 0
     for temp_dir, temp_obj in temporadas_obj_map.items():
-        print(f"\n[{temp_dir.replace('temporada_', '')}] Procesando CSVs...")
-        
         pattern = os.path.join(data_dir, temp_dir, 'jornada_*', 'p*.csv')
         csvs = sorted(glob.glob(pattern))
         
@@ -604,11 +565,7 @@ def fase_1_cargar_partidos_y_estadisticas():
             if procesar_csv_partido(csv_path, temp_obj):
                 total_csvs += 1
     
-    print(f"\n[OK] FASE 1 completada: {total_csvs} CSVs procesados")
-    print(f"  - Partidos: {Partido.objects.count()}")
-    print(f"  - Estadísticas: {EstadisticasPartidoJugador.objects.count()}")
-    
-    # Actualizar fechas de jornadas después de cargar partidos
+    _log.info("[FASE 1] OK: %d CSVs — %d partidos, %d stats", total_csvs, Partido.objects.count(), EstadisticasPartidoJugador.objects.count())
     actualizar_fechas_jornadas()
 
 # ============================================================================
@@ -616,13 +573,6 @@ def fase_1_cargar_partidos_y_estadisticas():
 # ============================================================================
 
 def actualizar_fechas_jornadas():
-    """
-    Calcula y actualiza fecha_inicio y fecha_fin para cada jornada.
-    
-    fecha_inicio = mínimo de fecha_partido de todos los partidos de la jornada
-    fecha_fin = máximo de fecha_partido de todos los partidos de la jornada
-    """
-    print("\n[FECHAS] Actualizando fechas_inicio/fin de jornadas...")
     
     jornadas = Jornada.objects.all()
     jornadas_actualizadas = 0
@@ -650,8 +600,6 @@ def actualizar_fechas_jornadas():
             jornada.fecha_fin = fecha_fin
             jornada.save()
             jornadas_actualizadas += 1
-    
-    print(f"  [OK] {jornadas_actualizadas} jornadas actualizadas")
 
 # ============================================================================
 # FUNCIONES DE CARGA (FASE 2: Roles, Goles, Clasificación, Rendimiento)
@@ -659,19 +607,18 @@ def actualizar_fechas_jornadas():
 
 def fase_2_cargar_roles():
     """FASE 2: Carga roles desde ROLES_DESTACADOS de roles.py (optimizado)."""
-    print("\n" + "=" * 70)
-    print("FASE 2: CARGAR ROLES (DESDE ROLES_DESTACADOS)")
-    print("=" * 70)
+    import logging
+    _log = logging.getLogger(__name__)
+    _log.info("[FASE 2] Cargando roles...")
     
     try:
         from main.scrapping.roles import ROLES_DESTACADOS
         from main.scrapping.commons import normalizar_texto
     except Exception as e:
-        print(f"[ERROR] No se pudo importar ROLES_DESTACADOS: {e}")
+        _log.warning("No se pudo importar ROLES_DESTACADOS: %s", e)
         return
     
     if not ROLES_DESTACADOS:
-        print("[WARN] ROLES_DESTACADOS está vacío")
         return
     
     # Obtener temporadas
@@ -682,7 +629,7 @@ def fase_2_cargar_roles():
             '25_26': Temporada.objects.get(nombre='25_26'),
         }
     except Temporada.DoesNotExist as e:
-        print(f"[ERROR] Temporada no encontrada: {e}")
+        _log.warning("Temporada no encontrada en roles: %s", e)
         return
     
     contador_total = 0
@@ -696,12 +643,8 @@ def fase_2_cargar_roles():
         temporada_obj = temporadas_map[temp_codigo]
         
         if not roles_dict:
-            print(f"[SKIP] {temp_codigo}: Sin roles disponibles")
             continue
         
-        print(f"\n[{temp_codigo}] Procesando {len(roles_dict)} jugadores...")
-        
-        # Solo procesar stats sin roles (más rápido)
         actualizados_temp = 0
         stats_sin_roles = EstadisticasPartidoJugador.objects.filter(
             partido__jornada__temporada=temporada_obj,
@@ -720,44 +663,26 @@ def fase_2_cargar_roles():
                     stat.save()
                     actualizados_temp += 1
                     contador_total += 1
-                    
-                    if contador_total % 100 == 0:
-                        print(f"  [{contador_total}] {jugador_nombre}")
-            except Exception as e:
+            except Exception:
                 pass
             finally:
                 contador_procesados += 1
-        
-        print(f"  ✅ {actualizados_temp} stats actualizadas en {temp_codigo}")
     
     con_roles = EstadisticasPartidoJugador.objects.exclude(roles=[]).count()
-    print(f"\n[OK] Resumen de carga de roles:")
-    print(f"  - Procesados: {contador_procesados}")
-    print(f"  - Actualizados: {contador_total}")
-    print(f"  - Total EstadísticasPartidoJugador con roles: {con_roles}")
+    _log.info("[FASE 2] Roles: %d actualizados, %d total con roles", contador_total, con_roles)
 
 
 
 
 
 def fase_2b_cargar_goles():
-    """FASE 2b: Carga goles en partidos - DESHABILITADO.
-    Los datos de goles en EstadisticasPartidoJugador vienen inflados/duplicados.
-    Mejor dejar los goles vacíos hasta tener fuente confiable (API o web scraping directo).
-    """
-    print("\n" + "=" * 70)
-    print("FASE 2b: CARGAR GOLES EN PARTIDOS - DESHABILITADO")
-    print("=" * 70)
-    print("[SKIP] Cálculo de goles deshabilitado - datos inflados en CSVs origen")
-    print("[INFO] Los goles permanecerán NULL hasta tener fuente primaria confiable")
-    con_goles = Partido.objects.filter(goles_local__isnull=False).count()
-    print(f"[OK] Partidos con goles oficiales: {con_goles}")
+    """FASE 2b: Carga goles en partidos - DESHABILITADO (datos inflados en CSVs)."""
+    pass
 
 def fase_2c_cargar_clasificacion():
     """FASE 2c: Carga clasificación jornada."""
-    print("\n" + "=" * 70)
-    print("FASE 2c: CARGAR CLASIFICACION JORNADA")
-    print("=" * 70)
+    import logging
+    _log = logging.getLogger(__name__)
     
     temporadas_map = {
         'temporada_23_24': '23_24',
@@ -812,14 +737,12 @@ def fase_2c_cargar_clasificacion():
         except Exception:
             continue
     
-    total = ClasificacionJornada.objects.count()
-    print(f"[OK] Clasificación cargada: {total} registros")
+    _log.info("[FASE 2c] Clasificación: %d registros", ClasificacionJornada.objects.count())
 
 def fase_2d_cargar_rendimiento():
     """FASE 2d: Carga rendimiento histórico."""
-    print("\n" + "=" * 70)
-    print("FASE 2d: CARGAR RENDIMIENTO HISTORICO")
-    print("=" * 70)
+    import logging
+    _log = logging.getLogger(__name__)
     
     creados = 0
     
@@ -866,14 +789,12 @@ def fase_2d_cargar_rendimiento():
         except Exception:
             continue
     
-    total = RendimientoHistoricoJugador.objects.count()
-    print(f"[OK] Rendimiento cargado: {total} registros")
+    _log.info("[FASE 2d] Rendimiento: %d registros", RendimientoHistoricoJugador.objects.count())
 
 def fase_2e_poblar_equipo_jugador_temporada():
     """FASE 2e: Puebla EquipoJugadorTemporada con jugadores por temporada (ya creado en fase 1)."""
-    print("\n" + "=" * 70)
-    print("FASE 2e: POBLAR EQUIPO-JUGADOR-TEMPORADA")
-    print("=" * 70)
+    import logging
+    _log = logging.getLogger(__name__)
     
     from django.db.models import Max
     
@@ -881,9 +802,6 @@ def fase_2e_poblar_equipo_jugador_temporada():
     total_actualizado = 0
     
     for temporada in temporadas:
-        print(f"\n[{temporada.nombre}] Actualizando información...")
-        
-        # Todos los EquipoJugadorTemporada ya existen, actualizar con edad y partidos
         eqt_list = EquipoJugadorTemporada.objects.filter(temporada=temporada)
         
         updated_count = 0
@@ -912,32 +830,18 @@ def fase_2e_poblar_equipo_jugador_temporada():
                 eqt.save(update_fields=['edad', 'partidos_jugados'])
                 updated_count += 1
         
-        print(f"  ✓ Actualizados: {updated_count}")
         total_actualizado += updated_count
     
-    total = EquipoJugadorTemporada.objects.count()
-    print(f"\n[OK] Plantillas por temporada actualizadas: {total} registros")
-    return total
+    _log.info("[FASE 2e] EquipoJugadorTemporada: %d registros", EquipoJugadorTemporada.objects.count())
+    return total_actualizado
 
 
 
 def main():
     """Función principal: ejecuta todas las fases."""
-    
-    print("\n" + "=" * 70)
-    print("CARGA COMPLETA UNIFICADA DE TODOS LOS DATOS")
-    print("=" * 70)
-    print("\nEste script carga TODO en una sola ejecución:")
-    print("0a. Crear todas las jornadas (1-38) para cada temporada")
-    print("0. Scrapea plantillas desde Transfermarkt y actualiza estadios")
-    print("1. Partidos y Estadísticas (45 campos)")
-    print("2. Roles con fuzzy matching")
-    print("3. Goles en Partidos")
-    print("4. Clasificación Jornada")
-    print("5. Rendimiento Histórico de Jugadores")
-    print("6. Equipo-Jugador-Temporada (Plantillas por temporada)")
-    print("7. FBREF: Scrappear Calendario y Resultados")
-    print("8. Cargar Calendario")
+    import logging
+    _log = logging.getLogger(__name__)
+    _log.info("[popularDB] Iniciando carga completa de datos...")
     
     # FASE 0a: Crear todas las jornadas PRIMERO (CRÍTICO)
     fase_0a_crear_todas_las_jornadas()
@@ -966,47 +870,17 @@ def main():
     # FASE 4: Precalcular percentiles y guardarlos en EquipoJugadorTemporada
     fase_4_precalcular_percentiles()
     
-    # Resumen final
-    print("\n" + "=" * 70)
-    print("RESUMEN FINAL")
-    print("=" * 70)
-    print(f"\nTemporadas: {Temporada.objects.count()}")
-    print(f"Equipos: {Equipo.objects.count()}")
-    print(f"Jugadores: {Jugador.objects.count()}")
-    print(f"Jornadas: {Jornada.objects.count()}")
-    print(f"Partidos: {Partido.objects.count()}")
-    print(f"Estadísticas: {EstadisticasPartidoJugador.objects.count()}")
-    
-    roles_count = EstadisticasPartidoJugador.objects.exclude(roles=[]).count()
-    goles_count = Partido.objects.filter(goles_local__isnull=False).count()
-    clasificacion_count = ClasificacionJornada.objects.count()
-    rendimiento_count = RendimientoHistoricoJugador.objects.count()
-    equipo_jugador_temp = EquipoJugadorTemporada.objects.count()
-    calendario_count = Calendario.objects.count()
-    
-    # Revisar cobertura de estadios
-    equipos_con_estadio = Equipo.objects.exclude(estadio__exact='').count()
-    equipos_total = Equipo.objects.count()
-    
-    print(f"\nDatos complementarios:")
-    print(f"  - Roles: {roles_count} estadísticas")
-    print(f"  - Goles: {goles_count} partidos")
-    print(f"  - Clasificación: {clasificacion_count} registros")
-    print(f"  - Rendimiento: {rendimiento_count} registros")
-    print(f"  - Plantillas por Temporada: {equipo_jugador_temp} registros")
-    print(f"  - Calendario: {calendario_count} partidos")
-    print(f"  - Estadios: {equipos_con_estadio}/{equipos_total} equipos ({100*equipos_con_estadio/equipos_total:.1f}%)")
-    
-    print("\n" + "=" * 70)
-    print("[OK] CARGA COMPLETADA - TODO LISTO EN LA BASE DE DATOS")
-    print("=" * 70)
+    _log.info(
+        "[popularDB] Carga completada — %d temporadas, %d equipos, %d jugadores, %d partidos, %d stats, %d calendario",
+        Temporada.objects.count(), Equipo.objects.count(), Jugador.objects.count(),
+        Partido.objects.count(), EstadisticasPartidoJugador.objects.count(), Calendario.objects.count(),
+    )
 
 
 def fase_2f_completar_estadios():
     """FASE 2F: Completa estadios faltantes como fallback."""
-    print("\n" + "=" * 70)
-    print("FASE 2F: COMPLETAR ESTADIOS FALTANTES")
-    print("=" * 70)
+    import logging
+    _log = logging.getLogger(__name__)
     
     # Mapeo manual de equipos -> estadios
     estadios_fallback = {
@@ -1038,36 +912,22 @@ def fase_2f_completar_estadios():
         'CA Osasuna': 'El Sadar',
     }
     
-    equipos_sin_estadio = []
-    equipos_actualizados = []
-    
+    actualizados = 0
     for equipo in Equipo.objects.all():
         if not equipo.estadio or equipo.estadio.strip() == '':
-            # Buscar en el mapeo
             if equipo.nombre in estadios_fallback:
                 equipo.estadio = estadios_fallback[equipo.nombre]
                 equipo.save()
-                equipos_actualizados.append((equipo.nombre, equipo.estadio))
-                print(f"  [OK] {equipo.nombre} -> {equipo.estadio}")
-            else:
-                equipos_sin_estadio.append(equipo.nombre)
-    
-    print(f"\n📊 Resultado:")
-    print(f"  - Estadios completados: {len(equipos_actualizados)}")
-    print(f"  - Aún sin estadio: {len(equipos_sin_estadio)}")
-    
-    if equipos_sin_estadio:
-        print(f"  Equipos sin estadio: {', '.join(equipos_sin_estadio)}")
+                actualizados += 1
+    _log.info("[FASE 2f] Estadios completados: %d", actualizados)
 
 
 def fase_3_cargar_calendario():
     """FASE 3: Carga el calendario desde JSON a la tabla Calendario en BD."""
     from main.models import Calendario
     from datetime import datetime as dt
-    
-    print("\n" + "=" * 70)
-    print("FASE 3: CARGAR CALENDARIO")
-    print("=" * 70)
+    import logging
+    _log = logging.getLogger(__name__)
     
     temporadas_map = {
         'temporada_23_24': '23_24',
@@ -1085,7 +945,6 @@ def fase_3_cargar_calendario():
         json_path = os.path.join(csv_dir, f'calendario_{temp_codigo}.json')
         
         if not os.path.exists(json_path):
-            print(f"  [WARN] No encontrado: {json_path}")
             continue
         
         try:
@@ -1093,7 +952,6 @@ def fase_3_cargar_calendario():
                 calendario_dict = json.load(f)
             
             temporada = Temporada.objects.get(nombre=temp_codigo)
-            print(f"\n[{temp_codigo}] Cargando {len(calendario_dict)} jornadas...\n")
             
             for jornada_num_str, matches in calendario_dict.items():
                 try:
@@ -1171,51 +1029,35 @@ def fase_3_cargar_calendario():
                         except Exception as e:
                             continue
                     
-                    if partidos_jornada > 0:
-                        print(f"  ✅ Jornada {jornada_num}: {partidos_jornada} partidos cargados")
-                    else:
-                        print(f"  ⚠️  Jornada {jornada_num}: Sin partidos cargados")
-                except Exception as e:
-                    print(f"  ❌ Error en jornada {jornada_num_str}: {e}")
+                except Exception:
                     continue
         except Exception as e:
-            print(f"  ❌ Error procesando {json_path}: {e}")
+            _log.warning("[FASE 3] Error procesando %s: %s", json_path, e)
             continue
     
-    if equipos_no_encontrados:
-        print(f"\n⚠️  Equipos no encontrados en BD (partidos ignorados):")
-        for equipo in sorted(equipos_no_encontrados):
-            print(f"   - {equipo}")
-    
     total_calendario = Calendario.objects.count()
-    print(f"\n[OK] Calendario cargado: {total_calendario} partidos en BD")
+    _log.info("[FASE 3] Calendario: %d partidos en BD", total_calendario)
     return total_calendario
 
 
 def fase_2g_cargar_goles_desde_calendario():
-    """FASE 2c: Carga goles desde los calendarios JSON de FBREF."""
-    print("\n" + "=" * 70)
-    print("FASE 2c: CARGAR GOLES DESDE CALENDARIO")
-    print("=" * 70)
+    """Carga goles desde los calendarios JSON de FBREF."""
+    import logging
+    _log = logging.getLogger(__name__)
     
     temporadas = ['23_24', '24_25', '25_26']
     total_actualizado = 0
     total_procesados = 0
     
     for cod_temporada in temporadas:
-        print(f"\n[{cod_temporada}] Procesando resultados...")
-        
-        # Obtener la temporada
         try:
             temporada = Temporada.objects.get(nombre=cod_temporada)
         except Temporada.DoesNotExist:
-            print(f"  ❌ Temporada no encontrada: {cod_temporada}")
             continue
         
         json_path = os.path.join("csv", "csvGenerados", f"calendario_{cod_temporada}.json")
         
         if not os.path.exists(json_path):
-            print(f"  ⚠️  Archivo no encontrado: {json_path}")
             continue
         
         try:
@@ -1290,120 +1132,120 @@ def fase_2g_cargar_goles_desde_calendario():
                         continue
         
         except Exception as e:
-            print(f"  ❌ Error procesando {json_path}: {e}")
+            _log.warning("[Goles] Error procesando %s: %s", json_path, e)
             continue
     
-    total_partidos = Partido.objects.exclude(goles_local__isnull=True).count()
-    print(f"\n[OK] Goles cargados: {total_actualizado} partidos actualizados (de {total_procesados} procesados)")
-    print(f"Total partidos con goles en BD: {total_partidos}")
+    _log.info("[Goles] %d actualizados (de %d), total con goles: %d",
+              total_actualizado, total_procesados,
+              Partido.objects.exclude(goles_local__isnull=True).count())
 
 
 def fase_4_precalcular_percentiles():
-    """Precalcula y almacena percentiles para todos los EquipoJugadorTemporada"""
-    print("\n" + "="*80)
-    print("FASE 4: PRECALCULAR PERCENTILES PARA PERFILES TÁCTICOS")
-    print("="*80)
+    """Precalcula y almacena percentiles para todos los EquipoJugadorTemporada (OPTIMIZADO)"""
+    import logging
+    _log = logging.getLogger(__name__)
     
     from main.models import EquipoJugadorTemporada, EstadisticasPartidoJugador
-    from django.db.models import Avg, Sum, Count, F, Q
+    from django.db.models import Sum, Count
     
-    all_records = EquipoJugadorTemporada.objects.all()
-    total_records = all_records.count()
-    updated_count = 0
-    
-    print(f"Procesando {total_records} registros de Equipo-Jugador-Temporada...")
-    
+    # Agregar campos a precalcular (nombres reales del modelo EstadisticasPartidoJugador)
+    stat_fields = [
+        'gol_partido', 'asist_partido', 'tiro_puerta_partido', 'tiros',
+        'despejes', 'entradas', 'bloqueos', 'pases_totales', 'pases_clave',
+        'faltas_cometidas', 'regates', 'regates_completados', 'duelos'
+    ]
     stats_grupos = {
-        'ataque': ['goles', 'asistencias', 'tiros_puerta', 'tiros_total'],
+        'ataque': ['gol_partido', 'asist_partido', 'tiro_puerta_partido', 'tiros'],
         'defensa': ['despejes', 'entradas', 'bloqueos'],
-        'organizacion': ['pases', 'pases_clave', 'faltas_cometidas'],
-        'regates_block': ['regates_intentados', 'regates_exitosos', 'duelos_totales']
+        'organizacion': ['pases_totales', 'pases_clave', 'faltas_cometidas'],
+        'regates_block': ['regates', 'regates_completados', 'duelos']
     }
     
-    for idx, equipo_jug_temp in enumerate(all_records, 1):
-        if idx % 50 == 0:
-            print(f"  Progreso: {idx}/{total_records}")
-        
-        # Obtener posición del jugador en esa temporada
-        position_stats = EstadisticasPartidoJugador.objects.filter(
-            jugador=equipo_jug_temp.jugador,
-            partido__temporada=equipo_jug_temp.temporada
-        ).values('posicion').annotate(count=Count('posicion')).order_by('-count').first()
-        
-        if not position_stats:
+    all_records = list(EquipoJugadorTemporada.objects.select_related('jugador', 'temporada'))
+    total_records = len(all_records)
+    _log.info("[FASE 4] Precalculando percentiles para %d registros...", total_records)
+    
+    # Mapeo: {temporada_id: {posicion: {jugador_id: stats_dict}}}
+    stats_cache = {}
+    
+    for temporada_id in set(r.temporada_id for r in all_records):
+        stats_cache[temporada_id] = {}
+        # Traer stats agregados de TODOS los jugadores para esta temporada
+        all_stats_temp = EstadisticasPartidoJugador.objects.filter(
+            partido__jornada__temporada_id=temporada_id
+        ).values('jugador_id').annotate(
+            **{f: Sum(f) for f in stat_fields}
+        )
+        for row in all_stats_temp:
+            stats_cache[temporada_id][row['jugador_id']] = {f: row.get(f, 0) for f in stat_fields}
+    
+    # Determinar posición más frecuente por temporada (evita N queries más)
+    position_cache = {}
+    for temporada_id in set(r.temporada_id for r in all_records):
+        position_cache[temporada_id] = {}
+        pos_data = EstadisticasPartidoJugador.objects.filter(
+            partido__jornada__temporada_id=temporada_id,
+            posicion__isnull=False
+        ).values('jugador_id', 'posicion').annotate(cnt=Count('id')).order_by('jugador_id', '-cnt')
+        # Deduplicar en Python: para cada jugador_id, tomar la posición más frecuente
+        seen = set()
+        for row in pos_data:
+            jid = row['jugador_id']
+            if jid not in seen and row['posicion']:
+                seen.add(jid)
+                position_cache[temporada_id][jid] = row['posicion']
+    
+    # PROCESAR: ahora con datos en caché
+    to_update = []
+    
+    for idx, ejt in enumerate(all_records, 1):
+        posicion = position_cache.get(ejt.temporada_id, {}).get(ejt.jugador_id)
+        if not posicion:
             continue
         
-        posicion = position_stats['posicion']
-        equipo_jug_temp.posicion = posicion
+        ejt.posicion = posicion
         
-        # Obtener stats del jugador para esta temporada
-        stats_jugador = EstadisticasPartidoJugador.objects.filter(
-            jugador=equipo_jug_temp.jugador,
-            partido__temporada=equipo_jug_temp.temporada
-        ).aggregate(
-            goles=Sum('goles') or 0,
-            asistencias=Sum('asistencias') or 0,
-            tiros_puerta=Sum('tiros_puerta') or 0,
-            tiros_total=Sum('tiros_total') or 0,
-            despejes=Sum('despejes') or 0,
-            entradas=Sum('entradas') or 0,
-            bloqueos=Sum('bloqueos') or 0,
-            pases=Sum('pases') or 0,
-            pases_clave=Sum('pases_clave') or 0,
-            faltas_cometidas=Sum('faltas_cometidas') or 0,
-            regates_intentados=Sum('regates_intentados') or 0,
-            regates_exitosos=Sum('regates_exitosos') or 0,
-            duelos_totales=Sum('duelos_totales') or 0
-        )
+        # Obtener stats del jugador desde el caché
+        stats_jugador = stats_cache.get(ejt.temporada_id, {}).get(ejt.jugador_id, {k: 0 for k in stat_fields})
         
-        # Obtener estadísticas de todos los jugadores con la misma posición en esa temporada
-        peers_stats = EstadisticasPartidoJugador.objects.filter(
-            jugador__equipojugadortemporada__posicion=posicion,
-            partido__temporada=equipo_jug_temp.temporada
-        ).values('jugador').annotate(
-            goles=Sum('goles') or 0,
-            asistencias=Sum('asistencias') or 0,
-            tiros_puerta=Sum('tiros_puerta') or 0,
-            tiros_total=Sum('tiros_total') or 0,
-            despejes=Sum('despejes') or 0,
-            entradas=Sum('entradas') or 0,
-            bloqueos=Sum('bloqueos') or 0,
-            pases=Sum('pases') or 0,
-            pases_clave=Sum('pases_clave') or 0,
-            faltas_cometidas=Sum('faltas_cometidas') or 0,
-            regates_intentados=Sum('regates_intentados') or 0,
-            regates_exitosos=Sum('regates_exitosos') or 0,
-            duelos_totales=Sum('duelos_totales') or 0
-        )
+        # Obtener peers: jugadores con la misma posición en la temporada
+        peers_stats_dict = {}
+        for jug_id, stats in stats_cache.get(ejt.temporada_id, {}).items():
+            if position_cache.get(ejt.temporada_id, {}).get(jug_id) == posicion:
+                peers_stats_dict[jug_id] = stats
         
-        if not peers_stats:
-            equipo_jug_temp.save()
-            updated_count += 1
+        if not peers_stats_dict:
+            to_update.append(ejt)
             continue
         
         # Calcular percentiles
         percentiles = {}
-        
         for grupo, stats_list in stats_grupos.items():
             percentiles[grupo] = {}
             for stat in stats_list:
-                valor_jugador = stats_jugador.get(stat, 0)
-                valores_peers = [p[stat] for p in peers_stats]
+                valor_jugador = stats_jugador.get(stat, 0) or 0
+                valores_peers = [s.get(stat, 0) or 0 for s in peers_stats_dict.values()]
                 
-                if valores_peers and valor_jugador is not None:
+                if valores_peers:
                     try:
-                        percentil = scipy_stats.percentileofscore(valores_peers, valor_jugador)
-                        percentiles[grupo][stat] = round(percentil, 2)
+                        percentil = scipy_stats.percentileofscore(valores_peers, valor_jugador, nan_policy='omit')
+                        percentiles[grupo][stat] = round(float(percentil), 2)
                     except:
-                        percentiles[grupo][stat] = 0
+                        percentiles[grupo][stat] = 0.0
                 else:
-                    percentiles[grupo][stat] = 0
+                    percentiles[grupo][stat] = 0.0
         
-        equipo_jug_temp.percentiles = percentiles
-        equipo_jug_temp.save()
-        updated_count += 1
+        ejt.percentiles = percentiles
+        to_update.append(ejt)
     
-    print(f"\n[OK] Percentiles precalculados y almacenados: {updated_count} registros procesados")
+    # BULK UPDATE: guardar todo de una sola vez (en lugar de 1000+ saves)
+    if to_update:
+        EquipoJugadorTemporada.objects.bulk_update(
+            to_update, 
+            ['posicion', 'percentiles'],
+            batch_size=500
+        )
+    _log.info("[FASE 4] Percentiles actualizados: %d registros", len(to_update))
 
 
 

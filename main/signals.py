@@ -13,13 +13,13 @@ except ImportError:
     MODELS_AVAILABLE = False
 
 try:
-    from .elasticsearch_docs import opensearch_client, ELASTICSEARCH_AVAILABLE
+    from .opensearch_docs import opensearch_client, OPENSEARCH_AVAILABLE
 except ImportError:
     opensearch_client = None
-    ELASTICSEARCH_AVAILABLE = False
+    OPENSEARCH_AVAILABLE = False
 
 
-if MODELS_AVAILABLE and ELASTICSEARCH_AVAILABLE and opensearch_client:
+if MODELS_AVAILABLE and OPENSEARCH_AVAILABLE and opensearch_client:
     import json
     
     @receiver(post_save, sender=Jugador)
@@ -186,4 +186,43 @@ try:
         transaction.on_commit(_lanzar)
 
 except Exception:
-    logger.info("AutoPredicción: EstadisticasPartidoJugador no disponible aún")
+    logger.info("AutoPrediccion: EstadisticasPartidoJugador no disponible aun")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NOTIFICACIONES: push por WebSocket cuando se crea una nueva notificacion
+# ─────────────────────────────────────────────────────────────────────────────
+from .models import Notificacion as _Notificacion
+
+@receiver(post_save, sender=_Notificacion)
+def notificacion_creada_ws(sender, instance, created, **kwargs):
+    """Push the new notification to the user's WebSocket group."""
+    if not created:
+        return
+    try:
+        from channels.layers import get_channel_layer
+        from asgiref.sync import async_to_sync
+        channel_layer = get_channel_layer()
+        if channel_layer is None:
+            return
+        no_leidas = _Notificacion.objects.filter(
+            usuario=instance.usuario, leida=False
+        ).count()
+        async_to_sync(channel_layer.group_send)(
+            f'notificaciones_{instance.usuario_id}',
+            {
+                'type': 'notificacion_nueva',
+                'notificacion': {
+                    'id': instance.id,
+                    'tipo': instance.tipo,
+                    'titulo': instance.titulo,
+                    'mensaje': instance.mensaje,
+                    'leida': instance.leida,
+                    'creada_en': instance.fecha_creada.isoformat(),
+                    'datos': instance.datos,
+                },
+                'no_leidas': no_leidas,
+            },
+        )
+    except Exception as exc:
+        logger.warning('No se pudo enviar notificacion WS: %s', exc)

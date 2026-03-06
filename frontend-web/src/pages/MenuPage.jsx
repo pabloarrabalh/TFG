@@ -6,6 +6,7 @@ import GlassPanel from '../components/ui/GlassPanel'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import TeamShield from '../components/ui/TeamShield'
 import HelpButton from '../components/ui/HelpButton'
+import { Riple } from 'react-loading-indicators'
 
 const BACKEND = 'http://localhost:8000'
 
@@ -23,17 +24,61 @@ export default function MenuPage() {
   const { user } = useAuth()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [jornada, setJornada] = useState(null)
+  const [jugadoresDestacados, setJugadoresDestacados] = useState(null)
+  const [loadingJugadores, setLoadingJugadores] = useState(true)
 
-  useEffect(() => {
-    apiClient.get('/api/menu/')
+  const loadMenuData = (jornadaNum) => {
+    setLoading(true)
+    const url = jornadaNum ? `/api/menu/?jornada=${jornadaNum}` : '/api/menu/'
+    apiClient.get(url)
       .then(({ data }) => setData(data))
       .catch(() => {})
       .finally(() => setLoading(false))
+  }
+
+  const loadJugadoresDestacados = (jornadaNum) => {
+    // La próxima jornada es jornadaNum + 1
+    const proxima = jornadaNum ? jornadaNum + 1 : null
+    if (!proxima) {
+      setLoadingJugadores(false)
+      return
+    }
+    setLoadingJugadores(true)
+    setJugadoresDestacados(null)
+    apiClient.get(`/api/menu/top-jugadores/?jornada=${proxima}`)
+      .then(({ data }) => setJugadoresDestacados(data.jugadores_destacados_por_posicion || {}))
+      .catch(() => setJugadoresDestacados({}))
+      .finally(() => setLoadingJugadores(false))
+  }
+
+  useEffect(() => {
+    // Cargar jornada inicial del localStorage
+    const saved = localStorage.getItem('jornada_global')
+    const jornadaInicial = saved ? parseInt(saved) : null
+    setJornada(jornadaInicial)
+    loadMenuData(jornadaInicial)
+    loadJugadoresDestacados(jornadaInicial)
   }, [])
 
-  if (loading) return <LoadingSpinner />
+  // Escuchar cambios de jornada desde el sidebar
+  useEffect(() => {
+    const handleJornadaChange = (e) => {
+      const newJornada = e.detail.jornada
+      setJornada(newJornada)
+      loadMenuData(newJornada)
+      loadJugadoresDestacados(newJornada)
+    }
+    
+    window.addEventListener('jornadaChanged', handleJornadaChange)
+    return () => window.removeEventListener('jornadaChanged', handleJornadaChange)
+  }, [])
+
+  if (loading && !data) return <LoadingSpinner />
 
   const { clasificacion_top = [], jornada_actual, proxima_jornada, partidos_proxima_jornada = [], partidos_favoritos = [] } = data || {}
+
+  const POSICIONES_GRID = [['Portero', 'Defensa'], ['Centrocampista', 'Delantero']]
 
   return (
     <div className="p-6 space-y-6 bg-background-dark min-h-full">
@@ -227,56 +272,70 @@ export default function MenuPage() {
               <div>
                 <h3 className="text-xl font-black text-white">Jugadores Destacados</h3>
                 <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">
-                  {proxima_jornada ? `Próxima Jornada - J${proxima_jornada.numero}` : 'Próxima jornada'}
+                  {proxima_jornada ? `Predicción — J${proxima_jornada.numero}` : 'Predicción próxima jornada'}
                 </p>
               </div>
             </div>
 
-            {data?.jugadores_destacados_por_posicion && Object.keys(data.jugadores_destacados_por_posicion).some(pos => data.jugadores_destacados_por_posicion[pos].length > 0) ? (
-              <div className="space-y-6">
-                {['Portero', 'Defensa', 'Centrocampista', 'Delantero'].map((posicion) => {
-                  const jugadores = data.jugadores_destacados_por_posicion[posicion] || []
-                  if (jugadores.length === 0) return null
-                  
+            {!user ? (
+              <div className="text-center bg-surface-dark border border-border-dark rounded-2xl p-8 space-y-3">
+                <span className="material-symbols-outlined text-4xl text-primary block mb-2">person_add</span>
+                <p className="text-white font-bold">Inicia sesión para ver jugadores destacados</p>
+                <p className="text-sm text-gray-400">Accede a tu cuenta para disfrutar de predicciones personalizadas y seguimiento de jugadores</p>
+                <Link
+                  to="/login"
+                  className="inline-block mt-4 bg-primary hover:bg-primary-dark text-black px-6 py-2 rounded-lg font-bold uppercase tracking-wider transition-all text-sm"
+                >
+                  Iniciar sesión
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-6">
+                {POSICIONES_GRID.flat().map((posicion) => {
+                  const jugadores = jugadoresDestacados?.[posicion] || []
+                  const isLoadingPos = loadingJugadores
                   return (
                     <div key={posicion}>
                       <h4 className="text-sm font-bold text-primary mb-3 uppercase">{posicion}</h4>
-                      <div className="space-y-2">
-                        {jugadores.map((jug, idx) => (
-                          <Link
-                            key={jug.id}
-                            to={`/jugador/${jug.id}`}
-                            className="flex items-center gap-3 p-3 bg-surface-dark border border-border-dark rounded-lg hover:bg-white/5 hover:border-primary/50 transition-all group"
-                          >
-                            <div className="flex-shrink-0">
-                              <TeamShield escudo={jug.equipo_escudo} nombre={jug.equipo} className="size-8 rounded-lg object-contain" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-bold text-white text-sm group-hover:text-primary transition-colors">
-                                {jug.nombre} {jug.apellido}
-                              </p>
-                              <p className="text-xs text-gray-500">{jug.equipo} • #{jug.dorsal}</p>
-                            </div>
-                            <div className="flex items-center gap-3 flex-shrink-0">
-                              <div className="text-right">
-                                <p className="text-xs text-gray-400">vs</p>
-                                <p className="text-xs font-bold text-white">{jug.proximo_rival}</p>
+                      {isLoadingPos ? (
+                        <div className="flex items-center justify-center h-24">
+                          <Riple color="#32cd32" size="medium" text="" textColor="" />
+                        </div>
+                      ) : jugadores.length > 0 ? (
+                        <div className="space-y-2">
+                          {jugadores.map((jug) => (
+                            <Link
+                              key={jug.id}
+                              to={`/jugador/${jug.id}`}
+                              className="flex items-center gap-3 p-3 bg-surface-dark border border-border-dark rounded-lg hover:bg-white/5 hover:border-primary/50 transition-all group"
+                            >
+                              <div className="flex-shrink-0">
+                                <TeamShield escudo={jug.equipo_escudo} nombre={jug.equipo} className="size-8 rounded-lg object-contain" />
                               </div>
-                              <span className="text-sm font-bold text-primary bg-primary/20 px-2.5 py-1 rounded whitespace-nowrap">
-                                {jug.prediccion} pts
-                              </span>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-bold text-white text-sm group-hover:text-primary transition-colors">
+                                  {jug.nombre} {jug.apellido}
+                                </p>
+                                <p className="text-xs text-gray-500">{jug.equipo} • #{jug.dorsal}</p>
+                              </div>
+                              <div className="flex items-center gap-3 flex-shrink-0">
+                                <div className="text-right">
+                                  <p className="text-xs text-gray-400">vs</p>
+                                  <p className="text-xs font-bold text-white">{jug.proximo_rival}</p>
+                                </div>
+                                <span className="text-sm font-bold text-primary bg-primary/20 px-2.5 py-1 rounded whitespace-nowrap">
+                                  {jug.prediccion.toFixed(1)} pts
+                                </span>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-gray-500 italic py-4 text-center">Sin datos disponibles</p>
+                      )}
                     </div>
                   )
                 })}
-              </div>
-            ) : (
-              <div className="text-center text-gray-500 py-6">
-                <span className="material-symbols-outlined text-3xl mb-2 block">trending_up</span>
-                <p className="text-sm">Estadísticas disponibles al inicio de la jornada</p>
               </div>
             )}
           </GlassPanel>

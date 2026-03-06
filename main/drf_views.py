@@ -24,7 +24,7 @@ from .models import (
     EquipoJugadorTemporada, EstadisticasPartidoJugador,
     ClasificacionJornada, PrediccionJugador,
 )
-from .api_views import shield_name
+from .views.utils import shield_name
 
 
 # ─────────────────────────────────────────────────────────────────────────────

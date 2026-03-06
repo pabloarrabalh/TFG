@@ -95,6 +95,7 @@ export default function PerfilPage() {
     }
   }
 
+
   async function deleteFavorite(id) {
     try {
       await api.delete(`/api/favoritos/${id}/`)

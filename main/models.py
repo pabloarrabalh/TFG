@@ -275,6 +275,15 @@ class EstadisticasPartidoJugador(models.Model):
     duelos_aereos_perdidos = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     duelos_aereos_ganados_pct = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(100)])
     
+    # Balones parados y pases clave
+    lanzadores_penalties = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    lanzadores_corners = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    pases_clave = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    
+    # Faltas
+    faltas_cometidas = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    faltas_recibidas = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    
     # Roles destacados (JSON array of role objects)
     roles = models.JSONField(default=list, blank=True)
     
@@ -368,6 +377,7 @@ class UserProfile(models.Model):
     preferencias_notificaciones = models.CharField(
         max_length=10, choices=NOTIF_CHOICES, default='all'
     )
+    jornada_pref = models.IntegerField(null=True, blank=True)  # Jornada preferida del usuario (None = usar actual)
 
     class Meta:
         verbose_name = 'Perfil de Usuario'
@@ -503,12 +513,14 @@ class PrediccionJugador(models.Model):
         ('xgb', 'XGBoost'),
         ('rf', 'Random Forest'),
         ('lgbm', 'LightGBM'),
+        ('ridge', 'Ridge Regression'),
+        ('baseline', 'Baseline (Media)'),
     ]
 
     jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE, related_name='predicciones')
     jornada = models.ForeignKey('Jornada', on_delete=models.CASCADE, related_name='predicciones_jugadores')
     prediccion = models.FloatField(help_text='Puntos fantasy predichos')
-    modelo = models.CharField(max_length=10, choices=MODELOS, default='xgb')
+    modelo = models.CharField(max_length=10, choices=MODELOS, default='rf')
     creada_en = models.DateTimeField(auto_now_add=True)
 
     class Meta:

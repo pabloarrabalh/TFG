@@ -207,45 +207,75 @@ def api_buscar(request):
     """
     GET /api/buscar/?q=QUERY
     Busca jugadores y equipos usando OpenSearch
-    Requiere al menos 3 caracteres
-    Retorna máximo 5 resultados
+    Requiere mínimo 2 caracteres
+    Retorna máximo 10 resultados
+    Usa: prefix matching (prioridad) + fuzzy matching (similitud)
     """
     try:
         query = request.GET.get('q', '').strip()
         
-        if len(query) < 3:
+        if len(query) < 2:
             return JsonResponse({
                 'status': 'error',
-                'message': 'Mínimo 3 caracteres requeridos',
+                'message': 'Mínimo 2 caracteres requeridos',
                 'results': []
             }, status=400)
         
+        from main.models import Equipo
+        
+        # OpenSearch es OBLIGATORIO
         try:
-            from main.elasticsearch_docs import opensearch_client, ELASTICSEARCH_AVAILABLE
+            from main.opensearch_docs import opensearch_client, OPENSEARCH_AVAILABLE
             
-            if not ELASTICSEARCH_AVAILABLE or not opensearch_client:
+            if not OPENSEARCH_AVAILABLE or not opensearch_client:
                 return JsonResponse({
                     'status': 'error',
-                    'message': 'OpenSearch no está disponible',
+                    'message': 'OpenSearch no está disponible. Asegurate de que esté corriendo en localhost:9200 y reinicia el servidor.',
                     'results': []
                 }, status=503)
         except ImportError as e:
             logger.error(f"Error importando OpenSearch: {str(e)}")
             return JsonResponse({
                 'status': 'error',
-                'message': 'OpenSearch no está configurado',
+                'message': 'OpenSearch no está configurado correctamente. Ejecuta: pip install -r requirements.txt',
                 'results': []
             }, status=503)
         
         resultados = []
         
         try:
-            # Búsqueda de jugadores con multi_match y fuzziness
+            # Búsqueda de jugadores: prefix + fuzzy matching
             try:
                 search_body_jugador = {
                     "query": {
                         "bool": {
                             "should": [
+                                # Prefix matching (coincidencia exacta al inicio) - muy prioritario
+                                {
+                                    "match_phrase_prefix": {
+                                        "nombre_completo": {
+                                            "query": query,
+                                            "boost": 10
+                                        }
+                                    }
+                                },
+                                {
+                                    "match_phrase_prefix": {
+                                        "nombre": {
+                                            "query": query,
+                                            "boost": 8
+                                        }
+                                    }
+                                },
+                                {
+                                    "match_phrase_prefix": {
+                                        "apellido": {
+                                            "query": query,
+                                            "boost": 8
+                                        }
+                                    }
+                                },
+                                # Fuzzy matching (similitud) - menos prioritario
                                 {
                                     "match": {
                                         "nombre_completo": {
@@ -277,7 +307,7 @@ def api_buscar(request):
                             "minimum_should_match": 1
                         }
                     },
-                    "size": 5
+                    "size": 10
                 }
                 
                 response = opensearch_client.search(
@@ -312,9 +342,10 @@ def api_buscar(request):
                     except Exception as e:
                         logger.warning(f"Error procesando resultado de jugador: {str(e)}")
             except Exception as e:
-                logger.warning(f"Error en búsqueda de jugadores OpenSearch: {str(e)}")
+                logger.error(f"Error en búsqueda de jugadores OpenSearch: {str(e)}")
+                raise
             
-            # Búsqueda de equipos
+            # Búsqueda de equipos: prefix + fuzzy matching
             try:
                 # Obtener la temporada actual (última disponible)
                 temporadas = Temporada.objects.all().order_by('-nombre')
@@ -324,6 +355,24 @@ def api_buscar(request):
                     "query": {
                         "bool": {
                             "should": [
+                                # Prefix matching - muy prioritario
+                                {
+                                    "match_phrase_prefix": {
+                                        "nombre": {
+                                            "query": query,
+                                            "boost": 10
+                                        }
+                                    }
+                                },
+                                {
+                                    "match_phrase_prefix": {
+                                        "estadio": {
+                                            "query": query,
+                                            "boost": 5
+                                        }
+                                    }
+                                },
+                                # Fuzzy matching - menos prioritario
                                 {
                                     "match": {
                                         "nombre": {
@@ -346,7 +395,7 @@ def api_buscar(request):
                             "minimum_should_match": 1
                         }
                     },
-                    "size": 5
+                    "size": 10
                 }
                 
                 response = opensearch_client.search(
@@ -363,13 +412,14 @@ def api_buscar(request):
                         'url': f'/equipo/{source.get("nombre")}/{temporada_actual}/'
                     })
             except Exception as e:
-                logger.warning(f"Error en búsqueda de equipos OpenSearch: {str(e)}")
+                logger.error(f"Error en búsqueda de equipos OpenSearch: {str(e)}")
+                raise
         
         except Exception as e:
-            logger.error(f"Error en búsqueda OpenSearch: {str(e)}")
+            logger.error(f"Error en búsqueda OpenSearch: {str(e)}", exc_info=True)
             return JsonResponse({
                 'status': 'error',
-                'message': 'Error conectando a OpenSearch',
+                'message': f'Error en búsqueda: {str(e)}',
                 'results': []
             }, status=503)
         
