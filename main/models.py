@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Count
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
@@ -90,8 +92,6 @@ class Jugador(models.Model):
             string: La posición más frecuente (Portero, Defensa, Centrocampista, Delantero)
                    o None si no tiene estadísticas
         """
-        from django.db.models import Count
-        
         # Obtener conteo de posiciones en EstadisticasPartidoJugador
         posiciones = (
             self.estadisticas_partidos
@@ -175,7 +175,6 @@ class Partido(models.Model):
         return f"{self.equipo_local} vs {self.equipo_visitante}"
 
     def clean(self):
-        from django.core.exceptions import ValidationError
         if self.equipo_local == self.equipo_visitante:
             raise ValidationError("El equipo local y visitante no pueden ser el mismo")
 
@@ -371,7 +370,7 @@ class UserProfile(models.Model):
     
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='profile')
     nickname = models.CharField(max_length=100, blank=True, default='')
-    foto = models.FileField(upload_to='profile_pics/%Y/%m/%d/', null=True, blank=True)
+    foto = models.FileField(upload_to='profile_pics/', null=True, blank=True)
     estado = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
     plantilla_guardada = models.TextField(blank=True, default='{}')  # JSON con la alineación guardada
     preferencias_notificaciones = models.CharField(

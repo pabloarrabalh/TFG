@@ -3,10 +3,12 @@ DRF API views – Menu / Home page data
 Endpoints:
   GET /api/menu/
 """
+import importlib
 import logging
 import sys as _sys
 import threading as _th
 from datetime import datetime
+from pathlib import Path
 
 from django.core.cache import cache
 from django.db.models import Count, Q
@@ -60,19 +62,6 @@ def _get_jugadores_destacados_con_predicciones(temporada, proxima_jornada, jorna
         .values('jugador_id', 'jugador__nombre', 'jugador__apellido',
                 'equipo_id', 'equipo__nombre', 'posicion', 'dorsal')
     }
-
-    # Position fallback from match stats for players with NULL ejt.posicion
-    pos_fallback = {}
-    for row in (
-        EstadisticasPartidoJugador.objects
-        .filter(partido__jornada__temporada=temporada, posicion__isnull=False)
-        .exclude(posicion='')
-        .values('jugador_id', 'posicion')
-        .annotate(cnt=Count('id'))
-        .order_by('jugador_id', '-cnt')
-    ):
-        if row['jugador_id'] not in pos_fallback:
-            pos_fallback[row['jugador_id']] = row['posicion']
 
     # Skip players with sum < 60 min in last 4 matches (omit from destacados)
     _min_sum_fast: dict = {}
@@ -133,7 +122,7 @@ def _get_jugadores_destacados_con_predicciones(temporada, proxima_jornada, jorna
             continue
         if jugador_id in skip_pocos_minutos:
             continue
-        posicion = ejt['posicion'] or pos_fallback.get(jugador_id)
+        posicion = ejt['posicion'] or 'Delantero'
         if posicion not in posiciones:
             continue
         candidatos_pos[posicion].append({
@@ -163,8 +152,6 @@ class MenuView(APIView):
 
     @cache_api_response(timeout=180, key_prefix='menu')
     def get(self, request):
-        from datetime import datetime
-
         temporada = Temporada.objects.order_by('-nombre').first()
         empty = {
             'clasificacion_top': [],
@@ -277,14 +264,6 @@ def _bg_compute_predictions(temporada_id, jornada_num, cache_key):
     Computes ML predictions for ALL players of the season and saves them to
     PrediccionJugador so future DB-backed reads are fast.
     """
-    from pathlib import Path
-    from django.db.models import Count
-    from ..models import (
-        Temporada, Jornada, EquipoJugadorTemporada,
-        EstadisticasPartidoJugador, Calendario, PrediccionJugador,
-    )
-    from ..views.utils import shield_name
-
     try:
         temporada = Temporada.objects.get(pk=temporada_id)
         jornada_obj = Jornada.objects.get(temporada=temporada, numero_jornada=jornada_num)
@@ -296,7 +275,6 @@ def _bg_compute_predictions(temporada_id, jornada_num, cache_key):
     if str(entren_path) not in _sys.path:
         _sys.path.insert(0, str(entren_path))
     try:
-        import importlib
         mod = importlib.import_module('predecir')
         predecir_puntos = getattr(mod, 'predecir_puntos')
     except Exception as e:

@@ -1,8 +1,6 @@
 ﻿"""
-views/__init__.py  façade for the views subpackage.
-
-Importing from `main.views` still works transparently for all url patterns.
-All logic lives in the sibling modules (utils, menu, auth, ).
+views/__init__.py – re-exports shared utility helpers used by main/api/*.py modules.
+All HTML template views have been removed; the frontend is a React SPA.
 """
 
 from .utils import (  # noqa: F401
@@ -19,38 +17,4 @@ from .utils import (  # noqa: F401
     get_jugadores_ultimas_temporadas,
     get_informacion_equipo,
     calcular_percentil,
-)
-
-from .menu import menu  # noqa: F401
-from .plantilla import (  # noqa: F401
-    mi_plantilla,
-    guardar_plantilla,
-    listar_plantillas,
-    obtener_plantilla,
-    eliminar_plantilla,
-    renombrar_plantilla,
-)
-from .equipo import equipos, equipo  # noqa: F401
-from .clasificacion import clasificacion  # noqa: F401
-from .jugador import jugador  # noqa: F401
-from .auth import (  # noqa: F401
-    amigos,
-    login_register,
-    login_view,
-    register_view,
-    select_favorite_teams,
-    toggle_favorite_team,
-    logout_view,
-    terms_conditions,
-    perfil_usuario,
-    upload_profile_photo,
-    update_profile,
-    update_user_status,
-    delete_favorite_team,
-)
-from .predicciones import (  # noqa: F401
-    predecir_portero_api,
-    cambiar_jornada_api,
-    explicar_prediccion_portero_api,
-    predecir_jugador_api,
 )

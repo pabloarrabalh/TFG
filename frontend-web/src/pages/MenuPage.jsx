@@ -161,7 +161,7 @@ export default function MenuPage() {
               <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
                 {partidos_proxima_jornada.map((p, i) => (
                   <div key={i} className="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 hover:border-primary/50 transition-all">
-                    <div className="grid items-center gap-2" style={{ gridTemplateColumns: '1fr auto 1fr' }}>
+                    <div className="grid items-center gap-2 grid-cols-[1fr_auto_1fr]">
                       <Link to={`/equipo/${encodeURIComponent(p.equipo_local)}`} className="flex items-center gap-2 min-w-0 hover:text-primary transition-colors">
                         <TeamShield escudo={p.equipo_local_escudo} nombre={p.equipo_local} className="size-10 object-contain flex-shrink-0" />
                         <div className="min-w-0">
@@ -214,7 +214,7 @@ export default function MenuPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {partidos_favoritos.map((p, i) => (
                     <div key={i} className="bg-surface-dark border border-border-dark rounded-xl p-4 hover:bg-white/5 transition-all">
-                      <div className="grid items-center gap-2" style={{ gridTemplateColumns: '1fr auto 1fr' }}>
+                      <div className="grid items-center gap-2 grid-cols-[1fr_auto_1fr]">
                         <Link to={`/equipo/${encodeURIComponent(p.equipo_local)}`} className="flex items-center gap-3 hover:text-primary transition-colors">
                           <TeamShield escudo={p.equipo_local_escudo} nombre={p.equipo_local} className="size-10 object-contain" />
                           <div>
@@ -341,12 +341,7 @@ export default function MenuPage() {
           </GlassPanel>
         </div>
       </div>
-      <HelpButton title="Guía del menú" fields={[
-        { label: 'Jornada', description: 'Jornada de liga actualmente en curso o la más reciente disputada.' },
-        { label: 'Clasificación', description: 'Top 5 de equipos por puntos en la jornada más reciente.' },
-        { label: 'Próxima jornada', description: 'Partidos programados para la siguiente jornada de liga.' },
-        { label: 'Favoritos', description: 'Partidos que involucran a los equipos marcados como favoritos.' },
-      ]} />
+      
     </div>
   )
 }

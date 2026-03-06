@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+﻿import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import api from '../services/apiClient'
 import HelpButton from '../components/ui/HelpButton'
@@ -407,7 +407,7 @@ export default function JugadorPage() {
               <div className="flex flex-wrap gap-2 mb-4">
                 {posicion && (
                   <span className="posicion-badge">
-                    <span className="material-symbols-outlined align-middle mr-2" style={{ fontSize: '1rem' }}>sports_soccer</span>
+                    <span className="material-symbols-outlined align-middle mr-2 icon-sm">sports_soccer</span>
                     {posicion}
                   </span>
                 )}
@@ -522,7 +522,7 @@ export default function JugadorPage() {
                 {/* BLOQUE ATAQUE */}
                 <div>
                   <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
-                    <span className="material-symbols-outlined text-red-400" style={{ fontSize: '1.4rem' }}>local_fire_department</span>
+                    <span className="material-symbols-outlined text-red-400 icon-xl">local_fire_department</span>
                     Ataque
                   </h3>
                   <div className="space-y-2">
@@ -572,7 +572,7 @@ export default function JugadorPage() {
                 {/* BLOQUE ORGANIZACIÓN */}
                 <div>
                   <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
-                    <span className="material-symbols-outlined text-blue-400" style={{ fontSize: '1.4rem' }}>hub</span>
+                    <span className="material-symbols-outlined text-blue-400 icon-xl">hub</span>
                     Pase y Asistencias
                   </h3>
                   <div className="space-y-2">
@@ -601,7 +601,7 @@ export default function JugadorPage() {
                 {/* BLOQUE REGATES */}
                 <div>
                   <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
-                    <span className="material-symbols-outlined text-purple-400" style={{ fontSize: '1.4rem' }}>sprint</span>
+                    <span className="material-symbols-outlined text-purple-400 icon-xl">sprint</span>
                     Regates e Impulsión
                   </h3>
                   <div className="space-y-2">
@@ -627,7 +627,7 @@ export default function JugadorPage() {
                 {/* BLOQUE DEFENSA */}
                 <div>
                   <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
-                    <span className="material-symbols-outlined text-green-400" style={{ fontSize: '1.4rem' }}>shield</span>
+                    <span className="material-symbols-outlined text-green-400 icon-xl">shield</span>
                     Defensa
                   </h3>
                   <div className="space-y-2">
@@ -703,7 +703,7 @@ export default function JugadorPage() {
               {/* COMPORTAMIENTO */}
               <div>
                 <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
-                  <span className="material-symbols-outlined text-yellow-400" style={{ fontSize: '1.4rem' }}>flag</span>
+                  <span className="material-symbols-outlined text-yellow-400 icon-xl">flag</span>
                   Comportamiento
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
@@ -722,7 +722,7 @@ export default function JugadorPage() {
               {posicion === "Portero" && (
                 <div>
                   <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider flex items-center gap-2">
-                    <span className="material-symbols-outlined text-orange-400" style={{ fontSize: '1.4rem' }}>sports_handball</span>
+                    <span className="material-symbols-outlined text-orange-400 icon-xl">sports_handball</span>
                     Portero
                   </h3>
                   <div className="grid grid-cols-3 gap-4">
@@ -748,7 +748,7 @@ export default function JugadorPage() {
           {/* Gráfico de todos los partidos - HISTOGRAMA CON SCROLL */}
           <div className="glass-panel rounded-2xl p-6">
             <h3 className="text-xl font-bold text-white mb-6 uppercase tracking-wider">
-              <span className="material-symbols-outlined align-middle mr-2" style={{ fontSize: '1.3rem' }}>trending_up</span>
+              <span className="material-symbols-outlined align-middle mr-2 icon-lg">trending_up</span>
               Partidos de la Temporada (Puntos Fantasy)
             </h3>
             
@@ -765,7 +765,7 @@ export default function JugadorPage() {
                   className="flex-shrink-0 bg-gradient-to-r from-primary to-primary/70 hover:from-primary/90 hover:to-primary text-white rounded-lg p-3 transition-all shadow-lg hover:shadow-xl"
                   title="Ver partidos anteriores"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: '1.5rem' }}>navigate_before</span>
+                  <span className="material-symbols-outlined icon-2xl">navigate_before</span>
                 </button>
 
                 {/* Contenedor scrolleable */}
@@ -872,7 +872,7 @@ export default function JugadorPage() {
                   className="flex-shrink-0 bg-gradient-to-r from-primary/70 to-primary hover:from-primary hover:to-primary/90 text-white rounded-lg p-3 transition-all shadow-lg hover:shadow-xl"
                   title="Ver próximos partidos"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: '1.5rem' }}>navigate_next</span>
+                  <span className="material-symbols-outlined icon-2xl">navigate_next</span>
                 </button>
               </div>
             ) : (
@@ -887,7 +887,7 @@ export default function JugadorPage() {
           {temporada === '25/26' && (
           <div className="glass-panel rounded-2xl p-6">
             <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-wider">
-              <span className="material-symbols-outlined align-middle mr-2" style={{ fontSize: '1.3rem' }}>psychology</span>
+              <span className="material-symbols-outlined align-middle mr-2 icon-lg">psychology</span>
               {predicciones && predicciones.some(p => p.is_early_jornada) ? (
                 predicciones.every(p => p.is_early_jornada) ? 'Media vs Real' : 'Predicción / Media vs Real'
               ) : 'Predicción vs Real'}
@@ -1038,7 +1038,7 @@ export default function JugadorPage() {
           {/* Perfil Táctico */}
           <div className="glass-panel rounded-2xl p-6">
             <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider">
-              <span className="material-symbols-outlined align-middle mr-2" style={{ fontSize: '1.2rem' }}>sports_soccer</span>
+              <span className="material-symbols-outlined align-middle mr-2 icon-md">sports_soccer</span>
               Perfil Táctico
             </h3>
             <div className="flex flex-col items-center gap-4">
@@ -1051,7 +1051,7 @@ export default function JugadorPage() {
                   onClick={generateRadar}
                   className="w-full px-4 py-2 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: '1.2rem' }}>play_arrow</span>
+                  <span className="material-symbols-outlined icon-md">play_arrow</span>
                   Generar Perfil Táctico
                 </button>
               )}
@@ -1060,7 +1060,7 @@ export default function JugadorPage() {
               {radarLoading && (
                 <div className="w-full flex flex-col items-center gap-2">
                   <div className="animate-spin">
-                    <span className="material-symbols-outlined text-primary" style={{ fontSize: '2rem' }}>hourglass_top</span>
+                    <span className="material-symbols-outlined text-primary icon-3xl">hourglass_top</span>
                   </div>
                   <p className="text-xs text-gray-400 text-center">Generando análisis táctico...</p>
                 </div>
@@ -1080,7 +1080,7 @@ export default function JugadorPage() {
           {/* Roles */}
           <div className="glass-panel rounded-2xl p-6">
             <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider">
-              <span className="material-symbols-outlined align-middle mr-2" style={{ fontSize: '1.2rem' }}>star</span>
+              <span className="material-symbols-outlined align-middle mr-2 icon-md">star</span>
               Roles Destacados
             </h3>
             {roles && roles.length > 0 ? (
@@ -1141,13 +1141,13 @@ export default function JugadorPage() {
           {/* AI Insight */}
           <div className="glass-panel rounded-2xl p-6">
             <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider">
-              <span className="material-symbols-outlined align-middle mr-2" style={{ fontSize: '1.2rem' }}>psychology</span>
+              <span className="material-symbols-outlined align-middle mr-2 icon-md">psychology</span>
               AI Insight
             </h3>
             {insightsLoading ? (
               <div className="flex flex-col items-center gap-2 py-6 text-gray-400">
                 <div className="animate-spin">
-                  <span className="material-symbols-outlined text-primary" style={{ fontSize: '2rem' }}>hourglass_top</span>
+                  <span className="material-symbols-outlined text-primary icon-3xl">hourglass_top</span>
                 </div>
                 <p className="text-xs">Analizando al jugador...</p>
               </div>
@@ -1216,7 +1216,7 @@ export default function JugadorPage() {
               onClick={() => setCompareModalOpen(true)}
               className="px-6 py-2 bg-primary hover:bg-primary/80 text-white font-bold rounded-lg transition-colors uppercase text-sm tracking-wide flex items-center gap-2"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: '1.2rem' }}>compare_arrows</span>
+              <span className="material-symbols-outlined icon-md">compare_arrows</span>
               Comparar
             </button>
           </div>
@@ -1358,7 +1358,7 @@ export default function JugadorPage() {
                 }}
                 className="text-gray-400 hover:text-white transition-colors"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: '1.5rem' }}>close</span>
+                <span className="material-symbols-outlined icon-2xl">close</span>
               </button>
             </div>
 
@@ -1608,7 +1608,7 @@ export default function JugadorPage() {
             onClick={() => setRolePopover(null)}
             className="absolute -top-3 -right-3 text-gray-400 hover:text-white transition-colors rounded-full p-1.5 bg-slate-900/95 border border-primary/50"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: '1.2rem' }}>close</span>
+            <span className="material-symbols-outlined icon-md">close</span>
           </button>
           <div className="mb-3">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Rol Destacado</p>
@@ -1645,7 +1645,7 @@ export default function JugadorPage() {
             onClick={() => setPercentilePopover(null)}
             className="absolute -top-2 -right-2 text-gray-300 hover:text-white transition-colors rounded-full p-1 bg-amber-900/90 border border-amber-600"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>close</span>
+            <span className="material-symbols-outlined icon-sm">close</span>
           </button>
           <div>
             <p className="text-xs font-bold text-yellow-300 uppercase tracking-wide mb-2">⭐ Percentil {percentilePopover.percentile} — {percentilePopover.stat}</p>
@@ -1658,7 +1658,7 @@ export default function JugadorPage() {
       <HelpButton title="Guía del jugador" sections={[
         { title: 'General', fields: [
           { label: 'PTS', description: 'Puntos fantasy totales acumulados en la temporada o carrera.' },
-          { label: 'PJ', description: 'Partidos jugados con al menos 1 minuto disputado.' },
+          { label: 'PJ', description: 'Partidos jugados.' },
           { label: 'MIN', description: 'Minutos totales jugados.' },
           { label: 'Percentil', description: 'Posición del jugador entre el 0% y 100% respecto al resto de jugadores de su misma posición en esa stat.' },
         ]},
@@ -1674,8 +1674,8 @@ export default function JugadorPage() {
         ]},
         { title: 'Defensa', fields: [
           { label: 'Entradas', description: 'Número de entradas (tackles) realizadas.' },
-          { label: 'Despejes', description: 'Balones despejados fuera del área propia.' },
-          { label: 'Duelos', description: 'Total de duelos disputados (ganados + perdidos).' },
+          { label: 'Despejes', description: 'Balones despejados.' },
+          { label: 'Duelos', description: 'Total de duelos disputados.' },
           { label: 'Aéreos', description: 'Duelos aéreos disputados.' },
         ]},
         { title: 'Portero', fields: [

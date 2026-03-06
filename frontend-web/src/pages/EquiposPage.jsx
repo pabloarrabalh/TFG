@@ -96,11 +96,6 @@ export default function EquiposPage() {
           </div>
         )}
       </div>
-      <HelpButton title="Guía de equipos" fields={[
-        { label: 'Jugadores', description: 'Número de jugadores registrados en la plantilla para la temporada actual.' },
-        { label: 'Favorito', description: 'Marca el equipo como favorito para acceder rápidamente a él desde el menú principal.' },
-      ]} />
-      
     </div>
     </>
     )

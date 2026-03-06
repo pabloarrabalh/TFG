@@ -136,4 +136,12 @@
   .league-table tr:last-child td { @apply border-b-0; }
   .league-table tr:hover td { @apply bg-white/5; }
   .league-table tr:hover td:first-child { @apply text-primary; }
+
+  /* Material Symbols icon size utilities */
+  .icon-sm   { font-size: 1rem; }
+  .icon-md   { font-size: 1.2rem; }
+  .icon-lg   { font-size: 1.3rem; }
+  .icon-xl   { font-size: 1.4rem; }
+  .icon-2xl  { font-size: 1.5rem; }
+  .icon-3xl  { font-size: 2rem; }
 }

@@ -6,6 +6,7 @@ Endpoints:
 import logging
 
 from django.db.models import Q, Sum, Count
+from django.utils.timezone import now
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -62,13 +63,12 @@ class ClasificacionView(APIView):
                     # Si la jornada específica no existe, usa la actual
                     jornada_obj = (
                         Jornada.objects.filter(
-                            temporada=temporada, fecha_fin__gte=__import__('django.utils.timezone', fromlist=['now']).now()
+                            temporada=temporada, fecha_fin__gte=now()
                         ).order_by('numero_jornada').first()
                         or Jornada.objects.filter(temporada=temporada).order_by('-numero_jornada').exclude(numero_jornada=38).first()
                     )
             else:
                 # Sin jornada en parámetros: usa la jornada actual (que ya jugó)
-                from django.utils.timezone import now
                 jornada_obj = (
                     Jornada.objects.filter(
                         temporada=temporada, fecha_fin__lt=now()

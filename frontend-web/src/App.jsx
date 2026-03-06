@@ -1,10 +1,10 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Layout from './components/layout/Layout'
 import LoadingSpinner from './components/ui/LoadingSpinner'
 
 // Pages (lazy-loaded)
-import { lazy, Suspense } from 'react'
 
 const LoginPage         = lazy(() => import('./pages/LoginPage'))
 const MenuPage          = lazy(() => import('./pages/MenuPage'))

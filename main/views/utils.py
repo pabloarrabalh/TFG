@@ -5,6 +5,7 @@ No Django request/response logic here — pure data helpers.
 import unicodedata
 import re
 from difflib import SequenceMatcher
+from scipy import stats as scipy_stats
 
 from django.db.models import Sum, Q, Count, Avg
 from django.core.cache import cache
@@ -487,8 +488,6 @@ def calcular_percentil(jugador_obj, temporada_obj, posicion, stat_field, es_carr
     Calcula el percentil de un jugador para un stat específico dentro de su posición y temporada.
     Retorna un número entre 0 y 100. Usa caché para evitar recálculos.
     """
-    from scipy import stats as scipy_stats
-
     temp_name = temporada_obj.nombre if temporada_obj else 'all'
     cache_key = f"percentil_{jugador_obj.id}_{temp_name}_{posicion}_{stat_field}"
 

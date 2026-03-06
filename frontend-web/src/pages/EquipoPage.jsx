@@ -296,7 +296,7 @@ export default function EquipoPage() {
                 className="w-32 h-32 object-contain flex-shrink-0"
               />
               <div className="flex-1 min-w-0">
-                <h1 className="text-3xl font-black text-white mb-2 truncate" style={{ maxWidth: '32rem' }}>
+                <h1 className="text-3xl font-black text-white mb-2 truncate max-w-lg">
                   {equipo.nombre?.toUpperCase() || 'EQUIPO'}
                 </h1>
                 <div className="flex items-center gap-6 text-white/80">

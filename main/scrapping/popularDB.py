@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 SCRIPT UNIFICADO COMPLETO DE CARGA DE DATOS
@@ -18,6 +18,7 @@ Uso: python popularDB.py
 
 import os
 import sys
+import logging
 import django
 import pandas as pd
 import json
@@ -38,7 +39,7 @@ from main.models import (
     ClasificacionJornada, RendimientoHistoricoJugador, EquipoJugadorTemporada,
     Calendario
 )
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Count, Q, Max
 from main.scrapping.alias import MAPEO_POSICIONES_INVERSO
 from main.scrapping.fbref import scrappear_calendario_para_bd
 from main.scrapping.transfermarkt import (
@@ -47,6 +48,12 @@ from main.scrapping.transfermarkt import (
     procesar_plantilla_equipo,
     mapear_equipo_tm_a_bd,
 )
+try:
+    from main.scrapping.roles import ROLES_DESTACADOS
+    from main.scrapping.commons import normalizar_texto
+except Exception:
+    ROLES_DESTACADOS = {}
+    normalizar_texto = None
 
 # Intentar importar rapidfuzz para fuzzy matching
 try:
@@ -395,7 +402,6 @@ def buscar_jugador_partido(nombre_csv, equipo, partido):
 
 def procesar_csv_partido(ruta_csv, temporada):
     """Procesa un CSV de partido y carga los datos."""
-    import logging
     _log = logging.getLogger(__name__)
     try:
         df = pd.read_csv(ruta_csv, encoding='utf-8-sig')
@@ -451,7 +457,6 @@ def fase_0a_crear_todas_las_jornadas():
     FASE 0a: Crea TODAS las jornadas (1-38) para cada temporada.
     Se ejecuta PRIMERO para que existan las jornadas aunque no haya partidos jugados aún.
     """
-    import logging
     _log = logging.getLogger(__name__)
     _log.info("[FASE 0a] Creando jornadas...")
     
@@ -479,7 +484,6 @@ def fase_0_scrapear_plantillas_y_estadios():
     Se ejecuta DESPUÉS de crear las jornadas para asegurar que todos los equipos
     tienen estadios actualizados en el modelo Equipo.
     """
-    import logging
     _log = logging.getLogger(__name__)
     _log.info("[FASE 0] Scrapando plantillas Transfermarkt...")
     
@@ -533,7 +537,6 @@ def fase_0_scrapear_plantillas_y_estadios():
 
 def fase_1_cargar_partidos_y_estadisticas():
     """FASE 1: Carga partidos y estadísticas iniciales."""
-    import logging
     _log = logging.getLogger(__name__)
     _log.info("[FASE 1] Cargando partidos y estadísticas...")
     
@@ -607,16 +610,8 @@ def actualizar_fechas_jornadas():
 
 def fase_2_cargar_roles():
     """FASE 2: Carga roles desde ROLES_DESTACADOS de roles.py (optimizado)."""
-    import logging
     _log = logging.getLogger(__name__)
     _log.info("[FASE 2] Cargando roles...")
-    
-    try:
-        from main.scrapping.roles import ROLES_DESTACADOS
-        from main.scrapping.commons import normalizar_texto
-    except Exception as e:
-        _log.warning("No se pudo importar ROLES_DESTACADOS: %s", e)
-        return
     
     if not ROLES_DESTACADOS:
         return
@@ -681,7 +676,6 @@ def fase_2b_cargar_goles():
 
 def fase_2c_cargar_clasificacion():
     """FASE 2c: Carga clasificación jornada."""
-    import logging
     _log = logging.getLogger(__name__)
     
     temporadas_map = {
@@ -741,7 +735,6 @@ def fase_2c_cargar_clasificacion():
 
 def fase_2d_cargar_rendimiento():
     """FASE 2d: Carga rendimiento histórico."""
-    import logging
     _log = logging.getLogger(__name__)
     
     creados = 0
@@ -793,10 +786,7 @@ def fase_2d_cargar_rendimiento():
 
 def fase_2e_poblar_equipo_jugador_temporada():
     """FASE 2e: Puebla EquipoJugadorTemporada con jugadores por temporada (ya creado en fase 1)."""
-    import logging
     _log = logging.getLogger(__name__)
-    
-    from django.db.models import Max
     
     temporadas = Temporada.objects.all()
     total_actualizado = 0
@@ -839,7 +829,6 @@ def fase_2e_poblar_equipo_jugador_temporada():
 
 def main():
     """Función principal: ejecuta todas las fases."""
-    import logging
     _log = logging.getLogger(__name__)
     _log.info("[popularDB] Iniciando carga completa de datos...")
     
@@ -879,7 +868,6 @@ def main():
 
 def fase_2f_completar_estadios():
     """FASE 2F: Completa estadios faltantes como fallback."""
-    import logging
     _log = logging.getLogger(__name__)
     
     # Mapeo manual de equipos -> estadios
@@ -924,9 +912,6 @@ def fase_2f_completar_estadios():
 
 def fase_3_cargar_calendario():
     """FASE 3: Carga el calendario desde JSON a la tabla Calendario en BD."""
-    from main.models import Calendario
-    from datetime import datetime as dt
-    import logging
     _log = logging.getLogger(__name__)
     
     temporadas_map = {
@@ -998,15 +983,15 @@ def fase_3_cargar_calendario():
                             
                             # Parsear fecha (dd/mm/yyyy)
                             try:
-                                fecha = dt.strptime(fecha_str, '%d/%m/%Y').date()
+                                fecha = datetime.strptime(fecha_str, '%d/%m/%Y').date()
                             except:
-                                fecha = dt.now().date()
+                                fecha = datetime.now().date()
                             
                             # Parsear hora (HH:MM)
                             hora = None
                             if hora_str and hora_str.strip():
                                 try:
-                                    hora = dt.strptime(hora_str, '%H:%M').time()
+                                    hora = datetime.strptime(hora_str, '%H:%M').time()
                                 except:
                                     hora = None
                             
@@ -1042,7 +1027,6 @@ def fase_3_cargar_calendario():
 
 def fase_2g_cargar_goles_desde_calendario():
     """Carga goles desde los calendarios JSON de FBREF."""
-    import logging
     _log = logging.getLogger(__name__)
     
     temporadas = ['23_24', '24_25', '25_26']
@@ -1142,23 +1126,53 @@ def fase_2g_cargar_goles_desde_calendario():
 
 def fase_4_precalcular_percentiles():
     """Precalcula y almacena percentiles para todos los EquipoJugadorTemporada (OPTIMIZADO)"""
-    import logging
     _log = logging.getLogger(__name__)
-    
-    from main.models import EquipoJugadorTemporada, EstadisticasPartidoJugador
-    from django.db.models import Sum, Count
-    
-    # Agregar campos a precalcular (nombres reales del modelo EstadisticasPartidoJugador)
+
+    # Campos reales del modelo EstadisticasPartidoJugador usados en las queries Sum
     stat_fields = [
         'gol_partido', 'asist_partido', 'tiro_puerta_partido', 'tiros',
+        'xg_partido',
         'despejes', 'entradas', 'bloqueos', 'pases_totales', 'pases_clave',
-        'faltas_cometidas', 'regates', 'regates_completados', 'duelos'
+        'faltas_cometidas', 'regates', 'regates_completados', 'conducciones', 'duelos',
+        'amarillas', 'goles_en_contra', 'porcentaje_paradas', 'psxg',
     ]
+
+    # Grupos con alias amigables para el frontend:
+    #   clave_almacenada -> campo_real_del_modelo
     stats_grupos = {
-        'ataque': ['gol_partido', 'asist_partido', 'tiro_puerta_partido', 'tiros'],
-        'defensa': ['despejes', 'entradas', 'bloqueos'],
-        'organizacion': ['pases_totales', 'pases_clave', 'faltas_cometidas'],
-        'regates_block': ['regates', 'regates_completados', 'duelos']
+        'ataque': {
+            'goles': 'gol_partido',
+            'asistencias': 'asist_partido',
+            'tiros_puerta': 'tiro_puerta_partido',
+            'tiros': 'tiros',
+            'xg': 'xg_partido',
+        },
+        'defensa': {
+            'despejes': 'despejes',
+            'entradas': 'entradas',
+            'bloqueos': 'bloqueos',
+        },
+        'organizacion': {
+            'pases_totales': 'pases_totales',
+            'pases_clave': 'pases_clave',
+            'faltas_cometidas': 'faltas_cometidas',
+        },
+        'regates_block': {
+            'regates': 'regates',
+            'regates_completados': 'regates_completados',
+            'conducciones': 'conducciones',
+            'duelos': 'duelos',
+        },
+        # Comportamiento: el frontend usa 100 - amarillas_pct
+        'comportamiento': {
+            'amarillas': 'amarillas',
+        },
+        # Stats de portero
+        'portero': {
+            'goles_en_contra': 'goles_en_contra',
+            'porcentaje_paradas': 'porcentaje_paradas',
+            'psxg': 'psxg',
+        },
     }
     
     all_records = list(EquipoJugadorTemporada.objects.select_related('jugador', 'temporada'))
@@ -1218,22 +1232,22 @@ def fase_4_precalcular_percentiles():
             to_update.append(ejt)
             continue
         
-        # Calcular percentiles
+        # Calcular percentiles (stats_grupos es {grupo: {alias: campo_real}})
         percentiles = {}
-        for grupo, stats_list in stats_grupos.items():
+        for grupo, alias_map in stats_grupos.items():
             percentiles[grupo] = {}
-            for stat in stats_list:
-                valor_jugador = stats_jugador.get(stat, 0) or 0
-                valores_peers = [s.get(stat, 0) or 0 for s in peers_stats_dict.values()]
+            for alias, campo_real in alias_map.items():
+                valor_jugador = stats_jugador.get(campo_real, 0) or 0
+                valores_peers = [s.get(campo_real, 0) or 0 for s in peers_stats_dict.values()]
                 
                 if valores_peers:
                     try:
                         percentil = scipy_stats.percentileofscore(valores_peers, valor_jugador, nan_policy='omit')
-                        percentiles[grupo][stat] = round(float(percentil), 2)
-                    except:
-                        percentiles[grupo][stat] = 0.0
+                        percentiles[grupo][alias] = round(float(percentil), 2)
+                    except Exception:
+                        percentiles[grupo][alias] = 0.0
                 else:
-                    percentiles[grupo][stat] = 0.0
+                    percentiles[grupo][alias] = 0.0
         
         ejt.percentiles = percentiles
         to_update.append(ejt)

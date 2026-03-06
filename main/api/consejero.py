@@ -13,6 +13,13 @@ import logging
 import numpy as np
 from pathlib import Path
 
+try:
+    import joblib
+    import shap as _shap
+except ImportError:
+    joblib = None
+    _shap = None
+
 from django.db.models import Avg
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -55,11 +62,12 @@ def _cargar_modelo():
     if _pipeline is not None:
         return True
     try:
-        import joblib, shap
+        if joblib is None or _shap is None:
+            raise ImportError("joblib or shap not available")
         _pipeline = joblib.load(_BASE / "modelo_consejero.pkl")
         with open(_BASE / "pos_avgs.json") as f:
             _pos_avgs = json.load(f)
-        _explainer = shap.TreeExplainer(_pipeline.named_steps["clf"])
+        _explainer = _shap.TreeExplainer(_pipeline.named_steps["clf"])
         return True
     except Exception as e:
         logger.error(f"No se pudo cargar el modelo Consejero: {e}")
@@ -198,8 +206,6 @@ def _predecir(features_array):
     Aplica el pipeline (scaler + RF) y calcula SHAP para un único jugador.
     Devuelve (recomendacion: str, confianza: int, factores: list[dict]).
     """
-    import shap as _shap
-
     scaler    = _pipeline.named_steps["scaler"]
     clf       = _pipeline.named_steps["clf"]
     X_scaled  = scaler.transform(features_array)

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/apiClient'
 import GlassPanel from '../components/ui/GlassPanel'
@@ -626,7 +626,7 @@ export default function EstadisticasPage() {
                   onClick={() => setFiltroModalOpen(false)}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: '1.5rem' }}>close</span>
+                  <span className="material-symbols-outlined icon-2xl">close</span>
                 </button>
               </div>
 
@@ -890,7 +890,7 @@ export default function EstadisticasPage() {
                 }}
                 className="text-gray-400 hover:text-white transition-colors"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: '1.5rem' }}>close</span>
+                <span className="material-symbols-outlined icon-2xl">close</span>
               </button>
             </div>
 
@@ -1423,16 +1423,6 @@ export default function EstadisticasPage() {
         )}
       </>
       )}
-
-      <HelpButton 
-        title="Guía de Estadísticas" 
-        fields={[
-          { label: 'Filtros', description: 'Busca por nombre, selecciona jornada o temporada para filtrar data' },
-          { label: 'Tipos', description: 'Goles: máximos goleadores | xG Diff: diferencia entre goles y expected goals' },
-          { label: 'Comparación', description: 'Activa el modo comparación y selecciona hasta 4 jugadores para análisis lado a lado' },
-          { label: 'Estadísticas', description: 'xG: goles esperados | xAG: asistencias esperadas | Percentiles automáticos' },
-        ]}
-      />
     </div>
   )
 }

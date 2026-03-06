@@ -124,10 +124,6 @@ export default function SelectFavoritesPage() {
           Continuar
         </button>
       </div>
-      <HelpButton title="Selección de favoritos" fields={[
-        { label: 'Equipo favorito', description: 'Selecciona hasta un equipo favorito. Sus partidos aparecerán destacados en el menú principal.' },
-        { label: 'Continuar', description: 'Guarda tu selección y accede a la aplicación.' },
-      ]} />
     </div>
   )
 }

@@ -43,6 +43,7 @@ class Command(BaseCommand):
                 fase_2e_poblar_equipo_jugador_temporada,
                 fase_2f_completar_estadios,
                 fase_2g_cargar_goles_desde_calendario,
+                fase_4_precalcular_percentiles,
             )
 
             self.stdout.write('📅 Fase 0a: Creando todas las jornadas...')
@@ -71,6 +72,9 @@ class Command(BaseCommand):
 
             self.stdout.write('⚽ Fase 2g: Cargando goles desde calendario...')
             fase_2g_cargar_goles_desde_calendario()
+
+            self.stdout.write('📊 Fase 4: Precalculando posición y percentiles en BD...')
+            fase_4_precalcular_percentiles()
 
             self.stdout.write(self.style.SUCCESS('✅ Datos cargados exitosamente'))
 

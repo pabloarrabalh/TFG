@@ -9,6 +9,7 @@ Endpoints:
 import json
 import logging
 
+from django.middleware.csrf import get_token
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
@@ -18,6 +19,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
+
+from ..models import UserProfile
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +61,6 @@ class MeView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        from django.middleware.csrf import get_token
         get_token(request)  # Ensures CSRF cookie is set
         return Response(_user_info(request.user))
 
@@ -135,9 +137,7 @@ class RegisterView(APIView):
             errors['username'] = 'Ese nombre de usuario ya está en uso'
         if User.objects.filter(email=email).exists():
             errors['email'] = 'Ese email ya está registrado'
-        
-        # Importar UserProfile aquí para evitar circular imports
-        from ..models import UserProfile
+
         if UserProfile.objects.filter(nickname=nickname).exists():
             errors['nickname'] = 'Ese apodo ya está en uso'
 

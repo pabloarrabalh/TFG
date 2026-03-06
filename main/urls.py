@@ -1,8 +1,9 @@
 from django.urls import path
-from . import views
-from . import api_endpoints
-from . import api_views  # legacy proxy – kept for backwards compat
 from . import drf_views
+from .api.predicciones import (
+    PredecirPorteroView, PredecirJugadorView,
+    ExplicarPrediccionView, CambiarJornadaLegacyView,
+)
 
 # ── DRF API v1 views ────────────────────────────────────────────────────────
 from .api.auth import MeView, LoginView, LogoutView, RegisterView
@@ -12,7 +13,11 @@ from .api.equipo import EquipoListView, EquipoDetailView
 from .api.jugador import JugadorDetailView, TopJugadoresPorPosicionView
 from .api.jugador_partidos import JugadorPartidosView
 from .api.jugador_insight import JugadorInsightView
-from .api.perfil import *
+from .api.buscar import RadarJugadorView, BuscarView
+from .api.perfil import (
+    PerfilView, UpdatePerfilView, UpdateStatusView, UploadPhotoView,
+    UpdatePreferenciasNotificacionesView, CambiarJornadaView,
+)
 from .api.favoritos import FavoritosView, ToggleFavoritoView, DeleteFavoritoView
 from .api.amigos import *
 from .api.plantilla import *
@@ -22,41 +27,14 @@ from .api.estadisticas import EstadisticasView, ComparacionJugadoresView
 from .api.consejero import ConsejeroView
 
 urlpatterns = [
-    path('', views.menu, name='menu'),
-    path('equipos/', views.equipos, name='equipos'),
-    path('favoritos/select/', views.select_favorite_teams, name='select_favorite_teams'),
-    path('favoritos/toggle/', views.toggle_favorite_team, name='toggle_favorite_team'),
-    path('mi-plantilla/', views.mi_plantilla, name='mi_plantilla'),
-    path('clasificacion/', views.clasificacion, name='clasificacion'),
-    path('equipo/<str:equipo_nombre>/', views.equipo, name='equipo'),
-    path('equipo/<str:equipo_nombre>/<str:temporada>/', views.equipo, name='equipo_temporada'),
-    path('jugador/', views.jugador, name='jugador'),
-    path('jugador/<int:jugador_id>/', views.jugador, name='jugador_detail'),
-    path('jugador/<int:jugador_id>/<str:temporada>/', views.jugador, name='jugador_temporada'),
-    path('amigos/', views.amigos, name='amigos'),
-    path('login/', views.login_register, name='login_register'),
-    path('login/submit/', views.login_view, name='login'),
-    path('register/submit/', views.register_view, name='register'),
-    path('logout/', views.logout_view, name='logout'),
-    path('perfil/', views.perfil_usuario, name='perfil'),
-    path('perfil/upload-photo/', views.upload_profile_photo, name='upload_profile_photo'),
-    path('perfil/update/', views.update_profile, name='update_profile'),
-    path('perfil/update-status/', views.update_user_status, name='update_user_status'),
-    path('perfil/delete-favorite/<int:fav_id>/', views.delete_favorite_team, name='delete_favorite_team'),
-    path('mi-plantilla/guardar/', views.guardar_plantilla, name='guardar_plantilla'),
-    path('mi-plantilla/listar/', views.listar_plantillas, name='listar_plantillas'),
-    path('mi-plantilla/<int:plantilla_id>/', views.obtener_plantilla, name='obtener_plantilla'),
-    path('mi-plantilla/<int:plantilla_id>/eliminar/', views.eliminar_plantilla, name='eliminar_plantilla'),
-    path('mi-plantilla/<int:plantilla_id>/renombrar/', views.renombrar_plantilla, name='renombrar_plantilla'),
-    path('terms-conditions/', views.terms_conditions, name='terms_conditions'),
-    # API Endpoints (existing)
-    path('api/radar/<int:jugador_id>/<str:temporada>/', api_endpoints.api_radar_jugador, name='api_radar_jugador'),
-    path('api/buscar/', api_endpoints.api_buscar, name='api_buscar'),
-    path('api/favoritos/toggle/', api_endpoints.api_toggle_favorito, name='api_toggle_favorito'),
-    path('api/predecir-portero/', views.predecir_portero_api, name='predecir_portero_api'),
-    path('api/predecir-jugador/', views.predecir_jugador_api, name='predecir_jugador_api'),
-    path('api/explicar-prediccion/', views.explicar_prediccion_portero_api, name='explicar_prediccion_portero_api'),
-    path('api/cambiar-jornada/', views.cambiar_jornada_api, name='cambiar_jornada_api'),
+    # API Endpoints
+    path('api/radar/<int:jugador_id>/<str:temporada>/', RadarJugadorView.as_view(), name='api_radar_jugador'),
+    path('api/buscar/', BuscarView.as_view(), name='api_buscar'),
+    path('api/favoritos/toggle/', ToggleFavoritoView.as_view(), name='api_toggle_favorito'),
+    path('api/predecir-portero/', PredecirPorteroView.as_view(), name='predecir_portero_api'),
+    path('api/predecir-jugador/', PredecirJugadorView.as_view(), name='predecir_jugador_api'),
+    path('api/explicar-prediccion/', ExplicarPrediccionView.as_view(), name='explicar_prediccion_portero_api'),
+    path('api/cambiar-jornada/', CambiarJornadaLegacyView.as_view(), name='cambiar_jornada_api'),
 
     # ── REST API v1 (DRF) ─────────────────────────────────────────────────────
     path('api/me/', MeView.as_view(), name='api_me'),

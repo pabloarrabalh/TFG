@@ -391,27 +391,6 @@ export default function AmigoPlantillaPage() {
           </div>
         </div>
       )}
-
-      <HelpButton
-        title="Plantilla de tu amigo"
-        sections={[
-          {
-            title: 'Plantilla',
-            fields: [
-              { label: 'Posicion', description: 'Linea tactica del jugador: Portero, Defensa, Centrocampista o Delantero.' },
-              { label: 'PTS', description: 'Puntos fantasy acumulados por el jugador en la temporada.' },
-            ],
-          },
-          {
-            title: 'Prediccion XAI',
-            fields: [
-              { label: 'Prediccion', description: 'Puntuacion estimada para el proximo partido por el modelo de IA.' },
-              { label: 'Factores positivos', description: 'Variables que aumentan la prediccion de puntos del jugador.' },
-              { label: 'Factores negativos', description: 'Variables que reducen la prediccion de puntos del jugador.' },
-            ],
-          },
-        ]}
-      />
     </div>
   )
 }

@@ -25,6 +25,9 @@ from .models import (
     ClasificacionJornada, PrediccionJugador,
 )
 from .views.utils import shield_name
+from .api.jugador import JugadorDetailView as JugadorDetailViewV1
+from .api.equipo import EquipoDetailView as EquipoDetailViewV1
+from .api.clasificacion import ClasificacionView as ClasificacionViewV1
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -153,9 +156,7 @@ class JugadorDetailView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, jugador_id):
-        from . import api_views
-        # Reutilizar la vista existente inyectando el request
-        return api_views.api_jugador(request._request, jugador_id)
+        return JugadorDetailViewV1().get(request, jugador_id)
 
 
 class JugadorPrediccionesView(generics.ListAPIView):
@@ -190,8 +191,7 @@ class EquipoDetailView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, equipo_nombre):
-        from . import api_views
-        return api_views.api_equipo(request._request, equipo_nombre)
+        return EquipoDetailViewV1().get(request, equipo_nombre)
 
 
 class PrediccionCreateView(generics.CreateAPIView):
@@ -219,8 +219,7 @@ class PrediccionCreateView(generics.CreateAPIView):
 @permission_classes([permissions.AllowAny])
 def clasificacion_view(request):
     """GET /api/v2/clasificacion/?temporada=25/26&jornada=N"""
-    from . import api_views
-    return api_views.api_clasificacion(request._request)
+    return ClasificacionViewV1().get(request)
 
 
 @api_view(['GET'])
