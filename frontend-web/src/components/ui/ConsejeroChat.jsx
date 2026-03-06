@@ -154,13 +154,26 @@ export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
         {/* STEP 4: Result */}
         {step === 'result' && resultado && (
           <div className="space-y-4">
+            {/* Header: accion + modelo recommendation */}
             <div className="bg-primary/20 border border-primary/40 rounded-xl p-4">
-              <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">
-                {resultado.accion === 'fichar' ? 'Fichar' : resultado.accion === 'vender' ? 'Vender' : 'Mantener'} — Análisis Inteligente
-              </p>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs font-bold text-primary uppercase tracking-wider">
+                  {resultado.accion === 'fichar' ? 'Fichar' : resultado.accion === 'vender' ? 'Vender' : 'Mantener'} — Análisis Inteligente
+                </p>
+                {resultado.confianza > 0 && (
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${
+                    resultado.recomendacion === 'fichar'   ? 'bg-green-500/20 border-green-500/50 text-green-300' :
+                    resultado.recomendacion === 'vender'   ? 'bg-red-500/20 border-red-500/50 text-red-300' :
+                                                             'bg-yellow-500/20 border-yellow-500/50 text-yellow-300'
+                  }`}>
+                    Modelo: {resultado.recomendacion} {resultado.confianza}%
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-white leading-relaxed font-semibold">{resultado.veredicto}</p>
             </div>
 
+            {/* Stats grid */}
             <div className="grid grid-cols-3 gap-2">
               <div className="bg-background-dark border border-border-dark rounded-lg p-3 text-center">
                 <p className="text-xs text-gray-400 mb-1">Rendimiento</p>

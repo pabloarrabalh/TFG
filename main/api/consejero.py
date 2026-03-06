@@ -2,9 +2,18 @@
 DRF API views – Consejero (Advisor)
 Endpoints:
   POST /api/consejero/
+
+El análisis utiliza un RandomForestClassifier entrenado sobre datos históricos
+de La Liga para predecir si un jugador rendirá bien en los próximos 3 partidos
+(fichar → seguir) o mal (vender → prescindir).  Los motivos se generan con
+valores SHAP sobre las features del jugador en tiempo real.
 """
+import json
 import logging
-from django.db.models import Avg, Sum
+import numpy as np
+from pathlib import Path
+
+from django.db.models import Avg
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -12,14 +21,53 @@ from rest_framework.permissions import IsAuthenticated
 
 from ..models import (
     Jugador, EstadisticasPartidoJugador, EquipoJugadorTemporada,
-    ClasificacionJornada, Temporada, Partido, EstadoPartido
+    Temporada,
 )
 
 logger = logging.getLogger(__name__)
 
+# ─── Rutas a los artefactos del modelo ────────────────────────────────────────
+_BASE = Path(__file__).resolve().parents[2] / "csv" / "csvGenerados" / "entrenamiento" / "consejero"
+
+_pipeline        = None   # cargado con lazy-loading
+_pos_avgs        = None
+_explainer       = None
+
+_POSICION_ENC = {"PT": 0, "DF": 1, "MC": 2, "DT": 3}
+_LABEL_MAP    = {0: "vender", 1: "mantener", 2: "fichar"}
+_FEATURES     = ["pf_last3", "pf_last5", "min_last3", "starter_rate3",
+                 "form_trend", "vs_pos_avg", "posicion_enc"]
+
+_FEATURE_DESC = {
+    "pf_last3":      "media de puntos (últ. 3 partidos)",
+    "pf_last5":      "media de puntos (últ. 5 partidos)",
+    "min_last3":     "minutos por partido (últ. 3 jornadas)",
+    "starter_rate3": "ratio de titularidades (últ. 3 jornadas)",
+    "form_trend":    "tendencia de forma (momentum)",
+    "vs_pos_avg":    "diferencia con la media de su posición",
+    "posicion_enc":  "posición en el campo",
+}
+
+
+def _cargar_modelo():
+    """Carga el pipeline y el explainer SHAP una sola vez."""
+    global _pipeline, _pos_avgs, _explainer
+    if _pipeline is not None:
+        return True
+    try:
+        import joblib, shap
+        _pipeline = joblib.load(_BASE / "modelo_consejero.pkl")
+        with open(_BASE / "pos_avgs.json") as f:
+            _pos_avgs = json.load(f)
+        _explainer = shap.TreeExplainer(_pipeline.named_steps["clf"])
+        return True
+    except Exception as e:
+        logger.error(f"No se pudo cargar el modelo Consejero: {e}")
+        return False
+
 
 class ConsejeroView(APIView):
-    """POST /api/consejero/ – Analizar jugador para fichar/vender/mantener"""
+    """POST /api/consejero/ – Analizar jugador para fichar/vender/mantener usando ML"""
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -36,68 +84,65 @@ class ConsejeroView(APIView):
             try:
                 jugador = Jugador.objects.get(id=jugador_id)
             except Jugador.DoesNotExist:
-                return Response(
-                    {'error': 'Jugador no encontrado'},
-                    status=status.HTTP_404_NOT_FOUND
-                )
+                return Response({'error': 'Jugador no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
-            # Obtener temporada actual — campo correcto: partido__jornada__temporada
             temporada = (
                 Temporada.objects.filter(nombre='25_26').first()
                 or Temporada.objects.order_by('-nombre').first()
             )
             if not temporada:
-                return Response(
-                    {'error': 'Temporada no disponible'},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+                return Response({'error': 'Temporada no disponible'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            # Últimos 5 partidos (para rendimiento general)
-            ultimos5 = list(
+            # Todas las estadísticas de la temporada, ordenadas de más reciente a más antigua
+            stats_temporada = list(
                 EstadisticasPartidoJugador.objects.filter(
                     jugador=jugador,
                     partido__jornada__temporada=temporada,
-                ).select_related('partido__jornada', 'partido__equipo_local', 'partido__equipo_visitante')
-                .order_by('-partido__jornada__numero_jornada')[:5]
+                ).order_by('-partido__jornada__numero_jornada')
             )
 
-            # Últimos 3 partidos (para criterios específicos)
-            ultimos3 = ultimos5[:3]
+            # Métricas básicas para el frontend
+            posicion = jugador.get_posicion_mas_frecuente() or 'DT'
+            rendimiento = (
+                sum(p.puntos_fantasy or 0 for p in stats_temporada) / len(stats_temporada)
+                if stats_temporada else 0
+            )
+            ultimos3 = stats_temporada[:3]
+            titulares_3 = sum(1 for p in ultimos3 if p.titular)
+            minutos_3   = sum(p.min_partido or 0 for p in ultimos3)
 
-            # Calcular métricas
-            posicion = jugador.get_posicion_mas_frecuente() or 'Delantero'
-            rendimiento = _calcular_rendimiento(jugador, temporada, ultimos5)
-            media_pos = _obtener_media_posicion(posicion, temporada)
+            media_pos   = _obtener_media_posicion(posicion, temporada)
             vs_promedio = rendimiento - media_pos
 
-            # Métricas de últimos 3 partidos
-            titulares_3 = sum(1 for p in ultimos3 if p.titular)
-            minutos_3 = sum(p.min_partido or 0 for p in ultimos3)
-            goles_3 = sum(p.gol_partido or 0 for p in ultimos3)
-
-            # Rival débil: obtener posición del próximo rival en clasificación
-            rival_debil, pos_rival = _rival_es_debil(jugador, temporada)
-
-            # Titularidad general (últimos 5)
-            titularidad_pct = (
-                sum(1 for p in ultimos5 if p.titular) / len(ultimos5) * 100
-                if ultimos5 else 0
-            )
-
-            # Generar veredicto
-            veredicto, razon = _generar_veredicto(
-                jugador, accion, rendimiento, media_pos, vs_promedio,
-                titulares_3, minutos_3, goles_3, titularidad_pct,
-                rival_debil, pos_rival
-            )
+            # ── Inferencia con el modelo ML ──────────────────────────────────
+            modelo_ok = _cargar_modelo()
+            if modelo_ok:
+                features   = _computar_features(stats_temporada, posicion, rendimiento, media_pos, temporada)
+                recomendacion, confianza, factores = _predecir(features)
+                veredicto, razon = _generar_veredicto_ml(
+                    jugador, accion, recomendacion, confianza, factores,
+                    rendimiento, media_pos, vs_promedio, titulares_3, minutos_3,
+                )
+            else:
+                # Fallback si el modelo no carga
+                recomendacion = 'mantener'
+                confianza     = 0
+                factores      = []
+                veredicto, razon = _fallback_veredicto(
+                    jugador, accion, rendimiento, media_pos, vs_promedio, titulares_3, minutos_3
+                )
 
             return Response({
-                'veredicto': veredicto,
-                'razon': razon,
-                'rendimiento': f'{rendimiento:.2f}',
-                'vs_promedio': vs_promedio,
-                'titularidad_pct': int(titularidad_pct),
-                'accion': accion,
+                'veredicto':     veredicto,
+                'razon':         razon,
+                'rendimiento':   f'{rendimiento:.2f}',
+                'vs_promedio':   round(vs_promedio, 2),
+                'titulares_3':   titulares_3,
+                'minutos_3':     minutos_3,
+                'accion':        accion,
+                'recomendacion': recomendacion,
+                'confianza':     confianza,
+                'factores':      factores,
             })
 
         except Exception as e:
@@ -108,7 +153,7 @@ class ConsejeroView(APIView):
             )
 
 
-# ─── helpers ────────────────────────────────────────────────────────────────
+# ─── helpers ─────────────────────────────────────────────────────────────────
 
 def _obtener_media_posicion(posicion, temporada):
     return (
@@ -119,145 +164,196 @@ def _obtener_media_posicion(posicion, temporada):
     )
 
 
-def _rival_es_debil(jugador, temporada):
+def _computar_features(stats_temporada, posicion, rendimiento_full, media_pos, temporada):
     """
-    Determina si el próximo rival del equipo del jugador está en la parte baja
-    de la clasificación (posición >= 14 = débil).
-    Devuelve (bool, int_posicion).
+    Construye el vector de features compatible con el modelo entrenado.
+    Features: pf_last3, pf_last5, min_last3, starter_rate3, form_trend, vs_pos_avg, posicion_enc
+    stats_temporada está ordenado de más reciente a más antiguo.
     """
-    try:
-        rel = (
-            EquipoJugadorTemporada.objects.filter(
-                jugador=jugador, temporada=temporada,
-            ).select_related('equipo').first()
-        )
-        if not rel:
-            return False, None
+    def _mean(objs, attr, default=0.0):
+        vals = [getattr(o, attr) or 0 for o in objs]
+        return float(np.mean(vals)) if vals else default
 
-        equipo = rel.equipo
+    last3 = stats_temporada[:3]
+    last5 = stats_temporada[:5]
 
-        # Próximo partido pendiente del equipo
-        proximo = (
-            Partido.objects.filter(
-                jornada__temporada=temporada,
-                estado=EstadoPartido.PENDIENTE,
-            ).filter(
-                equipo_local=equipo
-            ) | Partido.objects.filter(
-                jornada__temporada=temporada,
-                estado=EstadoPartido.PENDIENTE,
-            ).filter(
-                equipo_visitante=equipo
-            )
-        ).order_by('jornada__numero_jornada').first()
+    pf_last3      = _mean(last3, 'puntos_fantasy')
+    pf_last5      = _mean(last5, 'puntos_fantasy')
+    min_last3     = _mean(last3, 'min_partido')
+    starter_rate3 = float(sum(1 for p in last3 if p.titular) / max(len(last3), 1))
+    form_trend    = pf_last3 - pf_last5
 
-        if not proximo:
-            return False, None
+    # vs_pos_avg: pf_last3 comparado con la media de posición de toda la temporada
+    # Intentamos usar pos_avgs.json si el modelo está cargado; si no, usamos media_pos de la BD
+    vs_pos_avg = pf_last3 - media_pos
 
-        rival = proximo.equipo_visitante if proximo.equipo_local == equipo else proximo.equipo_local
+    posicion_enc = float(_POSICION_ENC.get(posicion.upper(), 3))
 
-        # Posición del rival en la última jornada con datos
-        clasif = (
-            ClasificacionJornada.objects.filter(
-                temporada=temporada, equipo=rival,
-            ).order_by('-jornada__numero_jornada').first()
-        )
-        if not clasif:
-            return False, None
-
-        return clasif.posicion >= 14, clasif.posicion
-
-    except Exception:
-        return False, None
+    return np.array([[pf_last3, pf_last5, min_last3, starter_rate3,
+                      form_trend, vs_pos_avg, posicion_enc]], dtype=float)
 
 
-# ─── generador de veredictos ────────────────────────────────────────────────
+def _predecir(features_array):
+    """
+    Aplica el pipeline (scaler + RF) y calcula SHAP para un único jugador.
+    Devuelve (recomendacion: str, confianza: int, factores: list[dict]).
+    """
+    import shap as _shap
 
-def _generar_veredicto(jugador, accion, rendimiento, media_pos, vs_promedio, titulares_3, minutos_3):
-    nombre = f"{jugador.nombre} {jugador.apellido}"
+    scaler    = _pipeline.named_steps["scaler"]
+    clf       = _pipeline.named_steps["clf"]
+    X_scaled  = scaler.transform(features_array)
 
-    # Criterios objetivos
-    por_encima_media = rendimiento > media_pos
-    titular_100 = titulares_3 == 3
-    criterios_fichar = sum([titular_100, por_encima_media])  # recomienda fichar si >= 2
-    recomienda_vender = minutos_3 < 50 and rendimiento < media_pos
-    recomienda_mantener = rendimiento >= media_pos
+    probs         = clf.predict_proba(X_scaled)[0]   # [p_vender, p_mantener, p_fichar]
+    pred_idx      = int(np.argmax(probs))
+    recomendacion = _LABEL_MAP[pred_idx]
+    confianza     = int(round(probs[pred_idx] * 100))
 
-    # ─── FICHAR ────────────────────────────────────────────────────────
+    # SHAP values para esta instancia
+    shap_values = _explainer.shap_values(X_scaled)   # lista o array 3D
+
+    # Extraer array (n_features,) para la clase predicha
+    if isinstance(shap_values, list):
+        sv_clase = shap_values[pred_idx][0]            # (n_features,)
+    elif isinstance(shap_values, np.ndarray) and shap_values.ndim == 3:
+        sv_clase = shap_values[0, :, pred_idx]
+    else:
+        sv_clase = np.zeros(len(_FEATURES))
+
+    # Top 3 features por magnitud de impacto
+    abs_shap = np.abs(sv_clase)
+    top_idx  = np.argsort(abs_shap)[::-1][:3]
+    factores = []
+    for i in top_idx:
+        if abs_shap[i] < 1e-6:
+            continue
+        factores.append({
+            "nombre":      _FEATURES[i],
+            "descripcion": _FEATURE_DESC[_FEATURES[i]],
+            "impacto":     round(float(abs_shap[i]), 3),
+            "direccion":   "positivo" if sv_clase[i] > 0 else "negativo",
+            "valor":       round(float(features_array[0, i]), 2),
+        })
+
+    return recomendacion, confianza, factores
+
+
+_ACCION_LABEL = {"fichar": "fichar", "vender": "vender", "mantener": "mantener"}
+
+
+def _generar_veredicto_ml(jugador, accion, recomendacion, confianza, factores,
+                           rendimiento, media_pos, vs_promedio, titulares_3, minutos_3):
+    """
+    Genera el texto del veredicto y la razón, integrando la recomendación del modelo
+    y los factores SHAP con el contexto de la acción elegida por el usuario.
+    """
+    nombre     = f"{jugador.nombre} {jugador.apellido}"
+    coincide   = (accion == recomendacion)
+
+    # ── FICHAR ────────────────────────────────────────────────────────────────
     if accion == 'fichar':
-        if criterios_fichar >= 2:
-            return (
-                f"Sí, fíchalo ahora. {nombre} cumple los criterios clave.",
-                f"Ha sido titular {titulares_3}/3 en los últimos partidos y su media de puntos "
-                f"({rendimiento:.1f}) supera la media de su posición ({media_pos:.1f} pts). "
-                f"Es el perfil que buscas."
+        if recomendacion == 'fichar':
+            veredicto = f"Sí, fíchalo. El modelo lo recomienda con un {confianza}% de confianza."
+            razon     = (
+                f"El análisis sobre datos históricos de La Liga indica que {nombre} tiene buenas "
+                f"perspectivas. Su media esta temporada es {rendimiento:.1f} pts "
+                f"({vs_promedio:+.1f} vs media de su posición, {media_pos:.1f} pts), "
+                f"con {titulares_3}/3 titularidades recientes."
             )
-        elif titular_100 and not por_encima_media:
-            return (
-                f"Casi, te recomendaría no ficharlo ahora. Tiene continuidad pero el rendimiento no acompaña.",
-                f"Ha sido titular los 3 últimos partidos, pero su media de puntos ({rendimiento:.1f}) "
-                f"está por debajo de la media de su posición ({media_pos:.1f} pts). "
-                f"Espera a que mejore sus números antes de hacerte con él."
+        elif recomendacion == 'mantener':
+            veredicto = f"Con matices. El modelo lo situaría en «mantener» ({confianza}% confianza)."
+            razon     = (
+                f"No es un fichaje evidente pero tampoco es mala opción. Su media es {rendimiento:.1f} pts "
+                f"({vs_promedio:+.1f} vs su posición). Ha sido titular {titulares_3}/3 partidos recientes."
             )
-        elif por_encima_media and not titular_100:
-            return (
-                f"Casi, te recomendaría no ficharlo ahora. Rinde bien pero la titularidad no es segura.",
-                f"Su media ({rendimiento:.1f} pts) supera la de su posición ({media_pos:.1f}), "
-                f"pero solo ha sido titular {titulares_3}/3 partidos recientes. "
-                f"Sin continuidad garantizada, los puntos no son constantes."
-            )
-        else:
-            return (
-                f"No, no lo ficharía ahora. {nombre} no cumple ninguno de los dos criterios.",
-                f"Su media ({rendimiento:.1f} pts) está por debajo de la media de su posición ({media_pos:.1f}) "
-                f"y solo ha sido titular {titulares_3}/3 partidos. Son los dos criterios que miro antes de fichar."
+        else:  # recomendacion == 'vender'
+            veredicto = f"El modelo no lo recomienda ahora ({confianza}% confianza en «no fichar»)."
+            razon     = (
+                f"Los datos apuntan a poca continuidad o bajo rendimiento. Media: {rendimiento:.1f} pts "
+                f"({vs_promedio:+.1f} vs posición), {titulares_3}/3 titularidades recientes y "
+                f"{minutos_3} minutos en los últimos 3 partidos."
             )
 
-    # ─── VENDER ────────────────────────────────────────────────────────
+    # ── VENDER ────────────────────────────────────────────────────────────────
     elif accion == 'vender':
-        if recomienda_vender:
-            return (
-                f"Sí, véndelo. La situación es clara.",
-                f"{nombre} solo ha acumulado {minutos_3} minutos en los últimos 3 partidos "
-                f"y su media de puntos ({rendimiento:.1f}) está {abs(vs_promedio):.1f} pts por debajo "
-                f"de la media de su posición ({media_pos:.1f} pts). "
-                f"No tiene protagonismo y no está generando puntos suficientes."
+        if recomendacion == 'vender':
+            veredicto = f"Sí, véndelo. El modelo confirma que la situación no mejora ({confianza}% confianza)."
+            razon     = (
+                f"El análisis respalda la venta: {nombre} lleva {minutos_3} minutos en los últimos 3 partidos, "
+                f"ha sido titular solo {titulares_3}/3 veces y su media ({rendimiento:.1f} pts) está "
+                f"{abs(vs_promedio):.1f} pts por debajo de la media de su posición."
             )
-        elif recomienda_mantener:
-            return (
-                f"No lo vendes ahora. Te recomendaría mantenerlo.",
-                f"Su rendimiento ({rendimiento:.1f} pts) está por encima de la media de su posición "
-                f"({media_pos:.1f} pts, diferencia {vs_promedio:+.1f}). "
-                f"Ha sumado {minutos_3} minutos en los últimos 3 partidos, con {titulares_3}/3 titularidades. "
-                f"No hay motivo para prescindir de él ahora mismo."
+        elif recomendacion == 'mantener':
+            veredicto = f"El modelo no lo vendería ahora. Rendimiento en la media ({confianza}% confianza)."
+            razon     = (
+                f"Aunque no es una estrella, {nombre} rinde dentro de la media de su posición "
+                f"({rendimiento:.1f} pts, {vs_promedio:+.1f}), con {titulares_3}/3 titularidades recientes. "
+                f"El modelo ve más valor en mantenerlo que en venderlo ahora."
             )
-        else:
-            return (
-                f"Podría tener sentido, pero no es urgente.",
-                f"Su rendimiento ({rendimiento:.1f} pts) está algo por debajo de la media ({media_pos:.1f} pts), "
-                f"pero ha sumado {minutos_3} minutos en los últimos 3 partidos ({titulares_3}/3 como titular). "
-                f"No es un caso claro de venta. Si tienes una alternativa mejor, analiza el cambio."
+        else:  # recomendacion == 'fichar'
+            veredicto = f"El modelo recomienda lo contrario: está en buena forma ({confianza}% confianza)."
+            razon     = (
+                f"Los datos apuntan a que {nombre} está rindiendo bien. Media: {rendimiento:.1f} pts "
+                f"({vs_promedio:+.1f} vs posición), {titulares_3}/3 titularidades recientes y "
+                f"{minutos_3} minutos en los últimos 3 partidos. Venderlo ahora podría ser un error."
             )
 
-    # ─── MANTENER ──────────────────────────────────────────────────────
+    # ── MANTENER ──────────────────────────────────────────────────────────────
     elif accion == 'mantener':
-        if recomienda_mantener:
-            return (
-                f"Sí, mantenlo. Rinde en la media o por encima.",
-                f"Su media de puntos ({rendimiento:.1f}) está {vs_promedio:+.1f} respecto a la media "
-                f"de su posición ({media_pos:.1f} pts). "
-                f"Ha sido titular {titulares_3}/3 partidos recientes. Es una pieza funcional en tu plantilla."
+        if recomendacion == 'mantener':
+            veredicto = f"Sí, mantenlo. El modelo también lo recomienda ({confianza}% confianza)."
+            razon     = (
+                f"{nombre} rinde de forma consistente: media {rendimiento:.1f} pts "
+                f"({vs_promedio:+.1f} vs posición), {titulares_3}/3 titularidades recientes. "
+                f"Es una pieza funcional en la plantilla."
             )
-        else:
-            return (
-                f"Te recomendaría no mantenerlo. Rinde por debajo de la media.",
-                f"Su media de puntos ({rendimiento:.1f}) está {abs(vs_promedio):.1f} pts por debajo "
-                f"de la media de su posición ({media_pos:.1f} pts). "
-                f"Solo ha sido titular {titulares_3}/3 partidos con {minutos_3} minutos totales. "
-                f"Hay opciones más productivas que merece la pena explorar."
+        elif recomendacion == 'fichar':
+            veredicto = f"Mantenlo, está en buena forma. El modelo incluso lo recomendaría para fichar ({confianza}% confianza)."
+            razon     = (
+                f"El análisis ve tendencia positiva: media {rendimiento:.1f} pts "
+                f"({vs_promedio:+.1f} vs posición), {titulares_3}/3 titularidades recientes. "
+                f"Si lo tienes, no lo sueltes."
+            )
+        else:  # recomendacion == 'vender'
+            veredicto = f"El modelo sugiere que no es la mejor opción a largo plazo ({confianza}% confianza en «vender»)."
+            razon     = (
+                f"El rendimiento de {nombre} está por debajo de lo esperado para su posición: "
+                f"media {rendimiento:.1f} pts ({vs_promedio:+.1f}), {titulares_3}/3 titularidades y "
+                f"{minutos_3} minutos en los últimos 3 partidos. Si tienes alternativas, merece la pena valorarlas."
             )
 
     else:
-        return "Análisis no disponible", "No se pudo generar un veredicto específico."
+        veredicto = "Análisis no disponible."
+        razon     = "Acción no reconocida."
 
     return veredicto, razon
+
+
+def _fallback_veredicto(jugador, accion, rendimiento, media_pos, vs_promedio, titulares_3, minutos_3):
+    """Veredicto simple por reglas cuando el modelo no está disponible."""
+    nombre = f"{jugador.nombre} {jugador.apellido}"
+    por_encima = rendimiento > media_pos
+    titular_ok = titulares_3 >= 2
+
+    if accion == 'fichar':
+        if por_encima and titular_ok:
+            return (f"Sí, fíchalo. Rinde por encima de la media de su posición.",
+                    f"Media {rendimiento:.1f} pts vs {media_pos:.1f} pts de su posición, {titulares_3}/3 titularidades.")
+        else:
+            return (f"No lo recomendaría ahora.",
+                    f"Media {rendimiento:.1f} pts vs {media_pos:.1f} pts, solo {titulares_3}/3 titularidades.")
+    elif accion == 'vender':
+        if not por_encima and minutos_3 < 150:
+            return (f"Sí, véndelo.",
+                    f"{minutos_3} minutos en los últimos 3 partidos y rinde {abs(vs_promedio):.1f} pts por debajo de la media.")
+        else:
+            return (f"No lo vendería ahora.",
+                    f"Rinde en la media ({rendimiento:.1f} pts) con {titulares_3}/3 titularidades.")
+    else:
+        if por_encima:
+            return (f"Sí, mantenlo. Rinde por encima de la media.",
+                    f"Media {rendimiento:.1f} pts ({vs_promedio:+.1f} vs posición).")
+        else:
+            return (f"Te recomendaría buscar alternativas.",
+                    f"Media {rendimiento:.1f} pts ({vs_promedio:+.1f} vs posición), {titulares_3}/3 titularidades.")
+
