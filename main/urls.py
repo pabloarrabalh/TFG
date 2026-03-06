@@ -12,26 +12,12 @@ from .api.equipo import EquipoListView, EquipoDetailView
 from .api.jugador import JugadorDetailView, TopJugadoresPorPosicionView
 from .api.jugador_partidos import JugadorPartidosView
 from .api.jugador_insight import JugadorInsightView
-from .api.perfil import (
-    PerfilView, UpdatePerfilView, UpdateStatusView,
-    UploadPhotoView, UpdatePreferenciasNotificacionesView,
-    CambiarJornadaView,
-)
+from .api.perfil import *
 from .api.favoritos import FavoritosView, ToggleFavoritoView, DeleteFavoritoView
-from .api.amigos import (
-    AmigosView, EnviarSolicitudView, AceptarSolicitudView,
-    RechazarSolicitudView, EliminarAmigoView, PlantillasAmigoView,
-)
-from .api.plantilla import (
-    MiPlantillaView, MiPlantillaJugadoresView,
-    TogglePrivacidadPlantillaView, SetPlantillaPredeterminadaView,
-    MisPlantillasPrivacidadView,
-)
+from .api.amigos import *
+from .api.plantilla import *
 from .api.plantilla_notificaciones import PlantillaNotificacionesView
-from .api.notificaciones import (
-    NotificacionesView, MarcarNotificacionLeidaView, MarcarTodasLeidasView,
-    BorrarNotificacionView, BorrarTodasNotificacionesView,
-)
+from .api.notificaciones import *
 from .api.estadisticas import EstadisticasView, ComparacionJugadoresView
 from .api.consejero import ConsejeroView
 
