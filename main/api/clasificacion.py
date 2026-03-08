@@ -1,4 +1,4 @@
-﻿"""
+"""
 DRF API views – League Classification
 Endpoints:
   GET /api/clasificacion/?temporada=25/26&jornada=17&equipo=&favoritos=true

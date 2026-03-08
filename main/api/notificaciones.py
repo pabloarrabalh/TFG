@@ -1,4 +1,4 @@
-﻿"""
+"""
 DRF API views – Notifications
 Endpoints:
   GET  /api/notificaciones/

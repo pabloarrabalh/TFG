@@ -1,5 +1,5 @@
-﻿"""
-DRF API views – Friends / Social
+"""
+DRF API views - Friends / Social
 Endpoints:
   GET  /api/amigos/
   POST /api/amigos/solicitud/

@@ -1,4 +1,4 @@
-﻿"""
+"""
 DRF API views – Fantasy Plantilla (team builder)
 Endpoints:
   GET  /api/mi-plantilla/?temporada=&jornada=
@@ -201,3 +201,98 @@ class MisPlantillasPrivacidadView(APIView):
             return Response({'plantillas': list(plantillas)})
         except Exception as exc:
             return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PlantillasUsuarioView(APIView):
+    """
+    GET  /api/plantillas/usuario/  – lista las plantillas guardadas del usuario
+    POST /api/plantillas/usuario/  – crea o actualiza una plantilla
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        plantillas = Plantilla.objects.filter(usuario=request.user).order_by('-fecha_modificada')
+        data = [
+            {
+                'id': p.id,
+                'nombre': p.nombre,
+                'formacion': p.formacion,
+                'alineacion': p.alineacion,
+                'predeterminada': p.predeterminada,
+                'privacidad': p.privacidad,
+                'fecha_modificada': p.fecha_modificada.isoformat(),
+            }
+            for p in plantillas
+        ]
+        return Response({'plantillas': data})
+
+    def post(self, request):
+        plantilla_id = request.data.get('plantilla_id')
+        nombre = request.data.get('nombre', 'Mi Team').strip() or 'Mi Team'
+        formacion = request.data.get('formacion', '4-3-3')
+        alineacion = request.data.get('alineacion', {})
+
+        try:
+            if plantilla_id:
+                plantilla = Plantilla.objects.get(id=plantilla_id, usuario=request.user)
+                plantilla.nombre = nombre
+                plantilla.formacion = formacion
+                plantilla.alineacion = alineacion
+                plantilla.save()
+                created = False
+            else:
+                # Create or get by (usuario, nombre) to avoid unique_together conflicts
+                plantilla, created = Plantilla.objects.get_or_create(
+                    usuario=request.user,
+                    nombre=nombre,
+                    defaults={'formacion': formacion, 'alineacion': alineacion},
+                )
+                if not created:
+                    plantilla.formacion = formacion
+                    plantilla.alineacion = alineacion
+                    plantilla.save()
+
+            return Response({
+                'status': 'success',
+                'plantilla_id': plantilla.id,
+                'plantilla_nombre': plantilla.nombre,
+                'message': 'Plantilla guardada correctamente.',
+            })
+        except Plantilla.DoesNotExist:
+            return Response({'status': 'error', 'error': 'Plantilla no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as exc:
+            return Response({'status': 'error', 'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PlantillaItemView(APIView):
+    """
+    POST   /api/plantillas/usuario/<id>/renombrar/  – renombra una plantilla
+    DELETE /api/plantillas/usuario/<id>/            – elimina una plantilla
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, plantilla_id):
+        """Renombrar plantilla."""
+        nombre = request.data.get('nombre', '').strip()
+        if not nombre:
+            return Response({'status': 'error', 'error': 'Nombre vacío'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            plantilla = Plantilla.objects.get(id=plantilla_id, usuario=request.user)
+            plantilla.nombre = nombre
+            plantilla.save()
+            return Response({'status': 'success', 'nombre': nombre})
+        except Plantilla.DoesNotExist:
+            return Response({'status': 'error', 'error': 'Plantilla no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as exc:
+            return Response({'status': 'error', 'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, plantilla_id):
+        """Eliminar plantilla."""
+        try:
+            plantilla = Plantilla.objects.get(id=plantilla_id, usuario=request.user)
+            plantilla.delete()
+            return Response({'status': 'success'})
+        except Plantilla.DoesNotExist:
+            return Response({'status': 'error', 'error': 'Plantilla no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as exc:
+            return Response({'status': 'error', 'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)

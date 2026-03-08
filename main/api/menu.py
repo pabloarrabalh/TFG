@@ -1,4 +1,4 @@
-﻿"""
+"""
 DRF API views – Menu / Home page data
 Endpoints:
   GET /api/menu/
@@ -7,7 +7,6 @@ import importlib
 import logging
 import sys as _sys
 import threading as _th
-from datetime import datetime
 from pathlib import Path
 
 from django.core.cache import cache
@@ -19,9 +18,11 @@ from rest_framework.permissions import AllowAny
 from ..models import (
     Temporada, Jornada, Calendario, ClasificacionJornada,
     EquipoJugadorTemporada, EstadisticasPartidoJugador, PrediccionJugador,
+    Partido,
 )
 from ..views.utils import shield_name
 from ..cache_utils import cache_api_response
+import math
 
 logger = logging.getLogger(__name__)
 
@@ -63,23 +64,34 @@ def _get_jugadores_destacados_con_predicciones(temporada, proxima_jornada, jorna
                 'equipo_id', 'equipo__nombre', 'posicion', 'dorsal')
     }
 
-    # Skip players with sum < 60 min in last 4 matches (omit from destacados)
-    _min_sum_fast: dict = {}
-    for _row in (
-        EstadisticasPartidoJugador.objects
-        .filter(partido__jornada__temporada=temporada)
-        .values('jugador_id', 'min_partido')
-        .order_by('jugador_id', '-partido__jornada__numero_jornada')
-    ):
-        _jid = _row['jugador_id']
-        if _jid not in _min_sum_fast:
-            _min_sum_fast[_jid] = []
-        if len(_min_sum_fast[_jid]) < 4:
-            _min_sum_fast[_jid].append(_row['min_partido'] or 0)
-    skip_pocos_minutos = {
-        jid for jid, mins in _min_sum_fast.items()
-        if mins and sum(mins) < 60
-    }
+    # Skip players with < 60 total minutes in the last 3 PLAYED jornadas.
+    # Use jornada number ordering; only consider actually-played matches.
+    # Edge case: if fewer than 3 jornadas have been played, skip the filter.
+    _played_nums = list(
+        Partido.objects
+        .filter(jornada__temporada=temporada, goles_local__isnull=False)
+        .values_list('jornada__numero_jornada', flat=True)
+        .distinct()
+        .order_by('-jornada__numero_jornada')[:3]
+    )
+    if len(_played_nums) < 3:
+        skip_pocos_minutos = set()
+    else:
+        _min_sum_fast: dict = {}
+        for _row in (
+            EstadisticasPartidoJugador.objects
+            .filter(
+                partido__jornada__temporada=temporada,
+                partido__jornada__numero_jornada__in=_played_nums,
+            )
+            .values('jugador_id', 'min_partido')
+        ):
+            _jid = _row['jugador_id']
+            _min_sum_fast[_jid] = _min_sum_fast.get(_jid, 0) + (_row['min_partido'] or 0)
+        skip_pocos_minutos = {
+            jid for jid in ejt_map
+            if _min_sum_fast.get(jid, 0) < 60
+        }
 
     # 2) Todas las predicciones para la próxima jornada (cualquier modelo, sin filtro de fecha)
     #    Ordenadas por fecha desc para que dedup tome la más reciente por jugador
@@ -97,7 +109,10 @@ def _get_jugadores_destacados_con_predicciones(temporada, proxima_jornada, jorna
         if jid not in pred_map:
             try:
                 val = float(row['prediccion'])
-                if val != val:  # NaN check
+                # Skip NaN and infinite values which break JSON encoding
+                if not math.isfinite(val):
+                    continue
+                if val != val:  # NaN check (redundant but safe)
                     continue
             except (TypeError, ValueError):
                 continue
@@ -150,7 +165,6 @@ class MenuView(APIView):
     """GET /api/menu/?jornada=6"""
     permission_classes = [AllowAny]
 
-    @cache_api_response(timeout=180, key_prefix='menu')
     def get(self, request):
         temporada = Temporada.objects.order_by('-nombre').first()
         empty = {
@@ -178,17 +192,25 @@ class MenuView(APIView):
             except (ValueError, TypeError):
                 jornada_actual = None
         else:
-            # Usar lógica original
-            jornada_actual = (
-                Jornada.objects.filter(temporada=temporada, numero_jornada=17).first()
-                or Jornada.objects.filter(
-                    temporada=temporada, fecha_fin__gte=datetime.now()
-                ).order_by('numero_jornada').first()
-                or Jornada.objects.filter(temporada=temporada)
-                .order_by('-numero_jornada')
-                .exclude(numero_jornada=38)
+            # Detect the last actually-played jornada from Partido results.
+            # This avoids hard-coding any jornada number.
+            _last_played_num = (
+                Partido.objects
+                .filter(jornada__temporada=temporada, goles_local__isnull=False)
+                .order_by('-jornada__numero_jornada')
+                .values_list('jornada__numero_jornada', flat=True)
                 .first()
             )
+            if _last_played_num:
+                jornada_actual = Jornada.objects.filter(
+                    temporada=temporada, numero_jornada=_last_played_num
+                ).first()
+            else:
+                jornada_actual = (
+                    Jornada.objects.filter(temporada=temporada)
+                    .order_by('numero_jornada')
+                    .first()
+                )
 
         clasificacion_top = []
         if jornada_actual:
@@ -305,23 +327,33 @@ def _bg_compute_predictions(temporada_id, jornada_num, cache_key):
                 'equipo_id', 'equipo__nombre', 'posicion', 'dorsal')
     )
 
-    # Skip players with sum < 60 min in last 4 matches
-    _min_sum_bg: dict = {}
-    for _row in (
-        EstadisticasPartidoJugador.objects
-        .filter(partido__jornada__temporada=temporada)
-        .values('jugador_id', 'min_partido')
-        .order_by('jugador_id', '-partido__jornada__numero_jornada')
-    ):
-        _jid = _row['jugador_id']
-        if _jid not in _min_sum_bg:
-            _min_sum_bg[_jid] = []
-        if len(_min_sum_bg[_jid]) < 4:
-            _min_sum_bg[_jid].append(_row['min_partido'] or 0)
-    skip_pocos_minutos_bg = {
-        jid for jid, mins in _min_sum_bg.items()
-        if mins and sum(mins) < 60
-    }
+    # Skip players with < 60 total minutes in the last 3 PLAYED jornadas.
+    _played_nums_bg = list(
+        Partido.objects
+        .filter(jornada__temporada=temporada, goles_local__isnull=False)
+        .values_list('jornada__numero_jornada', flat=True)
+        .distinct()
+        .order_by('-jornada__numero_jornada')[:3]
+    )
+    if len(_played_nums_bg) < 3:
+        skip_pocos_minutos_bg = set()
+    else:
+        _min_sum_bg: dict = {}
+        for _row in (
+            EstadisticasPartidoJugador.objects
+            .filter(
+                partido__jornada__temporada=temporada,
+                partido__jornada__numero_jornada__in=_played_nums_bg,
+            )
+            .values('jugador_id', 'min_partido')
+        ):
+            _jid = _row['jugador_id']
+            _min_sum_bg[_jid] = _min_sum_bg.get(_jid, 0) + (_row['min_partido'] or 0)
+        all_player_ids_bg = set(ejt['jugador_id'] for ejt in ejt_list)
+        skip_pocos_minutos_bg = {
+            jid for jid in all_player_ids_bg
+            if _min_sum_bg.get(jid, 0) < 60
+        }
 
     rival_map = {}
     for cal in (
@@ -353,12 +385,18 @@ def _bg_compute_predictions(temporada_id, jornada_num, cache_key):
             pts = result.get('prediccion') or result.get('puntos_predichos')
             if pts is None:
                 continue
+            try:
+                pts_f = float(pts)
+                if not math.isfinite(pts_f):
+                    continue
+            except (TypeError, ValueError):
+                continue
             # Persist to DB so the fast path picks it up next time
             PrediccionJugador.objects.update_or_create(
                 jugador_id=jid,
                 jornada=jornada_obj,
                 modelo=_POS_MODEL.get(pos_code, 'rf'),
-                defaults={'prediccion': float(pts)},
+                defaults={'prediccion': float(pts_f)},
             )
             candidatos[posicion].append({
                 'id': jid,
@@ -368,7 +406,7 @@ def _bg_compute_predictions(temporada_id, jornada_num, cache_key):
                 'equipo': ejt['equipo__nombre'],
                 'equipo_escudo': shield_name(ejt['equipo__nombre']),
                 'dorsal': str(ejt['dorsal']) if ejt['dorsal'] else '-',
-                'prediccion': round(float(pts), 2),
+                'prediccion': round(float(pts_f), 2),
                 'proximo_rival': rival_map.get(ejt['equipo_id'], '-'),
             })
         except Exception:

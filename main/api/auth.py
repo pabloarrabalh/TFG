@@ -1,4 +1,4 @@
-﻿"""
+"""
 DRF API views – Authentication & User Info
 Endpoints:
   GET  /api/me/
@@ -152,8 +152,8 @@ class RegisterView(APIView):
             last_name=last_name,
         )
         
-        # Guardar nickname en el perfil
-        profile = user.profile
+        # Guardar nickname en el perfil (o crear si no existe)
+        profile, created = UserProfile.objects.get_or_create(user=user)
         profile.nickname = nickname
         profile.save()
         

@@ -1,4 +1,4 @@
-﻿"""
+"""
 DRF API views – Favourite Teams
 Endpoints:
   GET    /api/favoritos/

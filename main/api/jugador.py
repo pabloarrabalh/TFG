@@ -1,4 +1,4 @@
-﻿"""
+"""
 DRF API views – Player Detail & Top Players
 Endpoints:
   GET /api/jugador/<id>/?temporada=25/26
@@ -29,26 +29,70 @@ logger = logging.getLogger(__name__)
 # ── helper ────────────────────────────────────────────────────────────────────
 
 def _get_predicciones_jugador(jugador, temporada):
-    """Returns stored predictions for a player, paired with real fantasy points."""
-    qs = PrediccionJugador.objects.filter(jugador=jugador)
+    """Returns predictions paired with real points.
+    Includes ALL jornadas with predictions (even if no real data yet).
+    Also includes all played jornadas (even without predictions) so the real bar renders.
+    """
+    import math
+    
+    def _sanitize_float(value):
+        """Convert inf/nan to None for JSON serialization"""
+        if value is None:
+            return None
+        try:
+            if math.isnan(value) or math.isinf(value):
+                return None
+            return value
+        except (TypeError, ValueError):
+            return None
+    
+    # 1. Fetch all predictions (evaluating queryset into a list avoids re-querying)
+    pred_qs = PrediccionJugador.objects.filter(jugador=jugador)
     if temporada:
-        qs = qs.filter(jornada__temporada=temporada)
-    qs = qs.select_related('jornada').order_by(
-        'jornada__temporada__nombre', 'jornada__numero_jornada'
-    )
+        pred_qs = pred_qs.filter(jornada__temporada=temporada)
+    predictions = list(pred_qs.select_related('jornada__temporada'))
+
+    pred_by_jornada_id = {p.jornada_id: p for p in predictions}
+    jornada_by_id = {p.jornada_id: p.jornada for p in predictions}  # ALL jornadas with predictions
+
+    # 2. Fetch real stats in a single query (avoids N+1)
+    stats_qs = EstadisticasPartidoJugador.objects.filter(jugador=jugador)
+    if temporada:
+        stats_qs = stats_qs.filter(partido__jornada__temporada=temporada)
+
+    real_by_jornada_id = {}
+    for stat in stats_qs.select_related('partido__jornada__temporada'):
+        j = stat.partido.jornada
+        real_by_jornada_id[j.pk] = real_by_jornada_id.get(j.pk, 0) + (stat.puntos_fantasy or 0)
+        # Register jornada so played jornadas without predictions are also included
+        jornada_by_id[j.pk] = j
+
+    # 3. Build result for every jornada (predictions + any played jornada + future jornadas with predictions)
     result = []
-    for pred in qs:
-        real = EstadisticasPartidoJugador.objects.filter(
-            jugador=jugador, partido__jornada=pred.jornada
-        ).aggregate(pts=Sum('puntos_fantasy'))['pts']
+    for jornada_id, j in jornada_by_id.items():
+        pred = pred_by_jornada_id.get(jornada_id)
+        real = real_by_jornada_id.get(jornada_id)
+        
+        pred_value = None
+        if pred:
+            sanitized_pred = _sanitize_float(pred.prediccion)
+            pred_value = round(sanitized_pred, 2) if sanitized_pred is not None else None
+        
+        real_value = None
+        if real is not None:
+            sanitized_real = _sanitize_float(real)
+            real_value = float(sanitized_real) if sanitized_real is not None else None
+        
         result.append({
-            'jornada': pred.jornada.numero_jornada,
-            'temporada': pred.jornada.temporada.nombre.replace('_', '/'),
-            'prediccion': round(pred.prediccion, 2),
-            'real': float(real) if real is not None else None,
-            'modelo': pred.modelo,
-            'is_early_jornada': pred.jornada.numero_jornada <= 5,
+            'jornada': j.numero_jornada,
+            'temporada': j.temporada.nombre.replace('_', '/'),
+            'prediccion': pred_value,
+            'real': real_value,
+            'modelo': pred.modelo if pred else None,
+            'is_early_jornada': j.numero_jornada <= 5,
         })
+
+    result.sort(key=lambda x: x['jornada'])
     return result
 
 
@@ -215,6 +259,19 @@ class JugadorDetailView(APIView):
             percentiles = ejt.percentiles if ejt.percentiles else {}
 
         st = stats_totales
+        
+        # Sanitize float values to prevent JSON serialization errors
+        import math
+        def _safe_float(val, default=0):
+            if val is None:
+                return default
+            try:
+                if math.isnan(val) or math.isinf(val):
+                    return default
+                return val
+            except (TypeError, ValueError):
+                return default
+        
         return Response({
             'jugador': {
                 'id': jugador.id,
@@ -234,18 +291,18 @@ class JugadorDetailView(APIView):
                 'asistencias': st['asistencias'] or 0,
                 'minutos': st['minutos'] or 0,
                 'partidos': st['partidos'] or 0,
-                'promedio_puntos': round(st['promedio_puntos'] or 0, 1),
+                'promedio_puntos': round(_safe_float(st['promedio_puntos']), 1),
                 'ataque': {
                     'goles': st['goles'] or 0,
-                    'xg': round(st['xg'] or 0, 2),
+                    'xg': round(_safe_float(st['xg']), 2),
                     'tiros': st['tiros'] or 0,
                     'tiros_puerta': st['tiros_puerta'] or 0,
                 },
                 'organizacion': {
                     'asistencias': st['asistencias'] or 0,
-                    'xag': round(st['xag'] or 0, 2),
+                    'xag': round(_safe_float(st['xag']), 2),
                     'pases': st['pases_totales'] or 0,
-                    'pases_accuracy': round(st['pases_accuracy'] or 0, 1),
+                    'pases_accuracy': round(_safe_float(st['pases_accuracy']), 1),
                 },
                 'regates': {
                     'regates_completados': st['regates_completados'] or 0,
@@ -274,7 +331,7 @@ class JugadorDetailView(APIView):
                     'paradas': 0,
                     'goles_encajados': st.get('goles_en_contra', 0) or 0,
                     'porterias_cero': 0,
-                    'porcentaje_paradas': round(st.get('porcentaje_paradas', 0) or 0, 1),
+                    'porcentaje_paradas': round(_safe_float(st.get('porcentaje_paradas')), 1),
                 },
             },
             'ultimos_8': ultimos_12_data,

@@ -407,15 +407,27 @@ class JugadorInsightView(APIView):
         if duelos_aereos_totales >= 5:
             pct_duelos_aereos = (agg.get("duelos_aereos_ganados") or 0) / duelos_aereos_totales * 100
 
+        # Helper to sanitize float values
+        import math
+        def _safe_float(val, default=0):
+            if val is None:
+                return default
+            try:
+                if math.isnan(val) or math.isinf(val):
+                    return default
+                return val
+            except (TypeError, ValueError):
+                return default
+
         stats = {
             "goles": agg.get("goles") or 0,
             "asistencias": agg.get("asistencias") or 0,
             "minutos": agg.get("minutos") or 0,
             "partidos": agg.get("partidos") or 0,
-            "promedio_puntos": round(agg.get("promedio_puntos") or 0, 1),
+            "promedio_puntos": round(_safe_float(agg.get("promedio_puntos")), 1),
             "pases_totales": agg.get("pases_totales") or 0,
-            "pases_accuracy": round(agg.get("pases_accuracy") or 0, 1),
-            "xag": round(agg.get("xag") or 0, 2),
+            "pases_accuracy": round(_safe_float(agg.get("pases_accuracy")), 1),
+            "xag": round(_safe_float(agg.get("xag")), 2),
             "regates_completados": agg.get("regates_completados") or 0,
             "conducciones_progresivas": agg.get("conducciones_progresivas") or 0,
             "despejes": agg.get("despejes") or 0,
@@ -426,14 +438,14 @@ class JugadorInsightView(APIView):
             "duelos_aereos_ganados": agg.get("duelos_aereos_ganados") or 0,
             "duelos_aereos_totales": duelos_aereos_totales,
             "amarillas": agg.get("amarillas") or 0,
-            "xg": round(agg.get("xg") or 0, 2),
+            "xg": round(_safe_float(agg.get("xg")), 2),
             "goles_en_contra": agg.get("goles_en_contra") or 0,
-            "porcentaje_paradas": round(agg.get("porcentaje_paradas") or 0, 1),
-            "pct_duelos": round(pct_duelos, 1),
-            "pct_duelos_aereos": round(pct_duelos_aereos, 1),
+            "porcentaje_paradas": round(_safe_float(agg.get("porcentaje_paradas")), 1),
+            "pct_duelos": round(_safe_float(pct_duelos), 1),
+            "pct_duelos_aereos": round(_safe_float(pct_duelos_aereos), 1),
             "tiros_contra": agg.get("tiros_contra") or 0,
-            "psxg_total": round(agg.get("psxg_total") or 0, 2),
-            "sobrepasos": round((agg.get("psxg_total") or 0) - (agg.get("goles_en_contra") or 0), 2),
+            "psxg_total": round(_safe_float(agg.get("psxg_total")), 2),
+            "sobrepasos": round(_safe_float((agg.get("psxg_total") or 0) - (agg.get("goles_en_contra") or 0)), 2),
         }
 
         insights = get_insights(stats, posicion, n=3)

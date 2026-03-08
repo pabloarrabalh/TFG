@@ -1,4 +1,4 @@
-﻿"""
+"""
 DRF API views – Teams
 Endpoints:
   GET /api/equipos/
@@ -164,6 +164,10 @@ class EquipoDetailView(APIView):
                     f'{eq_jug_temp.jugador.nombre} {eq_jug_temp.jugador.apellido}'.strip()
                 )
                 puntos_dorsal_cero[nombre_completo] = {'puntos': total_puntos}
+                continue
+
+            # No mostrar jugadores que aún no han jugado ni un minuto hasta jornada_actual
+            if partidos_jugados == 0 and total_minutos == 0:
                 continue
 
             posicion_frecuente = (
