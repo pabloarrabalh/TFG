@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import Header from './Header'
 import Sidebar from './Sidebar'
+import { useTour } from '../../context/TourContext'
+import TourEndButton from '../tour/TourEndButton'
 
 function GlobalToasts() {
   const [toasts, setToasts] = useState([])
@@ -38,6 +40,14 @@ export default function Layout({ children }) {
     }
   })
 
+  const { openSidebarRef } = useTour()
+
+  // Register the openSidebar callback for the tour system
+  useEffect(() => {
+    openSidebarRef.current = () => setSidebarOpen(true)
+    return () => { openSidebarRef.current = null }
+  }, [openSidebarRef])
+
   const toggleSidebar = () => {
     setSidebarOpen((prev) => {
       const next = !prev
@@ -63,6 +73,7 @@ export default function Layout({ children }) {
   return (
     <div className="flex flex-col h-screen bg-background-dark">
       <GlobalToasts />
+      <TourEndButton />
       <Header onToggleSidebar={toggleSidebar} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar open={sidebarOpen} onClose={closeSidebar} />

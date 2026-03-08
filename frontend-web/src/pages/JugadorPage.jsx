@@ -1,8 +1,11 @@
 ﻿import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import api from '../services/apiClient'
 import HelpButton from '../components/ui/HelpButton'
 import '../styles/jugador.css'
+import { useTour } from '../context/TourContext'
+import { driver } from 'driver.js'
+import 'driver.js/dist/driver.css'
 
 // Caché de banderas
 const flagCache = JSON.parse(localStorage.getItem('flag_cache') || '{}')
@@ -57,6 +60,9 @@ function FlagIcon({ nationality }) {
 export default function JugadorPage() {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const { tourActive, isPhaseCompleted, markPhaseCompleted } = useTour()
+  const driverRef = useRef(null)
   
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -359,6 +365,78 @@ export default function JugadorPage() {
     })
   }
 
+  // ── Tour guiado ──────────────────────────────────────────────────────────────
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!tourActive || isPhaseCompleted('jugador') || loading || !data) return
+    const timer = setTimeout(() => {
+      driverRef.current = driver({
+        showProgress: true,
+        allowClose: false,
+        nextBtnText: 'Siguiente →',
+        prevBtnText: '← Anterior',
+        doneBtnText: 'Ver Amigos →',
+        steps: [
+          {
+            element: '#tour-jugador-header',
+            popover: {
+              title: 'Ficha del jugador',
+              description: 'Todo sobre el jugador: nombre, posición, edad, equipo y estadísticas rápidas de la temporada.',
+              side: 'bottom',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-jugador-stats',
+            popover: {
+              title: 'Estadísticas detalladas',
+              description: 'Estadísticas por categoría: ataque, defensa, pases... Los estadísticos en dorado están en el percentil 90 o superior.',
+              side: 'bottom',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-jugador-histograma',
+            popover: {
+              title: 'Puntos por partido',
+              description: 'Histograma desplazable con los puntos fantasy de cada partido de la temporada. Haz scroll para ver jornadas antiguas.',
+              side: 'top',
+              align: 'center',
+            },
+          },
+          {
+            element: '#tour-jugador-radar',
+            popover: {
+              title: 'Perfil táctico (Radar)',
+              description: 'Genera un gráfico radar que compara las estadísticas del jugador con la media de su posición en percentiles.',
+              side: 'left',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-jugador-predicciones',
+            popover: {
+              title: 'Predicciones vs realidad',
+              description: 'Compara la puntuación predicha por la IA con la puntuación real obtenida en cada jornada. Evalúa la precisión del modelo.',
+              side: 'top',
+              align: 'center',
+            },
+          },
+        ],
+        onDestroyStarted: () => {
+          driverRef.current?.destroy()
+          markPhaseCompleted('jugador')
+          navigate('/amigos')
+        },
+      })
+      driverRef.current.drive()
+    }, 800)
+    return () => {
+      clearTimeout(timer)
+      driverRef.current?.destroy()
+    }
+  }, [tourActive, loading, data])
+
   if (loading && !data) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background-dark">
@@ -391,7 +469,7 @@ export default function JugadorPage() {
   return (
     <div className="p-6 space-y-6 bg-background-dark min-h-full">
       {/* HEADER CON INFO DEL JUGADOR */}
-      <div className="glass-panel header-gradient rounded-2xl p-8 mb-6">
+      <div id="tour-jugador-header" className="glass-panel header-gradient rounded-2xl p-8 mb-6">
         <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
           {/* Badge y Info básica */}
           <div className="flex gap-6 items-center">
@@ -490,7 +568,7 @@ export default function JugadorPage() {
         {/* IZQUIERDA: Stats y Gráfico (col-span-8) */}
         <div className="lg:col-span-8 space-y-6">
           {/* Estadísticas de la temporada en grid */}
-          <div className="glass-panel rounded-2xl p-6">
+          <div id="tour-jugador-stats" className="glass-panel rounded-2xl p-6">
             <h2 className="text-2xl font-black text-white mb-6 uppercase tracking-wider">
               Estadísticas {temporada_display}
             </h2>
@@ -746,7 +824,7 @@ export default function JugadorPage() {
           </div>
 
           {/* Gráfico de todos los partidos - HISTOGRAMA CON SCROLL */}
-          <div className="glass-panel rounded-2xl p-6">
+          <div id="tour-jugador-histograma" className="glass-panel rounded-2xl p-6">
             <h3 className="text-xl font-bold text-white mb-6 uppercase tracking-wider">
               <span className="material-symbols-outlined align-middle mr-2 icon-lg">trending_up</span>
               Partidos de la Temporada (Puntos Fantasy)
@@ -885,7 +963,7 @@ export default function JugadorPage() {
 
           {/* Gráfico Predicción vs Real - Solo para temporada actual */}
           {temporada === '25/26' && (
-          <div className="glass-panel rounded-2xl p-6">
+          <div id="tour-jugador-predicciones" className="glass-panel rounded-2xl p-6">
             <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-wider">
               <span className="material-symbols-outlined align-middle mr-2 icon-lg">psychology</span>
               {predicciones && predicciones.some(p => p.is_early_jornada) ? (
@@ -1036,7 +1114,7 @@ export default function JugadorPage() {
         {/* DERECHA: Sidebar (col-span-4) */}
         <div className="lg:col-span-4 space-y-6">
           {/* Perfil Táctico */}
-          <div className="glass-panel rounded-2xl p-6">
+          <div id="tour-jugador-radar" className="glass-panel rounded-2xl p-6">
             <h3 className="text-lg font-bold text-white mb-4 uppercase tracking-wider">
               <span className="material-symbols-outlined align-middle mr-2 icon-md">sports_soccer</span>
               Perfil Táctico

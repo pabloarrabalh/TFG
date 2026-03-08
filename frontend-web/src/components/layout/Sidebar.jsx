@@ -72,11 +72,12 @@ export default function Sidebar({ open, onClose }) {
       )}
 
       <aside
+        id="tour-sidebar"
         className={`sidebar ${open ? '' : 'sidebar-hidden'} fixed flex flex-col w-72 h-full bg-surface-dark border-r border-border-dark z-50`}
       >
         <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto scrollbar-hide">
           {/* Selector de Jornada Global */}
-          <div className="mb-6 p-4 bg-primary/10 border border-primary/30 rounded-xl">
+          <div id="tour-sidebar-jornada" className="mb-6 p-4 bg-primary/10 border border-primary/30 rounded-xl">
             <div className="flex items-center gap-2 mb-3">
               <span className="material-symbols-outlined text-primary text-lg">schedule</span>
               <h3 className="text-xs font-bold text-primary uppercase tracking-wide">Jornada</h3>
@@ -136,6 +137,7 @@ export default function Sidebar({ open, onClose }) {
           {NAV_ITEMS.map(({ path, label, icon, key }) => (
             <Link
               key={key}
+              id={`tour-sidebar-${key}`}
               to={path}
               onClick={() => { if (window.innerWidth < 1024) onClose() }}
               className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all group ${

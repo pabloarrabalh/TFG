@@ -1,8 +1,12 @@
 ﻿import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import HelpButton from '../components/ui/HelpButton'
 import ConsejeroChat from '../components/ui/ConsejeroChat'
 import apiClient from '../services/apiClient'
+import { useTour } from '../context/TourContext'
+import { driver } from 'driver.js'
+import 'driver.js/dist/driver.css'
 
 const BACKEND = 'http://localhost:8000'
 
@@ -220,9 +224,10 @@ function PlayerCard({ jugador, posicion, indice, onOpen, onRemove, prediccion, o
 }
 
 // ─── Slot vacío del campo ───────────────────────────────────────────────────
-function EmptySlot({ posicion, indice, onAdd, isDropTarget, onDragOver, onDrop }) {
+function EmptySlot({ posicion, indice, onAdd, isDropTarget, onDragOver, onDrop, id }) {
   return (
     <button
+      id={id}
       onClick={() => onAdd(posicion, false, indice)}
       className={`w-[130px] h-[180px] rounded-xl border-2 border-dashed flex items-center justify-center text-gray-500 hover:border-primary/50 hover:text-primary/70 transition-all ${isDropTarget ? 'border-yellow-400 bg-yellow-400/10' : 'border-white/20'}`}
       onDragOver={onDragOver}
@@ -267,6 +272,9 @@ function SuplenteCard({ jugador, indice, onOpen, onRemove, prediccion, onDragSta
 
 // ─── COMPONENTE PRINCIPAL ───────────────────────────────────────────────────
 export default function MiPlantillaPage() {
+  const navigate = useNavigate()
+  const { tourActive, isPhaseCompleted, markPhaseCompleted } = useTour()
+  const driverRef = useRef(null)
   const [loading, setLoading] = useState(true)
   // Inicializa jornadaActual correctamente: jornada_global + 1
   const [jornadaActual, setJornadaActual] = useState(() => {
@@ -428,7 +436,8 @@ export default function MiPlantillaPage() {
 
   async function loadPlantillas() {
     try {
-      const res = await fetch(`${BACKEND}/mi-plantilla/listar/`, { credentials: 'include' })
+      const res = await fetch(`${BACKEND}/api/plantillas/usuario/`, { credentials: 'include' })
+      if (!res.ok) return
       const data = await res.json()
       const ps = data.plantillas || []
       setTodasPlantillas(ps)
@@ -533,7 +542,7 @@ export default function MiPlantillaPage() {
   async function guardarPlantilla() {
     setSaving(true)
     try {
-      const res = await fetch(`${BACKEND}/mi-plantilla/guardar/`, {
+      const res = await fetch(`${BACKEND}/api/plantillas/usuario/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         credentials: 'include',
@@ -563,7 +572,7 @@ export default function MiPlantillaPage() {
       return
     }
     try {
-      const res = await fetch(`${BACKEND}/mi-plantilla/${plantillaId}/renombrar/`, {
+      const res = await fetch(`${BACKEND}/api/plantillas/usuario/${plantillaId}/renombrar/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         credentials: 'include',
@@ -583,7 +592,7 @@ export default function MiPlantillaPage() {
   async function eliminarPlantilla() {
     if (!plantillaId || !window.confirm(`¿Eliminar "${plantillaNombre}"?`)) return
     try {
-      await fetch(`${BACKEND}/mi-plantilla/${plantillaId}/eliminar/`, {
+      await fetch(`${BACKEND}/api/plantillas/usuario/${plantillaId}/`, {
         method: 'DELETE', headers: { 'X-CSRFToken': getCsrfToken() }, credentials: 'include',
       })
       setPlantillaId(null); setPlantillaNombre('Mi Team')
@@ -784,6 +793,9 @@ export default function MiPlantillaPage() {
   // ── Render línea campo ────────────────────────────────────────────────────
   const cfg = FORMACIONES[formacion]
 
+  // Track whether we've already rendered the first empty slot (for tour ID)
+  const firstEmptySlotRendered = useRef(false)
+
   function renderLinea(pos) {
     const slots = cfg[pos] || 1
     return (
@@ -805,6 +817,13 @@ export default function MiPlantillaPage() {
           ) : (
             <EmptySlot
               key={i}
+              id={(() => {
+                if (!firstEmptySlotRendered.current) {
+                  firstEmptySlotRendered.current = true
+                  return 'tour-empty-slot-first'
+                }
+                return undefined
+              })()}
               posicion={pos} indice={i} onAdd={abrirModalSel}
               isDropTarget={isDrop}
               onDragOver={e => handleDragOver(e, pos, i)}
@@ -830,10 +849,189 @@ export default function MiPlantillaPage() {
       .sort((a, b) => (b.puntos_fantasy_25_26 || 0) - (a.puntos_fantasy_25_26 || 0))
   })()
 
+  // ── Tour guiado ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!tourActive || isPhaseCompleted('plantilla') || loading) return
+    const timer = setTimeout(() => {
+      driverRef.current = driver({
+        showProgress: true,
+        allowClose: false,
+        nextBtnText: 'Siguiente →',
+        prevBtnText: '← Anterior',
+        doneBtnText: 'Ver Liga →',
+        steps: [
+          {
+            element: '#tour-sidebar',
+            popover: {
+              title: 'Menú lateral',
+              description: 'Desde aquí navegas por toda la app. Puedes abrirlo y cerrarlo con el botón del header.',
+              side: 'right',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-sidebar-jornada',
+            popover: {
+              title: 'Jornada global',
+              description: 'Este selector controla qué jornada se muestra en toda la app. Cámbialo para ver datos de cualquier jornada de la temporada.',
+              side: 'right',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-sidebar-mi-plantilla',
+            popover: {
+              title: 'Mi Plantilla',
+              description: 'Estamos aquí. Gestiona tu equipo fantasy: elige jugadores, formaciones y usa IA para predecir puntuaciones.',
+              side: 'right',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-sidebar-liga',
+            popover: {
+              title: 'Liga',
+              description: 'Clasificación, partidos de la jornada y estadísticas completas de LaLiga.',
+              side: 'right',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-sidebar-amigos',
+            popover: {
+              title: 'Amigos',
+              description: 'Añade amigos y compara vuestras plantillas fantasy.',
+              side: 'right',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-plantilla-header',
+            popover: {
+              title: 'Tu plantilla fantasy',
+              description: 'Aquí configuras tu equipo: nombre, formación, jugadores y guardado. Todo en un solo lugar.',
+              side: 'bottom',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-plantilla-nombre',
+            popover: {
+              title: 'Nombre de tu plantilla',
+              description: 'Haz clic en el icono de lápiz junto al nombre para renombrar tu plantilla como quieras.',
+              side: 'bottom',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-plantilla-formacion',
+            popover: {
+              title: 'Formación táctica',
+              description: 'Selecciona la formación de tu equipo: 4-3-3, 4-4-2, 3-5-2... El campo visual se adapta automáticamente.',
+              side: 'bottom',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-plantilla-nueva',
+            popover: {
+              title: 'Varias plantillas',
+              description: 'Puedes crear múltiples plantillas y alternar entre ellas. Ideal para probar distintas estrategias o jornadas.',
+              side: 'bottom',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-plantilla-guardar',
+            popover: {
+              title: 'Guardar cambios',
+              description: 'No olvides guardar tu plantilla tras hacer cambios. El botón verde la almacena en el servidor.',
+              side: 'bottom',
+              align: 'end',
+            },
+          },
+          {
+            element: '#tour-plantilla-modelos',
+            popover: {
+              title: 'Modelos de predicción',
+              description: 'Elige el modelo de IA por posición: Random Forest, Ridge o ElasticNet. Cada uno tiene diferente precisión según la posición del jugador.',
+              side: 'bottom',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-campo',
+            popover: {
+              title: 'El campo visual',
+              description: 'Aquí ves tu equipo en el campo según la formación elegida. Las casillas vacías muestran las posiciones disponibles que debes cubrir.',
+              side: 'top',
+              align: 'center',
+            },
+          },
+          {
+            element: '#tour-empty-slot-first',
+            popover: {
+              title: 'Añadir un jugador',
+              description: 'Haz clic en cualquier casilla vacía para abrir el selector de jugadores. Búscalos por nombre, filtra por posición y equipo.',
+              side: 'top',
+              align: 'center',
+            },
+          },
+          {
+            element: '#tour-jornada-selector',
+            popover: {
+              title: 'Jornada a predecir',
+              description: 'Elige para qué jornada quieres ver las predicciones de puntuación. Prueba distintas jornadas para planificar.',
+              side: 'bottom',
+              align: 'end',
+            },
+          },
+          {
+            element: '#tour-pts-previstos',
+            popover: {
+              title: 'Puntos previstos',
+              description: 'La IA calcula cuántos puntos fantasy espera que sumen todos los jugadores de tu equipo en la jornada seleccionada.',
+              side: 'right',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-consejero-btn',
+            popover: {
+              title: 'Consejero inteligente',
+              description: 'El Consejero analiza tu plantilla y sugiere mejoras: qué jugadores cambiar, quién está en mejor forma, lesionados, etc.',
+              side: 'right',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-bench',
+            popover: {
+              title: 'Banquillo',
+              description: 'Hasta 5 suplentes. Arrastra jugadores del campo al banquillo (o viceversa) para hacer cambios tácticos.',
+              side: 'top',
+              align: 'center',
+            },
+          },
+        ],
+        onDestroyStarted: () => {
+          driverRef.current?.destroy()
+          markPhaseCompleted('plantilla')
+          navigate('/clasificacion')
+        },
+      })
+      driverRef.current.drive()
+    }, 800)
+    return () => {
+      clearTimeout(timer)
+      driverRef.current?.destroy()
+    }
+  }, [tourActive, loading])
+
   if (loading) return <div className="flex items-center justify-center min-h-screen"><LoadingSpinner size="lg" /></div>
 
   return (
-    <div className="p-6 space-y-4 bg-background-dark min-h-full" onClick={() => setShowFormDropdown(false)}>
+    <div className="p-6 space-y-4 bg-background-dark min-h-full" onClick={() => { setShowFormDropdown(false); setShowJornadaDropdown(false); setShowEquipoFilterDropdown(false); setShowPosFiltroDropdown(false) }}>
       <NotificacionesStack items={notifs} />
 
       {/* Aviso de actualización azul */}
@@ -845,17 +1043,17 @@ export default function MiPlantillaPage() {
       )}
 
       {/* ── Cabecera ── */}
-      <div className="glass-panel rounded-2xl p-5 relative z-[100]">
+      <div id="tour-plantilla-header" className="glass-panel rounded-2xl p-5 relative z-[100]">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <h2 className="text-2xl font-black text-white truncate">{plantillaNombre}</h2>
+            <h2 id="tour-plantilla-nombre" className="text-2xl font-black text-white truncate">{plantillaNombre}</h2>
             <button onClick={() => { setNuevoNombre(plantillaNombre); setModalRen(true) }} className="text-gray-400 hover:text-primary transition-colors flex-shrink-0">
               <span className="material-symbols-outlined text-lg">edit</span>
             </button>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             {/* Selector formación */}
-            <div className="relative" onClick={e => e.stopPropagation()}>
+            <div id="tour-plantilla-formacion" className="relative" onClick={e => e.stopPropagation()}>
               <button onClick={() => setShowFormDropdown(v => !v)} className="px-4 py-2 bg-surface-dark border border-border-dark text-white rounded-lg hover:bg-primary/10 hover:border-primary/50 transition-all text-sm font-bold flex items-center gap-2">
                 <span className="material-symbols-outlined text-base text-primary">grid_view</span>
                 {formacion}
@@ -875,7 +1073,7 @@ export default function MiPlantillaPage() {
                 {todasPlantillas.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
               </select>
             )}
-            <button onClick={crearNueva} className="px-3 py-2 bg-surface-dark border border-border-dark text-white rounded-lg hover:bg-white/5 text-sm" title="Nueva plantilla">
+            <button id="tour-plantilla-nueva" onClick={crearNueva} className="px-3 py-2 bg-surface-dark border border-border-dark text-white rounded-lg hover:bg-white/5 text-sm" title="Nueva plantilla">
               <span className="material-symbols-outlined text-base">add</span>
             </button>
             {plantillaId && (
@@ -883,7 +1081,7 @@ export default function MiPlantillaPage() {
                 <span className="material-symbols-outlined text-base">delete</span>
               </button>
             )}
-            <button onClick={guardarPlantilla} disabled={saving} className="px-5 py-2 bg-primary hover:bg-primary-dark text-black rounded-lg font-bold text-sm flex items-center gap-2 transition-colors disabled:opacity-60">
+            <button id="tour-plantilla-guardar" onClick={guardarPlantilla} disabled={saving} className="px-5 py-2 bg-primary hover:bg-primary-dark text-black rounded-lg font-bold text-sm flex items-center gap-2 transition-colors disabled:opacity-60">
               <span className="material-symbols-outlined text-base">save</span>
               {saving ? 'Guardando...' : 'Guardar'}
             </button>
@@ -907,7 +1105,7 @@ export default function MiPlantillaPage() {
 
 
       {/* ── Selector de modelos por posición ── */}
-      <div className="glass-panel rounded-2xl p-4 relative z-50" onClick={e => e.stopPropagation()}>
+      <div id="tour-plantilla-modelos" className="glass-panel rounded-2xl p-4 relative z-50" onClick={e => e.stopPropagation()}>
         <button 
           onClick={() => setShowModelPanel(!showModelPanel)}
           className="w-full flex items-center justify-between mb-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
@@ -993,7 +1191,7 @@ export default function MiPlantillaPage() {
       </div>
 
       {/* ── Campo ── */}
-      <div style={{ perspective: '1200px', overflow: 'visible' }}>
+      <div id="tour-campo" style={{ perspective: '1200px', overflow: 'visible' }}>
         <div
           className="relative rounded-3xl w-full overflow-visible py-6"
           style={{
@@ -1015,7 +1213,7 @@ export default function MiPlantillaPage() {
           </svg>
 
           {/* Selector jornada - esquina superior derecha */}
-          <div className="absolute top-4 right-4 z-20">
+          <div id="tour-jornada-selector" className="absolute top-4 right-4 z-20" onClick={e => e.stopPropagation()}>
             <div className="bg-surface-dark border border-border-dark rounded-xl px-3 py-2 text-center relative">
               <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-1">Jornada a predecir</p>
               <button
@@ -1046,6 +1244,7 @@ export default function MiPlantillaPage() {
           </div>
 
           <div className="relative z-10 flex flex-col justify-around" style={{ minHeight: 640 }}>
+            {(firstEmptySlotRendered.current = false, null)}
             {renderLinea('Delantero')}
             {renderLinea('Centrocampista')}
             {renderLinea('Defensa')}
@@ -1057,13 +1256,14 @@ export default function MiPlantillaPage() {
             const total = POSICIONES.flatMap(p => alineacion[p] || []).filter(Boolean).reduce((sum, j) => sum + (predicciones[j.id]?.value ?? 0), 0)
             const count = POSICIONES.flatMap(p => alineacion[p] || []).filter(Boolean).length
             return (
-              <div className="absolute top-4 left-4 space-y-3 z-20 pointer-events-auto">
+              <div id="tour-pts-previstos" className="absolute top-4 left-4 space-y-3 z-20 pointer-events-auto">
                 <div className="bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-3 text-center">
                   <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-0.5">Pts previstos</p>
                   <p className="text-yellow-300 font-black text-2xl leading-none">{total > 0 ? total.toFixed(1) : '—'}</p>
                   {count > 0 && <p className="text-white/40 text-xs mt-1">{count} jugadores</p>}
                 </div>
-                <button 
+                <button
+                  id="tour-consejero-btn"
                   onClick={() => setShowConsejero(true)}
                   className="w-full px-4 py-2 bg-primary/20 hover:bg-primary/30 border border-primary/40 text-primary rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors"
                   title="Abrir Consejero de Plantilla"
@@ -1099,7 +1299,7 @@ export default function MiPlantillaPage() {
       </div>
 
       {/* ── Banquillo ── */}
-      <div className="glass-panel rounded-2xl p-5">
+      <div id="tour-bench" className="glass-panel rounded-2xl p-5">
         <h3 className="text-xl font-black text-white mb-4">Suplentes</h3>
         <div className="grid grid-cols-5 gap-3">
           {Array.from({ length: 5 }, (_, i) => {

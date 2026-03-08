@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState, useRef } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import apiClient from '../services/apiClient'
 import { useAuth } from '../context/AuthContext'
 import GlassPanel from '../components/ui/GlassPanel'
@@ -7,6 +7,9 @@ import LoadingSpinner from '../components/ui/LoadingSpinner'
 import TeamShield from '../components/ui/TeamShield'
 import HelpButton from '../components/ui/HelpButton'
 import { Riple } from 'react-loading-indicators'
+import { useTour } from '../context/TourContext'
+import { driver } from 'driver.js'
+import 'driver.js/dist/driver.css'
 
 const BACKEND = 'http://localhost:8000'
 
@@ -22,11 +25,14 @@ function formatDate(fecha) {
 
 export default function MenuPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
+  const { tourActive, isPhaseCompleted, markPhaseCompleted, openSidebarRef, setTourJugadorId } = useTour()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [jornada, setJornada] = useState(null)
   const [jugadoresDestacados, setJugadoresDestacados] = useState(null)
   const [loadingJugadores, setLoadingJugadores] = useState(true)
+  const driverRef = useRef(null)
 
   const loadMenuData = (jornadaNum) => {
     setLoading(true)
@@ -74,6 +80,88 @@ export default function MenuPage() {
     return () => window.removeEventListener('jornadaChanged', handleJornadaChange)
   }, [])
 
+  // Save first jugador ID so ClasificacionPage tour can navigate to it
+  useEffect(() => {
+    if (!tourActive || !jugadoresDestacados) return
+    const posKeys = Object.keys(jugadoresDestacados)
+    if (posKeys.length > 0) {
+      const first = jugadoresDestacados[posKeys[0]]?.[0]
+      if (first?.id) setTourJugadorId(first.id)
+    }
+  }, [jugadoresDestacados, tourActive])
+
+  // Run tour phase for this page
+  useEffect(() => {
+    if (!tourActive || isPhaseCompleted('menu') || loading) return
+    const timer = setTimeout(() => {
+      driverRef.current = driver({
+        showProgress: true,
+        allowClose: false,
+        nextBtnText: 'Siguiente →',
+        prevBtnText: '← Anterior',
+        doneBtnText: 'Mi Plantilla →',
+        steps: [
+          {
+            element: '#tour-menu-welcome',
+            popover: {
+              title: 'Panel principal',
+              description: 'Aquí tienes un resumen de todo lo importante: clasificación, próximos partidos y predicciones de jugadores generadas por IA.',
+              side: 'bottom',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-menu-clasificacion',
+            popover: {
+              title: 'Clasificación Top 5',
+              description: 'Los 5 mejores equipos de LaLiga actualizado jornada a jornada. Pulsa «Ver clasificación completa» para la tabla entera.',
+              side: 'right',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-menu-proxima-jornada',
+            popover: {
+              title: 'Próxima jornada',
+              description: 'Los partidos que se jugarán en la próxima jornada con fechas y horarios actualizados.',
+              side: 'right',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-menu-favoritos-partidos',
+            popover: {
+              title: 'Tus equipos favoritos',
+              description: 'Los partidos de los equipos que marcaste como favoritos para seguirlos de cerca sin buscarlos.',
+              side: 'left',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-menu-destacados',
+            popover: {
+              title: 'Jugadores destacados por IA',
+              description: 'Los jugadores con mayor puntuación predicha para la próxima jornada, calculada por nuestros modelos de Machine Learning. ¡Ideal para elegir tu equipo fantasy!',
+              side: 'left',
+              align: 'start',
+            },
+          },
+        ],
+        onDestroyStarted: () => {
+          driverRef.current?.destroy()
+          markPhaseCompleted('menu')
+          openSidebarRef.current?.()
+          navigate('/mi-plantilla')
+        },
+      })
+      driverRef.current.drive()
+    }, 600)
+    return () => {
+      clearTimeout(timer)
+      driverRef.current?.destroy()
+    }
+  }, [tourActive, loading])
+
   if (loading && !data) return <LoadingSpinner />
 
   const { clasificacion_top = [], jornada_actual, proxima_jornada, partidos_proxima_jornada = [], partidos_favoritos = [] } = data || {}
@@ -83,7 +171,7 @@ export default function MenuPage() {
   return (
     <div className="p-6 space-y-6 bg-background-dark min-h-full">
       {/* Header */}
-      <div className="mb-8">
+      <div id="tour-menu-welcome" className="mb-8">
         <h2 className="text-3xl font-black text-white mb-2">¡Bienvenido de vuelta!</h2>
         <p className="text-gray-400 text-lg">Gestiona tu equipo y sigue la liga</p>
       </div>
@@ -93,7 +181,7 @@ export default function MenuPage() {
         <div className="xl:col-span-4 space-y-6">
 
           {/* Clasificación top 5 */}
-          <GlassPanel className="overflow-hidden">
+          <GlassPanel id="tour-menu-clasificacion" className="overflow-hidden">
             <div className="p-6 border-b border-white/10">
               <div className="flex items-center justify-between gap-3 mb-4">
                 <div className="flex items-center gap-2">
@@ -144,7 +232,7 @@ export default function MenuPage() {
           </GlassPanel>
 
           {/* Próximos partidos */}
-          <GlassPanel className="p-6">
+          <GlassPanel id="tour-menu-proxima-jornada" className="p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="bg-gradient-to-r from-primary to-blue-500 rounded-xl p-3">
                 <span className="material-symbols-outlined text-white text-xl font-bold">calendar_today</span>
@@ -199,7 +287,7 @@ export default function MenuPage() {
           {/* Favoritos */}
           {user ? (
             partidos_favoritos.length > 0 ? (
-              <GlassPanel className="p-6">
+              <GlassPanel id="tour-menu-favoritos-partidos" className="p-6">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="bg-gradient-to-r from-primary to-green-500 rounded-xl p-3">
                     <span className="material-symbols-outlined text-white text-xl font-bold">favorite</span>
@@ -264,7 +352,7 @@ export default function MenuPage() {
           )}
 
           {/* Jugadores destacados */}
-          <GlassPanel className="p-6">
+          <GlassPanel id="tour-menu-destacados" className="p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl p-3">
                 <span className="material-symbols-outlined text-white text-xl font-bold">trending_up</span>

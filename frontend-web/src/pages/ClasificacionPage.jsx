@@ -1,13 +1,18 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import api from '../services/apiClient'
 import GlassPanel from '../components/ui/GlassPanel'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import TeamShield from '../components/ui/TeamShield'
+import { useTour } from '../context/TourContext'
+import { driver } from 'driver.js'
+import 'driver.js/dist/driver.css'
 
 export default function ClasificacionPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { tourActive, isPhaseCompleted, markPhaseCompleted, tourJugadorId } = useTour()
+  const driverRef = useRef(null)
 
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -72,8 +77,16 @@ export default function ClasificacionPage() {
   }
 
   const handleJornadaChange = (e) => {
+    const val = e.target.value
     const newParams = new URLSearchParams(searchParams)
-    newParams.set('jornada', e.target.value)
+    // If the user selected the empty value (Jornada Actual), read the sidebar/global jornada
+    if (val === '') {
+      const saved = localStorage.getItem('jornada_global')
+      if (saved) newParams.set('jornada', saved)
+      else newParams.delete('jornada')
+    } else {
+      newParams.set('jornada', val)
+    }
     newParams.delete('equipo')
     setSearchParams(newParams)
   }
@@ -104,6 +117,69 @@ export default function ClasificacionPage() {
     newParams.delete('equipo')
     setSearchParams(newParams)
   }
+
+  // ── Tour guiado ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!tourActive || isPhaseCompleted('clasificacion') || loading) return
+    const timer = setTimeout(() => {
+      driverRef.current = driver({
+        showProgress: true,
+        allowClose: false,
+        nextBtnText: 'Siguiente →',
+        prevBtnText: '← Anterior',
+        doneBtnText: 'Ver jugador →',
+        steps: [
+          {
+            element: '#tour-clasificacion-filtros',
+            popover: {
+              title: 'Filtros',
+              description: 'Filtra los datos por temporada, jornada o equipo. Puedes cambiar el contexto para explorar cualquier momento de la historia de LaLiga.',
+              side: 'bottom',
+              align: 'start',
+            },
+          },
+          {
+            element: '#partidos-section',
+            popover: {
+              title: 'Partidos de la jornada',
+              description: 'Los partidos de la jornada seleccionada. Haz clic en cualquier fila para desplegar el resultado detallado y estadísticas del encuentro.',
+              side: 'top',
+              align: 'start',
+            },
+          },
+          {
+            element: '#partido-0',
+            popover: {
+              title: 'Detalle del partido',
+              description: 'Al expandir un partido ves el marcador, los goles y estadísticas. Muy útil para analizar el rendimiento de cada jugador.',
+              side: 'top',
+              align: 'center',
+            },
+          },
+          {
+            element: '#clasificacion-section',
+            popover: {
+              title: 'Tabla de clasificación',
+              description: 'La clasificación completa de LaLiga. Haz clic en el nombre de un equipo para ir a su página con estadísticas en profundidad y sus jugadores.',
+              side: 'top',
+              align: 'center',
+            },
+          },
+        ],
+        onDestroyStarted: () => {
+          driverRef.current?.destroy()
+          markPhaseCompleted('clasificacion')
+          const jugId = tourJugadorId || 1
+          navigate(`/jugador/${jugId}`)
+        },
+      })
+      driverRef.current.drive()
+    }, 700)
+    return () => {
+      clearTimeout(timer)
+      driverRef.current?.destroy()
+    }
+  }, [tourActive, loading])
 
   if (loading && !data) return <LoadingSpinner />
 
@@ -141,7 +217,7 @@ export default function ClasificacionPage() {
       </div>
 
       {/* Filters Panel */}
-      <GlassPanel className="rounded-2xl p-6 mb-6">
+      <GlassPanel id="tour-clasificacion-filtros" className="rounded-2xl p-6 mb-6">
         <div
           className="flex items-center gap-2 cursor-pointer mb-4"
           onClick={() => setFiltrosOpen(!filtrosOpen)}

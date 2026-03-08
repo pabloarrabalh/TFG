@@ -1,17 +1,88 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/apiClient'
 import GlassPanel from '../components/ui/GlassPanel'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import TeamShield from '../components/ui/TeamShield'
 import HelpButton from '../components/ui/HelpButton'
+import TourModal from '../components/tour/TourModal'
+import { useTour } from '../context/TourContext'
+import { driver } from 'driver.js'
+import 'driver.js/dist/driver.css'
 
 export default function SelectFavoritesPage() {
   const navigate = useNavigate()
+  const { tourActive, isPhaseCompleted, markPhaseCompleted, hasTourBeenOffered } = useTour()
 
   const [equipos, setEquipos] = useState([])
   const [favoritos, setFavoritos] = useState(new Set()) // Set of equipo IDs
   const [loading, setLoading] = useState(true)
+  const [showTourModal, setShowTourModal] = useState(false)
+  const driverRef = useRef(null)
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  // Show tour modal to new users who haven't been offered the tour yet
+  useEffect(() => {
+    if (!loading && !hasTourBeenOffered()) {
+      setShowTourModal(true)
+    }
+  }, [loading])
+
+  // Run tour phase for this page
+  useEffect(() => {
+    if (!tourActive || isPhaseCompleted('favorites') || loading) return
+    const timer = setTimeout(() => {
+      driverRef.current = driver({
+        showProgress: true,
+        allowClose: false,
+        nextBtnText: 'Siguiente →',
+        prevBtnText: '← Anterior',
+        doneBtnText: 'Ir al panel →',
+        steps: [
+          {
+            element: '#tour-favorites-header',
+            popover: {
+              title: '¡Bienvenido/a!',
+              description: 'Primero vamos a seleccionar tus equipos favoritos. Los verás destacados en el panel principal.',
+              side: 'bottom',
+              align: 'center',
+            },
+          },
+          {
+            element: '#tour-favorites-grid',
+            popover: {
+              title: 'Tus equipos del corazón',
+              description: 'Haz clic en los escudos para seleccionar los equipos que quieres seguir. Puedes elegir varios.',
+              side: 'top',
+              align: 'center',
+            },
+          },
+          {
+            element: '#tour-favorites-btn',
+            popover: {
+              title: '¡Listo!',
+              description: 'Cuando hayas elegido tus equipos, pulsa "Continuar" para ir al panel principal.',
+              side: 'top',
+              align: 'center',
+            },
+          },
+        ],
+        onDestroyStarted: () => {
+          driverRef.current?.destroy()
+          markPhaseCompleted('favorites')
+          navigate('/menu')
+        },
+      })
+      driverRef.current.drive()
+    }, 600)
+    return () => {
+      clearTimeout(timer)
+      driverRef.current?.destroy()
+    }
+  }, [tourActive, loading])
 
   useEffect(() => {
     loadData()
@@ -70,8 +141,10 @@ export default function SelectFavoritesPage() {
 
   return (
     <div className="p-6 space-y-6 min-h-screen">
+      {showTourModal && <TourModal onClose={() => setShowTourModal(false)} />}
+
       {/* Header */}
-      <div className="text-center mb-8">
+      <div id="tour-favorites-header" className="text-center mb-8">
         <h1 className="text-4xl font-black text-white mb-2">Selecciona tus equipos favoritos</h1>
         <p className="text-gray-400 text-lg">Elige los equipos que quieras seguir de cerca</p>
         {favoritos.size > 0 && (
@@ -82,7 +155,7 @@ export default function SelectFavoritesPage() {
       </div>
 
       {/* Teams grid */}
-      <GlassPanel className="p-8">
+      <GlassPanel id="tour-favorites-grid" className="p-8">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {equipos.map(equipo => {
             const isFav = favoritos.has(equipo.id)
@@ -118,6 +191,7 @@ export default function SelectFavoritesPage() {
       {/* Action buttons */}
       <div className="flex gap-4 justify-center mt-6">
         <button
+          id="tour-favorites-btn"
           onClick={() => navigate('/menu')}
           className="bg-primary hover:bg-primary-dark text-black font-bold px-8 py-3 rounded-xl transition-all"
         >

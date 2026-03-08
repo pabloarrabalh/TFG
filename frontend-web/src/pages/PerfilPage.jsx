@@ -1,11 +1,14 @@
 import { useEffect, useState, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import api from '../services/apiClient'
 import GlassPanel from '../components/ui/GlassPanel'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import TeamShield from '../components/ui/TeamShield'
 import { useAuth } from '../context/AuthContext'
 import HelpButton from '../components/ui/HelpButton'
+import { useTour } from '../context/TourContext'
+import { driver } from 'driver.js'
+import 'driver.js/dist/driver.css'
 
 const BACKEND = 'http://localhost:8000'
 const ESTADOS = [
@@ -18,6 +21,9 @@ const AVATAR_COUNT = 5
 
 export default function PerfilPage() {
   const { user, refetchUser } = useAuth()
+  const navigate = useNavigate()
+  const { tourActive, isPhaseCompleted, markPhaseCompleted } = useTour()
+  const driverRef = useRef(null)
 
   const [perfil, setPerfil] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -43,6 +49,58 @@ export default function PerfilPage() {
   useEffect(() => {
     loadPerfil()
   }, [])
+
+  useEffect(() => {
+    if (!tourActive || isPhaseCompleted('perfil') || loading || !perfil) return
+    const timer = setTimeout(() => {
+      driverRef.current = driver({
+        showProgress: true,
+        allowClose: false,
+        nextBtnText: 'Siguiente →',
+        prevBtnText: '← Anterior',
+        doneBtnText: '¡Tour completado!',
+        steps: [
+          {
+            element: '#tour-perfil-header',
+            popover: {
+              title: 'Tu perfil',
+              description: 'Edita tu nombre, email y foto de perfil. También puedes cambiar tu estado (Activo, Ausente, No molestar).',
+              side: 'bottom',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-perfil-notificaciones',
+            popover: {
+              title: 'Notificaciones',
+              description: 'Configura qué notificaciones quieres recibir: goles, asistencias, tarjetas... de los jugadores de tu plantilla predeterminada.',
+              side: 'top',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-perfil-privacidad',
+            popover: {
+              title: 'Privacidad de plantillas',
+              description: 'Controla si tus plantillas son públicas (visibles por amigos) o privadas. ¡Y eso es todo el tour! Ya conoces la app.',
+              side: 'top',
+              align: 'center',
+            },
+          },
+        ],
+        onDestroyStarted: () => {
+          driverRef.current?.destroy()
+          markPhaseCompleted('perfil')
+          endTour()
+        },
+      })
+      driverRef.current.drive()
+    }, 700)
+    return () => {
+      clearTimeout(timer)
+      driverRef.current?.destroy()
+    }
+  }, [tourActive, loading, perfil])
 
   async function loadPerfil() {
     setLoading(true)
@@ -206,7 +264,7 @@ export default function PerfilPage() {
       )}
 
       {/* Profile header */}
-      <GlassPanel className="p-8">
+      <GlassPanel id="tour-perfil-header" className="p-8">
         <div className="flex flex-col sm:flex-row items-center gap-6">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
@@ -316,7 +374,7 @@ export default function PerfilPage() {
       </GlassPanel>
 
       {/* ── Notification preferences ── */}
-      <GlassPanel className="p-6">
+      <GlassPanel id="tour-perfil-notificaciones" className="p-6">
         <div className="flex items-center gap-3 mb-5">
           <span className="material-symbols-outlined text-2xl text-yellow-400">notifications</span>
           <h2 className="text-xl font-bold text-white">Preferencias de notificaciones</h2>
@@ -339,7 +397,7 @@ export default function PerfilPage() {
 
       {/* ── Plantilla privacy ── */}
       {plantillasPriv.length > 0 && (
-        <GlassPanel className="p-6">
+        <GlassPanel id="tour-perfil-privacidad" className="p-6">
           <div className="flex items-center gap-3 mb-5">
             <span className="material-symbols-outlined text-2xl text-primary">lock</span>
             <h2 className="text-xl font-bold text-white">Configuración de plantillas</h2>

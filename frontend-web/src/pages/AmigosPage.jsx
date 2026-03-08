@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState, useRef } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import api from '../services/apiClient'
 import GlassPanel from '../components/ui/GlassPanel'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import { useAuth } from '../context/AuthContext'
 import HelpButton from '../components/ui/HelpButton'
+import { useTour } from '../context/TourContext'
+import { driver } from 'driver.js'
+import 'driver.js/dist/driver.css'
 
 const STATUS_CONFIG = {
   active: { color: 'bg-green-500', label: 'Activo' },
@@ -49,6 +52,9 @@ function Avatar({ name, photo, size = 10 }) {
 
 export default function AmigosPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
+  const { tourActive, isPhaseCompleted, markPhaseCompleted } = useTour()
+  const driverRef = useRef(null)
 
   const [data, setData] = useState({ amigos: [], solicitudes_pendientes: [], solicitudes_enviadas: [] })
   const [loading, setLoading] = useState(true)
@@ -129,6 +135,51 @@ export default function AmigosPage() {
     }
   }
 
+  // ── Tour guiado ──────────────────────────────────────────────────────────────
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!tourActive || isPhaseCompleted('amigos') || loading) return
+    const timer = setTimeout(() => {
+      driverRef.current = driver({
+        showProgress: true,
+        allowClose: false,
+        nextBtnText: 'Siguiente →',
+        prevBtnText: '← Anterior',
+        doneBtnText: 'Ver Perfil →',
+        steps: [
+          {
+            element: '#tour-amigos-buscar',
+            popover: {
+              title: 'Buscar amigos',
+              description: 'Escribe el @usuario de un amigo y envíale una solicitud de amistad para poder ver vuestras plantillas.',
+              side: 'bottom',
+              align: 'start',
+            },
+          },
+          {
+            element: '#tour-amigos-lista',
+            popover: {
+              title: 'Tu lista de amigos',
+              description: 'Aquí aparecen tus amigos. Haz clic en cualquiera para ver su plantilla fantasy con las predicciones y los puntos reales.',
+              side: 'top',
+              align: 'center',
+            },
+          },
+        ],
+        onDestroyStarted: () => {
+          driverRef.current?.destroy()
+          markPhaseCompleted('amigos')
+          navigate('/perfil')
+        },
+      })
+      driverRef.current.drive()
+    }, 700)
+    return () => {
+      clearTimeout(timer)
+      driverRef.current?.destroy()
+    }
+  }, [tourActive, loading])
+
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
       <LoadingSpinner size="lg" />
@@ -164,7 +215,7 @@ export default function AmigosPage() {
         {/* ── Left panel ── */}
         <div className="xl:col-span-5 space-y-4">
           {/* Send request */}
-          <GlassPanel className="p-5">
+          <GlassPanel id="tour-amigos-buscar" className="p-5">
             <h3 className="text-base font-bold text-white mb-3 flex items-center gap-2">
               <span className="material-symbols-outlined text-primary text-lg">person_add</span>
               Añadir amigo
@@ -247,7 +298,7 @@ export default function AmigosPage() {
           )}
 
           {/* Friends list with filter + search */}
-          <GlassPanel className="overflow-hidden">
+          <GlassPanel id="tour-amigos-lista" className="overflow-hidden">
             <div className="p-4 border-b border-white/10 space-y-2">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-black text-white">

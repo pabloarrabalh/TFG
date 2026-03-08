@@ -73,23 +73,23 @@ export const predecirPortero = (jugadorId, jornadaNum) =>
   apiClient.post('/api/predecir-portero/', { jugador_id: jugadorId, jornada: jornadaNum })
 
 // ── Plantilla ────────────────────────────────────────────────
-export const fetchPlantillas = () => apiClient.get('/mi-plantilla/listar/')
-export const fetchPlantilla = (id) => apiClient.get(`/mi-plantilla/${id}/`)
-export const guardarPlantilla = (data) => apiClient.post('/mi-plantilla/guardar/', data)
-export const eliminarPlantilla = (id) => apiClient.delete(`/mi-plantilla/${id}/eliminar/`)
+export const fetchPlantillas = () => apiClient.get('/api/plantillas/usuario/')
+export const fetchPlantilla = (id) => apiClient.get(`/api/plantillas/usuario/${id}/`)
+export const guardarPlantilla = (data) => apiClient.post('/api/plantillas/usuario/', data)
+export const eliminarPlantilla = (id) => apiClient.delete(`/api/plantillas/usuario/${id}/`)
 export const renombrarPlantilla = (id, nombre) =>
-  apiClient.post(`/mi-plantilla/${id}/renombrar/`, { nombre })
+  apiClient.post(`/api/plantillas/usuario/${id}/renombrar/`, { nombre })
 
 // ── Perfil ───────────────────────────────────────────────────
 export const fetchPerfil = () => apiClient.get('/api/perfil/')
-export const updatePerfil = (data) => apiClient.post('/perfil/update/', data)
-export const updateStatus = (status) => apiClient.post('/perfil/update-status/', { status })
+export const updatePerfil = (data) => apiClient.post('/api/perfil/update/', data)
+export const updateStatus = (status) => apiClient.post('/api/perfil/status/', { estado: status })
 export const uploadProfilePhoto = (formData) =>
-  apiClient.post('/perfil/upload-photo/', formData, {
+  apiClient.post('/api/perfil/foto/', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
 export const deleteFavoriteTeam = (favId) =>
-  apiClient.delete(`/perfil/delete-favorite/${favId}/`)
+  apiClient.delete(`/api/favoritos/${favId}/`)
 
 // ── Favoritos ────────────────────────────────────────────────
 export const fetchFavoriteTeams = () => apiClient.get('/api/favoritos/')

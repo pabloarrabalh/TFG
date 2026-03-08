@@ -89,7 +89,7 @@ export default function EstadisticasPage() {
     const handleJornadaChange = (e) => {
       const newJornada = e.detail.jornada
       setJornadaActual(newJornada)
-      setJornada(String(newJornada))
+      // No se sobreescribe jornada para preservar la selección del usuario en el select
     }
     
     window.addEventListener('jornadaChanged', handleJornadaChange)
@@ -581,7 +581,12 @@ export default function EstadisticasPage() {
             {TIPO_OPCIONES.map(opt => (
               <button
                 key={opt.key}
-                onClick={() => setTipo(tipo === opt.key ? null : opt.key)}
+                onClick={() => {
+                  const newTipo = tipo === opt.key ? null : opt.key
+                  setTipo(newTipo)
+                  setSortBy(newTipo)
+                  setSortOrder('desc')
+                }}
                 className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${
                   tipo === opt.key
                     ? 'bg-primary text-black'

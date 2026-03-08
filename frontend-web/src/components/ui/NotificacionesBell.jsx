@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import api from '../../services/apiClient'
 import { useAuth } from '../../context/AuthContext'
 
-const WS_URL = 'ws://localhost:5173/ws/notificaciones/'
+const WS_URL = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/notificaciones/`
 const RECONNECT_DELAY_MS = 5000
 
 const TIPO_CFG = {

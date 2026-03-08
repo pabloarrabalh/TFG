@@ -56,7 +56,6 @@ export default function EquipoPage() {
   const POS_ORDER = ['Portero', 'Defensa', 'Centrocampista', 'Delantero']
   const [posicionesAbiertas, setPosicionesAbiertas] = useState({ Portero: true, Defensa: true, Centrocampista: true, Delantero: true, Otros: true })
   const togglePosicion = (pos) => setPosicionesAbiertas(prev => ({ ...prev, [pos]: !prev[pos] }))
-  const [jornadaDropdownOpen, setJornadaDropdownOpen] = useState(false)
   const [analysisModalOpen, setAnalysisModalOpen] = useState(false)
   const [pastSeasonModalOpen, setPastSeasonModalOpen] = useState(false)
 
@@ -79,16 +78,6 @@ export default function EquipoPage() {
   }, [nombre, temporada, jornada])
 
   useEffect(() => { fetchData() }, [fetchData])
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest('.jornada-dropdown-container')) {
-        setJornadaDropdownOpen(false)
-      }
-    }
-    document.addEventListener('click', handleClickOutside)
-    return () => document.removeEventListener('click', handleClickOutside)
-  }, [])
 
   // Sync jornada from sidebar (localStorage + event)
   useEffect(() => {
