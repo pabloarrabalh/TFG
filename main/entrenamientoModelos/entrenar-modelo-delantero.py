@@ -5,31 +5,18 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from pathlib import Path
-from functools import reduce
-import operator
 import json
 import pickle
 
 from xgboost import XGBRegressor
-from scipy.stats import spearmanr
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import ElasticNet, Ridge
-from sklearn.metrics import mean_absolute_error, root_mean_squared_error
-from sklearn.model_selection import GridSearchCV, ParameterGrid, cross_val_score
-from sklearn.base import clone
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from role_enricher import enriquecer_dataframe_con_roles, crear_features_interaccion_roles
 from feature_improvements import eliminar_features_ruido, crear_features_fantasy_delantero, seleccionar_features_por_correlacion
+from common_trainer import BaseTrainer, GRID
 
-DIRECTORIO_SALIDA = Path("csv/csvGenerados/entrenamiento/delantero")
-DIRECTORIO_IMAGENES = DIRECTORIO_SALIDA / "imagenes"
-DIRECTORIO_MODELOS = DIRECTORIO_SALIDA / "modelos"
-DIRECTORIO_CSVS = DIRECTORIO_SALIDA / "csvs"
-
-for d in [DIRECTORIO_SALIDA, DIRECTORIO_IMAGENES, DIRECTORIO_MODELOS, DIRECTORIO_CSVS]:
-    d.mkdir(parents=True, exist_ok=True)
+DIRECTORIO_SALIDA, DIRECTORIO_IMAGENES, DIRECTORIO_MODELOS, DIRECTORIO_CSVS = BaseTrainer.build_output_dirs("delantero")
 
 CONFIG = {
     'archivo': "csv/csvGenerados/players_with_features.csv",
@@ -43,44 +30,20 @@ CONFIG = {
 def crear_features_temporales(df, columna, ventana_corta=3, ventana_larga=5, 
                               default_value=0, crear_lag=True, crear_std=False, 
                               crear_volatility=False, prefix="", verbose=False):
-    if columna not in df.columns:
-        return df
-    
-    nombre_base = prefix if prefix else columna
-    df[columna] = pd.to_numeric(df[columna], errors='coerce').fillna(default_value)
-    features_nuevos = []
-    nuevas_cols = {}
-
-    for ventana, nombre_ventana in [(ventana_corta, "3"), (ventana_larga, "5")]:
-        col_roll = f"{nombre_base}_roll{nombre_ventana}"
-        col_ewma = f"{nombre_base}_ewma{nombre_ventana}"
-        
-        nuevas_cols[col_roll] = df.groupby("player")[columna].transform(lambda x: x.shift().rolling(ventana, min_periods=1).mean())
-        nuevas_cols[col_ewma] = df.groupby("player")[columna].transform(lambda x: x.shift().ewm(span=ventana, adjust=False).mean())
-        
-        features_nuevos.extend([col_roll, col_ewma])
-    
-    if crear_lag:
-        nuevas_cols[f"{nombre_base}_lag1"] = df.groupby("player")[columna].transform(lambda x: x.shift(1))
-        features_nuevos.append(f"{nombre_base}_lag1")
-    
-    if crear_std:
-        col_std = f"{nombre_base}_std5"
-        nuevas_cols[col_std] = df.groupby("player")[columna].transform(lambda x: x.shift().rolling(5, min_periods=1).std())
-        features_nuevos.append(col_std)
-    
-    if crear_volatility:
-        col_vol = f"{nombre_base}_volatility5"
-        nuevas_cols[col_vol] = df.groupby("player")[columna].transform(lambda x: x.shift().rolling(5, min_periods=1).std() / (x.shift().rolling(5, min_periods=1).mean() + 0.1))
-        features_nuevos.append(col_vol)
-    
-    if nuevas_cols:
-        df = pd.concat([df, pd.DataFrame(nuevas_cols, index=df.index)], axis=1)
-    
-    if verbose:
-        print(f"   ✅ {columna}: {len(features_nuevos)} features temporales")
-    
-    return df
+    return BaseTrainer.crear_features_temporales(
+        df,
+        columna,
+        ventana_corta,
+        ventana_larga,
+        ventana_extra=None,
+        default_value=default_value,
+        crear_lag=crear_lag,
+        crear_std=crear_std,
+        crear_volatility=crear_volatility,
+        prefix=prefix,
+        verbose=verbose,
+        return_feature_list=False,
+    )
 
 
 def extraer_feature_importance(modelo, X_ent, feature_names):
@@ -98,108 +61,28 @@ def extraer_feature_importance(modelo, X_ent, feature_names):
 
 
 def convertir_racha_a_numerico(racha):
-    """Convierte racha de string (ej: 'WDLWW') a ratio de victorias"""
-    if pd.isna(racha) or not isinstance(racha, str):
-        return 0.0
-    victorias = racha.count("W")
-    total = len(racha)
-    return (victorias / total if total > 0 else 0.0)
+    return BaseTrainer.convertir_racha_a_numerico(racha, mode='ratio')
 
 
 def visualizar_feature_importance(fi, titulo, nombre, top_n=20):
-    if fi is None or len(fi) == 0:
-        return
-    
-    df_top = fi.head(top_n)
-    fig, ax = plt.subplots(figsize=(12, max(8, top_n * 0.4)))
-    colors = plt.cm.viridis(np.linspace(0.3, 0.9, len(df_top)))
-    ax.barh(range(len(df_top)), df_top['importance'].values, color=colors)
-    ax.set_yticks(range(len(df_top)))
-    ax.set_yticklabels(df_top['feature'].values, fontsize=9)
-    ax.set_xlabel('Importancia', fontsize=11, fontweight='bold')
-    ax.set_title(titulo, fontsize=12, fontweight='bold', pad=15)
-    ax.invert_yaxis()
-    for i, v in enumerate(df_top['importance'].values):
-        ax.text(v, i, f' {v:.4f}', va='center', fontsize=8)
-    ax.grid(axis='x', alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(DIRECTORIO_IMAGENES / nombre, dpi=150, bbox_inches='tight')
-    plt.close()
+    BaseTrainer.visualizar_feature_importance(fi, titulo, nombre, DIRECTORIO_IMAGENES, top_n=top_n, text_offset=0.0)
 
 
 def cargar_datos():
-    print(f"📂 Cargando: {CONFIG['archivo']}")
-    try:
-        df = pd.read_csv(CONFIG['archivo'], low_memory=False)
-    except:
-        df = pd.read_csv(CONFIG['archivo'], encoding='latin-1', low_memory=False)
-    
-    print(f"ℹ️  Total registros: {len(df)}")
-    print(f"ℹ️  Total columnas: {len(df.columns)}")
-    
-    # Filtrar solo delanteros (posición ST)
-    posicion_cols = [col for col in df.columns if 'posicion' in col.lower()]
-    print(f"ℹ️  Columnas de posición encontradas: {posicion_cols}")
-    
-    if len(posicion_cols) > 0:
-        # Prefer 'DT' as forward label in dataset; fallback to 'ST' if DT not present
-        posiciones_existentes = df['posicion'].dropna().unique().tolist()
-        if 'DT' in posiciones_existentes:
-            df_delanteros = df[df['posicion'] == 'DT'].copy()
-        else:
-            df_delanteros = df[df['posicion'] == 'ST'].copy()
-    else:
-        print("❌ No se encontraron columnas de posición")
-        df_delanteros = df.copy()
-    
-    print(f"✅ {df_delanteros.shape[0]} delanteros (ST) cargados\n")
-    return df_delanteros
+    df = BaseTrainer.cargar_datos(CONFIG['archivo'], {'DT', 'ST'}, low_memory=False, empty_msg="❌ No se encontraron columnas de posición")
+    print(f"✅ {df.shape[0]} delanteros (ST) cargados\n")
+    return df
 
 
 def diagnosticar_y_limpiar(df):
-    filas_inicio = len(df)
-    
-    print("\n1️⃣ Verificando columnas necesarias...")
-    cols_necesarias = ['player', CONFIG['columna_objetivo'], 'min_partido']
-    cols_faltantes = [c for c in cols_necesarias if c not in df.columns]
-    if cols_faltantes:
-        print(f"   ⚠️ Columnas faltantes: {cols_faltantes}")
-    else:
-        print("   ✅ Todas las columnas necesarias presentes")
-    
-    print("\n2️⃣ Ordenando por jugador + jornada...")
-    if 'jornada' in df.columns:
-        df = df.sort_values(['player', 'jornada']).reset_index(drop=True)
-    else:
-        df = df.sort_values('player').reset_index(drop=True)
-    print("   ✅ Datos ordenados temporalmente")
-    
-    print("\n3️⃣ Eliminando registros con <10 minutos...")
-    muy_poco_antes = (df['min_partido'] < 10).sum()
-    df = df[df['min_partido'] >= 10].copy()
-    print(f"   ✅ Eliminados {muy_poco_antes} registros")
-    
-    print("\n4️⃣ Filtrando delanteros con <5 partidos...")
-    jugs_validos = df.groupby('player').size() >= 5
-    jugs_validos = jugs_validos[jugs_validos].index
-    antes_jugs = len(df)
-    df = df[df['player'].isin(jugs_validos)]
-    print(f"   ✅ Eliminados {antes_jugs - len(df)} registros")
-    
-    print("\n5️⃣ Eliminando outliers extremos...")
-    outliers_pf = (df[CONFIG['columna_objetivo']] > 30).sum()
-    df = df[df[CONFIG['columna_objetivo']] <= 30].copy()
-    print(f"   ✅ Eliminados {outliers_pf} registros")
-    
-    print("\n6️⃣ Limpiando valores NaN e infinitos...")
-    nan_inicio = df.isnull().sum().sum()
-    df = df.fillna(df.median(numeric_only=True))
-    df = df.replace([np.inf, -np.inf], np.nan)
-    df = df.fillna(df.median(numeric_only=True))
-    print(f"   ✅ Procesados {nan_inicio} valores NaN")
-    
-    print(f"\nTotal: {filas_inicio} → {len(df)} filas ({100*len(df)/filas_inicio:.1f}%)\n")
-    return df
+    return BaseTrainer.diagnosticar_y_limpiar(
+        df,
+        columna_objetivo=CONFIG['columna_objetivo'],
+        etiqueta_posicion='delanteros',
+        outlier_max=30,
+        outlier_mode='drop',
+        reset_index=True,
+    )
 
 
 def preparar_basicos(df):
@@ -223,110 +106,7 @@ def preparar_basicos(df):
 
 
 def cargar_y_procesar_odds(df):
-    """Carga odds desde live_odds_cache.csv e integra 5 features de mercado."""
-    print("[CHART] Integrando ODDS de mercado...")
-    
-    try:
-        odds_df = pd.read_csv('csv/csvDescargados/live_odds_cache.csv')
-        print(f"  [OK] live_odds_cache.csv: {odds_df.shape}")
-        
-        if 'jornada' not in odds_df.columns or 'jornada' not in df.columns:
-            print("  [WARN] No existe columna 'jornada'")
-            df['odds_prob_win'] = 0.33
-            df['odds_prob_loss'] = 0.33
-            df['odds_expected_goals_against'] = 0.33
-            df['odds_is_favored'] = 0
-            df['odds_market_confidence'] = 0.33
-            return df
-        
-        def normalizar_equipo(nombre):
-            if pd.isna(nombre):
-                return None
-            nombre = str(nombre).lower().strip()
-            mapeos = {
-                'ath bilbao': 'athletic bilbao',
-                'ath madrid': 'atletico madrid',
-                'vallecano': 'rayo',
-                'ca osasuna': 'osasuna',
-            }
-            return mapeos.get(nombre, nombre)
-        
-        df['equipo_propio_norm'] = df['equipo_propio'].apply(normalizar_equipo)
-        df['equipo_rival_norm'] = df['equipo_rival'].apply(normalizar_equipo)
-        odds_df['home_norm'] = odds_df['home'].apply(normalizar_equipo)
-        odds_df['away_norm'] = odds_df['away'].apply(normalizar_equipo)
-        
-        df['odds_prob_win'] = 0.33
-        df['odds_prob_loss'] = 0.33
-        df['odds_expected_goals_against'] = 0.33
-        df['odds_is_favored'] = 0
-        df['odds_market_confidence'] = 0.33
-        
-        if 'local' not in df.columns:
-            print("  [WARN] No existe columna 'local'")
-            return df
-        
-        # Procesar odds: usar merge en lugar de loops con .loc[] (más eficiente y evita conflictos)
-        local_count = 0
-        away_count = 0
-        
-        # Para locales
-        local_df = df[df['local'] == 1].copy()
-        local_merged = local_df.merge(
-            odds_df[['jornada', 'home_norm', 'p_home', 'p_away', 'p_draw']],
-            left_on=['jornada', 'equipo_propio_norm'],
-            right_on=['jornada', 'home_norm'],
-            how='left'
-        )
-        
-        # Asignar valores para locales
-        mask_local = local_merged['p_home'].notna()
-        df.loc[local_df[mask_local].index, 'odds_prob_win'] = local_merged.loc[mask_local, 'p_home'].values
-        df.loc[local_df[mask_local].index, 'odds_prob_loss'] = local_merged.loc[mask_local, 'p_away'].values
-        df.loc[local_df[mask_local].index, 'odds_expected_goals_against'] = (local_merged.loc[mask_local, 'p_away'].values * 2.5)
-        df.loc[local_df[mask_local].index, 'odds_is_favored'] = (local_merged.loc[mask_local, 'p_home'] > local_merged.loc[mask_local, 'p_away']).astype(int).values
-        
-        # odds_market_confidence para locales
-        for i, row in local_merged[mask_local].iterrows():
-            probs = [row['p_home'], row['p_draw'], row['p_away']]
-            df.loc[i, 'odds_market_confidence'] = max(probs) - min(probs)
-        local_count = mask_local.sum()
-        
-        # Para visitantes
-        away_df = df[df['local'] == 0].copy()
-        away_merged = away_df.merge(
-            odds_df[['jornada', 'away_norm', 'p_home', 'p_away', 'p_draw']],
-            left_on=['jornada', 'equipo_rival_norm'],
-            right_on=['jornada', 'away_norm'],
-            how='left'
-        )
-        
-        # Asignar valores para visitantes
-        mask_away = away_merged['p_away'].notna()
-        df.loc[away_df[mask_away].index, 'odds_prob_win'] = away_merged.loc[mask_away, 'p_away'].values
-        df.loc[away_df[mask_away].index, 'odds_prob_loss'] = away_merged.loc[mask_away, 'p_home'].values
-        df.loc[away_df[mask_away].index, 'odds_expected_goals_against'] = (away_merged.loc[mask_away, 'p_home'].values * 2.5)
-        df.loc[away_df[mask_away].index, 'odds_is_favored'] = (away_merged.loc[mask_away, 'p_away'] > away_merged.loc[mask_away, 'p_home']).astype(int).values
-        
-        # odds_market_confidence para visitantes
-        for i, row in away_merged[mask_away].iterrows():
-            probs = [row['p_home'], row['p_draw'], row['p_away']]
-            df.loc[i, 'odds_market_confidence'] = max(probs) - min(probs)
-        away_count = mask_away.sum()
-        
-        print(f"  [OK] Matched {local_count} local + {away_count} away = {local_count + away_count} records\n")
-        
-        df = df.drop(columns=['equipo_propio_norm', 'equipo_rival_norm'], errors='ignore')
-        
-    except Exception as e:
-        print(f"  [ERROR] {e}")
-        df['odds_prob_win'] = 0.33
-        df['odds_prob_loss'] = 0.33
-        df['odds_expected_goals_against'] = 0.33
-        df['odds_is_favored'] = 0
-        df['odds_market_confidence'] = 0.33
-    
-    return df
+    return BaseTrainer.cargar_y_procesar_odds(df)
 
 
 def crear_features_delanteros_basicos(df):
@@ -375,168 +155,58 @@ def crear_features_disponibilidad(df):
     print("=" * 80)
     
     vc, vl = CONFIG['ventana_corta'], CONFIG['ventana_larga']
-    
-    df["min_partido"] = pd.to_numeric(df["min_partido"], errors='coerce').fillna(45)
-    df["minutes_pct_temp"] = (df["min_partido"] / 90).fillna(0).clip(0, 1)
-    
-    df = crear_features_temporales(df, "minutes_pct_temp", vc, vl, crear_lag=False, default_value=0, prefix="minutes_pct", verbose=True)
-    
-    if "titular" in df.columns:
-        df["starter_temp"] = df["titular"].astype(float)
-        df = crear_features_temporales(df, "starter_temp", vc, vl, crear_lag=False, default_value=0, prefix="starter_pct", verbose=True)
-    
-    df = df.drop(columns=["minutes_pct_temp"])
-    return df
+    return BaseTrainer.crear_features_disponibilidad(
+        df,
+        ventana_corta=vc,
+        ventana_larga=vl,
+        ventana_extra=None,
+        minutos_fill=45,
+        titular_col='titular',
+        titular_transform='float',
+        return_feature_list=False,
+    )
 
 
 def crear_features_contexto(df):
-    print("=" * 80)
-    print("FEATURES CONTEXTO")
-    print("=" * 80)
-    
-    if "local" in df.columns:
-        df["is_home"] = (df["local"] == 1).astype(int)
-    else:
-        df["is_home"] = 0
-    
-    print("✅ Home/Away (is_home)\n")
-    return df
+    return BaseTrainer.crear_features_contexto(df, include_fixture_from_p_home=False)
 
 
 def crear_features_rival(df):
     print("=" * 80)
     print("FEATURES RIVAL (HISTÓRICOS CON SHIFT - SIN LEAKAGE)")
     print("=" * 80)
-
-    # Calcular opp_form desde GF/GC reales (no desde racha de victorias)
-    # Normalizado a [0, 1]: 0.5 neutro, >0.5 rival en buena forma, <0.5 rival en mala forma
-    if "gf_rival" in df.columns and "gc_rival" in df.columns:
-        gf = pd.to_numeric(df["gf_rival"], errors='coerce').fillna(0)
-        gc = pd.to_numeric(df["gc_rival"], errors='coerce').fillna(0)
-        total = (gf + gc).clip(lower=1)
-        df["opp_form_raw"] = np.clip(((gf - gc) / total + 1) / 2, 0.0, 1.0)
-        print("   Calculando opp_form desde GF/GC reales del rival")
-    else:
-        print("   ERROR: sin columnas gf_rival/gc_rival en el CSV")
-        df["opp_form_raw"] = 0.5
-
-    # SAFE: datos del rival en partidos ANTERIORES (shift evita leakage)
-    rival_specs = [
-        ("gf_rival",     0.0, "opp_gf"),
-        ("gc_rival",     0.0, "opp_gc"),
-        ("opp_form_raw", 0.5, "opp_form"),
-    ]
-
-    for col, default, prefix in rival_specs:
-        if col not in df.columns:
-            continue
-
-        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(default)
-
-        if df[col].nunique() <= 1:
-            print(f"   AVISO: {col} es constante ({df[col].iloc[0]:.3f})")
-
-        if "equipo_propio" in df.columns:
-            df[f'{col}_shifted'] = df.groupby('equipo_propio')[col].shift(1)
-        else:
-            df[f'{col}_shifted'] = df[col].shift(1)
-
-        df[f'{col}_shifted'] = df[f'{col}_shifted'].fillna(default)
-
-        df[f'{prefix}_roll3'] = df[f'{col}_shifted'].rolling(3, min_periods=1).mean()
-        df[f'{prefix}_ewma3'] = df[f'{col}_shifted'].ewm(span=3, adjust=False).mean()
-
-        df[f'{prefix}_roll5'] = df[f'{col}_shifted'].rolling(5, min_periods=1).mean()
-        df[f'{prefix}_ewma5'] = df[f'{col}_shifted'].ewm(span=5, adjust=False).mean()
-
-        df[f'{prefix}_roll7'] = df[f'{col}_shifted'].rolling(7, min_periods=1).mean()
-        df[f'{prefix}_ewma7'] = df[f'{col}_shifted'].ewm(span=7, adjust=False).mean()
-
-        df = df.drop(columns=[f'{col}_shifted'], errors='ignore')
-
-        print(f"   OK {col} → {prefix}_roll3/5/7 + ewma3/5/7 (shift por equipo, sin leakage)")
-
-    print()
-    return df
+    return BaseTrainer.crear_features_rival(df)
 
 
 def crear_features_avanzados(df):
-    """Features avanzados para delanteros - Eficiencia ofensiva"""
-    print("=" * 80)
-    print("FEATURES AVANZADOS (DELANTEROS)")
-    print("=" * 80)
-    
-    df = df.copy()
-    nuevos_features = []
-    
-    # Eficiencia de tiro: xG vs Goles
-    if "xg_roll5" in df.columns and "goals_roll5" in df.columns:
-        df["shot_efficiency"] = (df["goals_roll5"] / (df["xg_roll5"] + 0.1)).fillna(0)
-        nuevos_features.append("shot_efficiency")
-    
-    # Precisión de tiro: Tiros a puerta / Total tiros
-    if "shots_on_target_roll5" in df.columns and "shots_roll5" in df.columns:
-        df["shot_accuracy"] = (df["shots_on_target_roll5"] / (df["shots_roll5"] + 0.1)).fillna(0)
-        nuevos_features.append("shot_accuracy")
-    
-    # Amenaza ofensiva: Tiros + Regates
-    if "shots_roll5" in df.columns and "succ_dribbles_roll5" in df.columns:
-        df["offensive_threat"] = df["shots_roll5"] + df["succ_dribbles_roll5"]
-        nuevos_features.append("offensive_threat")
-    
-    # Creatividad: Pases clave / Partidos
-    if "key_passes_roll5" in df.columns:
-        df["creativity_index"] = df["key_passes_roll5"]
-        nuevos_features.append("creativity_index")
-    
-    # Disponibilidad ofensiva: Minutos x Amenaza
-    if "minutes_pct_roll5" in df.columns and "shots_roll5" in df.columns:
-        df["availability_threat"] = df["minutes_pct_roll5"] * df["shots_roll5"]
-        nuevos_features.append("availability_threat")
-    
-    # Forma delantero: Goles + xG
-    if "goals_roll5" in df.columns and "xg_roll5" in df.columns:
-        df["offensive_form"] = df["goals_roll5"] + df["xg_roll5"]
-        nuevos_features.append("offensive_form")
-    
-    # Regates ofensivos: Regates completados para avanzar
-    if "prog_dribbles_roll5" in df.columns:
-        df["progressive_pressure"] = df["prog_dribbles_roll5"]
-        nuevos_features.append("progressive_pressure")
-    
-    # Productividad: Goles / Tiros
-    if "goals_roll5" in df.columns and "shots_roll5" in df.columns:
-        df["goal_productivity"] = (df["goals_roll5"] / (df["shots_roll5"] + 0.1)).fillna(0)
-        nuevos_features.append("goal_productivity")
-    
-    df = df.fillna(0).replace([np.inf, -np.inf], 0)
-    print(f"   {len(nuevos_features)} features avanzados agregados\n")
-    
-    return df
+    specs = [
+        {'name': 'shot_efficiency', 'cols': ['xg_roll5', 'goals_roll5'], 'func': lambda d: d['goals_roll5'] / (d['xg_roll5'] + 0.1)},
+        {'name': 'shot_accuracy', 'cols': ['shots_on_target_roll5', 'shots_roll5'], 'func': lambda d: d['shots_on_target_roll5'] / (d['shots_roll5'] + 0.1)},
+        {'name': 'offensive_threat', 'cols': ['shots_roll5', 'succ_dribbles_roll5'], 'func': lambda d: d['shots_roll5'] + d['succ_dribbles_roll5']},
+        {'name': 'creativity_index', 'cols': ['key_passes_roll5'], 'func': lambda d: d['key_passes_roll5']},
+        {'name': 'availability_threat', 'cols': ['minutes_pct_roll5', 'shots_roll5'], 'func': lambda d: d['minutes_pct_roll5'] * d['shots_roll5']},
+        {'name': 'offensive_form', 'cols': ['goals_roll5', 'xg_roll5'], 'func': lambda d: d['goals_roll5'] + d['xg_roll5']},
+        {'name': 'progressive_pressure', 'cols': ['prog_dribbles_roll5'], 'func': lambda d: d['prog_dribbles_roll5']},
+        {'name': 'goal_productivity', 'cols': ['goals_roll5', 'shots_roll5'], 'func': lambda d: d['goals_roll5'] / (d['shots_roll5'] + 0.1)},
+    ]
+    return BaseTrainer.crear_features_avanzados_desde_specs(df, "FEATURES AVANZADOS (DELANTEROS)", specs)
 
 
 def integrar_roles(df):
     print("=" * 80)
     print("ROLES FBREF")
     print("=" * 80)
-    df = enriquecer_dataframe_con_roles(df, position="DT", columna_roles="roles")
-    df = crear_features_interaccion_roles(df, position="DT", columna_objetivo=CONFIG['columna_objetivo'])
-    print(" Roles OK\n")
-    return df
+    return BaseTrainer.integrar_roles(df, position="DT", columna_objetivo=CONFIG['columna_objetivo'])
 
 
 def aplicar_mejoras(df):
-    print("=" * 80)
-    print("MEJORAS (DELANTERO)")
-    print("=" * 80)
-    antes = len(df.columns)
-    df = eliminar_features_ruido(df, position="DT", verbose=True)
-    print(f"Sin ruido: {antes} → {len(df.columns)}")
-
-    antes = len(df.columns)
-    df = crear_features_fantasy_delantero(df, verbose=True)
-    print(f"Finales: {antes} → {len(df.columns)}\n")
-    return df
+    return BaseTrainer.aplicar_mejoras(
+        df,
+        position="DT",
+        eliminar_features_fn=eliminar_features_ruido,
+        crear_features_fantasy_fn=crear_features_fantasy_delantero,
+        titulo="MEJORAS (DELANTERO)",
+    )
 
 
 def aplicar_feature_selection(X, y):
@@ -566,10 +236,6 @@ def aplicar_feature_selection(X, y):
 
 
 def definir_variables_finales(df):
-    print("=" * 80)
-    print(" VARIABLES FINALES (DELANTERO)")
-    print("=" * 80 + "\n")
-    
     variables = [
         # ATAQUE (CORE)
         "goals_roll5", "goals_ewma5",
@@ -614,237 +280,104 @@ def definir_variables_finales(df):
         "progressive_pressure", "goal_productivity",
     ]
     
-    variables_finales = [v for v in variables if v in df.columns]
-    
-    print(f"Total variables finales: {len(variables_finales)}\n")
-    return variables_finales
+    return BaseTrainer.definir_variables_finales(df, variables, titulo="VARIABLES FINALES (DELANTERO)")
 
 
 def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
-    print("=" * 80)
-    print(" GRIDSEARCH TRAINING (Delantero)")
-    print("=" * 80 + "\n")
-    
-    resultados = []
-    
-    # 1. Random Forest
-    print(" Random Forest...")
-    rf_params = {
-        'n_estimators': [200, 300, 400],
-        'max_depth': [10, 20, 30, ],
-        'min_samples_split': [2, 3, 5, 7],
-        'min_samples_leaf': [ 2, 3, 4, 5],
-        'max_features': ['sqrt', 'log2']
-    }
-    rf_num_configs = reduce(operator.mul, [len(v) for v in rf_params.values()])
-    print(f"   {rf_num_configs} configs")
-    
-    rf_gs = GridSearchCV(RandomForestRegressor(random_state=42, n_jobs=-1), rf_params, cv=5, 
-                         scoring='neg_mean_absolute_error', n_jobs=-1, verbose=1)
-    rf_gs.fit(X_train, y_train)
-    rf_best = rf_gs.best_estimator_
-    pred_rf = rf_best.predict(X_test)
-    mae_rf = mean_absolute_error(y_test, pred_rf)
-    rmse_rf = root_mean_squared_error(y_test, pred_rf)
-    spearman_rf = spearmanr(y_test, pred_rf)[0]
+    resultados_finales, df_resultados = BaseTrainer.entrenar_modelos_gridsearch(
+        X_train,
+        X_test,
+        y_train,
+        y_test,
+        variables,
+        DIRECTORIO_CSVS,
+        DIRECTORIO_MODELOS,
+        extraer_feature_importance,
+        visualizar_feature_importance,
+        resultados_csv_name="resultados_gridsearch_delantero.csv",
+        model_prefix="delantero",
+        elasticnet_estimator=ElasticNet(random_state=42),
+    )
 
-    print(f"   MAE: {mae_rf:.4f}, RMSE: {rmse_rf:.4f}, Spearman: {spearman_rf:.4f}\n")
-    resultados.append({'Model': 'RF', 'MAE': mae_rf, 'RMSE': rmse_rf, 'Spearman': spearman_rf})
-
-    fi_rf = extraer_feature_importance(rf_best, X_train, variables)
-    if fi_rf is not None:
-        fi_rf.to_csv(DIRECTORIO_CSVS / "feature_importance_rf.csv", index=False)
-        visualizar_feature_importance(fi_rf, "Random Forest - Top 20", "01_feature_importance_rf.png", 20)
-
-    # 2. XGBoost
-    print(" XGBoost...")
-    xgb_params = {
-        'max_depth': [5, 7],
-        'learning_rate': [0.1, 0.15],
-        'n_estimators': [300, 500],
-        'subsample': [0.7, 0.9],
-        'colsample_bytree': [0.7, 0.9],
-        'gamma': [0.25, 0.5],
-        'min_child_weight': [1, 3, 5],
-        'reg_alpha': [0.05, 0.1],
-        'reg_lambda': [1.0, 2.0]
-    }
-    xgb_num_configs = reduce(operator.mul, [len(v) for v in xgb_params.values()])
-    print(f"   {xgb_num_configs} configs")
-    
-    xgb_gs = GridSearchCV(XGBRegressor(random_state=42, n_jobs=-1), xgb_params, cv=5, 
-                          scoring='neg_mean_absolute_error', n_jobs=-1, verbose=1)
-    xgb_gs.fit(X_train, y_train)
-    xgb_best = xgb_gs.best_estimator_
-    pred_xgb = xgb_best.predict(X_test)
-    mae_xgb = mean_absolute_error(y_test, pred_xgb)
-    rmse_xgb = root_mean_squared_error(y_test, pred_xgb)
-    spearman_xgb = spearmanr(y_test, pred_xgb)[0]
-
-    print(f"   MAE: {mae_xgb:.4f}, RMSE: {rmse_xgb:.4f}, Spearman: {spearman_xgb:.4f}\n")
-    resultados.append({'Model': 'XGB', 'MAE': mae_xgb, 'RMSE': rmse_xgb, 'Spearman': spearman_xgb})
-
-    fi_xgb = extraer_feature_importance(xgb_best, X_train, variables)
-    if fi_xgb is not None:
-        fi_xgb.to_csv(DIRECTORIO_CSVS / "feature_importance_xgb.csv", index=False)
-        visualizar_feature_importance(fi_xgb, "XGBoost - Top 20", "02_feature_importance_xgb.png", 20)
-
-    # 3. Ridge
-    print(" Ridge...")
-    ridge_pipeline = Pipeline([('scaler', StandardScaler()), ('regresor', Ridge())])
-    ridge_params = {'regresor__alpha': [0.001, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 2000.0]}
-    ridge_num_configs = len(ridge_params['regresor__alpha'])
-    print(f"   {ridge_num_configs} configs")
-    
-    ridge_gs = GridSearchCV(ridge_pipeline, ridge_params, cv=5, scoring='neg_mean_absolute_error', n_jobs=-1, verbose=1)
-    ridge_gs.fit(X_train, y_train)
-    ridge_best = ridge_gs.best_estimator_
-    pred_ridge = ridge_best.predict(X_test)
-    mae_ridge = mean_absolute_error(y_test, pred_ridge)
-    rmse_ridge = root_mean_squared_error(y_test, pred_ridge)
-    spearman_ridge = spearmanr(y_test, pred_ridge)[0]
-    
-    print(f"   MAE: {mae_ridge:.4f}, RMSE: {rmse_ridge:.4f}, Spearman: {spearman_ridge:.4f}\n")
-    resultados.append({'Model': 'Ridge', 'MAE': mae_ridge, 'RMSE': rmse_ridge, 'Spearman': spearman_ridge})
-
-    fi_ridge = extraer_feature_importance(ridge_best, X_train, variables)
-    if fi_ridge is not None:
-        fi_ridge.to_csv(DIRECTORIO_CSVS / "feature_importance_ridge.csv", index=False)
-        visualizar_feature_importance(fi_ridge, "Ridge - Top 20", "03_feature_importance_ridge.png", 20)
-    
-    # 4. ElasticNet
-    print(" ElasticNet...")
-    elastic_pipeline = Pipeline([('scaler', StandardScaler()), ('regresor', ElasticNet(random_state=42))])
-    elastic_params = {
-        'regresor__alpha': [0.0001, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0],
-        'regresor__l1_ratio': [0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 0.9, 1.0],
-        'regresor__max_iter': [5000, 10000, 15000],
-        'regresor__tol': [1e-3, 1e-4, 1e-5]
-    }
-    elastic_num_configs = reduce(operator.mul, [len(v) for v in elastic_params.values()])
-    print(f"   {elastic_num_configs} configs")
-    
-    elastic_gs = GridSearchCV(elastic_pipeline, elastic_params, cv=5, scoring='neg_mean_absolute_error', n_jobs=-1, verbose=1)
-    elastic_gs.fit(X_train, y_train)
-    elastic_best = elastic_gs.best_estimator_
-    pred_elastic = elastic_best.predict(X_test)
-    mae_elastic = mean_absolute_error(y_test, pred_elastic)
-    rmse_elastic = root_mean_squared_error(y_test, pred_elastic)
-    spearman_elastic = spearmanr(y_test, pred_elastic)[0]
-    
-    print(f"   MAE: {mae_elastic:.4f}, RMSE: {rmse_elastic:.4f}, Spearman: {spearman_elastic:.4f}\n")
-    resultados.append({'Model': 'ElasticNet', 'MAE': mae_elastic, 'RMSE': rmse_elastic, 'Spearman': spearman_elastic})
-
-    fi_elastic = extraer_feature_importance(elastic_best, X_train, variables)
-    if fi_elastic is not None:
-        fi_elastic.to_csv(DIRECTORIO_CSVS / "feature_importance_elastic.csv", index=False)
-        visualizar_feature_importance(fi_elastic, "ElasticNet - Top 20", "04_feature_importance_elastic.png", 20)
-
-    df_resultados = pd.DataFrame(resultados).sort_values('MAE')
     print("\n" + "=" * 80)
     print("RANKING MODELOS POR MAE")
     print("=" * 80)
     print(df_resultados.to_string(index=False))
-    df_resultados.to_csv(DIRECTORIO_CSVS / "resultados_gridsearch_delantero.csv", index=False)
-    
     print(f"\n✅ Modelos guardados en {DIRECTORIO_MODELOS}")
     print(f"✅ Mejor modelo: {df_resultados.iloc[0]['Model']} (MAE: {df_resultados.iloc[0]['MAE']:.4f})\n")
-    
-    models_dict = {'RF': rf_best, 'XGB': xgb_best, 'Ridge': ridge_best, 'ElasticNet': elastic_best}
-    for name, model in models_dict.items():
-        with open(DIRECTORIO_MODELOS / f"best_model_delantero_{name.lower()}.pkl", "wb") as f:
-            pickle.dump(model, f)
-
-    # Guardar también el RF con nombre genérico (para carga automática)
-    with open(DIRECTORIO_MODELOS / "best_model_RF.pkl", "wb") as f:
-        pickle.dump(rf_best, f)
-
-    # Guardar hiperparámetros como JSON (igual que porteros)
-    params_dict = {
-        'RF': rf_gs.best_params_,
-        'XGB': xgb_gs.best_params_,
-        'Ridge': ridge_gs.best_params_,
-        'ElasticNet': elastic_gs.best_params_,
-    }
-    for name, params in params_dict.items():
-        with open(DIRECTORIO_MODELOS / f"best_model_params_{name}.json", 'w') as f:
-            json.dump(params, f, indent=2)
-
-    print(f"✅ Parámetros RF guardados en {DIRECTORIO_MODELOS / 'best_model_params_RF.json'}")
-    print(f"✅ MAE RF: {mae_rf:.4f} | MAE XGB: {mae_xgb:.4f}")
 
     return df_resultados
 
 
+class DelanteroTrainer(BaseTrainer):
+    def __init__(self):
+        super().__init__("delantero")
+
+    def run(self):
+        BaseTrainer.print_banner("ENTRENA MODELO DE PREDICCIÓN: DELANTEROS (ST)")
+        
+        # 1. Cargar datos
+        df = cargar_datos()
+        
+        # 2. Diagnosticar y limpiar
+        df = diagnosticar_y_limpiar(df)
+        
+        # 3. Cargar y procesar odds (ANTES de borrar jornada)
+        df = cargar_y_procesar_odds(df)
+        
+        # 4. Preparar básicos (borra jornada DESPUÉS de odds)
+        df = preparar_basicos(df)
+        
+        # 5. Crear features delanteros
+        df = crear_features_delanteros_basicos(df)
+        
+        # 6. Features form, disponibilidad, contexto
+        df = crear_features_form(df)
+        df = crear_features_disponibilidad(df)
+        df = crear_features_contexto(df)
+        df = crear_features_rival(df)
+        # 7. Features avanzados
+        df = crear_features_avanzados(df)
+        
+        # 8. Roles
+        df = integrar_roles(df)
+        
+        # 9. Aplicar mejoras
+        df = aplicar_mejoras(df)
+        
+        # 10. Preparar variables finales
+        variables_finales = definir_variables_finales(df)
+        
+        # Verificar que existan todas las variables
+        variables_finales = [v for v in variables_finales if v in df.columns]
+        print(f"Variables finales disponibles: {len(variables_finales)}\n")
+        
+        # 11. Split train/test
+        BaseTrainer.print_section("SPLIT TRAIN/TEST")
+        
+        X = df[variables_finales].fillna(0)
+        y = df[CONFIG['columna_objetivo']].fillna(0)
+        
+        split_idx = int(len(X) * (1 - CONFIG['test_size']))
+        X_train, X_test = X[:split_idx], X[split_idx:]
+        y_train, y_test = y[:split_idx], y[split_idx:]
+        
+        BaseTrainer.print_split_summary(X_train, X_test)
+        print(f"Features: {len(variables_finales)}\n")
+        
+        # 12. Application feature selection
+        variables_finales = aplicar_feature_selection(X_train, y_train)
+        X_train = X_train[variables_finales]
+        X_test = X_test[variables_finales]
+        
+        # 13. Entrenar modelos
+        entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables_finales)
+        
+        BaseTrainer.print_banner("✅ ENTRENAMIENTO COMPLETADO EXITOSAMENTE")
+
+
 def main():
-    print("\n" + "=" * 80)
-    print(" ENTRENA MODELO DE PREDICCIÓN: DELANTEROS (ST)")
-    print("=" * 80 + "\n")
-    
-    # 1. Cargar datos
-    df = cargar_datos()
-    
-    # 2. Diagnosticar y limpiar
-    df = diagnosticar_y_limpiar(df)
-    
-    # 3. Cargar y procesar odds (ANTES de borrar jornada)
-    df = cargar_y_procesar_odds(df)
-    
-    # 4. Preparar básicos (borra jornada DESPUÉS de odds)
-    df = preparar_basicos(df)
-    
-    # 5. Crear features delanteros
-    df = crear_features_delanteros_basicos(df)
-    
-    # 6. Features form, disponibilidad, contexto
-    df = crear_features_form(df)
-    df = crear_features_disponibilidad(df)
-    df = crear_features_contexto(df)
-    df = crear_features_rival(df)
-    
-    # 7. Features avanzados
-    df = crear_features_avanzados(df)
-    
-    # 8. Roles
-    df = integrar_roles(df)
-    
-    # 9. Aplicar mejoras
-    df = aplicar_mejoras(df)
-    
-    # 10. Preparar variables finales
-    variables_finales = definir_variables_finales(df)
-    
-    # Verificar que existan todas las variables
-    variables_finales = [v for v in variables_finales if v in df.columns]
-    print(f"Variables finales disponibles: {len(variables_finales)}\n")
-    
-    # 11. Split train/test
-    print("=" * 80)
-    print(" SPLIT TRAIN/TEST")
-    print("=" * 80 + "\n")
-    
-    X = df[variables_finales].fillna(0)
-    y = df[CONFIG['columna_objetivo']].fillna(0)
-    
-    split_idx = int(len(X) * (1 - CONFIG['test_size']))
-    X_train, X_test = X[:split_idx], X[split_idx:]
-    y_train, y_test = y[:split_idx], y[split_idx:]
-    
-    print(f"Train: {len(X_train)} muestras")
-    print(f"Test: {len(X_test)} muestras")
-    print(f"Features: {len(variables_finales)}\n")
-    
-    # 12. Application feature selection
-    variables_finales = aplicar_feature_selection(X_train, y_train)
-    X_train = X_train[variables_finales]
-    X_test = X_test[variables_finales]
-    
-    # 13. Entrenar modelos
-    entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables_finales)
-    
-    print("\n" + "=" * 80)
-    print(" ✅ ENTRENAMIENTO COMPLETADO EXITOSAMENTE")
-    print("=" * 80)
+    DelanteroTrainer().run()
 
 
 if __name__ == "__main__":

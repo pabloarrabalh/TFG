@@ -1,5 +1,5 @@
 {
-  "regresor__alpha": 0.05,
+  "regresor__alpha": 0.01,
   "regresor__l1_ratio": 1.0,
   "regresor__max_iter": 5000,
   "regresor__tol": 0.001

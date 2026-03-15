@@ -1,5 +1,5 @@
-Model,MAE,RMSE,Spearman
-ElasticNet,2.6344182765658024,3.1350980359162137,0.7405720205782456
-Ridge,2.636017707259191,3.136619322253106,0.7382738332954225
-XGB,2.780081521035156,3.2814740238624878,0.5989435268645871
-RF,2.790305872496883,3.274976088052625,0.6827687087040536
+Model,MAE,RMSE,Spearman,Best_Params
+Ridge,2.66497904380952,3.4443425278815023,0.22771208244402408,{'regresor__alpha': 250.0}
+ElasticNet,2.66724422898776,3.445737561111795,0.22573817911527014,"{'regresor__alpha': 0.01, 'regresor__l1_ratio': 0.8, 'regresor__max_iter': 5000, 'regresor__tol': 1e-05}"
+RF,2.6700863845964786,3.4469977915239873,0.2258846065353693,"{'max_depth': 10, 'max_features': 'log2', 'min_samples_leaf': 5, 'min_samples_split': 2, 'n_estimators': 400}"
+XGB,2.762141984365581,3.5537074134277837,0.15655426136605355,"{'colsample_bytree': 0.7, 'gamma': 0.5, 'learning_rate': 0.1, 'max_depth': 5, 'min_child_weight': 3, 'n_estimators': 300, 'reg_alpha': 0.05, 'reg_lambda': 2.0, 'subsample': 0.9}"

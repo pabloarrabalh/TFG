@@ -1,5 +1,5 @@
 Model,MAE,RMSE,Spearman,Best_Params
-RF,3.1742842195883068,3.7675535645876446,0.11409818778989958,"{'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 4, 'min_samples_split': 7, 'n_estimators': 300}"
-XGB,3.2896598068554286,3.9709929584350028,0.05309502381935232,"{'colsample_bytree': 0.9, 'gamma': 0.25, 'learning_rate': 0.1, 'max_depth': 7, 'min_child_weight': 1, 'n_estimators': 300, 'reg_alpha': 0.05, 'reg_lambda': 2.0, 'subsample': 0.9}"
-Ridge,3.2032710873831935,3.769034243329502,0.09827794187466812,{'regresor__alpha': 250.0}
-ElasticNet,3.1908754282544756,3.7605654290809905,0.11251075468733364,"{'regresor__alpha': 0.05, 'regresor__l1_ratio': 1.0, 'regresor__max_iter': 5000, 'regresor__tol': 0.001}"
+ElasticNet,3.1877647358707923,3.75978981256535,0.1149454126476901,"{'regresor__alpha': 0.05, 'regresor__l1_ratio': 1.0, 'regresor__max_iter': 5000, 'regresor__tol': 0.001}"
+Ridge,3.2067987553267665,3.775002214819436,0.08996955808453704,{'regresor__alpha': 250.0}
+RF,3.22464943323191,3.827338311256209,0.02097001907707038,"{'max_depth': 20, 'max_features': 'log2', 'min_samples_leaf': 5, 'min_samples_split': 2, 'n_estimators': 400}"
+XGB,3.3536900326310732,4.072658450353687,-0.040716363334463414,"{'colsample_bytree': 0.7, 'gamma': 0.5, 'learning_rate': 0.1, 'max_depth': 7, 'min_child_weight': 1, 'n_estimators': 300, 'reg_alpha': 0.05, 'reg_lambda': 2.0, 'subsample': 0.9}"
