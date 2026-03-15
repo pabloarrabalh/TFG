@@ -158,11 +158,12 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
     _django_setup()
     try:
         from main.models import Jugador, EstadisticasPartidoJugador
+        from django.db.models import Avg
     except Exception as e:
         return {'error': f'Django no disponible: {e}', 'jugador_id': jugador_id, 'prediccion': None}
 
-    # Si es baseline para MC, calcular media y retornar
-    if modelo_tipo == 'Baseline' and posicion_code == 'MC':
+    # Si es Baseline, calcular media y retornar (para TODAS las posiciones)
+    if modelo_tipo and str(modelo_tipo).upper() == 'BASELINE':
         try:
             if isinstance(jugador_id, int):
                 jugador = Jugador.objects.get(id=jugador_id)
@@ -176,14 +177,14 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
                         nombre_jugador = f"{j.nombre} {j.apellido}".strip()
                         break
                 if not jugador:
-                    return {'error': f'Jugador no encontrado: {jugador_id}', 'jugador_id': jugador_id, 'prediccion': None}
+                    return {'status': 'success', 'jugador_id': jugador_id, 'prediccion': None, 'explicacion_texto': 'Jugador no encontrado'}
             
             stats_qs = (EstadisticasPartidoJugador.objects
                         .filter(jugador=jugador)
                         .select_related('partido__jornada'))
             
             if not stats_qs.exists():
-                return {'jugador_id': jugador_id, 'prediccion': None, 'explicacion_texto': 'Sin datos históricos'}
+                return {'status': 'success', 'jugador_id': jugador_id, 'posicion': posicion_code, 'prediccion': None, 'explicacion_texto': 'Sin datos históricos', 'jornada': jornada_actual, 'modelo': 'Baseline (Media)', 'features_impacto': []}
             
             if jornada_actual is None:
                 jornada_actual = stats_qs.last().partido.jornada.numero_jornada + 1
@@ -191,7 +192,7 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
             
             stats_hist = stats_qs.filter(partido__jornada__numero_jornada__lt=jornada_actual)
             if not stats_hist.exists():
-                return {'jugador_id': jugador_id, 'prediccion': None, 'explicacion_texto': 'Sin datos anteriores'}
+                return {'status': 'success', 'jugador_id': jugador_id, 'posicion': posicion_code, 'prediccion': None, 'explicacion_texto': 'Sin datos anteriores a esta jornada', 'jornada': jornada_actual, 'modelo': 'Baseline (Media)', 'features_impacto': []}
             
             media_pts = float(stats_hist.aggregate(media=Avg('puntos_fantasy'))['media'] or 0.0)
             
@@ -217,7 +218,7 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
                 'error': None,
             }
         except Exception as e:
-            return {'error': f'Error calculando baseline: {e}', 'jugador_id': jugador_id, 'prediccion': None}
+            return {'status': 'success', 'jugador_id': jugador_id, 'prediccion': None, 'explicacion_texto': f'Sin predicción disponible: {str(e)[:50]}', 'error': None}
 
     modelo, tipo_modelo = cargar_modelo(posicion_code, modelo_tipo)
     if modelo is None:

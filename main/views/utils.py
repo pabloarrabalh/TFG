@@ -1,4 +1,4 @@
-﻿"""
+"""
 Shared helper utilities used by all views_*.py modules.
 No Django request/response logic here — pure data helpers.
 """
@@ -10,11 +10,7 @@ from scipy import stats as scipy_stats
 from django.db.models import Sum, Q, Count, Avg
 from django.core.cache import cache
 
-from ..models import (
-    Temporada, Jornada, Partido, Calendario,
-    ClasificacionJornada, EstadisticasPartidoJugador,
-    EquipoJugadorTemporada,
-)
+from ..models import *
 
 
 # ── Name helpers ──────────────────────────────────────────────────────────────

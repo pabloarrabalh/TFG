@@ -8,7 +8,10 @@ Contiene funciones para:
 """
 
 from rapidfuzz import process as rf_process, fuzz as rf_fuzz
-from main.scrapping.commons import obten_coincidencia_nombre, construir_clave_normalizacion
+from main.scrapping.commons import (
+    obten_coincidencia_nombre, construir_clave_normalizacion,
+    limpiar_minuto, mapear_posicion, to_int,
+)
 from main.scrapping.alias import UMBRAL_MATCH
 
 
@@ -26,8 +29,6 @@ def generar_propuestas(resumen_summary, fantasy_partido, local_norm, visit_norm,
     Returns:
         propuestas: lista de dicts, una por jugador FBref con info del matching.
     """
-    from main.scrapping.commons import limpiar_minuto, mapear_posicion, to_int
-    
     propuestas = [] 
     for nombre_fb_norm, fila_sum in resumen_summary.items():
         nombre_fb = str(fila_sum.get("Player", "")).strip()

@@ -346,7 +346,7 @@ class RendimientoHistoricoJugador(models.Model):
     class Meta:
         verbose_name = 'Rendimiento Histórico Jugador'
         verbose_name_plural = 'Rendimientos Históricos Jugadores'
-        unique_together = ('jugador', 'temporada')
+        unique_together = ('jugador', 'temporada', 'equipo')
         ordering = ['-temporada', '-goles_temporada']
 
     def __str__(self):
@@ -530,3 +530,41 @@ class PrediccionJugador(models.Model):
 
     def __str__(self):
         return f"{self.jugador} | J{self.jornada.numero_jornada} | {self.modelo}: {self.prediccion:.1f}"
+
+
+# ============================================================================
+# TABLA: PREDICCIONES PENDIENTES (para generación en background/on-demand)
+# ============================================================================
+class PedidoPrediccion(models.Model):
+    """Trackea predicciones pendientes de generar.
+    - PENDING: Falta generar (background queue)
+    - GENERATED: Ya existe predicción
+    - FAILED: Error en generación
+    """
+    ESTADO_CHOICES = [
+        ('pending', 'Pendiente'),
+        ('generated', 'Generada'),
+        ('failed', 'Error'),
+    ]
+
+    jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE, related_name='pedidos_prediccion')
+    jornada = models.ForeignKey('Jornada', on_delete=models.CASCADE, related_name='pedidos_prediccion')
+    temporada = models.ForeignKey('Temporada', on_delete=models.CASCADE, related_name='pedidos_prediccion')
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='pending')
+    creado_en = models.DateTimeField(auto_now_add=True)
+    actualizado_en = models.DateTimeField(auto_now=True)
+    intentos = models.IntegerField(default=0)
+    motivo_error = models.TextField(blank=True, default='')
+
+    class Meta:
+        verbose_name = 'Pedido Predicción'
+        verbose_name_plural = 'Pedidos Predicción'
+        unique_together = [['jugador', 'jornada', 'temporada']]
+        indexes = [
+            models.Index(fields=['estado', 'temporada'], name='pred_estado_temp_idx'),
+            models.Index(fields=['jugador', 'estado'], name='pred_jugador_estado_idx'),
+        ]
+        ordering = ['-creado_en']
+
+    def __str__(self):
+        return f"{self.jugador} | J{self.jornada.numero_jornada} | {self.estado}"

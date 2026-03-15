@@ -12,10 +12,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 
-from ..models import (
-    Temporada, Jornada, Calendario, ClasificacionJornada,
-    Equipo, EquipoJugadorTemporada, EstadisticasPartidoJugador, Partido,
-)
+from ..models import *
 from ..views.utils import shield_name, get_racha_detalles
 from .menu import _serialize_partido_calendario
 

@@ -336,13 +336,6 @@ def cargar_y_procesar_odds(df):
             probs = [row['p_home'], row['p_draw'], row['p_away']]
             df.loc[i, 'odds_market_confidence'] = max(probs) - min(probs)
         away_count = mask_away.sum()
-                
-                df.loc[idx, 'odds_prob_win'] = p_win
-                df.loc[idx, 'odds_prob_loss'] = p_loss
-                df.loc[idx, 'odds_expected_goals_against'] = p_loss * 2.5
-                df.loc[idx, 'odds_is_favored'] = 1 if p_win > p_loss else 0
-                df.loc[idx, 'odds_market_confidence'] = max(p_win, match.iloc[0]['p_draw'], p_loss) - min(p_win, match.iloc[0]['p_draw'], p_loss)
-                away_count += 1
         
         df = df.drop(columns=['equipo_propio_norm', 'equipo_rival_norm'], errors='ignore')
         

@@ -53,7 +53,7 @@ function Avatar({ name, photo, size = 10 }) {
 export default function AmigosPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const { tourActive, isPhaseCompleted, markPhaseCompleted } = useTour()
+  const { tourActive, isPhaseCompleted, markPhaseCompleted, endTour, isManualExit } = useTour()
   const driverRef = useRef(null)
 
   const [data, setData] = useState({ amigos: [], solicitudes_pendientes: [], solicitudes_enviadas: [] })
@@ -169,7 +169,12 @@ export default function AmigosPage() {
         onDestroyStarted: () => {
           driverRef.current?.destroy()
           markPhaseCompleted('amigos')
-          navigate('/perfil')
+          if (isManualExit()) {
+            endTour()
+          } else {
+            endTour()
+            navigate('/perfil')
+          }
         },
       })
       driverRef.current.drive()

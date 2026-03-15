@@ -10,12 +10,22 @@ const BACKEND = 'http://localhost:8000'
 // Caché de banderas
 const flagCache = JSON.parse(localStorage.getItem('flag_cache') || '{}')
 
+// Nationality codes that restcountries.com doesn't support → emoji fallback
+const NATIONALITY_EMOJI_MAP = {
+  'ENG': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+}
+
 // Hook para cargar banderas
 const useFlag = (nationality) => {
   const [flagUrl, setFlagUrl] = useState(null)
   
   useEffect(() => {
     if (!nationality || nationality === '0' || nationality === '—') {
+      setFlagUrl(null)
+      return
+    }
+    // Skip API call for sub-national codes handled by emoji map
+    if (NATIONALITY_EMOJI_MAP[nationality]) {
       setFlagUrl(null)
       return
     }
@@ -103,10 +113,12 @@ export default function EquipoPage() {
   }, [searchParams, setSearchParams])
 
   // Auto-redirect to the most recent season with players when the current season has none
+  // Only on initial mount (no temporada param set by the user yet)
   useEffect(() => {
     if (!data || data.jugadores?.length > 0 || !data.suggested_temporada) return
+    // Only auto-redirect if the user didn't explicitly choose a temporada
+    if (searchParams.get('temporada')) return
     const tempDisplay = data.suggested_temporada.replace('_', '/')
-    if (tempDisplay === temporada) return
     const newParams = new URLSearchParams(searchParams)
     newParams.set('temporada', tempDisplay)
     setSearchParams(newParams, { replace: true })
@@ -134,7 +146,8 @@ export default function EquipoPage() {
     ultimas_3_stats = null,
     historico_temporadas = [],
     goles_equipo_favor = 0,
-    goles_equipo_contra = 0
+    goles_equipo_contra = 0,
+    suggested_temporada = null
   } = data || {}
 
   const cambiarJornada = (delta) => {
@@ -171,6 +184,11 @@ export default function EquipoPage() {
 
   const FlagIcon = ({ nationality }) => {
     const flagUrl = useFlag(nationality)
+    const emoji = NATIONALITY_EMOJI_MAP[nationality]
+
+    if (emoji) {
+      return <span className="text-base">{emoji}</span>
+    }
     
     if (!flagUrl) {
       return <span className="text-base">🌍</span>
@@ -561,16 +579,24 @@ export default function EquipoPage() {
             <GlassPanel className="rounded-2xl p-6 mb-6 bg-yellow-500/10 border-yellow-500/30">
               <div className="text-center space-y-2">
                 <span className="material-symbols-outlined text-yellow-500 text-5xl mb-3">info</span>
-                <h3 className="text-lg font-bold text-yellow-600 mb-2">No disponible en LaLiga</h3>
+                <h3 className="text-lg font-bold text-yellow-400 mb-2">Sin datos esta temporada</h3>
                 <p className="text-gray-300 text-sm mb-3">
-                  Actualmente no está en LaLiga, revise la clasificación de la LigaHipermotion
+                  {equipo.nombre} no disputa LaLiga EA Sports en la temporada {temporada}.
                 </p>
+                {suggested_temporada && (
+                  <button
+                    onClick={() => handleTemporadaChange(suggested_temporada)}
+                    className="w-full bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all"
+                  >
+                    Ver temporada {suggested_temporada.replace('_', '/')}
+                  </button>
+                )}
               </div>
             </GlassPanel>
           )}
 
           {/* Próximo Encuentro */}
-          {jugadores.length > 0 && (
+          {jugadores.length > 0 && !mostrarUltimas3 && (
             <GlassPanel className="rounded-2xl p-6 mb-6">
               <div className="flex items-center gap-3 mb-4">
                 <span className="material-symbols-outlined text-primary">calendar_today</span>

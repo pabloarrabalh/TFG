@@ -14,23 +14,36 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        from main.models import Equipo, Jugador, Partido
+        from main.models import Equipo, Jugador, Partido, Jornada
 
-        # Checar si ya hay datos
-        if options['skip_if_exists']:
-            equipo_count = Equipo.objects.count()
-            jugador_count = Jugador.objects.count()
-            partido_count = Partido.objects.count()
+        verbosity = int(options.get('verbosity', 1))
 
-            if equipo_count >= 15 and jugador_count >= 200 and partido_count >= 500:
-                self.stdout.write(
-                    self.style.WARNING(
-                        f'⏭️  BD ya tiene datos suficientes ({equipo_count} equipos, {jugador_count} jugadores, {partido_count} partidos). Saltando carga.'
-                    )
-                )
-                return
+        # Verify database is empty after flush
+        if verbosity >= 1:
+            self.stdout.write('[INFO] Paso 1/5 - Verificando base de datos vacía...')
+        
+        jornada_count = Jornada.objects.count()
+        equipo_count = Equipo.objects.count()
+        
+        if jornada_count > 0 or equipo_count > 0:
+            self.stdout.write(
+                self.style.WARNING(f'[WARN] BD no está vacía ({jornada_count} jornadas, {equipo_count} equipos)')
+            )
+        else:
+            self.stdout.write('[OK] BD vacía, lista para cargar datos')
+        
+        if verbosity >= 1:
+            self.stdout.write('[INFO] Paso 2/5 - Cargando datos iniciales...')
 
-        self.stdout.write('⏳ Cargando datos iniciales...')
+        # Disconnect the auto-prediction signal to avoid spawning thousands of
+        # background threads (one per stat row) that exhaust DB connections.
+        from django.db.models.signals import post_save
+        from main.models import EstadisticasPartidoJugador
+        from main import signals as main_signals
+        signal_disconnected = False
+        if hasattr(main_signals, 'auto_generar_prediccion'):
+            post_save.disconnect(main_signals.auto_generar_prediccion, sender=EstadisticasPartidoJugador)
+            signal_disconnected = True
 
         try:
             from main.scrapping.popularDB import (
@@ -43,46 +56,43 @@ class Command(BaseCommand):
                 fase_2e_poblar_equipo_jugador_temporada,
                 fase_2f_completar_estadios,
                 fase_2g_cargar_goles_desde_calendario,
+                fase_3_cargar_calendario,
                 fase_4_precalcular_percentiles,
             )
 
-            self.stdout.write('📅 Fase 0a: Creando todas las jornadas...')
+            if verbosity >= 2:
+                self.stdout.write('[INFO] Paso 1 - Creando jornadas y cargando partidos...')
+            
             fase_0a_crear_todas_las_jornadas()
-
-            self.stdout.write('📊 Fase 1: Cargando partidos y estadísticas desde CSVs...')
             fase_1_cargar_partidos_y_estadisticas()
-
-            self.stdout.write('👥 Fase 2: Cargando roles...')
             fase_2_cargar_roles()
-
-            self.stdout.write('⚽ Fase 2b: Cargando goles en partidos...')
             fase_2b_cargar_goles()
-
-            self.stdout.write('🏆 Fase 2c: Cargando clasificación por jornada...')
             fase_2c_cargar_clasificacion()
-
-            self.stdout.write('📈 Fase 2d: Cargando rendimiento histórico...')
             fase_2d_cargar_rendimiento()
-
-            self.stdout.write('🔗 Fase 2e: Poblando equipo-jugador-temporada...')
             fase_2e_poblar_equipo_jugador_temporada()
-
-            self.stdout.write('🏟️  Fase 2f: Completando estadios...')
             fase_2f_completar_estadios()
-
-            self.stdout.write('⚽ Fase 2g: Cargando goles desde calendario...')
             fase_2g_cargar_goles_desde_calendario()
-
-            self.stdout.write('📊 Fase 4: Precalculando posición y percentiles en BD...')
+            fase_3_cargar_calendario()
+            
+            if verbosity >= 2:
+                self.stdout.write('[INFO] Paso 2 - Calculando percentiles...')
+            
             fase_4_precalcular_percentiles()
 
-            self.stdout.write(self.style.SUCCESS('✅ Datos cargados exitosamente'))
+            if verbosity >= 1:
+                self.stdout.write(self.style.SUCCESS('[SUCCESS] Datos cargados exitosamente'))
 
         except ImportError as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Error de importación: {str(e)}')
+                self.style.ERROR(f'[ERROR] Error de importación: {str(e)}')
             )
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Error durante carga de datos: {str(e)}')
+                self.style.ERROR(f'[ERROR] Error durante carga de datos: {str(e)}')
             )
+        finally:
+            if signal_disconnected:
+                try:
+                    post_save.connect(main_signals.auto_generar_prediccion, sender=EstadisticasPartidoJugador)
+                except Exception:
+                    pass

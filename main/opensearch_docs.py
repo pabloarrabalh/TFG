@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from dotenv import load_dotenv
@@ -34,7 +35,6 @@ try:
         )
         # Probar conexión
         opensearch_client.info()
-        logger.info(f"Conectado a OpenSearch en {es_host}")
         OPENSEARCH_AVAILABLE = True
     except Exception as e:
         OPENSEARCH_AVAILABLE = False
@@ -102,11 +102,6 @@ if OPENSEARCH_AVAILABLE:
                 logger.error("OpenSearch client no disponible")
                 return
             
-            from .models import Jugador
-            import json
-            
-            print("\nIndexando jugadores...")
-            
             # Crear índice si no existe
             try:
                 opensearch_client.indices.create(
@@ -114,13 +109,11 @@ if OPENSEARCH_AVAILABLE:
                     body=JUGADORES_MAPPING,
                     ignore=400
                 )
-                logger.info("Índice 'jugadores' creado o ya existe")
             except Exception as e:
-                logger.warning(f"Error creando índice: {str(e)}")
+                logger.warning(f"Error creando índice jugadores: {str(e)}")
             
             jugadores = Jugador.objects.all()
             total = jugadores.count()
-            print(f"Total jugadores a indexar: {total}")
             
             if total == 0:
                 logger.warning("No hay jugadores para indexar")
@@ -154,8 +147,7 @@ if OPENSEARCH_AVAILABLE:
                         body = '\n'.join(operations) + '\n'
                         response = opensearch_client.bulk(body=body)
                         if response.get('errors'):
-                            logger.warning(f"Algunos documentos fallaron en bulk: {response}")
-                        print(f"Indexados {contador}/{total} jugadores...")
+                            logger.warning(f"Bulk error (jugadores): {response}")
                     except Exception as e:
                         logger.error(f"Error en bulk indexing: {str(e)}")
                     operations = []
@@ -166,15 +158,11 @@ if OPENSEARCH_AVAILABLE:
                     body = '\n'.join(operations) + '\n'
                     response = opensearch_client.bulk(body=body)
                     if response.get('errors'):
-                        logger.warning(f"Algunos documentos fallaron: {response}")
+                        logger.warning(f"Bulk error final (jugadores): {response}")
                 except Exception as e:
                     logger.error(f"Error en bulk indexing final: {str(e)}")
-            
-            logger.info(f"{contador} jugadores indexados")
-            print(f"Indexados {contador} jugadores correctamente\n")
         except Exception as e:
             logger.error(f"Error indexando jugadores: {str(e)}")
-            print(f"Error indexando jugadores: {str(e)}\n")
 
     def indexar_equipos():
         """Indexa todos los equipos en OpenSearch"""
@@ -183,11 +171,6 @@ if OPENSEARCH_AVAILABLE:
                 logger.error("OpenSearch client no disponible")
                 return
             
-            from .models import Equipo
-            import json
-            
-            print("Indexando equipos...")
-            
             # Crear índice si no existe
             try:
                 opensearch_client.indices.create(
@@ -195,13 +178,11 @@ if OPENSEARCH_AVAILABLE:
                     body=EQUIPOS_MAPPING,
                     ignore=400
                 )
-                logger.info("Índice 'equipos' creado o ya existe")
             except Exception as e:
-                logger.warning(f"Error creando índice: {str(e)}")
+                logger.warning(f"Error creando índice equipos: {str(e)}")
             
             equipos = Equipo.objects.all()
             total = equipos.count()
-            print(f"Total equipos a indexar: {total}")
             
             if total == 0:
                 logger.warning("No hay equipos para indexar")
@@ -232,8 +213,7 @@ if OPENSEARCH_AVAILABLE:
                         body = '\n'.join(operations) + '\n'
                         response = opensearch_client.bulk(body=body)
                         if response.get('errors'):
-                            logger.warning(f"Algunos documentos fallaron en bulk: {response}")
-                        print(f"Indexados {contador}/{total} equipos...")
+                            logger.warning(f"Bulk error (equipos): {response}")
                     except Exception as e:
                         logger.error(f"Error en bulk indexing: {str(e)}")
                     operations = []
@@ -244,31 +224,26 @@ if OPENSEARCH_AVAILABLE:
                     body = '\n'.join(operations) + '\n'
                     response = opensearch_client.bulk(body=body)
                     if response.get('errors'):
-                        logger.warning(f"Algunos documentos fallaron: {response}")
+                        logger.warning(f"Bulk error final (equipos): {response}")
                 except Exception as e:
                     logger.error(f"Error en bulk indexing final: {str(e)}")
-            
-            logger.info(f"{contador} equipos indexados")
-            print(f"Indexados {contador} equipos correctamente\n")
         except Exception as e:
             logger.error(f"Error indexando equipos: {str(e)}")
-            print(f"Error indexando equipos: {str(e)}\n")
 
     def reindexar_todo():
         """Re-indexa todos los documentos"""
         indexar_jugadores()
         indexar_equipos()
-        logger.info("Indexación completada")
 
 else:
     # Stubs cuando OpenSearch no está disponible
     opensearch_client = None
     
     def indexar_jugadores():
-        logger.error("OpenSearch no esta disponible. Instalalo ejecutando: pip install -r requirements.txt")
+        pass
     
     def indexar_equipos():
-        logger.error("OpenSearch no esta disponible. Instalalo ejecutando: pip install -r requirements.txt")
+        pass
     
     def reindexar_todo():
-        logger.error("OpenSearch no esta disponible. Instalalo ejecutando: pip install -r requirements.txt")
+        pass

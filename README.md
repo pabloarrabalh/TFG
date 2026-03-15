@@ -87,7 +87,7 @@ Acceso: **http://localhost:8000** (Django + Nginx)
 | Servicio    | Puerto | Descripción                        |
 |-------------|--------|------------------------------------|
 | `db`        | 5432   | PostgreSQL 16-alpine               |
-| `opensearch`| 9200   | OpenSearch 2.11.0                  |
+| `opensearch`| 9200   | OpenSearch                  |
 | `backend`   | 8000   | Django + Gunicorn                  |
 | `frontend`  | 80     | React + Nginx                      |
 

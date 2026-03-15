@@ -11,10 +11,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 
-from ..models import (
-    Jugador, PrediccionJugador, Jornada, Temporada, Calendario,
-    Partido, EquipoJugadorTemporada, EstadisticasPartidoJugador,
-)
+from ..models import *
 
 logger = logging.getLogger(__name__)
 
@@ -260,12 +257,6 @@ class ExplicarPrediccionView(APIView):
             jornada_para_pred = int(jornada) if jornada is not None else None
             resultado = predecir_puntos(jugador_id, posicion_code, jornada_para_pred, verbose=False, modelo_tipo=modelo_tipo)
 
-            if resultado.get('error'):
-                return Response(
-                    {'status': 'error', 'error': resultado['error'], 'jugador_id': jugador_id},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
             prediccion = resultado.get('prediccion')
 
             # Guardar predicción en BD para sincronizar con el menú de destacados
@@ -300,33 +291,9 @@ class ExplicarPrediccionView(APIView):
                 except Exception as e_save:
                     logger.debug(f'No se pudo guardar predicción en BD: {e_save}')
 
-            return Response({
-                'status': 'success',
-                'jugador_id': jugador_id,
-                'jugador_nombre': nombre_jugador,
-                'posicion': posicion_code,
-                'prediccion': float(prediccion) if prediccion is not None else None,
-                'puntos_reales': float(resultado['puntos_reales']) if resultado.get('puntos_reales') is not None else None,
-                'puntos_reales_texto': resultado.get('puntos_reales_texto', 'Aún no jugado'),
-                'jornada': int(resultado.get('jornada', jornada or 0)),
-                'modelo': resultado.get('modelo', ''),
-                'features_impacto': resultado.get('features_impacto', []),
-                'explicacion_texto': resultado.get('explicacion_texto', ''),
-                'error': None,
-            })
-
-        except ImportError as e:
-            logger.error(f"[XAI API] Error de módulo: {e}", exc_info=True)
-            return Response(
-                {'status': 'error', 'error': f'Error de módulo: {e}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-        except ValueError as e:
-            logger.error(f"[XAI API] Error de valor: {e}", exc_info=True)
-            return Response(
-                {'status': 'error', 'error': f'Error de valor: {e}'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            # El endpoint devuelve la respuesta tal cual del backend
+            # (sin datos históricos, sin datos anteriores, etc. son casos normales, no errores)
+            return Response(resultado, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error(f"[XAI API] Error inesperado: {e}", exc_info=True)
             return Response({

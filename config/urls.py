@@ -18,13 +18,21 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
+
+
+def health_check(request):
+    """Endpoint de health check para Docker/Render/Azure."""
+    return JsonResponse({'status': 'ok'})
+
 
 urlpatterns = [
+    path('health/', health_check, name='health_check'),
     path('', include('main.urls')),
     path('admin/', admin.site.urls),
 ]
 
-# Servir archivos estáticos y media en desarrollo
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Servir archivos estáticos y media siempre (necesario en Docker con DEBUG=False)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

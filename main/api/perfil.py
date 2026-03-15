@@ -20,16 +20,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ..models import (
-    Calendario,
-    EquipoFavorito,
-    EquipoJugadorTemporada,
-    EstadisticasPartidoJugador,
-    Jornada,
-    Partido,
-    Temporada,
-    UserProfile,
-)
+from ..models import *
+from ..views.utils import shield_name
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +60,11 @@ class PerfilView(APIView):
             'preferencias_notificaciones': profile.preferencias_notificaciones,
             'foto_url': profile.foto.url if profile.foto else None,
             'equipos_favoritos': [
-                {'id': f.equipo.id, 'nombre': f.equipo.nombre}
+                {
+                    'id': f.equipo.id,
+                    'nombre': f.equipo.nombre,
+                    'escudo': shield_name(f.equipo.nombre),
+                }
                 for f in favoritos
             ],
         })

@@ -12,7 +12,7 @@ const BACKEND = 'http://localhost:8000'
 export default function TeamShield({ escudo, nombre = '', className = 'size-8', size = 32 }) {
   const [imageError, setImageError] = useState(false)
 
-  const src = escudo ? `${BACKEND}/static/escudos/${escudo}.png` : null
+  const src = escudo ? `/static/escudos/${escudo}.png` : null
   const fallbackInitial = (nombre || '?')[0].toUpperCase()
 
   if (imageError || !src) {

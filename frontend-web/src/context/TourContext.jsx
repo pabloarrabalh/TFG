@@ -5,6 +5,7 @@ const TourContext = createContext(null)
 export function TourProvider({ children }) {
   const [tourActive, setTourActive] = useState(false)
   const [completedPhases, setCompletedPhases] = useState(new Set())
+  const [manualExit, setManualExit] = useState(false)
   // Layout registers its openSidebar callback here so tour phases can open the sidebar
   const openSidebarRef = useRef(null)
   // Stores a jugador-page ID found during the menu phase, for later navigation
@@ -20,10 +21,20 @@ export function TourProvider({ children }) {
   function startTour() {
     setTourActive(true)
     setCompletedPhases(new Set())
+    setManualExit(false)
     localStorage.setItem('_tour_active', '1')
   }
 
   function endTour() {
+    setTourActive(false)
+    setCompletedPhases(new Set())
+    setManualExit(false)
+    localStorage.removeItem('_tour_active')
+    localStorage.setItem('_tour_done', '1')
+  }
+
+  function endTourManually() {
+    setManualExit(true)
     setTourActive(false)
     setCompletedPhases(new Set())
     localStorage.removeItem('_tour_active')
@@ -47,11 +58,16 @@ export function TourProvider({ children }) {
     localStorage.setItem('_tour_offered', '1')
   }
 
+  function isManualExit() {
+    return manualExit
+  }
+
   return (
     <TourContext.Provider value={{
       tourActive,
       startTour,
       endTour,
+      endTourManually,
       markPhaseCompleted,
       isPhaseCompleted,
       openSidebarRef,
@@ -59,6 +75,7 @@ export function TourProvider({ children }) {
       setTourJugadorId,
       hasTourBeenOffered,
       markTourOffered,
+      isManualExit,
     }}>
       {children}
     </TourContext.Provider>

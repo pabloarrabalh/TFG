@@ -15,10 +15,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from ..models import (
-    Temporada, Jornada, Calendario, Equipo,
-    EquipoJugadorTemporada, EstadisticasPartidoJugador, Plantilla,
-)
+from ..models import *
 from ..views.utils import shield_name
 
 logger = logging.getLogger(__name__)

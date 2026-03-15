@@ -118,7 +118,7 @@ export default function Header({ onToggleSidebar }) {
               </div>
             )}
             <div className="hidden md:block text-left">
-              <p className="text-sm font-bold text-white leading-none">{user.nickname || user.first_name || user.username}</p>
+              <p className="text-sm font-bold text-white leading-none">{user.username}</p>
               <p className="text-xs mt-0.5" style={{ color: user.estado === 'active' ? '#4ade80' : user.estado === 'away' ? '#9ca3af' : '#facc15' }}>
               {user.estado === 'active' ? 'Activo' : user.estado === 'away' ? 'Ausente' : user.estado === 'dnd' ? 'No molestar' : 'Activo'}
             </p>

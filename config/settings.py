@@ -14,25 +14,28 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-# Cargar variables de entorno
-load_dotenv()             # carga .env si existe
-load_dotenv('.env.local', override=True)  # sobreescribe con .env.local (desarrollo local)
+# Cargar variables de entorno según el entorno activo
+# Orden de prioridad: .env.local (dev) > .env (CI/docker) > valores por defecto
+load_dotenv('.env')
+load_dotenv('.env.local', override=True)   # Solo sobrescribe si el archivo existe
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+# ─────────────────────────────────────────────────────────────────────────────
+# CORE SETTINGS
+# ─────────────────────────────────────────────────────────────────────────────
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=e=%5h-+b5tfh3u#eudd3d50jef1mup6p0)fia9zxg-dd3)r&7'
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'django-insecure-=e=%5h-+b5tfh3u#eudd3d50jef1mup6p0)fia9zxg-dd3)r&7'
+)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-_extra_hosts = [h for h in os.environ.get('EXTRA_ALLOWED_HOSTS', '').split(',') if h]
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend'] + _extra_hosts
+_extra_hosts = [h.strip() for h in os.environ.get('EXTRA_ALLOWED_HOSTS', '').split(',') if h.strip()]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'backend', '0.0.0.0'] + _extra_hosts
 
 
 # Application definition
@@ -108,17 +111,33 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # PostgreSQL siempre (no SQLite)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'laliga'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
-        'CONN_MAX_AGE': 600,
+# Soporte para DATABASE_URL (Render inyecta esto automáticamente)
+_DATABASE_URL = os.environ.get('DATABASE_URL', '')
+if _DATABASE_URL:
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=_DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=os.environ.get('DB_SSL', 'false').lower() in ('true', 'require', '1'),
+        )
     }
-}
+else:
+    _db_options = {}
+    if os.environ.get('DB_SSL', '').lower() in ('true', 'require'):
+        _db_options['sslmode'] = 'require'
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('DB_NAME', 'laliga'),
+            'USER': os.environ.get('DB_USER', 'postgres'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
+            'HOST': os.environ.get('DB_HOST', 'localhost'),
+            'PORT': os.environ.get('DB_PORT', '5432'),
+            'CONN_MAX_AGE': 600,
+            'OPTIONS': _db_options,
+        }
+    }
 
 
 
@@ -186,18 +205,117 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'login_register'
 LOGIN_REDIRECT_URL = 'menu'
 
-# CORS / CSRF configuration for React frontend (http://localhost:5173)
+# CORS / CSRF configuration for React frontend
 CORS_ALLOW_CREDENTIALS = True
-_extra_cors = [o for o in os.environ.get('EXTRA_CORS_ORIGINS', '').split(',') if o]
+_extra_cors = [o.strip() for o in os.environ.get('EXTRA_CORS_ORIGINS', '').split(',') if o.strip()]
 CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
     'http://localhost:5173',
     'http://127.0.0.1:5173',
     'http://localhost',
     'http://localhost:80',
 ] + _extra_cors
 CSRF_TRUSTED_ORIGINS = list(CORS_ALLOWED_ORIGINS)
+
+# En producción (DEBUG=False), también confiar en los hosts de EXTRA_ALLOWED_HOSTS
+if not DEBUG:
+    for _host in _extra_hosts:
+        if _host:
+            CSRF_TRUSTED_ORIGINS.append(f'https://{_host}')
+            CORS_ALLOWED_ORIGINS.append(f'https://{_host}')
+
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_HTTPONLY = False  # JS needs to read the CSRF token
 SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = not DEBUG   # HTTPS en producción
+CSRF_COOKIE_SECURE = not DEBUG
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# Logging configuration - show startup steps, silence debug logs
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[{levelname}] {message}',
+            'style': '{',
+        },
+        'django_simple': {
+            'format': '{message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'django_console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'django_simple',
+        },
+    },
+    'loggers': {
+        'main.apps': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django': {
+            'handlers': ['django_console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['django_console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'opensearchpy': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'opensearch': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'daphne': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'channels': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'urllib3': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'urllib3.connectionpool': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'requests': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'elastic_transport': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+}

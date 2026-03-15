@@ -11,7 +11,7 @@ import 'driver.js/dist/driver.css'
 export default function ClasificacionPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { tourActive, isPhaseCompleted, markPhaseCompleted, tourJugadorId } = useTour()
+  const { tourActive, isPhaseCompleted, markPhaseCompleted, tourJugadorId, endTour, isManualExit } = useTour()
   const driverRef = useRef(null)
 
   const [data, setData] = useState(null)
@@ -169,8 +169,13 @@ export default function ClasificacionPage() {
         onDestroyStarted: () => {
           driverRef.current?.destroy()
           markPhaseCompleted('clasificacion')
-          const jugId = tourJugadorId || 1
-          navigate(`/jugador/${jugId}`)
+          if (isManualExit()) {
+            endTour()
+          } else {
+            endTour()
+            const jugId = tourJugadorId || 1
+            navigate(`/jugador/${jugId}`)
+          }
         },
       })
       driverRef.current.drive()
@@ -571,9 +576,9 @@ export default function ClasificacionPage() {
                           <td className="px-4 py-3 text-center text-gray-300">
                             {(reg.partidos_ganados || 0) + (reg.partidos_empatados || 0) + (reg.partidos_perdidos || 0)}
                           </td>
-                          <td className="px-4 py-3 text-center text-green-400">{reg.partidos_ganados}</td>
-                          <td className="px-4 py-3 text-center text-yellow-400">{reg.partidos_empatados}</td>
-                          <td className="px-4 py-3 text-center text-red-400">{reg.partidos_perdidos}</td>
+                          <td className="px-4 py-3 text-center text-white">{reg.partidos_ganados}</td>
+                          <td className="px-4 py-3 text-center text-white">{reg.partidos_empatados}</td>
+                          <td className="px-4 py-3 text-center text-white">{reg.partidos_perdidos}</td>
                           <td className="px-4 py-3 text-center text-gray-300">{reg.goles_favor}</td>
                           <td className="px-4 py-3 text-center text-gray-300">{reg.goles_contra}</td>
                           <td

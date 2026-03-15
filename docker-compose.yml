@@ -1,55 +1,71 @@
 services:
 
-  # ── PostgreSQL 16 ─────────────────────────────────────────────────────────
+  # ── PostgreSQL 16 ──────────────────────────────────────────────────────────
   db:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB:       ${DB_NAME}
-      POSTGRES_USER:     ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-laliga}
+      POSTGRES_USER: ${DB_USER:-laliga_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-laliga_pass}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-laliga_user} -d ${DB_NAME:-laliga}"]
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - app-network
 
-  # ── OpenSearch 2.x ────────────────────────────────────────────────────────
+  # ── OpenSearch 2.x ─────────────────────────────────────────────────────────
   opensearch:
     image: opensearchproject/opensearch:2.11.0
     restart: unless-stopped
     environment:
       - discovery.type=single-node
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_PASSWORD}
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_PASSWORD:-Admin_Password1!}
       - plugins.security.disabled=true
       - DISABLE_INSTALL_DEMO_CONFIG=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - bootstrap.memory_lock=true
     volumes:
       - opensearch_data:/usr/share/opensearch/data
     ports:
       - "9200:9200"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 12
+    networks:
+      - app-network
 
-  # ── Django backend ────────────────────────────────────────────────────────
+  # ── Django backend (ASGI / Daphne) ────────────────────────────────────────
   backend:
     build:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
-    env_file: .env
+    env_file:
+      - .env
     environment:
       DB_HOST: db
+      DB_PORT: "5432"
       OPENSEARCH_HOST: opensearch:9200
-      OPENSEARCH_USER: ${OPENSEARCH_USER}
-      OPENSEARCH_PASSWORD: ${OPENSEARCH_PASSWORD}
+      OPENSEARCH_USER: ${OPENSEARCH_USER:-admin}
+      OPENSEARCH_PASSWORD: ${OPENSEARCH_PASSWORD:-Admin_Password1!}
     volumes:
       - media_data:/app/media
       - static_data:/app/staticfiles
+      - ./static:/app/static:ro
       - ./data:/app/data:ro
       - ./csv:/app/csv:ro
     ports:
@@ -59,8 +75,10 @@ services:
         condition: service_healthy
       opensearch:
         condition: service_healthy
+    networks:
+      - app-network
 
-  # ── React/Vite frontend (Nginx) ───────────────────────────────────────────
+  # ── React/Vite frontend (Nginx) ────────────────────────────────────────────
   frontend:
     build:
       context: ./frontend-web
@@ -68,11 +86,22 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+    volumes:
+      - ./static:/app/static:ro
+      - ./media:/app/media:ro
+      - ./frontend-web/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - backend
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
   opensearch_data:
   media_data:
   static_data:
+
+networks:
+  app-network:
+    driver: bridge
+

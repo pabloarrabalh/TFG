@@ -78,22 +78,18 @@ def parse_tabla_jornada_transfermarkt(html: str, temporada: str, jornada: int):
     una lista de dicts, una fila por equipo, SIN racha (la racha
     se calcula fuera, con estado entre jornadas).
     """
-    print(f"[LOG] Parseando HTML de jornada {jornada} (Transfermarkt)...")
     soup = BeautifulSoup(html, "lxml")
 
     tabla = soup.find("table", class_="items")
     if not tabla or not tabla.tbody:
-        print("[WARN] No se ha encontrado <table class='items'><tbody> en el HTML.")
         return []
 
     filas_out = []
     trs = tabla.tbody.find_all("tr")
-    print(f"[LOG] Encontradas {len(trs)} filas de equipos en jornada {jornada}.")
 
     for idx, tr in enumerate(trs, start=1):
         tds = tr.find_all("td")
         if len(tds) < 10:
-            print(f"[DBG] tr #{idx} con menos de 10 td, se salta.")
             continue
 
         # Posición
@@ -145,12 +141,6 @@ def parse_tabla_jornada_transfermarkt(html: str, temporada: str, jornada: int):
         }
         filas_out.append(fila)
 
-        print(
-            f"[DBG FILA] j{jornada}: pos={posicion}, equipo={equipo} "
-            f"pj={pj}, pg={pg}, pe={pe}, pp={pp}, gf={gf}, gc={gc}, dg={dg}, pts={pts}"
-        )
-
-    print(f"[LOG] Filas encontradas jornada {jornada}: {len(filas_out)}")
     return filas_out
 
 
@@ -169,11 +159,6 @@ def scrapear_rango_jornadas_online(
     Una fila = un equipo en una jornada, con racha5partidos ya calculada
     dinámicamente a medida que se recorre la temporada.
     """
-    print(
-        f"[LOG] Iniciando scrap ONLINE de clasificación Transfermarkt: temp={codigo_temporada}, "
-        f"saison_id={temporada_transfermarkt}, jornadas {j_ini}..{j_fin}"
-    )
-
     # Asegurar que la carpeta de salida existe
     os.makedirs(carpeta_salida, exist_ok=True)
     ruta_csv = os.path.join(carpeta_salida, "clasificacion_temporada.csv")
@@ -204,14 +189,11 @@ def scrapear_rango_jornadas_online(
         for jornada in range(j_ini, j_fin + 1):
             # pequeña espera aleatoria entre requests (p.ej. 3-7 segundos)
             sleep_s = random.uniform(3, 7)
-            print(f"[LOG] Esperando {sleep_s:.2f}s antes de pedir jornada {jornada}...")
             time.sleep(sleep_s)
 
             params = {"saison_id": temporada_transfermarkt, "spieltag": jornada}
-            print(f"[LOG] Descargando jornada {jornada} (saison_id={temporada_transfermarkt})...")
             resp = requests.get(BASE_URL, params=params, headers={"User-Agent": "Mozilla/5.0"})
             if resp.status_code != 200:
-                print(f"⚠️ Error HTTP {resp.status_code} para jornada {jornada}")
                 continue
 
             filas = parse_tabla_jornada_transfermarkt(resp.text, codigo_temporada, jornada)
@@ -260,8 +242,6 @@ def scrapear_rango_jornadas_online(
 
                 writer.writerow(fila)
 
-    print(f"✅ CSV único de temporada generado con racha5partidos: {ruta_csv}")
-
 
 def extraer_fecha_hora_desde_html(fecha_str, hora_str):
     """
@@ -284,8 +264,7 @@ def extraer_fecha_hora_desde_html(fecha_str, hora_str):
         # Parsear DD/MM/YYYY HH:MM
         datetime_str = f"{fecha_str} {hora_str}"
         return datetime.strptime(datetime_str, "%d/%m/%Y %H:%M")
-    except Exception as e:
-        print(f"❌ Error al parsear fecha/hora: {fecha_str} {hora_str} - {e}")
+    except Exception:
         return None
 
 
@@ -316,7 +295,6 @@ def parse_partidos_jornada_transfermarkt(html_content, jornada_num):
     # Buscar tabla de partidos
     tabla_partidos = soup.find('div', class_='responsive-table')
     if not tabla_partidos:
-        print(f"⚠️ No se encontró tabla de partidos para jornada {jornada_num}")
         return partidos
     
     filas = tabla_partidos.find_all('tr')
@@ -407,8 +385,7 @@ def parse_partidos_jornada_transfermarkt(html_content, jornada_num):
                 'hora': hora_str
             })
         
-        except Exception as e:
-            print(f"⚠️ Error procesando fila en jornada {jornada_num}: {e}")
+        except Exception:
             continue
     
     return partidos
@@ -448,8 +425,6 @@ def parse_partidos_jornada_transfermarkt(html_content, jornada_num):
             # URL de la jornada
             url = f"{MATCHES_BASE_URL}/spieltag/{jornada}/saison_id/{temporada_transfermarkt}"
             
-            print(f"📥 Descargando partidos de jornada {jornada}...")
-            
             # Delay aleatorio
             delay = random.uniform(delay_min, delay_max)
             time.sleep(delay)
@@ -461,8 +436,6 @@ def parse_partidos_jornada_transfermarkt(html_content, jornada_num):
             # Parsear
             partidos = parse_partidos_jornada_transfermarkt(response.text, jornada)
             all_partidos.extend(partidos)
-            
-            print(f"✅ Jornada {jornada}: {len(partidos)} partidos extraídos")
             
             # Guardar a CSV si se proporciona carpeta
             if ruta_csv and partidos:
@@ -482,12 +455,8 @@ def parse_partidos_jornada_transfermarkt(html_content, jornada_num):
                         partido_copia['fecha'] = partido['fecha'].isoformat()
                         writer.writerow(partido_copia)
         
-        except Exception as e:
-            print(f"❌ Error en jornada {jornada}: {e}")
+        except Exception:
             continue
-    
-    if ruta_csv:
-        print(f"\n✅ Partidos guardados en: {ruta_csv}")
     
     return all_partidos
 
@@ -530,7 +499,6 @@ def obtener_plantilla_equipo(href_equipo, saison_id=2024, delay_min=1, delay_max
     """
     try:
         url_completa = f"https://www.transfermarkt.es{href_equipo}/saison/{saison_id}"
-        print(f"📥 Descargando plantilla: {url_completa}")
         
         delay = random.uniform(delay_min, delay_max)
         time.sleep(delay)
@@ -544,8 +512,7 @@ def obtener_plantilla_equipo(href_equipo, saison_id=2024, delay_min=1, delay_max
         
         return response.text
     
-    except Exception as e:
-        print(f"❌ Error descargando plantilla {href_equipo}: {e}")
+    except Exception:
         return None
 
 
@@ -580,22 +547,16 @@ def procesar_plantilla_equipo(html_content, equipo_norm):
                         a_tag = span_content.find('a')
                         if a_tag:
                             estadio = a_tag.get_text(strip=True)
-                            print(f"✅ Estadio encontrado para {equipo_norm}: {estadio}")
                             break
-        
-        if not estadio:
-            print(f"⚠️ No se encontró estadio para {equipo_norm}")
         
         # ============ EXTRAER JUGADORES ============
         # Buscar tabla principal de plantilla
         tabla = soup.find('table', class_='items')
         
         if not tabla or not tabla.tbody:
-            print(f"⚠️ No se encontró tabla de plantilla para {equipo_norm}")
             return jugadores, estadio
         
         filas = tabla.tbody.find_all('tr')
-        print(f"[LOG] Procesando {len(filas)} filas de jugadores para {equipo_norm}")
         
         for fila in filas:
             try:
@@ -656,15 +617,12 @@ def procesar_plantilla_equipo(html_content, equipo_norm):
                         'equipo': equipo_norm
                     })
             
-            except Exception as e:
-                print(f"⚠️ Error procesando fila de jugador: {e}")
+            except Exception:
                 continue
         
-        print(f"✅ Extraído {len(jugadores)} jugadores de {equipo_norm}")
         return jugadores, estadio
     
-    except Exception as e:
-        print(f"❌ Error procesando plantilla {equipo_norm}: {e}")
+    except Exception:
         return [], None
 
 
@@ -681,10 +639,7 @@ def scrapear_plantillas_temporada(código_equipos_to_href, temporada_codigo, car
         delay_min, delay_max: Delay entre requests
     """
     
-    estadios_actualizados = []
-    
-    for idx, (equipo_norm, href) in enumerate(código_equipos_to_href.items(), 1):
-        print(f"\n[{idx}/{len(código_equipos_to_href)}] Procesando {equipo_norm}...")
+    for equipo_norm, href in código_equipos_to_href.items():
         
         html = obtener_plantilla_equipo(href, saison_id=saison_id, delay_min=delay_min, delay_max=delay_max)
         
@@ -703,35 +658,9 @@ def scrapear_plantillas_temporada(código_equipos_to_href, temporada_codigo, car
                         if equipo_obj.estadio != estadio:
                             equipo_obj.estadio = estadio
                             equipo_obj.save()
-                            print(f"✅ Estadio actualizado en BD: {equipo_bd_nombre} -> {estadio}")
-                            estadios_actualizados.append((equipo_bd_nombre, estadio))
-                        else:
-                            print(f"ℹ️ Estadio ya estaba actualizado: {equipo_bd_nombre} -> {estadio}")
-                    else:
-                        print(f"⚠️ No se encontró equipo en BD: {equipo_bd_nombre} (buscado desde: {equipo_norm})")
-                except Exception as e:
-                    print(f"❌ Error actualizando estadio en BD para {equipo_norm}: {e}")
-            else:
-                print(f"⚠️ No se extrajo estadio para {equipo_norm}")
-            
-            # CSV DE JUGADORES DESHABILITADO - No se usa en el proyecto
-            # if jugadores:
-            #     with open(ruta_csv, 'a', newline='', encoding='utf-8-sig') as f:
-            #         writer = csv.DictWriter(
-            #             f,
-            #             fieldnames=['jugador', 'nacionalidad', 'posicion', 'dorsal', 'edad', 'equipo']
-            #         )
-            #         if f.tell() == 0:
-            #             writer.writeheader()
-            #         writer.writerows(jugadores)
-        else:
-            print(f"⚠️ No se pudo descargar plantilla de {equipo_norm}")
-    
-    print(f"\n🏟️ Total estadios actualizados: {len(estadios_actualizados)}")
-    if estadios_actualizados:
-        print("   Equipos con estadios actualizados:")
-        for equipo, stadium in estadios_actualizados:
-            print(f"   - {equipo}: {stadium}")
+                except Exception:
+                    pass
+        pass
 
 
 
@@ -774,12 +703,10 @@ def extraer_hrefs_equipos_desde_clasificacion(html_clasificacion):
                     # para acceder a la plantilla
                     href_plantilla = href.replace('/spielplan/', '/kader/')
                     equipos_href[equipo_norm] = href_plantilla
-                    print(f"  📌 {equipo_norm} -> {href_plantilla}")
         
         return equipos_href
     
-    except Exception as e:
-        print(f"❌ Error extrayendo hrefs de equipos: {e}")
+    except Exception:
         return equipos_href
 
 
@@ -818,7 +745,5 @@ if __name__ == "__main__":
     #     )
     # else:
     #     print(f"❌ Error descargando clasificación: {resp.status_code}")
-    
-    print("Use scrapear_rango_jornadas_online() para descargar clasificación")
-    print("Nota: Generar CSVs de partidos y nacionalidades está DEPRECATED")
+    pass
 

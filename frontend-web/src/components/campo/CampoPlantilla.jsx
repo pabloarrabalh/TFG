@@ -42,7 +42,7 @@ function EscudoImg({ nombre, size = 24, BACKEND }) {
   if (!s) return <span className="text-gray-400 text-xs font-bold">{(nombre || '?')[0]}</span>
   return (
     <img
-      src={`${BACKEND}/static/escudos/${s}.png`}
+      src={`/static/escudos/${s}.png`}
       alt={nombre}
       style={{ width: size, height: size }}
       className="object-contain rounded"

@@ -20,7 +20,11 @@ from .api.perfil import (
 )
 from .api.favoritos import FavoritosView, ToggleFavoritoView, DeleteFavoritoView
 from .api.amigos import *
-from .api.plantilla import *
+from .api.plantilla import (
+    MiPlantillaView, MiPlantillaJugadoresView,
+    TogglePrivacidadPlantillaView, SetPlantillaPredeterminadaView, MisPlantillasPrivacidadView,
+    PlantillasUsuarioView, PlantillaItemView,
+)
 from .api.plantilla_notificaciones import PlantillaNotificacionesView
 from .api.notificaciones import *
 from .api.estadisticas import EstadisticasView, ComparacionJugadoresView
@@ -68,6 +72,9 @@ urlpatterns = [
     path('api/amigos/<int:user_id>/plantillas/', PlantillasAmigoView.as_view(), name='api_plantillas_amigo'),
     path('api/mi-plantilla/', MiPlantillaView.as_view(), name='api_mi_plantilla'),
     path('api/mi-plantilla/jugadores/', MiPlantillaJugadoresView.as_view(), name='api_mi_plantilla_jugadores'),
+    path('api/plantillas/usuario/', PlantillasUsuarioView.as_view(), name='api_plantillas_usuario'),
+    path('api/plantillas/usuario/<int:plantilla_id>/', PlantillaItemView.as_view(), name='api_plantilla_item'),
+    path('api/plantillas/usuario/<int:plantilla_id>/renombrar/', PlantillaItemView.as_view(), name='api_plantilla_renombrar'),
     path('api/plantilla-notificaciones/<int:jornada_num>/', PlantillaNotificacionesView.as_view(), name='api_plantilla_notificaciones'),
     path('api/notificaciones/', NotificacionesView.as_view(), name='api_notificaciones'),
     path('api/notificaciones/leer-todas/', MarcarTodasLeidasView.as_view(), name='api_marcar_todas_leidas'),

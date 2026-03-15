@@ -61,7 +61,7 @@ export default function JugadorPage() {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { tourActive, isPhaseCompleted, markPhaseCompleted } = useTour()
+  const { tourActive, isPhaseCompleted, markPhaseCompleted, endTour, isManualExit } = useTour()
   const driverRef = useRef(null)
   
   const [data, setData] = useState(null)
@@ -426,6 +426,7 @@ export default function JugadorPage() {
         onDestroyStarted: () => {
           driverRef.current?.destroy()
           markPhaseCompleted('jugador')
+          endTour()
           navigate('/amigos')
         },
       })
@@ -865,72 +866,61 @@ export default function JugadorPage() {
                     style={{ height: '320px' }}
                   >
                   {(() => {
-                    // Crear mapa de datos disponibles por jornada
-                    const dataMap = {}
-                    ultimos_8.forEach(stat => {
+                    // ultimos_8 now includes ALL jornadas from backend, even without data
+                    if (!ultimos_8 || ultimos_8.length === 0) return null
+
+                    return ultimos_8.map(stat => {
                       const jornada = stat.partido?.jornada?.numero_jornada
-                      if (jornada) {
-                        dataMap[jornada] = stat
-                      }
-                    })
-
-                    // Encontrar rango de jornadas (primera y última)
-                    const jornadas = Object.keys(dataMap).map(Number).sort((a, b) => a - b)
-                    if (jornadas.length === 0) return null
-
-                    const minJ = jornadas[0]
-                    const maxJ = jornadas[jornadas.length - 1]
-
-                    // Generar array completo de jornadas
-                    const allJornadas = Array.from({ length: maxJ - minJ + 1 }, (_, i) => minJ + i)
-
-                    return allJornadas.map(jornada => {
-                      const stat = dataMap[jornada]
-                      const maxHeight = 230   // 320px contenedor - ~24 valor - ~22 etiqueta - gutters
+                      const puntos = stat.puntos_fantasy
+                      const maxHeight = 230
                       const maxValue = 20
                       const minValue = -12
+                      const range = maxValue - minValue
 
-                      if (!stat) {
-                        return (
-                          <div
-                            key={jornada}
-                            className="histogram-bar"
-                            title={`J${jornada}: sin datos`}
-                          >
-                            <div className="histogram-bar-value" style={{ color: 'rgb(107,114,128)' }}>—</div>
-                            <div
-                              className="histogram-bar-inner"
-                              style={{
-                                height: '30px',
-                                background: 'rgba(255,255,255,0.07)',
-                                borderRadius: '5px 5px 0 0',
-                                border: '1px dashed rgba(255,255,255,0.18)',
-                              }}
-                            />
-                            <div className="histogram-bar-label" style={{ color: 'rgb(107,114,128)' }}>J{jornada}</div>
-                          </div>
-                        )
-                      }
+                      const barHeight = puntos !== null && puntos !== undefined
+                        ? Math.max(4, ((Math.max(minValue, puntos) - minValue) / range) * maxHeight)
+                        : null
 
-                      const heightPercent = ((stat.puntos_fantasy - minValue) / (maxValue - minValue)) * 100
-                      const heightPx = Math.max(6, (heightPercent / 100) * maxHeight)
+                      const barClass = puntos === null ? '' :
+                        puntos > 10 ? 'histogram-bar-high' :
+                        puntos === 0 ? 'histogram-bar-zero' :
+                        puntos > 0 ? 'histogram-bar-positive' :
+                        'histogram-bar-negative'
 
                       return (
                         <div
                           key={jornada}
-                          className={`histogram-bar ${
-                            stat.puntos_fantasy > 10
-                              ? 'histogram-bar-high'
-                              : stat.puntos_fantasy === 0
-                              ? 'histogram-bar-zero'
-                              : stat.puntos_fantasy > 0
-                              ? 'histogram-bar-positive'
-                              : 'histogram-bar-negative'
-                          }`}
-                          title={`Jornada ${jornada}: ${stat.puntos_fantasy} puntos`}
+                          className="histogram-bar"
+                          title={jornada ? `J${jornada}: ${puntos !== null ? puntos + ' pts' : 'sin datos'}` : ''}
                         >
-                          <div className="histogram-bar-value">{stat.puntos_fantasy}</div>
-                          <div className="histogram-bar-inner" style={{ height: `${heightPx}px` }}></div>
+                          {/* Valor arriba */}
+                          <div className="histogram-bar-value">
+                            {puntos !== null && puntos !== undefined ? (
+                              <span style={{ color: puntos > 10 ? 'rgb(34,197,94)' : puntos > 0 ? 'rgb(34,197,94)' : 'rgb(239,68,68)' }}>
+                                {puntos.toFixed(1)}
+                              </span>
+                            ) : null}
+                          </div>
+                          
+                          {/* Barra */}
+                          <div className={barClass} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', height: '200px' }}>
+                            {barHeight !== null ? (
+                              <div
+                                className="histogram-bar-inner"
+                                style={{ width: 24, height: barHeight }}
+                              />
+                            ) : (
+                              <div style={{
+                                width: 24,
+                                height: 8,
+                                background: 'rgba(255,255,255,0.07)',
+                                borderRadius: '4px 4px 0 0',
+                                border: '1px dashed rgba(255,255,255,0.18)',
+                              }} />
+                            )}
+                          </div>
+                          
+                          {/* Jornada */}
                           <div className="histogram-bar-label">J{jornada}</div>
                         </div>
                       )
@@ -1031,12 +1021,20 @@ export default function JugadorPage() {
                         : 'linear-gradient(180deg,rgb(167,139,250),rgb(109,40,217))'
                       const predLabelColor = p.is_early_jornada ? 'rgb(156,163,175)' : 'rgb(167,139,250)'
 
+                      // Generar tooltip dinámico
+                      let tooltipText
+                      if (p.prediccion === null && p.is_early_jornada) {
+                        tooltipText = 'Sin datos suficientes para calcular la media de puntos previa'
+                      } else {
+                        tooltipText = `J${p.jornada} — ${label}: ${p.prediccion !== null ? p.prediccion.toFixed(1) : '—'} | Real: ${p.real ?? 'pendiente'}`
+                      }
+
                       return (
                         <div
                           key={p.jornada}
                           className="histogram-bar"
                           style={{ minWidth: 52 }}
-                          title={`J${p.jornada} — ${label}: ${p.prediccion !== null ? p.prediccion.toFixed(1) : '—'} | Real: ${p.real ?? 'pendiente'}`}
+                          title={tooltipText}
                         >
                           {/* Valores arriba */}
                           <div className="histogram-bar-value" style={{ fontSize: '0.68rem', display: 'flex', gap: 4 }}>

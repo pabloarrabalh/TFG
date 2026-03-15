@@ -155,7 +155,7 @@ function EscudoImg({ nombre, size = 28 }) {
   if (!s) return <span className="text-gray-400 text-xs font-bold">{(nombre || '?')[0]}</span>
   return (
     <img
-      src={`${BACKEND}/static/escudos/${s}.png`}
+      src={`/static/escudos/${s}.png`}
       alt={nombre}
       style={{ width: size, height: size }}
       className="object-contain rounded"
@@ -273,7 +273,7 @@ function SuplenteCard({ jugador, indice, onOpen, onRemove, prediccion, onDragSta
 // ─── COMPONENTE PRINCIPAL ───────────────────────────────────────────────────
 export default function MiPlantillaPage() {
   const navigate = useNavigate()
-  const { tourActive, isPhaseCompleted, markPhaseCompleted } = useTour()
+  const { tourActive, isPhaseCompleted, markPhaseCompleted, endTour, isManualExit } = useTour()
   const driverRef = useRef(null)
   const [loading, setLoading] = useState(true)
   // Inicializa jornadaActual correctamente: jornada_global + 1
@@ -344,23 +344,52 @@ export default function MiPlantillaPage() {
     modelosPrevRef.current = modelosPorPos
   }, [])
 
-  // Cargar predicciones al cambiar alineación o jornada
+  // Cargar predicciones al cambiar alineación o jornada (sin modelosPorPos — lo gestiona el efecto de abajo)
   useEffect(() => {
     cargarPredicciones()
-  }, [alineacion, jornadaActual, modelosPorPos])
+  }, [alineacion, jornadaActual]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Mostrar aviso cuando cambian los modelos
+  // Cuando cambia el modelo de una posición: solo borrar y recargar los jugadores afectados
   useEffect(() => {
-    if (modelosPrevRef.current && JSON.stringify(modelosPrevRef.current) !== JSON.stringify(modelosPorPos)) {
-      setActualizandoPredicciones(true)
-      setPredicciones({})
-      fetchingRef.current.clear()
-      predictedRef.current.clear()
-      const timer = setTimeout(() => setActualizandoPredicciones(false), 3000)
+    if (!modelosPrevRef.current) {
       modelosPrevRef.current = modelosPorPos
-      return () => clearTimeout(timer)
+      return
     }
-  }, [modelosPorPos])
+    const posicionesChanged = Object.keys(modelosPorPos).filter(
+      pos => modelosPorPos[pos] !== modelosPrevRef.current[pos]
+    )
+    if (posicionesChanged.length === 0) {
+      modelosPrevRef.current = modelosPorPos
+      return
+    }
+
+    // Identificar jugadores de las posiciones modificadas
+    const todosJugadores = [
+      ...POSICIONES.flatMap(p => alineacion[p] || []),
+      ...(alineacion.Suplentes || []),
+    ].filter(Boolean)
+    const jugadoresCambio = todosJugadores.filter(j => posicionesChanged.includes(j.posicion))
+
+    // Borrar solo sus predicciones y limpiar refs
+    setPredicciones(prev => {
+      const next = { ...prev }
+      jugadoresCambio.forEach(j => delete next[j.id])
+      return next
+    })
+    jugadoresCambio.forEach(j => {
+      fetchingRef.current.delete(j.id)
+      predictedRef.current.delete(j.id)
+    })
+
+    modelosPrevRef.current = modelosPorPos
+    setActualizandoPredicciones(true)
+    const timer = setTimeout(() => setActualizandoPredicciones(false), 3000)
+
+    // Re-fetch predictions for affected players now that refs are cleared
+    cargarPredicciones()
+
+    return () => clearTimeout(timer)
+  }, [modelosPorPos]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Cargar partidos cuando el modal de selección se abre
   useEffect(() => {
@@ -729,11 +758,21 @@ export default function MiPlantillaPage() {
       })
       const data = await res.json()
       if (data.status === 'success') {
-        setDetPrediccion({ value: data.prediccion, type: data.type || 'prediccion', modelo: data.modelo })
-        setDetExplicacion(data.explicacion_texto || null)
-        setDetFeaturesImpacto(Array.isArray(data.features_impacto) ? data.features_impacto : [])
+        // Solo establecer predicción si existe un valor válido
+        if (data.prediccion != null) {
+          setDetPrediccion({ value: data.prediccion, type: data.type || 'prediccion', modelo: data.modelo })
+          setDetExplicacion(data.explicacion_texto || null)
+          setDetFeaturesImpacto(Array.isArray(data.features_impacto) ? data.features_impacto : [])
+        } else {
+          // Sin predicción disponible (sin datos históricos, etc.)
+          setDetPrediccion(null)
+          setDetExplicacion(data.explicacion_texto || 'Sin datos históricos para generar predicción')
+          setDetFeaturesImpacto([])
+        }
       }
-    } catch {}
+    } catch (error) {
+      console.error('Error obteniendo predicción:', error)
+    }
     setDetLoadingPred(false)
   }
 
@@ -1017,7 +1056,12 @@ export default function MiPlantillaPage() {
         onDestroyStarted: () => {
           driverRef.current?.destroy()
           markPhaseCompleted('plantilla')
-          navigate('/clasificacion')
+          if (isManualExit()) {
+            endTour()
+          } else {
+            endTour()
+            navigate('/clasificacion')
+          }
         },
       })
       driverRef.current.drive()

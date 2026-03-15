@@ -1,0 +1,62 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# docker-compose.render.yml – Pre-producción en Render.com
+#
+# Diferencias respecto al compose local:
+#   - Sin servicio 'db': se usa Render PostgreSQL (managed, externo)
+#   - OpenSearch: Bonsai free tier o Aiven (host externo, sin contenedor)
+#   - Backend y Frontend se despliegan como "Web Services" individuales en Render
+#
+# Uso para test local simulando Render:
+#   docker compose -f docker-compose.render.yml --env-file .env.render up --build
+#
+# En Render.com:
+#   1. Crear "PostgreSQL" service  → te da DATABASE_URL
+#   2. Crear Web Service "backend" → apunta a este repo, Dockerfile raíz
+#      - Environment vars: copiar de .env.render + DATABASE_URL de paso 1
+#   3. Crear Static Site o Web Service "frontend" → apunta a frontend-web/
+#      - Build command: npm install && npm run build
+#      - Publish directory: dist
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Django backend (ASGI / Daphne) ────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env.render
+    environment:
+      # DB_HOST/PORT vienen de .env.render (Render PostgreSQL externo)
+      # OPENSEARCH_HOST viene de .env.render (Bonsai / Aiven externo)
+      OPENSEARCH_USE_SSL: "True"
+    volumes:
+      - media_data:/app/media
+      - ./data:/app/data:ro
+      - ./csv:/app/csv:ro
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+  # ── React/Vite frontend (Nginx) ────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend-web
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=https://tu-backend.onrender.com
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  media_data:

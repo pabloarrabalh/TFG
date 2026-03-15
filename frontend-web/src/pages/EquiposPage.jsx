@@ -56,10 +56,14 @@ export default function EquiposPage() {
 
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filtered.map((eq) => (
+        {filtered.map((eq) => {
+          const equipoHref = eq.jugadores_count === 0 && eq.suggested_temporada
+            ? `/equipo/${encodeURIComponent(eq.nombre)}?temporada=${eq.suggested_temporada}`
+            : `/equipo/${encodeURIComponent(eq.nombre)}`
+          return (
           <GlassPanel key={eq.id} className="p-5 hover:border-primary/30 transition-all group">
             <div className="flex items-start justify-between mb-4">
-              <Link to={`/equipo/${encodeURIComponent(eq.nombre)}`} className="flex items-center gap-3 flex-1 min-w-0 group-hover:text-primary transition-colors">
+              <Link to={equipoHref} className="flex items-center gap-3 flex-1 min-w-0 group-hover:text-primary transition-colors">
                 <TeamShield escudo={eq.escudo} nombre={eq.nombre} className="size-14 object-contain flex-shrink-0" />
                 <div className="min-w-0">
                   <h3 className="font-black text-white text-sm truncate group-hover:text-primary transition-colors">{eq.nombre}</h3>
@@ -81,14 +85,15 @@ export default function EquiposPage() {
                 {eq.jugadores_count > 0 ? `${eq.jugadores_count} jugadores` : 'Disputando LaLiga Hypermotion'}
               </span>
               <Link
-                to={`/equipo/${encodeURIComponent(eq.nombre)}`}
+                to={equipoHref}
                 className="text-xs text-primary font-bold hover:text-primary-dark transition-colors flex items-center gap-1"
               >
                 Ver equipo <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </Link>
             </div>
           </GlassPanel>
-        ))}
+          )
+        })}
         {filtered.length === 0 && (
           <div className="col-span-full text-center text-gray-400 py-16">
             <span className="material-symbols-outlined text-4xl mb-2 block">search_off</span>

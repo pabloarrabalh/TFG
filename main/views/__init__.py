@@ -1,4 +1,4 @@
-﻿"""
+"""
 views/__init__.py – re-exports shared utility helpers used by main/api/*.py modules.
 All HTML template views have been removed; the frontend is a React SPA.
 """

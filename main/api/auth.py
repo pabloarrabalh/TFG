@@ -112,23 +112,16 @@ class RegisterView(APIView):
 
     def post(self, request):
         data = request.data
-        first_name = (data.get('first_name') or '').strip()
-        last_name = (data.get('last_name') or '').strip()
         email = (data.get('email') or '').strip().lower()
         username = (data.get('username') or '').strip()
-        nickname = (data.get('nickname') or '').strip()
         password1 = data.get('password1') or ''
         password2 = data.get('password2') or ''
 
         errors = {}
-        if not first_name:
-            errors['first_name'] = 'El nombre es obligatorio'
         if not email:
             errors['email'] = 'El email es obligatorio'
         if not username:
             errors['username'] = 'El nombre de usuario es obligatorio'
-        if not nickname:
-            errors['nickname'] = 'El apodo es obligatorio'
         if not password1:
             errors['password1'] = 'La contraseña es obligatoria'
         if password1 != password2:
@@ -138,9 +131,6 @@ class RegisterView(APIView):
         if User.objects.filter(email=email).exists():
             errors['email'] = 'Ese email ya está registrado'
 
-        if UserProfile.objects.filter(nickname=nickname).exists():
-            errors['nickname'] = 'Ese apodo ya está en uso'
-
         if errors:
             return Response({'errors': errors}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -148,14 +138,15 @@ class RegisterView(APIView):
             username=username,
             email=email,
             password=password1,
-            first_name=first_name,
-            last_name=last_name,
         )
         
-        # Guardar nickname en el perfil (o crear si no existe)
+        # Crear perfil de usuario
         profile, created = UserProfile.objects.get_or_create(user=user)
-        profile.nickname = nickname
         profile.save()
         
         auth_login(request._request, user)
-        return Response({'status': 'ok', 'user': _user_info(user)})
+        return Response({
+            'status': 'ok',
+            'user': _user_info(user),
+            'is_new_user': True  # Siempre es nuevo usuario en registro
+        })

@@ -4,6 +4,8 @@ Endpoints:
   GET /api/jugador/<id>/?temporada=25/26
   GET /api/top-jugadores-por-posicion/?temporada=25/26
 """
+import math
+import json
 import logging
 
 from django.db.models import Q, Sum, Avg, Count
@@ -12,10 +14,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 
-from ..models import (
-    Temporada, Jornada, Jugador, EquipoJugadorTemporada,
-    EstadisticasPartidoJugador, PrediccionJugador,
-)
+from ..models import *
 from ..views.utils import shield_name
 
 try:
@@ -26,15 +25,185 @@ except Exception:
 logger = logging.getLogger(__name__)
 
 
+# ── Custom JSON encoder for NaN/Inf handling ────────────────────────────────
+
+class NaNInfEncoder(json.JSONEncoder):
+    """Custom JSON encoder that replaces NaN/Inf with null or 0"""
+    def encode(self, o):
+        if isinstance(o, float):
+            if math.isnan(o) or math.isinf(o):
+                return '0'
+        return super().encode(o)
+    
+    def iterencode(self, o, _one_shot=False):
+        """Yield JSON string chunks while sanitizing NaN/Inf"""
+        for chunk in super().iterencode(o, _one_shot):
+            # Replace any NaN/Inf that might have slipped through
+            chunk = chunk.replace('NaN', '0').replace('Infinity', '0').replace('-Infinity', '0')
+            yield chunk
+
+
+# ── Global sanitizer for JSON serialization ─────────────────────────────────────
+
+def _safe_float(val, default=0):
+    """Safely convert to float, replacing NaN/Inf with default value."""
+    if val is None:
+        return default
+    try:
+        if math.isnan(val) or math.isinf(val):
+            return default
+        return float(val)
+    except (TypeError, ValueError):
+        return default
+
+
+def _sanitize_dict(d, default=0):
+    """Recursively sanitize a dict, replacing any NaN/Inf floats with default."""
+    if d is None:
+        return None
+    if not isinstance(d, dict):
+        # Handle primitive types
+        if isinstance(d, float):
+            if math.isnan(d) or math.isinf(d):
+                return default
+            return d
+        elif isinstance(d, (int, str, bool)):
+            return d
+        return d
+    
+    result = {}
+    for k, v in d.items():
+        if v is None:
+            result[k] = None
+        elif isinstance(v, dict):
+            result[k] = _sanitize_dict(v, default)
+        elif isinstance(v, (list, tuple)):
+            # Sanitize each item in list
+            sanitized_list = []
+            for item in v:
+                if isinstance(item, dict):
+                    sanitized_list.append(_sanitize_dict(item, default))
+                elif isinstance(item, float):
+                    if math.isnan(item) or math.isinf(item):
+                        sanitized_list.append(default)
+                    else:
+                        sanitized_list.append(item)
+                else:
+                    sanitized_list.append(item)
+            result[k] = sanitized_list if isinstance(v, list) else tuple(sanitized_list)
+        elif isinstance(v, float):
+            if math.isnan(v) or math.isinf(v):
+                result[k] = default
+            else:
+                result[k] = v
+        else:
+            result[k] = v
+    return result
+
+
 # ── helper ────────────────────────────────────────────────────────────────────
+
+def _get_datos_temporada_completa(jugador, temporada):
+    """
+    Returns array with ALL jornadas of the season, including:
+    - predictions (real or null)
+    - partido stats (real or null) 
+    - structured for frontend to display all jornadas even without data
+    """
+    # Get all jornadas sorted
+    todas_jornadas = Jornada.objects.filter(temporada=temporada).order_by('numero_jornada')
+    if not todas_jornadas.exists():
+        return []
+    
+    # Fetch predictions (if exist)
+    pred_qs = PrediccionJugador.objects.filter(jugador=jugador, jornada__temporada=temporada)
+    pred_by_jornada = {p.jornada_id: p for p in pred_qs}
+    
+    # Fetch real stats
+    stats_qs = EstadisticasPartidoJugador.objects.filter(
+        jugador=jugador, partido__jornada__temporada=temporada
+    ).select_related('partido__jornada')
+    stats_by_jornada = {}
+    for stat in stats_qs:
+        j = stat.partido.jornada
+        if j.pk not in stats_by_jornada:
+            stats_by_jornada[j.pk] = []
+        stats_by_jornada[j.pk].append(stat)
+    
+    # Build result for EVERY jornada
+    result = []
+    for jornada in todas_jornadas:
+        pred = pred_by_jornada.get(jornada.pk)
+        stats = stats_by_jornada.get(jornada.pk, [])
+        
+        # Real points (sum if multiple matches)
+        real_pts = None
+        if stats:
+            real_pts = sum(s.puntos_fantasy or 0 for s in stats)
+        
+        # Prediction value
+        pred_value = None
+        if pred:
+            pred_value = round(pred.prediccion, 2) if pred.prediccion is not None else None
+        
+        result.append({
+            'jornada': jornada.numero_jornada,
+            'temporada': jornada.temporada.nombre.replace('_', '/'),
+            'prediccion': pred_value,
+            'real': real_pts,
+            'modelo': pred.modelo if pred else None,
+            'is_early_jornada': jornada.numero_jornada <= 5,
+        })
+    
+    return result
+
+
+def _get_ultimos_8_temporada_completa(jugador, temporada):
+    """
+    Returns array with ALL jornadas for histogram, even without partido data.
+    Frontend shows empty bars for jornadas without matches.
+    """
+    todas_jornadas = Jornada.objects.filter(temporada=temporada).order_by('numero_jornada')
+    if not todas_jornadas.exists():
+        return []
+    
+    stats_qs = EstadisticasPartidoJugador.objects.filter(
+        jugador=jugador, partido__jornada__temporada=temporada
+    ).exclude(puntos_fantasy__gt=40).select_related('partido__jornada')
+    
+    stats_by_jornada = {}
+    for stat in stats_qs:
+        j = stat.partido.jornada
+        if j.pk not in stats_by_jornada:
+            stats_by_jornada[j.pk] = stat
+    
+    result = []
+    for jornada in todas_jornadas:
+        stat = stats_by_jornada.get(jornada.pk)
+        if stat:
+            result.append({
+                'puntos_fantasy': float(stat.puntos_fantasy or 0),
+                'partido': {
+                    'jornada': {'numero_jornada': stat.partido.jornada.numero_jornada}
+                },
+            })
+        else:
+            # No data for this jornada - include empty structure
+            result.append({
+                'puntos_fantasy': None,
+                'partido': {
+                    'jornada': {'numero_jornada': jornada.numero_jornada}
+                },
+            })
+    
+    return result
+
 
 def _get_predicciones_jugador(jugador, temporada):
     """Returns predictions paired with real points.
     Includes ALL jornadas with predictions (even if no real data yet).
     Also includes all played jornadas (even without predictions) so the real bar renders.
     """
-    import math
-    
     def _sanitize_float(value):
         """Convert inf/nan to None for JSON serialization"""
         if value is None:
@@ -96,6 +265,69 @@ def _get_predicciones_jugador(jugador, temporada):
     return result
 
 
+def _generar_predicciones_faltantes(jugador, temporada):
+    """
+    Genera predicciones faltantes para un jugador en una temporada.
+    Se ejecuta on-demand cuando se accede a la página del jugador.
+    """
+    if not jugador or not temporada:
+        return
+    
+    try:
+        import sys
+        from pathlib import Path
+        entrenamientos_path = Path(__file__).resolve().parents[2] / 'entrenamientoModelos'
+        if str(entrenamientos_path) not in sys.path:
+            sys.path.insert(0, str(entrenamientos_path))
+        
+        from predecir import predecir_puntos
+        
+        # Obtener posición del jugador
+        ejt = EquipoJugadorTemporada.objects.filter(
+            jugador=jugador, temporada=temporada
+        ).first()
+        posicion = ejt.posicion if ejt else jugador.get_posicion_mas_frecuente() or 'Delantero'
+        
+        # Obtener todas las jornadas de la temporada
+        jornadas = Jornada.objects.filter(temporada=temporada).order_by('numero_jornada')
+        
+        # Para cada jornada, generar predicción si no existe
+        for jornada in jornadas:
+            # Chequear si ya existe
+            if PrediccionJugador.objects.filter(jugador=jugador, jornada=jornada).exists():
+                continue
+            
+            # Generar predicción bajo demanda
+            try:
+                # Para jornadas 1-5, usar Baseline (media histórica); para jornadas 6+, usar modelo ML
+                modelo_para_pred = 'Baseline' if jornada.numero_jornada <= 5 else None
+                
+                resultado = predecir_puntos(
+                    jugador.pk,
+                    posicion,
+                    jornada_actual=jornada.numero_jornada,
+                    verbose=False,
+                    modelo_tipo=modelo_para_pred
+                )
+                
+                if resultado and isinstance(resultado, dict) and not resultado.get('error'):
+                    prediction = resultado.get('prediccion')
+                    if prediction is not None:
+                        # Determinar qué modelo se usó (según jornada)
+                        modelo_usado = 'baseline' if jornada.numero_jornada <= 5 else 'rf'
+                        PrediccionJugador.objects.update_or_create(
+                            jugador=jugador,
+                            jornada=jornada,
+                            modelo=modelo_usado,
+                            defaults={'prediccion': float(prediction)}
+                        )
+            except Exception as e:
+                logger.debug(f"Error generando predicción para {jugador} J{jornada.numero_jornada}: {e}")
+                continue
+    except Exception as e:
+        logger.debug(f"Error en _generar_predicciones_faltantes: {e}")
+
+
 # ── views ─────────────────────────────────────────────────────────────────────
 
 class JugadorDetailView(APIView):
@@ -137,6 +369,13 @@ class JugadorDetailView(APIView):
         # Si aún no hay temporada, usar la última de todas
         if temporada is None:
             temporada = Temporada.objects.order_by('-nombre').first()
+
+        # Generar predicciones faltantes under-demand (no bloquea, se ejecuta rápido si ya existen)
+        if temporada and not es_carrera:
+            try:
+                _generar_predicciones_faltantes(jugador, temporada)
+            except Exception as e:
+                logger.debug(f"Error generando predicciones para {jugador}: {e}")
 
         posicion = jugador.get_posicion_mas_frecuente() or ''
 
@@ -228,15 +467,19 @@ class JugadorDetailView(APIView):
                 .order_by('-partido__jornada__numero_jornada')
             )
 
-        ultimos_12_data = [
-            {
-                'puntos_fantasy': float(s.puntos_fantasy or 0),
-                'partido': {
-                    'jornada': {'numero_jornada': s.partido.jornada.numero_jornada}
-                },
-            }
-            for s in reversed(list(ultimos_qs))
-        ]
+        # Use new function that includes ALL jornadas, even without data
+        if es_carrera:
+            ultimos_12_data = [
+                {
+                    'puntos_fantasy': float(s.puntos_fantasy or 0),
+                    'partido': {
+                        'jornada': {'numero_jornada': s.partido.jornada.numero_jornada}
+                    },
+                }
+                for s in reversed(list(ultimos_qs))
+            ]
+        else:
+            ultimos_12_data = _get_ultimos_8_temporada_completa(jugador, temporada)
 
         # Roles
         roles = self._build_roles(jugador, temporada, es_carrera)
@@ -272,7 +515,8 @@ class JugadorDetailView(APIView):
             except (TypeError, ValueError):
                 return default
         
-        return Response({
+        # Build response with all floats sanitized
+        response_data = {
             'jugador': {
                 'id': jugador.id,
                 'nombre': jugador.nombre,
@@ -342,10 +586,31 @@ class JugadorDetailView(APIView):
             'media_general': 0,
             'percentiles': percentiles,
             'descripciones_roles': DESCRIPCIONES_ROLES,
-            'predicciones': _get_predicciones_jugador(
+            'predicciones': _get_datos_temporada_completa(
                 jugador, temporada if not es_carrera else None
-            ),
-        })
+            ) if not es_carrera else [],
+        }
+        
+        # Sanitize the dict deeply to remove NaN/Inf
+        response_data = _sanitize_dict(response_data)
+        
+        # Try to serialize to JSON to catch any NaN/Inf failures
+        try:
+            test_json = json.dumps(response_data)
+            logger.debug(f"Response JSON serialization OK for jugador {jugador_id}")
+        except ValueError as e:
+            logger.error(f"JSON serialization error for jugador {jugador_id}: {e}")
+            # Try to identify the problematic field
+            for key in ['stats', 'ultimos_8', 'historico', 'predicciones']:
+                if key in response_data:
+                    try:
+                        json.dumps(response_data[key])
+                    except ValueError as field_error:
+                        logger.error(f"Problem in field '{key}': {field_error}")
+            # Fallback: return empty stats
+            response_data['stats'] = {}
+        
+        return Response(response_data)
 
     @staticmethod
     def _build_roles(jugador, temporada, es_carrera):
@@ -456,8 +721,8 @@ class JugadorDetailView(APIView):
                 'pj': partidos,
                 'minutos': sh['minutos'] or 0,
                 'pases': sh['pases'] or 0,
-                'pases_accuracy': round(sh['pases_accuracy'] or 0, 1),
-                'xag': round(sh['xag'] or 0, 2),
+                'pases_accuracy': round(_safe_float(sh['pases_accuracy']), 1),
+                'xag': round(_safe_float(sh['xag']), 2),
                 'despejes': sh['despejes'] or 0,
                 'entradas': sh['entradas'] or 0,
                 'duelos_totales': (sh['duelos_ganados'] or 0) + (sh['duelos_perdidos'] or 0),
@@ -469,12 +734,12 @@ class JugadorDetailView(APIView):
                 ),
                 'tiros': sh['tiros'] or 0,
                 'tiros_puerta': sh['tiros_puerta'] or 0,
-                'xg': round(sh['xg'] or 0, 2),
+                'xg': round(_safe_float(sh['xg']), 2),
                 'regates_completados': sh['regates_completados'] or 0,
                 'regates_fallidos': sh['regates_fallidos'] or 0,
                 'conducciones': sh['conducciones'] or 0,
                 'conducciones_progresivas': sh['conducciones_progresivas'] or 0,
-                'distancia_conduccion': round(sh['distancia_conduccion'] or 0, 1),
+                'distancia_conduccion': round(_safe_float(sh['distancia_conduccion']), 1),
             })
         return historico_data
 

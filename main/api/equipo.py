@@ -8,26 +8,14 @@ import logging
 from datetime import datetime, time
 from difflib import SequenceMatcher
 
-from django.db.models import Q, Sum, Count
+from django.db.models import Q, Sum, Count, Max
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 
-from ..models import (
-    Temporada, Jornada, Calendario, ClasificacionJornada,
-    Equipo, Jugador, EquipoJugadorTemporada, EstadisticasPartidoJugador, Partido,
-)
-from ..views.utils import (
-    shield_name,
-    get_racha_detalles,
-    get_maximo_goleador,
-    get_partido_anterior_temporada,
-    get_h2h_historico,
-    get_historico_temporadas,
-    get_estadisticas_equipo_temporadas,
-    get_jugadores_ultimas_temporadas,
-)
+from ..models import *
+from ..views.utils import *
 
 logger = logging.getLogger(__name__)
 
@@ -47,13 +35,35 @@ class EquipoListView(APIView):
                 pass
 
         temporada = Temporada.objects.order_by('-nombre').first()
+
+        # Precompute counts for the latest season (avoid N queries)
+        counts_current = {}
+        if temporada:
+            for row in (
+                EquipoJugadorTemporada.objects
+                .filter(temporada=temporada)
+                .values('equipo_id')
+                .annotate(cnt=Count('id'))
+            ):
+                counts_current[row['equipo_id']] = row['cnt']
+
+        # Precompute latest season with players per equipo
+        latest_season_map = {}
+        for row in (
+            EquipoJugadorTemporada.objects
+            .values('equipo_id')
+            .annotate(latest=Max('temporada__nombre'))
+        ):
+            latest_season_map[row['equipo_id']] = row['latest']
+
         result = []
         for eq in Equipo.objects.order_by('nombre'):
-            jugadores_count = 0
-            if temporada:
-                jugadores_count = EquipoJugadorTemporada.objects.filter(
-                    equipo=eq, temporada=temporada
-                ).count()
+            jugadores_count = counts_current.get(eq.id, 0)
+            suggested_temporada = None
+            if jugadores_count == 0:
+                latest = latest_season_map.get(eq.id)
+                if latest:
+                    suggested_temporada = latest.replace('_', '/')
             result.append({
                 'id': eq.id,
                 'nombre': eq.nombre,
@@ -61,6 +71,7 @@ class EquipoListView(APIView):
                 'estadio': eq.estadio or '',
                 'jugadores_count': jugadores_count,
                 'es_favorito': eq.id in favoritos_ids,
+                'suggested_temporada': suggested_temporada,
             })
 
         return Response({'equipos': result})

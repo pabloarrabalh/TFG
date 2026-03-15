@@ -10,9 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
-from ..models import (
-    Plantilla, EstadisticasPartidoJugador, Jornada, Temporada, Notificacion
-)
+from ..models import *
 
 logger = logging.getLogger(__name__)
 

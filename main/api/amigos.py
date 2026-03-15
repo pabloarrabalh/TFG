@@ -81,12 +81,8 @@ class EnviarSolicitudView(APIView):
                 receptor = User.objects.get(username__iexact=username_raw)
             except User.DoesNotExist:
                 receptor = User.objects.filter(
-                    profile__nickname__iexact=username_raw
+                    username__icontains=username_raw
                 ).first()
-                if receptor is None:
-                    receptor = User.objects.filter(
-                        username__icontains=username_raw
-                    ).first()
             if receptor is None:
                 return Response(
                     {'error': 'Usuario no encontrado. Usa el nombre de usuario exacto (sin @).'},

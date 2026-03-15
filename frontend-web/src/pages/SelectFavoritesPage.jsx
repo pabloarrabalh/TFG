@@ -12,7 +12,7 @@ import 'driver.js/dist/driver.css'
 
 export default function SelectFavoritesPage() {
   const navigate = useNavigate()
-  const { tourActive, isPhaseCompleted, markPhaseCompleted, hasTourBeenOffered } = useTour()
+  const { tourActive, isPhaseCompleted, markPhaseCompleted, hasTourBeenOffered, endTour, isManualExit } = useTour()
 
   const [equipos, setEquipos] = useState([])
   const [favoritos, setFavoritos] = useState(new Set()) // Set of equipo IDs
@@ -37,10 +37,10 @@ export default function SelectFavoritesPage() {
     const timer = setTimeout(() => {
       driverRef.current = driver({
         showProgress: true,
-        allowClose: false,
+        allowClose: true,
         nextBtnText: 'Siguiente →',
         prevBtnText: '← Anterior',
-        doneBtnText: 'Ir al panel →',
+        doneBtnText: 'Salir del tour',
         steps: [
           {
             element: '#tour-favorites-header',
@@ -73,7 +73,12 @@ export default function SelectFavoritesPage() {
         onDestroyStarted: () => {
           driverRef.current?.destroy()
           markPhaseCompleted('favorites')
-          navigate('/menu')
+          if (isManualExit()) {
+            endTour()
+          } else {
+            endTour()
+            navigate('/menu')
+          }
         },
       })
       driverRef.current.drive()

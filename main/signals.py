@@ -1,3 +1,7 @@
+import json
+import sys
+from pathlib import Path
+
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.db import transaction
@@ -7,10 +11,26 @@ import threading
 logger = logging.getLogger(__name__)
 
 try:
-    from .models import Jugador, Equipo
+    from .models import Jugador, Equipo, UserProfile
+    from django.contrib.auth.models import User
     MODELS_AVAILABLE = True
 except ImportError:
     MODELS_AVAILABLE = False
+
+
+# ── Create UserProfile automatically when User is created ──────────────────────
+try:
+    from django.contrib.auth.models import User
+    from .models import UserProfile as UP_Model
+    
+    @receiver(post_save, sender=User)
+    def create_user_profile(sender, instance, created, **kwargs):
+        """Crea automáticamente UserProfile cuando se crea un User"""
+        if created:
+            UP_Model.objects.get_or_create(user=instance)
+except Exception as e:
+    logger.warning(f"No se pudo registrar signal de UserProfile: {e}")
+
 
 try:
     from .opensearch_docs import opensearch_client, OPENSEARCH_AVAILABLE
@@ -20,8 +40,6 @@ except ImportError:
 
 
 if MODELS_AVAILABLE and OPENSEARCH_AVAILABLE and opensearch_client:
-    import json
-    
     @receiver(post_save, sender=Jugador)
     def indexar_jugador_al_guardar(sender, instance, created, **kwargs):
         """Indexa automáticamente un jugador cuando se guarda en OpenSearch"""
@@ -84,21 +102,6 @@ if MODELS_AVAILABLE and OPENSEARCH_AVAILABLE and opensearch_client:
             logger.warning(f"Error eliminando equipo {instance.id} del índice: {str(e)}")
 else:
     logger.info("⚠️ OpenSearch no está disponible, signals de indexación desactivados")
-# Signals para UserProfile
-from django.contrib.auth.models import User
-from main.models import UserProfile
-
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    """Crea automáticamente un UserProfile cuando se crea un nuevo usuario"""
-    if created:
-        UserProfile.objects.get_or_create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    """Guarda el UserProfile cuando se guarda el usuario"""
-    if hasattr(instance, 'profile'):
-        instance.profile.save()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -108,9 +111,6 @@ def save_user_profile(sender, instance, **kwargs):
 
 def _generar_prediccion_background(jugador_id, jornada_id, posicion):
     """Ejecuta en un hilo demonio: predice puntos y guarda en PrediccionJugador."""
-    import sys
-    from pathlib import Path
-
     try:
         from main.models import PrediccionJugador, Jornada
 

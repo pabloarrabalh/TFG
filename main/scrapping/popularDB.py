@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 SCRIPT UNIFICADO COMPLETO DE CARGA DE DATOS
@@ -8,37 +8,85 @@ Carga todos los datos en un único script:
 2. Crea Temporadas, Equipos, Jornadas
 3. Carga EstadisticasPartidoJugador desde CSVs (45 campos)
 4. Carga Roles con fuzzy matching
-5. Calcula y carga Goles en Partidos
-6. Carga ClasificacionJornada desde CSVs
-7. Genera RendimientoHistoricoJugador por agregación
-8. Carga Plantillas por temporada (EquipoJugadorTemporada)
+5. Calcula y carga ClasificacionJornada desde CSVs
+6. Genera RendimientoHistoricoJugador por agregación
+7. Carga Plantillas por temporada (EquipoJugadorTemporada)
 
 Uso: python popularDB.py
 """
 
+import ast
+import glob
+import json
+import logging
 import os
 import sys
-import logging
+from datetime import datetime
+
 import django
 import pandas as pd
-import json
-import glob
-import ast
-from datetime import datetime
 import requests
+from psycopg2 import sql
 from scipy import stats as scipy_stats
+
+try:
+    import psycopg2
+except ImportError:
+    psycopg2 = None
+
+
+def crear_bd_si_no_existe():
+    """Crea la BD PostgreSQL si no existe (para uso con contenedores)."""
+    if psycopg2 is None:
+        logging.getLogger(__name__).warning("psycopg2 no disponible, saltando creación de BD")
+        return
+    
+    db_name = os.environ.get('DB_NAME', 'laliga')
+    db_user = os.environ.get('DB_USER', 'postgres')
+    db_password = os.environ.get('DB_PASSWORD', 'postgres')
+    db_host = os.environ.get('DB_HOST', 'localhost')
+    db_port = os.environ.get('DB_PORT', '5432')
+    
+    try:
+        # Conectar al servidor PostgreSQL (sin especificar BD)
+        conn = psycopg2.connect(
+            dbname='postgres',  # BD default de PostgreSQL
+            user=db_user,
+            password=db_password,
+            host=db_host,
+            port=db_port,
+            connect_timeout=5
+        )
+        conn.autocommit = True
+        cur = conn.cursor()
+        
+        # Comprobar si la BD existe
+        cur.execute(
+            sql.SQL("SELECT 1 FROM pg_database WHERE datname = %s"),
+            [db_name]
+        )
+        existe = cur.fetchone()
+        
+        if not existe:
+            # Crear la BD
+            cur.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(db_name)))
+            logging.getLogger(__name__).info(f"Base de datos '{db_name}' creada correctamente")
+        
+        cur.close()
+        conn.close()
+    except psycopg2.OperationalError as e:
+        # PostgreSQL no disponible (normal en desarrollo sin BD, Django lo maneja)
+        logging.getLogger(__name__).warning(f"No se pudo crear BD: {e}")
+    except Exception as e:
+        logging.getLogger(__name__).warning(f"Advertencia al crear BD: {e}")
+
 
 # Configurar Django
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
-from main.models import (
-    Temporada, Equipo, EquipoTemporada, Jugador,
-    Jornada, Partido, EstadisticasPartidoJugador,
-    ClasificacionJornada, RendimientoHistoricoJugador, EquipoJugadorTemporada,
-    Calendario
-)
+from main.models import *
 from django.db.models import Sum, Count, Q, Max
 from main.scrapping.alias import MAPEO_POSICIONES_INVERSO
 from main.scrapping.fbref import scrappear_calendario_para_bd
@@ -401,7 +449,7 @@ def buscar_jugador_partido(nombre_csv, equipo, partido):
 # ============================================================================
 
 def procesar_csv_partido(ruta_csv, temporada):
-    """Procesa un CSV de partido y carga los datos."""
+    """Procesa un CSV de partido y carga los datos con bulk_create para perf."""
     _log = logging.getLogger(__name__)
     try:
         df = pd.read_csv(ruta_csv, encoding='utf-8-sig')
@@ -413,6 +461,7 @@ def procesar_csv_partido(ruta_csv, temporada):
         return False
     
     contador_stats = 0
+    stats_to_create = []  # Acumular para bulk_create
     try:
         primera_fila = df.iloc[0]
         jornada_num = int(primera_fila['jornada'])
@@ -428,23 +477,85 @@ def procesar_csv_partido(ruta_csv, temporada):
         
         partido = obtener_o_crear_partido(jornada, equipo_local, equipo_visitante, fecha_partido)
         
+        # Acumular todos los stats antes de bulk_create
         for idx, row in df.iterrows():
             try:
                 nombre_jugador = row['player']
                 posicion = row['posicion']
-                nacionalidad = row.get('nacionalidad', '')  # Obtener nacionalidad del CSV
+                nacionalidad = row.get('nacionalidad', '')
                 equipo_nombre = row['equipo_propio']
                 dorsal = row['dorsal']
                 
                 equipo = obtener_o_crear_equipo(equipo_nombre)
                 obtener_o_crear_equipo_temporada(equipo, temporada)
-                jugador = obtener_o_crear_jugador(nombre_jugador, posicion, nacionalidad)  # Pasar nacionalidad
+                jugador = obtener_o_crear_jugador(nombre_jugador, posicion, nacionalidad)
                 obtener_o_crear_equipo_jugador_temporada(jugador, equipo, temporada, dorsal)
                 
-                stats = cargar_estadisticas_partido(row, jugador, equipo, partido)
+                # Construir objeto sin guardarlo aún
+                posicion_codigo = row.get('posicion') if pd.notna(row.get('posicion')) else None
+                posicion_norm = MAPEO_POSICIONES_INVERSO.get(posicion_codigo) if posicion_codigo else None
+                edad = None
+                if pd.notna(row.get('edad')):
+                    try:
+                        edad = int(row['edad'])
+                    except (ValueError, TypeError):
+                        edad = None
+                
+                stat_obj = EstadisticasPartidoJugador(
+                    partido=partido,
+                    jugador=jugador,
+                    nacionalidad=nacionalidad,
+                    edad=edad,
+                    min_partido=int(row['min_partido']) if pd.notna(row['min_partido']) else 0,
+                    titular=bool(row['titular']) if pd.notna(row['titular']) else False,
+                    gol_partido=int(row['gol_partido']) if pd.notna(row['gol_partido']) else 0,
+                    asist_partido=int(row['asist_partido']) if pd.notna(row['asist_partido']) else 0,
+                    xg_partido=float(row['xg_partido']) if pd.notna(row['xg_partido']) else 0.0,
+                    xag=float(row['xag']) if pd.notna(row['xag']) else 0.0,
+                    tiros=int(row['tiros']) if pd.notna(row['tiros']) else 0,
+                    tiro_fallado_partido=int(row['tiro_fallado_partido']) if pd.notna(row['tiro_fallado_partido']) else 0,
+                    tiro_puerta_partido=int(row['tiro_puerta_partido']) if pd.notna(row['tiro_puerta_partido']) else 0,
+                    pases_totales=int(row['pases_totales']) if pd.notna(row['pases_totales']) else 0,
+                    pases_completados_pct=float(row['pases_completados_pct']) if pd.notna(row['pases_completados_pct']) else 0.0,
+                    amarillas=int(row['amarillas']) if pd.notna(row['amarillas']) else 0,
+                    rojas=int(row['rojas']) if pd.notna(row['rojas']) else 0,
+                    goles_en_contra=int(row['goles_en_contra']) if pd.notna(row['goles_en_contra']) else 0,
+                    porcentaje_paradas=float(row['porcentaje_paradas']) if pd.notna(row['porcentaje_paradas']) else 0.0,
+                    psxg=float(row['psxg']) if pd.notna(row['psxg']) else 0.0,
+                    puntos_fantasy=_puntos_fantasy_sin_outlier(row, jugador),
+                    entradas=int(row['entradas']) if pd.notna(row['entradas']) else 0,
+                    duelos=int(row['duelos']) if pd.notna(row['duelos']) else 0,
+                    duelos_ganados=int(row['duelos_ganados']) if pd.notna(row['duelos_ganados']) else 0,
+                    duelos_perdidos=int(row['duelos_perdidos']) if pd.notna(row['duelos_perdidos']) else 0,
+                    bloqueos=int(row['bloqueos']) if pd.notna(row['bloqueos']) else 0,
+                    bloqueo_tiros=int(row['bloqueo_tiros']) if pd.notna(row['bloqueo_tiros']) else 0,
+                    bloqueo_pase=int(row['bloqueo_pase']) if pd.notna(row['bloqueo_pase']) else 0,
+                    despejes=int(row['despejes']) if pd.notna(row['despejes']) else 0,
+                    regates=int(row['regates']) if pd.notna(row['regates']) else 0,
+                    regates_completados=int(row['regates_completados']) if pd.notna(row['regates_completados']) else 0,
+                    regates_fallidos=int(row['regates_fallidos']) if pd.notna(row['regates_fallidos']) else 0,
+                    conducciones=int(row['conducciones']) if pd.notna(row['conducciones']) else 0,
+                    distancia_conduccion=float(row['distancia_conduccion']) if pd.notna(row['distancia_conduccion']) else 0.0,
+                    metros_avanzados_conduccion=float(row['metros_avanzados_conduccion']) if pd.notna(row['metros_avanzados_conduccion']) else 0.0,
+                    conducciones_progresivas=int(row['conducciones_progresivas']) if pd.notna(row['conducciones_progresivas']) else 0,
+                    duelos_aereos_ganados=int(row['duelos_aereos_ganados']) if pd.notna(row['duelos_aereos_ganados']) else 0,
+                    duelos_aereos_perdidos=int(row['duelos_aereos_perdidos']) if pd.notna(row['duelos_aereos_perdidos']) else 0,
+                    duelos_aereos_ganados_pct=float(row['duelos_aereos_ganados_pct']) if pd.notna(row['duelos_aereos_ganados_pct']) else 0.0,
+                    posicion=posicion_norm,
+                    roles=[]
+                )
+                stats_to_create.append(stat_obj)
                 contador_stats += 1
             except Exception:
                 continue
+        
+        # Bulk insert con ignore_conflicts para no fallar si ya existe (rápido)
+        if stats_to_create:
+            EstadisticasPartidoJugador.objects.bulk_create(
+                stats_to_create,
+                batch_size=5000,
+                ignore_conflicts=True
+            )
         
         return True
     except Exception as e:
@@ -831,6 +942,9 @@ def main():
     """Función principal: ejecuta todas las fases."""
     _log = logging.getLogger(__name__)
     _log.info("[popularDB] Iniciando carga completa de datos...")
+    
+    # FASE -1: Crear BD si no existe (necesario para contenedores)
+    crear_bd_si_no_existe()
     
     # FASE 0a: Crear todas las jornadas PRIMERO (CRÍTICO)
     fase_0a_crear_todas_las_jornadas()

@@ -22,7 +22,7 @@ const AVATAR_COUNT = 5
 export default function PerfilPage() {
   const { user, refetchUser } = useAuth()
   const navigate = useNavigate()
-  const { tourActive, isPhaseCompleted, markPhaseCompleted } = useTour()
+  const { tourActive, isPhaseCompleted, markPhaseCompleted, endTour, isManualExit } = useTour()
   const driverRef = useRef(null)
 
   const [perfil, setPerfil] = useState(null)
@@ -38,7 +38,7 @@ export default function PerfilPage() {
 
   // Edit form
   const [editOpen, setEditOpen] = useState(false)
-  const [editData, setEditData] = useState({ first_name: '', last_name: '', email: '', nickname: '' })
+  const [editData, setEditData] = useState({ first_name: '', last_name: '', email: '' })
 
   // Photo modal
   const [photoModal, setPhotoModal] = useState(false)
@@ -112,7 +112,6 @@ export default function PerfilPage() {
         first_name: res.data.first_name || '',
         last_name: res.data.last_name || '',
         email: res.data.email || '',
-        nickname: res.data.nickname || '',
       })
     } catch {
       setMessage({ type: 'error', text: 'Error al cargar el perfil' })
@@ -285,9 +284,6 @@ export default function PerfilPage() {
             <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">
               {perfil?.first_name} {perfil?.last_name}
             </h1>
-            {perfil?.nickname && (
-              <p className="text-primary font-semibold mb-2">@{perfil.nickname}</p>
-            )}
             <div className="space-y-1.5 mb-5">
               <div className="flex items-center gap-2 text-gray-400 justify-center sm:justify-start">
                 <span className="material-symbols-outlined text-lg">mail</span>
@@ -336,9 +332,9 @@ export default function PerfilPage() {
           <h2 className="text-xl font-bold text-white">Equipos Favoritos</h2>
         </div>
 
-        {perfil?.favoritos?.length > 0 ? (
+        {perfil?.equipos_favoritos?.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {perfil.favoritos.map(fav => (
+            {perfil.equipos_favoritos.map(fav => (
               <div key={fav.id} className="group relative">
                 <button
                   onClick={() => deleteFavorite(fav.id)}
@@ -346,13 +342,13 @@ export default function PerfilPage() {
                 >
                   <span className="material-symbols-outlined text-base text-white">close</span>
                 </button>
-                <Link to={`/equipo/${encodeURIComponent(fav.equipo_nombre)}`}>
+                <Link to={`/equipo/${encodeURIComponent(fav.nombre)}`}>
                   <div className="glass-panel rounded-xl p-5 hover:border-primary/50 hover:shadow-neon transition-all cursor-pointer">
                     <div className="flex items-center gap-4">
-                      <TeamShield escudo={fav.equipo_escudo} nombre={fav.equipo_nombre} size={56} className="size-14" />
+                      <TeamShield escudo={fav.escudo} nombre={fav.nombre} size={56} className="size-14" />
                       <div className="flex-1 min-w-0">
                         <h3 className="font-bold text-white group-hover:text-primary transition-colors truncate">
-                          {fav.equipo_nombre}
+                          {fav.nombre}
                         </h3>
                       </div>
                     </div>
@@ -445,16 +441,10 @@ export default function PerfilPage() {
       )}
 
       {/* Quick stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <GlassPanel className="p-5 text-center">
-          <div className="text-3xl font-black text-primary mb-1">{perfil?.favoritos?.length || 0}</div>
+          <div className="text-3xl font-black text-primary mb-1">{perfil?.equipos_favoritos?.length || 0}</div>
           <p className="text-gray-400 text-sm">Equipos Favoritos</p>
-        </GlassPanel>
-        <GlassPanel className="p-5 text-center">
-          <div className="text-lg font-black text-white mb-1">
-            {perfil?.date_joined ? new Date(perfil.date_joined).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }) : '—'}
-          </div>
-          <p className="text-gray-400 text-sm">Miembro desde</p>
         </GlassPanel>
         <GlassPanel className="p-5 text-center">
           <div className="flex items-center justify-center gap-2 mb-1">
@@ -482,7 +472,6 @@ export default function PerfilPage() {
                 { key: 'first_name', label: 'Nombre' },
                 { key: 'last_name', label: 'Apellidos' },
                 { key: 'email', label: 'Email', type: 'email' },
-                { key: 'nickname', label: 'Nickname' },
               ].map(({ key, label, type = 'text' }) => (
                 <div key={key}>
                   <label className="block text-sm font-semibold text-gray-300 mb-1.5">{label}</label>

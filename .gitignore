@@ -4,7 +4,14 @@ venv/
 
 __pycache__/
 *.pyc
+
+# Environment files — the production/staging ones contain real secrets
 .env
+.env.render
+.env.azure
+
+# Keep .env.local and .env.docker (they are templates with placeholder values)
+
 .node_modules/*
 node_modules/
 
@@ -16,3 +23,4 @@ logs/
 scripts/test_output.txt
 
 opensearch-3.5.0/
+opensearch-3.5.0/*

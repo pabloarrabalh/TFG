@@ -26,6 +26,7 @@ class NotificacionConsumer(AsyncWebsocketConsumer):
         self.group_name = f'notificaciones_{user.id}'
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
+        logger.info(f"---------------WebSocket funcionando correctametne")
         # Send current notifications immediately on connect
         notifs, no_leidas = await self._get_notificaciones(user)
         await self.send(text_data=json.dumps({

@@ -5,11 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
-from .models import (
-    Jugador, Equipo, Temporada, Jornada, Partido,
-    EstadisticasPartidoJugador, UserProfile,
-    Plantilla, SolicitudAmistad, Amistad, Notificacion,
-)
+from .models import *
 
 
 # ── Auth ──────────────────────────────────────────────────────────────────────

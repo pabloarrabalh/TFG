@@ -12,10 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 
-from ..models import (
-    Jugador, Temporada, Jornada, EstadisticasPartidoJugador,
-    EquipoJugadorTemporada
-)
+from ..models import *
 from ..views.utils import shield_name
 from ..cache_utils import cache_api_response
 

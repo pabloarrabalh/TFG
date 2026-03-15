@@ -1,27 +1,67 @@
-# ── Backend Dockerfile ────────────────────────────────────────────────────────
-FROM python:3.11-slim
+# ─────────────────────────────────────────────────────────────────────────────
+# Backend Dockerfile – Multi-stage build
+#   Stage 1 (builder): compila dependencias Python
+#   Stage 2 (runtime): imagen final limpia
+# ─────────────────────────────────────────────────────────────────────────────
 
-# System deps needed by psycopg2 and Pillow
+# ── Stage 1: Builder ─────────────────────────────────────────────────────────
+FROM python:3.11-slim AS builder
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     gcc \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /tmp
+
+COPY requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+
+# ── Stage 2: Runtime ─────────────────────────────────────────────────────────
+FROM python:3.11-slim
+
+# System deps de runtime (sin dev tools)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH=/root/.local/bin:$PATH
 
 WORKDIR /app
 
-# Install Python deps
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt gunicorn
+# Copiar deps compiladas desde builder
+COPY --from=builder /root/.local /root/.local
 
-# Copy source
+# Copiar código fuente
 COPY . .
 
-# Collect static files at build time (needs a dummy DB env so Django doesn't crash)
-RUN DB_HOST=localhost python manage.py collectstatic --noinput || true
+# Recolectar archivos estáticos en tiempo de build
+# (Usar valores dummy para SECRET_KEY y DB ya que solo se necesitan para collectstatic)
+RUN SECRET_KEY=build-placeholder \
+    DB_HOST=localhost \
+    DB_NAME=placeholder \
+    DB_USER=placeholder \
+    DB_PASSWORD=placeholder \
+    python manage.py collectstatic --noinput --clear 2>/dev/null || true
+
+# Asegurar que los escudos y logos estén disponibles (collectstatic podría no incluirlos)
+RUN mkdir -p /app/staticfiles/escudos /app/staticfiles/logos && \
+    cp -r /app/static/escudos/* /app/staticfiles/escudos/ 2>/dev/null || true && \
+    cp -r /app/static/logos/* /app/staticfiles/logos/ 2>/dev/null || true
+
+# Permisos de ejecución
+RUN chmod +x /app/docker-entrypoint.sh
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8000/health/ || exit 1
 
 EXPOSE 8000
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
-ENTRYPOINT ["/entrypoint.sh"]

@@ -12,6 +12,8 @@ Recursos expuestos:
   GET /api/v2/jornadas/                     — jornadas por temporada
   POST /api/v2/predicciones/                — guardar predicción (requiere auth)
 """
+import math
+
 from rest_framework import serializers, generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -19,11 +21,7 @@ from rest_framework.views import APIView
 
 from django.db.models import Sum, Count, Q, Avg
 
-from .models import (
-    Jugador, Equipo, Temporada, Jornada,
-    EquipoJugadorTemporada, EstadisticasPartidoJugador,
-    ClasificacionJornada, PrediccionJugador,
-)
+from .models import *
 from .views.utils import shield_name
 from .api.jugador import JugadorDetailView as JugadorDetailViewV1
 from .api.equipo import EquipoDetailView as EquipoDetailViewV1
@@ -78,6 +76,7 @@ class EquipoListSerializer(serializers.ModelSerializer):
 class PrediccionSerializer(serializers.ModelSerializer):
     jornada_numero = serializers.IntegerField(source='jornada.numero_jornada', read_only=True)
     temporada = serializers.CharField(source='jornada.temporada.nombre', read_only=True)
+    prediccion = serializers.SerializerMethodField()
     real = serializers.SerializerMethodField()
 
     class Meta:
@@ -86,12 +85,30 @@ class PrediccionSerializer(serializers.ModelSerializer):
                   'prediccion', 'modelo', 'creada_en', 'real']
         read_only_fields = ['id', 'creada_en', 'jornada_numero', 'temporada', 'real']
 
+    def get_prediccion(self, obj):
+        val = obj.prediccion
+        if val is None:
+            return None
+        try:
+            if math.isnan(val) or math.isinf(val):
+                return None
+            return round(val, 2)
+        except (TypeError, ValueError):
+            return None
+
     def get_real(self, obj):
         pts = EstadisticasPartidoJugador.objects.filter(
             jugador=obj.jugador,
             partido__jornada=obj.jornada,
         ).aggregate(s=Sum('puntos_fantasy'))['s']
-        return float(pts) if pts is not None else None
+        if pts is None:
+            return None
+        try:
+            if math.isnan(pts) or math.isinf(pts):
+                return None
+            return float(pts)
+        except (TypeError, ValueError):
+            return None
 
 
 class PrediccionCreateSerializer(serializers.ModelSerializer):
