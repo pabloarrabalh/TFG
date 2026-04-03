@@ -50,6 +50,20 @@ const obtenerEscudo = (nombre) => ESCUDO_MAP[nombre] || (nombre?.toLowerCase().r
 
 const POSICIONES = ['Portero', 'Defensa', 'Centrocampista', 'Delantero']
 const ALINEACION_VACIA = { Portero: [], Defensa: [], Centrocampista: [], Delantero: [], Suplentes: [] }
+const MODELOS_DISPONIBLES = ['RF', 'Ridge', 'ElasticNet', 'XGB', 'Baseline']
+const MODEL_TO_BACKEND = {
+  RF: 'RF',
+  Ridge: 'Ridge',
+  ElasticNet: 'ElasticNet',
+  XGB: 'XGB',
+  Baseline: 'Baseline',
+}
+const MEJOR_MODELO_POR_POS = {
+  Portero: 'ElasticNet',
+  Defensa: 'Ridge',
+  Centrocampista: 'Ridge',
+  Delantero: 'ElasticNet',
+}
 
 // ─── Mapa de explicaciones de features XAI ─────────────────────────────────
 const FEATURE_EXPLICACIONES = {
@@ -300,10 +314,10 @@ export default function MiPlantillaPage() {
 
   // Selector de modelos por posición
   const [modelosPorPos, setModelosPorPos] = useState({
-    Portero: 'Random Forest',          // Solo Random Forest
-    Defensa: 'Random Forest',          // Solo Random Forest
-    Centrocampista: 'Ridge', // Ridge o Baseline
-    Delantero: 'Ridge',     // Ridge o ElasticNet
+    Portero: 'RF',
+    Defensa: 'RF',
+    Centrocampista: 'Ridge',
+    Delantero: 'Ridge',
   })
   const [showModelDropdown, setShowModelDropdown] = useState(null) // null | posicion
   const [showModelPanel, setShowModelPanel] = useState(true) // Para expandir/contraer panel de modelos
@@ -390,6 +404,12 @@ export default function MiPlantillaPage() {
 
     return () => clearTimeout(timer)
   }, [modelosPorPos]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Si el modal de detalles está abierto, refrescarlo con el modelo/jornada actuales
+  useEffect(() => {
+    if (!modalDet) return
+    abrirDetalles(modalDet)
+  }, [modelosPorPos, jornadaActual]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Cargar partidos cuando el modal de selección se abre
   useEffect(() => {
@@ -691,22 +711,14 @@ export default function MiPlantillaPage() {
     ].filter(Boolean)
     if (!todos.length) return
     
-    // Mapeo de nombres mostrados a códigos de backend
-    const mapModeloBackend = {
-      'Random Forest': 'RF',
-      'Ridge': 'Ridge',
-      'ElasticNet': 'ElasticNet',
-      'Baseline': 'Baseline',
-    }
-    
     for (const jug of todos) {
       if (fetchingRef.current.has(jug.id) || predictedRef.current.has(jug.id)) continue
       fetchingRef.current.add(jug.id)
       try {
         // Usar /api/explicar-prediccion/ (recalcula siempre, igual que el modal)
         // Con el modelo seleccionado para esa posición
-        const modeloUI = modelosPorPos[jug.posicion] || 'Random Forest'
-        const modeloBackend = mapModeloBackend[modeloUI] || 'RF'
+        const modeloUI = modelosPorPos[jug.posicion] || 'RF'
+        const modeloBackend = MODEL_TO_BACKEND[modeloUI] || 'RF'
         
         const payload = { 
           jugador_id: jug.id, 
@@ -740,16 +752,9 @@ export default function MiPlantillaPage() {
     setModalDet(jugador); setDetPrediccion(null); setDetExplicacion(null); setDetFeaturesImpacto([])
     setDetLoadingPred(true)
     try {
-      // Mapeo de nombres mostrados a códigos de backend
-      const mapModeloBackend = {
-        'Random Forest': 'RF',
-        'Ridge': 'Ridge',
-        'ElasticNet': 'ElasticNet',
-        'Baseline': 'Baseline',
-      }
       // Endpoint unificado XAI para TODAS las posiciones (PT, DF, MC, DT)
-      const modeloUI = modelosPorPos[jugador.posicion] || 'Random Forest'
-      const modeloBackend = mapModeloBackend[modeloUI] || 'RF'
+      const modeloUI = modelosPorPos[jugador.posicion] || 'RF'
+      const modeloBackend = MODEL_TO_BACKEND[modeloUI] || 'RF'
       const res = await fetch(`${BACKEND}/api/explicar-prediccion/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
@@ -993,7 +998,7 @@ export default function MiPlantillaPage() {
             element: '#tour-plantilla-modelos',
             popover: {
               title: 'Modelos de predicción',
-              description: 'Elige el modelo de IA por posición: Random Forest, Ridge o ElasticNet. Cada uno tiene diferente precisión según la posición del jugador.',
+              description: 'Elige el modelo de IA por posición: RF, Ridge, ElasticNet, XGB o Baseline. Cada uno puede comportarse distinto según el jugador y el contexto.',
               side: 'bottom',
               align: 'start',
             },
@@ -1163,10 +1168,10 @@ export default function MiPlantillaPage() {
         {showModelPanel && (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            { pos: 'Portero', opciones: ['Random Forest'] },
-            { pos: 'Defensa', opciones: ['Random Forest'] },
-            { pos: 'Centrocampista', opciones: ['Ridge', 'Baseline'] },
-            { pos: 'Delantero', opciones: ['Ridge', 'ElasticNet'] },
+            { pos: 'Portero', opciones: MODELOS_DISPONIBLES },
+            { pos: 'Defensa', opciones: MODELOS_DISPONIBLES },
+            { pos: 'Centrocampista', opciones: MODELOS_DISPONIBLES },
+            { pos: 'Delantero', opciones: MODELOS_DISPONIBLES },
           ].map(({ pos, opciones }) => (
             <div key={pos} className="relative">
               <button 
@@ -1181,7 +1186,10 @@ export default function MiPlantillaPage() {
                   <span className="truncate">{pos}</span>
                   <span className="material-symbols-outlined text-sm">arrow_drop_down</span>
                 </div>
-                <div className="text-xs text-gray-300 mt-0.5">{modelosPorPos[pos]}</div>
+                <div className="text-xs text-gray-300 mt-0.5 flex items-center justify-center gap-1">
+                  <span>{modelosPorPos[pos]}</span>
+                  {MEJOR_MODELO_POR_POS[pos] === modelosPorPos[pos] && <span title="Mejor MAE">★</span>}
+                </div>
               </button>
               {showModelDropdown === pos && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-background-dark border border-border-dark rounded-lg shadow-2xl z-[10001] py-1">
@@ -1189,33 +1197,8 @@ export default function MiPlantillaPage() {
                     <button
                       key={opt}
                       onClick={() => {
-                        // Lógica de confirmación según posición y modelo
-                        if (pos === 'Centrocampista' && opt === 'Baseline') {
-                          setModalConfirm({
-                            titulo: 'Cambiar a Baseline',
-                            mensaje: 'Se usará la media histórica de puntos del jugador en lugar de predicción con IA.',
-                            onConfirm: () => {
-                              setModelosPorPos(prev => ({ ...prev, [pos]: opt }))
-                              setShowModelDropdown(null)
-                              setModalConfirm(null)
-                            },
-                            onCancel: () => setModalConfirm(null)
-                          })
-                        } else if (pos === 'Delantero' && opt === 'ElasticNet' && modelosPorPos[pos] === 'Ridge') {
-                          setModalConfirm({
-                            titulo: 'Cambiar a ElasticNet',
-                            mensaje: 'La predicción con ElasticNet es algo peor que Ridge (MAE más alto). ¿Aceptas el cambio?',
-                            onConfirm: () => {
-                              setModelosPorPos(prev => ({ ...prev, [pos]: opt }))
-                              setShowModelDropdown(null)
-                              setModalConfirm(null)
-                            },
-                            onCancel: () => setModalConfirm(null)
-                          })
-                        } else {
-                          setModelosPorPos(prev => ({ ...prev, [pos]: opt }))
-                          setShowModelDropdown(null)
-                        }
+                        setModelosPorPos(prev => ({ ...prev, [pos]: opt }))
+                        setShowModelDropdown(null)
                       }}
                       className={`block w-full text-left px-3 py-2 text-xs transition-colors whitespace-nowrap ${
                         modelosPorPos[pos] === opt 
@@ -1223,7 +1206,10 @@ export default function MiPlantillaPage() {
                           : 'text-white hover:bg-white/10'
                       }`}
                     >
-                      {opt}
+                      <span className="inline-flex items-center gap-1">
+                        <span>{opt}</span>
+                        {MEJOR_MODELO_POR_POS[pos] === opt && <span className="text-yellow-300" title="Mejor MAE">★</span>}
+                      </span>
                     </button>
                   ))}
                 </div>

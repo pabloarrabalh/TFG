@@ -267,7 +267,9 @@ class ExplicarPrediccionView(APIView):
                         'XGB': 'xgb', 'XGBOOST': 'xgb',
                         'LGBM': 'lgbm',
                         'RIDGE': 'ridge', 'RIDGE REGRESSION': 'ridge',
-                        'ELASTICNET': 'rf', 'BASELINE': 'rf',
+                        'ELASTICNET': 'elasticnet',
+                        'ELASTIC NET': 'elasticnet',
+                        'BASELINE': 'baseline',
                     }
                     _POS_DEFAULT = {'PT': 'rf', 'DF': 'rf', 'MC': 'ridge', 'DT': 'ridge'}
                     if modelo_tipo:

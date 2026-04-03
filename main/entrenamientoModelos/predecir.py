@@ -86,6 +86,9 @@ MODELO_POR_POSICION = {
 NOMBRE_MODELO_LEGIBLE = {
     'RF':    'Random Forest',
     'Ridge': 'Ridge Regression',
+    'ElasticNet': 'ElasticNet',
+    'XGB': 'XGBoost',
+    'Baseline': 'Baseline (Media)',
 }
 
 
@@ -96,18 +99,45 @@ def cargar_modelo(posicion, modelo_tipo=None):
     if modelo_tipo is None:
         modelo_tipo = MODELO_POR_POSICION.get(posicion, 'RF')
 
+    # Normalizar entradas para evitar fallos por mayúsculas/minúsculas o alias.
+    modelo_alias = {
+        'RF': 'RF',
+        'RANDOM FOREST': 'RF',
+        'RIDGE': 'Ridge',
+        'RIDGE REGRESSION': 'Ridge',
+        'ELASTICNET': 'ElasticNet',
+        'ELASTIC NET': 'ElasticNet',
+        'XGB': 'XGB',
+        'XGBOOST': 'XGB',
+        'BASELINE': 'Baseline',
+    }
+    modelo_tipo = modelo_alias.get(str(modelo_tipo).upper(), modelo_tipo)
+
     directorio = DIRECTORIOS_MODELOS.get(posicion)
     if directorio is None:
         return None, modelo_tipo
 
     # Candidatos ordenados por prioridad según posición y tipo
     candidatos = {
-        ('PT', 'RF'):    ['best_model_RF.pkl', 'best_model_rf.pkl', 'best_model_portero_rf.pkl'],
-        ('DF', 'RF'):    ['best_model_RF.pkl', 'best_model_rf.pkl', 'best_model_defensa_rf.pkl'],
+        ('PT', 'RF'): ['best_model_RF.pkl', 'best_model_rf.pkl', 'best_model_portero_rf.pkl'],
+        ('PT', 'Ridge'): ['best_model_ridge.pkl', 'best_model_Ridge.pkl'],
+        ('PT', 'ElasticNet'): ['best_model_ElasticNet.pkl', 'best_model_elasticnet.pkl'],
+        ('PT', 'XGB'): ['best_model_xgb.pkl', 'best_model_XGB.pkl'],
+
+        ('DF', 'RF'): ['best_model_RF.pkl', 'best_model_rf.pkl', 'best_model_defensa_rf.pkl'],
+        ('DF', 'Ridge'): ['best_model_Ridge.pkl', 'best_model_ridge.pkl'],
+        ('DF', 'ElasticNet'): ['best_model_ElasticNet.pkl', 'best_model_elasticnet.pkl'],
+        ('DF', 'XGB'): ['best_model_xgb.pkl', 'best_model_XGB.pkl'],
+
+        ('MC', 'RF'): ['best_model_mc_rf.pkl', 'best_model_RF.pkl'],
         ('MC', 'Ridge'): ['best_model_mc_ridge.pkl', 'best_model_Ridge.pkl', 'best_model_ridge.pkl'],
-        ('MC', 'RF'):    ['best_model_mc_rf.pkl', 'best_model_RF.pkl'],
+        ('MC', 'ElasticNet'): ['best_model_mc_elasticnet.pkl', 'best_model_ElasticNet.pkl'],
+        ('MC', 'XGB'): ['best_model_mc_xgb.pkl', 'best_model_xgb.pkl'],
+
+        ('DT', 'RF'): ['best_model_delantero_rf.pkl', 'best_model_RF.pkl'],
         ('DT', 'Ridge'): ['best_model_delantero_ridge.pkl', 'best_model_Ridge.pkl', 'best_model_ridge.pkl'],
-        ('DT', 'RF'):    ['best_model_delantero_rf.pkl', 'best_model_RF.pkl'],
+        ('DT', 'ElasticNet'): ['best_model_delantero_elasticnet.pkl', 'best_model_ElasticNet.pkl'],
+        ('DT', 'XGB'): ['best_model_delantero_xgb.pkl', 'best_model_xgb.pkl'],
     }
     key = (posicion, modelo_tipo)
     lista = candidatos.get(key, ['best_model_RF.pkl'])
@@ -648,11 +678,14 @@ def _cargar_csv_portero():
         return None, None
 
 
-def _predecir_portero(jugador_id, jornada_actual=None, verbose=False):
+def _predecir_portero(jugador_id, jornada_actual=None, verbose=False, modelo_tipo=None):
     """
     Predicción de portero usando CSV (lógica extraída de predecir_portero.py).
     """
-    modelo, tipo_modelo_pt = cargar_modelo('PT')
+    if modelo_tipo and str(modelo_tipo).upper() == 'BASELINE':
+        return _predecir_desde_db(jugador_id, 'PT', jornada_actual, verbose, modelo_tipo='Baseline')
+
+    modelo, tipo_modelo_pt = cargar_modelo('PT', modelo_tipo)
     if modelo is None:
         return {'error': 'Modelo PT no disponible', 'jugador_id': jugador_id, 'prediccion': None}
     nombre_modelo_pt = NOMBRE_MODELO_LEGIBLE.get(tipo_modelo_pt, tipo_modelo_pt)
@@ -904,7 +937,7 @@ def predecir_puntos(jugador_id, posicion, jornada_actual=None, verbose=False, mo
     pos_code = _POSICION_MAP.get(posicion.upper(), posicion.upper())
 
     if pos_code == 'PT':
-        return _predecir_portero(jugador_id, jornada_actual, verbose)
+        return _predecir_portero(jugador_id, jornada_actual, verbose, modelo_tipo)
     elif pos_code == 'DF':
         return _predecir_desde_db(jugador_id, 'DF', jornada_actual, verbose, modelo_tipo)
     elif pos_code == 'MC':
@@ -921,7 +954,7 @@ def predecir_puntos(jugador_id, posicion, jornada_actual=None, verbose=False, mo
 
 # Backward-compatible aliases
 def predecir_puntos_portero(jugador_id, jornada_actual=None, verbose=False, modelo_tipo='RF'):
-    return predecir_puntos(jugador_id, 'PT', jornada_actual, verbose)
+    return predecir_puntos(jugador_id, 'PT', jornada_actual, verbose, modelo_tipo)
 
 def predecir_puntos_defensa(jugador_id, jornada_actual=None, verbose=False):
     return predecir_puntos(jugador_id, 'DF', jornada_actual, verbose)
@@ -933,7 +966,7 @@ def predecir_puntos_delantero(jugador_id, jornada_actual=None, verbose=False):
     return predecir_puntos(jugador_id, 'DT', jornada_actual, verbose)
 
 def explicar_prediccion_portero(jugador_id, jornada_actual=None, modelo_tipo='RF'):
-    return predecir_puntos(jugador_id, 'PT', jornada_actual, verbose=True)
+    return predecir_puntos(jugador_id, 'PT', jornada_actual, verbose=True, modelo_tipo=modelo_tipo)
 
 
 # =============================================================================

@@ -503,6 +503,7 @@ class PrediccionJugador(models.Model):
     MODELOS = [
         ('xgb', 'XGBoost'),
         ('rf', 'Random Forest'),
+        ('elasticnet', 'ElasticNet'),
         ('lgbm', 'LightGBM'),
         ('ridge', 'Ridge Regression'),
         ('baseline', 'Baseline (Media)'),

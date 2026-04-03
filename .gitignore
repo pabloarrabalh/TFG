@@ -24,3 +24,13 @@ scripts/test_output.txt
 
 opensearch-3.5.0/
 opensearch-3.5.0/*
+
+# SonarQube files — KEEP OUT OF REPO
+sonar-scanner-*/
+sonar-scanner*.zip
+sonar-project.properties
+coverage.xml
+.coverage
+.coverage.*
+.sonarqube/
+.scannerwork/
