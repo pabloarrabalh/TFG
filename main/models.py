@@ -85,14 +85,6 @@ class Jugador(models.Model):
         return f"{self.nombre} {self.apellido}"
     
     def get_posicion_mas_frecuente(self):
-        """
-        Calcula la posición más frecuente del jugador en todos sus partidos.
-        
-        Returns:
-            string: La posición más frecuente (Portero, Defensa, Centrocampista, Delantero)
-                   o None si no tiene estadísticas
-        """
-        # Obtener conteo de posiciones en EstadisticasPartidoJugador
         posiciones = (
             self.estadisticas_partidos
             .filter(posicion__isnull=False)

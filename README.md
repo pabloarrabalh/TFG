@@ -13,7 +13,8 @@ Stack: **Django 5.1.4** · **DRF** · **OpenSearch 3.5.0** · **React 18 + Vite*
 4. [Variables de entorno](#variables-de-entorno)
 5. [Estructura del proyecto](#estructura-del-proyecto)
 6. [API REST](#api-rest)
-7. [Troubleshooting](#troubleshooting)
+7. [Pruebas y Coverage](#pruebas-y-coverage)
+8. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -87,6 +88,7 @@ Acceso: **http://localhost:8000** (Django + Nginx)
 | Servicio    | Puerto | Descripción                        |
 |-------------|--------|------------------------------------|
 | `db`        | 5432   | PostgreSQL 16-alpine               |
+| `redis`     | 6379   | Cache distribuida + Channels       |
 | `opensearch`| 9200   | OpenSearch                  |
 | `backend`   | 8000   | Django + Gunicorn                  |
 | `frontend`  | 80     | React + Nginx                      |
@@ -104,6 +106,7 @@ Copia `.env.local` o `.env.docker` como `.env` según el modo de ejecución.
 | `OPENSEARCH_PASSWORD`| `admin`            | `Admin_Password1!`        |
 | `DB_HOST`           | `localhost`         | `db`                      |
 | `DB_PORT`           | `5432`              | `5432`                    |
+| `REDIS_URL`         | `redis://localhost:6379/1` | `redis://redis:6379/1` |
 | `DEBUG`             | `True`              | `False`                   |
 | `SECRET_KEY`        | cualquier valor     | clave segura larga        |
 
@@ -187,6 +190,64 @@ TFG/
 ### v2 (DRF) – endpoints extendidos
 
 Prefijo `/api/v2/`. Ver `main/drf_views.py` para la lista completa.
+
+---
+
+## Pruebas y Coverage
+
+Instalar dependencias de desarrollo (solo una vez):
+
+```powershell
+& .\.venv311\Scripts\Activate.ps1
+pip install -r requirements-dev.txt
+```
+
+Ejecutar tests con coverage y umbral mínimo del 65%:
+
+```powershell
+& .\.venv311\Scripts\Activate.ps1
+python -m coverage erase
+python -m coverage run manage.py test main.tests.test_unit_models main.tests.test_integration_api main.tests.test_e2e_user_journey main.tests.test_matching main.tests.test_negative_api main.tests.test_jugador_manual
+python -m coverage report -m
+```
+
+### Rendimiento con Locust
+
+1) Arranca Django en local:
+
+```powershell
+& .\.venv311\Scripts\Activate.ps1
+python manage.py runserver
+```
+
+2) En otra terminal, lanza Locust (UI web):
+
+```powershell
+& .\.venv311\Scripts\Activate.ps1
+locust -f main/tests/locustfile.py --host http://127.0.0.1:8000
+```
+
+UI: `http://127.0.0.1:8089`
+
+3) Ejecución directa sin UI (headless):
+
+```powershell
+& .\.venv311\Scripts\Activate.ps1
+python -m locust -f main/tests/locustfile.py --host http://127.0.0.1:8000 --users 20 --spawn-rate 5 --run-time 1m --headless --only-summary
+```
+
+Generar reporte HTML (opcional):
+
+```powershell
+python -m coverage html
+```
+
+La configuración está en `.coveragerc` y actualmente mide estos módulos críticos:
+
+- `main.models`
+- `main.api.auth`
+- `main.api.clasificacion`
+- `main.scrapping.matching`
 
 ---
 

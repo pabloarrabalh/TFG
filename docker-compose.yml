@@ -48,6 +48,21 @@ services:
     networks:
       - app-network
 
+  # ── Redis 7 (cache + channels) ────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks:
+      - app-network
+
   # ── Django backend (ASGI / Daphne) ────────────────────────────────────────
   backend:
     build:
@@ -59,6 +74,7 @@ services:
     environment:
       DB_HOST: db
       DB_PORT: "5432"
+      REDIS_URL: redis://redis:6379/1
       OPENSEARCH_HOST: opensearch:9200
       OPENSEARCH_USER: ${OPENSEARCH_USER:-admin}
       OPENSEARCH_PASSWORD: ${OPENSEARCH_PASSWORD:-Admin_Password1!}
@@ -74,6 +90,8 @@ services:
       db:
         condition: service_healthy
       opensearch:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - app-network

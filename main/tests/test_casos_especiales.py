@@ -21,7 +21,7 @@ class TestJugadorManual(unittest.TestCase):
             'Rojas': '0.0',  # Miscellaneous Stats (Performance) -> CrdR o bien 2 amarillas lo pone a 1
             'Goles_en_contra': '0',  # Cálculo de la suma de goles del equipo contrario mientras está en el campo, solo defensas y porteros
             'puntosFantasy': '2',  # Scrapping a parte (se coge bien)
-            'Tkl_challenge': '1.0',  # Defensive Actions (Challenges)-> Columna:Att
+            'Tkl_challenge': '1',  # Defensive Actions (Challenges)-> Columna:Att
             'Att_challenge': '3',  #  Defensive Actions (Challenges)-> Columna:Att
             'Tkl_pct_challenge': '0',   #  Defensive Actions (Challenges)-> Columna:Tkl%
             'Lost_challenge': '3',  #  Defensive Actions (Challenges)-> Columna:Lost
@@ -54,7 +54,7 @@ class TestJugadorManual(unittest.TestCase):
             'TiroF_partido': 0.0,
             'TiroPuerta_partido': 0.0,
             'Pases_Totales': 33.0,
-            'Pases_Completados_Pct': 0.0,
+            'Pases_Completados_Pct': 90.9,
             'Amarillas': 0.0,
             'Rojas': 0.0,
             'Goles_en_contra': 0,
