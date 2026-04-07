@@ -165,7 +165,6 @@ class EstadisticasView(APIView):
 
         # Pre-calcular puntos_fantasy filtrados (sin outliers > 40)
         puntos_por_jugador = {}
-        # Agrupar puntos por jugador
         for jugador_id in [stat['jugador_id'] for stat in jugador_stats]:
             puntos_lista = list(stats_qs.filter(jugador_id=jugador_id).values_list('puntos_fantasy', flat=True))
             puntos_por_jugador[jugador_id] = calcular_puntos_fantasy_filtrados_lista(puntos_lista)

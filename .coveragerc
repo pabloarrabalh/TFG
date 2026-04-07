@@ -2,8 +2,8 @@
 branch = True
 source =
     main.models
-    main.api.auth
-    main.api.clasificacion
+    main.drf_views
+    main.api
     main.scrapping.matching
 omit =
     */migrations/*
