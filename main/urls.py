@@ -1,11 +1,6 @@
 from django.urls import path
 from . import drf_views
-from .api.predicciones import (
-    PredecirPorteroView, PredecirJugadorView,
-    ExplicarPrediccionView, CambiarJornadaLegacyView,
-)
-
-# ── DRF API v1 views ────────────────────────────────────────────────────────
+from .api.predicciones import *
 from .api.auth import MeView, LoginView, LogoutView, RegisterView
 from .api.menu import MenuView, MenuTopJugadoresView
 from .api.clasificacion import ClasificacionView
@@ -14,24 +9,16 @@ from .api.jugador import JugadorDetailView, TopJugadoresPorPosicionView
 from .api.jugador_partidos import JugadorPartidosView
 from .api.jugador_insight import JugadorInsightView
 from .api.buscar import RadarJugadorView, BuscarView
-from .api.perfil import (
-    PerfilView, UpdatePerfilView, UpdateStatusView, UploadPhotoView,
-    UpdatePreferenciasNotificacionesView, CambiarJornadaView,
-)
+from .api.perfil import *
 from .api.favoritos import FavoritosView, ToggleFavoritoView, DeleteFavoritoView
 from .api.amigos import *
-from .api.plantilla import (
-    MiPlantillaView, MiPlantillaJugadoresView,
-    TogglePrivacidadPlantillaView, SetPlantillaPredeterminadaView, MisPlantillasPrivacidadView,
-    PlantillasUsuarioView, PlantillaItemView,
-)
+from .api.plantilla import *
 from .api.plantilla_notificaciones import PlantillaNotificacionesView
 from .api.notificaciones import *
 from .api.estadisticas import EstadisticasView, ComparacionJugadoresView
 from .api.consejero import ConsejeroView
 
 urlpatterns = [
-    # API Endpoints
     path('api/radar/<int:jugador_id>/<str:temporada>/', RadarJugadorView.as_view(), name='api_radar_jugador'),
     path('api/buscar/', BuscarView.as_view(), name='api_buscar'),
     path('api/favoritos/toggle/', ToggleFavoritoView.as_view(), name='api_toggle_favorito'),
@@ -39,8 +26,6 @@ urlpatterns = [
     path('api/predecir-jugador/', PredecirJugadorView.as_view(), name='predecir_jugador_api'),
     path('api/explicar-prediccion/', ExplicarPrediccionView.as_view(), name='explicar_prediccion_portero_api'),
     path('api/cambiar-jornada/', CambiarJornadaLegacyView.as_view(), name='cambiar_jornada_api'),
-
-    # ── REST API v1 (DRF) ─────────────────────────────────────────────────────
     path('api/me/', MeView.as_view(), name='api_me'),
     path('api/auth/login/', LoginView.as_view(), name='api_auth_login'),
     path('api/auth/logout/', LogoutView.as_view(), name='api_auth_logout'),
@@ -87,18 +72,12 @@ urlpatterns = [
     path('api/plantillas/privacidad/', MisPlantillasPrivacidadView.as_view(), name='api_mis_plantillas_privacidad'),
     path('api/estadisticas/', EstadisticasView.as_view(), name='api_estadisticas'),
     path('api/estadisticas/comparacion/', ComparacionJugadoresView.as_view(), name='api_comparacion_jugadores'),
-
-    # ── REST API v2 (DRF) ────────────────────────────────────────────────────
-    # Jugadores
     path('api/v2/jugadores/', drf_views.JugadorListView.as_view(), name='v2_jugadores'),
     path('api/v2/jugadores/<int:jugador_id>/', drf_views.JugadorDetailView.as_view(), name='v2_jugador_detail'),
     path('api/v2/jugadores/<int:jugador_id>/predicciones/', drf_views.JugadorPrediccionesView.as_view(), name='v2_jugador_predicciones'),
-    # Equipos
     path('api/v2/equipos/', drf_views.EquipoListView.as_view(), name='v2_equipos'),
     path('api/v2/equipos/<str:equipo_nombre>/', drf_views.EquipoDetailView.as_view(), name='v2_equipo_detail'),
-    # Otros recursos
     path('api/v2/clasificacion/', drf_views.clasificacion_view, name='v2_clasificacion'),
     path('api/v2/jornadas/', drf_views.jornadas_view, name='v2_jornadas'),
-    # Predicciones (escritura autenticada)
     path('api/v2/predicciones/', drf_views.PrediccionCreateView.as_view(), name='v2_predicciones'),
 ]

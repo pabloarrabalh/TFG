@@ -4,15 +4,7 @@ import random
 import cloudscraper
 
 
-# =====================================================
-# HELPER: crear scraper y descargar con reintentos
-# =====================================================
-
-
 def crear_scraper_ff():
-    """
-    Crea un scraper de Cloudflare afinado para FutbolFantasy.
-    """
     scraper = cloudscraper.create_scraper(
         browser={
             "browser": "chrome",
@@ -36,7 +28,6 @@ def crear_scraper_ff():
 
 
 def descargar_html_con_reintentos(url: str,ruta_salida: str,max_intentos: int = 5,backoff_inicial: float = 3.0,backoff_max: float = 30.0,timeout: int = 30,verbose: bool = True,):
-
     os.makedirs(os.path.dirname(ruta_salida), exist_ok=True)
 
     if os.path.exists(ruta_salida):
@@ -86,10 +77,6 @@ def descargar_html_con_reintentos(url: str,ruta_salida: str,max_intentos: int = 
     )
 
 
-# =====================================================
-# DESCARGA DE PUNTOS POR TEMPORADA (j1-j38)
-# =====================================================
-
 
 def descargar_puntos_temporada(temporada: str, j_ini: int, j_fin: int):
     # El año de la URL es el segundo número de la temporada
@@ -118,7 +105,7 @@ def descargar_puntos_temporada(temporada: str, j_ini: int, j_fin: int):
                 backoff_inicial=3.0,
                 backoff_max=30.0,
                 timeout=30,
-                verbose=True,  # ponlo a False si no quieres logs
+                verbose=False,  
             )
         except Exception as e:
             print(f"[FALLO] Jornada {j}: {e!r}")

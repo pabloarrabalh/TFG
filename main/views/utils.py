@@ -1,6 +1,6 @@
-"""
+﻿"""
 Shared helper utilities used by all views_*.py modules.
-No Django request/response logic here — pure data helpers.
+No Django request/response logic here ÔÇö pure data helpers.
 """
 import unicodedata
 import re
@@ -13,7 +13,6 @@ from django.core.cache import cache
 from ..models import *
 
 
-# ── Name helpers ──────────────────────────────────────────────────────────────
 
 def normalize_team_name_python(nombre):
     """Normaliza el nombre del equipo para usar en clases CSS (replica del filtro template)"""
@@ -70,10 +69,10 @@ def similitud_nombres(nombre1, nombre2):
     return SequenceMatcher(None, nombre1.lower(), nombre2.lower()).ratio()
 
 
-# ── Match/streak helpers ──────────────────────────────────────────────────────
+# ÔöÇÔöÇ Match/streak helpers ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 def get_racha_detalles(equipo, temporada, jornada_actual):
-    """Obtiene los detalles de los últimos 5 partidos jugados incluyendo la jornada actual si se ha jugado"""
+    """Obtiene los detalles de los ├║ltimos 5 partidos jugados incluyendo la jornada actual si se ha jugado"""
     partidos = Partido.objects.filter(
         jornada__temporada=temporada,
         jornada__numero_jornada__lte=jornada_actual.numero_jornada,
@@ -116,7 +115,7 @@ def get_racha_detalles(equipo, temporada, jornada_actual):
             'goles_rival': goles_rival,
         })
 
-    # Si la jornada actual no tiene resultado aún, añadir marcador de partido pendiente
+    # Si la jornada actual no tiene resultado a├║n, a├▒adir marcador de partido pendiente
     partido_actual_sin_resultado = Calendario.objects.filter(
         jornada=jornada_actual
     ).filter(
@@ -146,7 +145,7 @@ def get_racha_detalles(equipo, temporada, jornada_actual):
 
 
 def get_racha_futura(equipo, temporada, jornada_actual):
-    """Obtiene los próximos 5 partidos sin resultado (futuros) incluyendo jornada actual si no se ha jugado"""
+    """Obtiene los pr├│ximos 5 partidos sin resultado (futuros) incluyendo jornada actual si no se ha jugado"""
     partidos = Calendario.objects.filter(
         jornada__temporada=temporada,
         jornada__numero_jornada__gte=jornada_actual.numero_jornada,
@@ -201,7 +200,7 @@ def get_racha_futura(equipo, temporada, jornada_actual):
 
 
 def get_historico_temporadas(equipo):
-    """Obtiene las estadísticas de cada temporada (V/E/P, GF, GC, DF, Posición)"""
+    """Obtiene las estad├¡sticas de cada temporada (V/E/P, GF, GC, DF, Posici├│n)"""
     temporadas = Temporada.objects.all().order_by('-nombre')
     historico = []
 
@@ -253,7 +252,7 @@ def get_historico_temporadas(equipo):
 
 
 def get_maximo_goleador(equipo, temporada, jornada_actual):
-    """Obtiene el máximo goleador de un equipo hasta una jornada específica en una temporada"""
+    """Obtiene el m├íximo goleador de un equipo hasta una jornada espec├¡fica en una temporada"""
     estadisticas = EstadisticasPartidoJugador.objects.filter(
         partido__jornada__temporada=temporada,
         partido__jornada__numero_jornada__lte=jornada_actual.numero_jornada,
@@ -274,7 +273,7 @@ def get_maximo_goleador(equipo, temporada, jornada_actual):
 
 
 def get_partido_anterior_temporada(equipo1, equipo2, temporada, jornada_actual):
-    """Busca si ya se jugó un partido entre dos equipos en la temporada actual (antes de la jornada actual)"""
+    """Busca si ya se jug├│ un partido entre dos equipos en la temporada actual (antes de la jornada actual)"""
     partido = Partido.objects.filter(
         jornada__temporada=temporada,
         jornada__numero_jornada__lt=jornada_actual.numero_jornada,
@@ -299,7 +298,7 @@ def get_partido_anterior_temporada(equipo1, equipo2, temporada, jornada_actual):
 
 
 def get_h2h_historico(equipo1, equipo2, temporada=None):
-    """Obtiene el histórico H2H entre dos equipos.
+    """Obtiene el hist├│rico H2H entre dos equipos.
     Si se especifica temporada, incluye esa y todas las anteriores (no futuro).
     """
     partidos_filter = Partido.objects.filter(
@@ -356,10 +355,10 @@ def get_h2h_historico(equipo1, equipo2, temporada=None):
     }
 
 
-# ── Team aggregate stats ──────────────────────────────────────────────────────
+# ÔöÇÔöÇ Team aggregate stats ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 def get_estadisticas_equipo_temporadas(equipo, num_temporadas=3):
-    """Obtiene estadísticas agregadas de un equipo para las últimas N temporadas"""
+    """Obtiene estad├¡sticas agregadas de un equipo para las ├║ltimas N temporadas"""
     temporadas = Temporada.objects.all().order_by('-nombre')[:num_temporadas]
 
     eq_jug_temp = EquipoJugadorTemporada.objects.filter(
@@ -385,7 +384,7 @@ def get_estadisticas_equipo_temporadas(equipo, num_temporadas=3):
 
 
 def get_jugadores_ultimas_temporadas(equipo, num_temporadas=3):
-    """Obtiene jugadores y sus estadísticas agregadas para las últimas N temporadas."""
+    """Obtiene jugadores y sus estad├¡sticas agregadas para las ├║ltimas N temporadas."""
     temporadas = Temporada.objects.all().order_by('-nombre')[:num_temporadas]
 
     ejt_qs = (
@@ -435,7 +434,7 @@ def get_jugadores_ultimas_temporadas(equipo, num_temporadas=3):
 
 
 def get_informacion_equipo(equipo):
-    """Obtiene información completa de un equipo: máximo goleador, asistente, máximos partidos jugados"""
+    """Obtiene informaci├│n completa de un equipo: m├íximo goleador, asistente, m├íximos partidos jugados"""
     jugadores_ids = EquipoJugadorTemporada.objects.filter(
         equipo=equipo
     ).values_list('jugador_id', flat=True).distinct()
@@ -477,12 +476,12 @@ def get_informacion_equipo(equipo):
     }
 
 
-# ── Percentile helper ─────────────────────────────────────────────────────────
+# ÔöÇÔöÇ Percentile helper ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 def calcular_percentil(jugador_obj, temporada_obj, posicion, stat_field, es_carrera=False):
     """
-    Calcula el percentil de un jugador para un stat específico dentro de su posición y temporada.
-    Retorna un número entre 0 y 100. Usa caché para evitar recálculos.
+    Calcula el percentil de un jugador para un stat espec├¡fico dentro de su posici├│n y temporada.
+    Retorna un n├║mero entre 0 y 100. Usa cach├® para evitar rec├ílculos.
     """
     temp_name = temporada_obj.nombre if temporada_obj else 'all'
     cache_key = f"percentil_{jugador_obj.id}_{temp_name}_{posicion}_{stat_field}"

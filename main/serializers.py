@@ -1,10 +1,11 @@
-"""
-DRF Serializers for main app models.
-"""
+import math
+
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
+from django.db.models import Sum
 from rest_framework import serializers
 
+from .views.utils import shield_name
 from .models import *
 
 
@@ -49,8 +50,6 @@ class RegisterSerializer(serializers.Serializer):
         )
 
 
-# ── User / Profile ────────────────────────────────────────────────────────────
-
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
@@ -85,8 +84,6 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
 
-# ── Notificaciones ────────────────────────────────────────────────────────────
-
 class NotificacionSerializer(serializers.ModelSerializer):
     creada_en = serializers.DateTimeField(source='fecha_creada', read_only=True)
 
@@ -95,8 +92,6 @@ class NotificacionSerializer(serializers.ModelSerializer):
         fields = ['id', 'tipo', 'titulo', 'mensaje', 'leida', 'datos', 'creada_en']
         read_only_fields = ['id', 'tipo', 'titulo', 'mensaje', 'datos', 'creada_en']
 
-
-# ── Amigos / Solicitudes ──────────────────────────────────────────────────────
 
 class SolicitudAmistadSerializer(serializers.ModelSerializer):
     emisor_username = serializers.CharField(source='emisor.username', read_only=True)
@@ -134,16 +129,12 @@ class AmistadSerializer(serializers.ModelSerializer):
             return None
 
 
-# ── Plantilla ─────────────────────────────────────────────────────────────────
-
 class PlantillaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plantilla
         fields = ['id', 'nombre', 'formacion', 'alineacion', 'privacidad', 'predeterminada', 'fecha_modificada']
         read_only_fields = ['id', 'fecha_modificada']
 
-
-# ── Equipo / Jugador (read-only, for listings) ────────────────────────────────
 
 class EquipoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -155,3 +146,100 @@ class JugadorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Jugador
         fields = ['id', 'nombre', 'apellido', 'nacionalidad']
+
+
+class TemporadaSerializer(serializers.ModelSerializer):
+    display = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Temporada
+        fields = ['id', 'nombre', 'display']
+
+    def get_display(self, obj):
+        return obj.nombre.replace('_', '/')
+
+
+class JugadorListSerializer(serializers.ModelSerializer):
+    posicion = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Jugador
+        fields = ['id', 'nombre', 'apellido', 'nacionalidad', 'posicion']
+
+    def get_posicion(self, obj):
+        return obj.get_posicion_mas_frecuente() or ''
+
+
+class EquipoListSerializer(serializers.ModelSerializer):
+    escudo = serializers.SerializerMethodField()
+    jugadores_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Equipo
+        fields = ['id', 'nombre', 'estadio', 'escudo', 'jugadores_count']
+
+    def get_escudo(self, obj):
+        return shield_name(obj.nombre)
+
+    def get_jugadores_count(self, obj):
+        temporada = Temporada.objects.order_by('-nombre').first()
+        if not temporada:
+            return 0
+        return EquipoJugadorTemporada.objects.filter(equipo=obj, temporada=temporada).count()
+
+
+class PrediccionSerializer(serializers.ModelSerializer):
+    jornada_numero = serializers.IntegerField(source='jornada.numero_jornada', read_only=True)
+    temporada = serializers.CharField(source='jornada.temporada.nombre', read_only=True)
+    prediccion = serializers.SerializerMethodField()
+    real = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PrediccionJugador
+        fields = ['id', 'jugador_id', 'jornada_id', 'jornada_numero', 'temporada','prediccion', 'modelo', 'creada_en', 'real']
+        read_only_fields = ['id', 'creada_en', 'jornada_numero', 'temporada', 'real']
+
+    def get_prediccion(self, obj):
+        val = obj.prediccion
+        if val is None:
+            return None
+        try:
+            if math.isnan(val) or math.isinf(val):
+                return None
+            return round(val, 2)
+        except (TypeError, ValueError):
+            return None
+
+    def get_real(self, obj):
+        pts = EstadisticasPartidoJugador.objects.filter(
+            jugador=obj.jugador,
+            partido__jornada=obj.jornada,
+        ).aggregate(s=Sum('puntos_fantasy'))['s']
+        if pts is None:
+            return None
+        try:
+            if math.isnan(pts) or math.isinf(pts):
+                return None
+            return float(pts)
+        except (TypeError, ValueError):
+            return None
+
+
+class PrediccionCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PrediccionJugador
+        fields = ['jugador', 'jornada', 'prediccion', 'modelo']
+
+    def validate(self, data):
+        qs = PrediccionJugador.objects.filter(
+            jugador=data['jugador'],
+            jornada=data['jornada'],
+            modelo=data.get('modelo', 'xgb'),
+        )
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError(
+                'Ya existe una predicción para este jugador, jornada y modelo.'
+            )
+        return data

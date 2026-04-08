@@ -1,17 +1,9 @@
-"""
-Módulo para scraping y análisis de datos de FBref.
-
-Este módulo procesa datos de partidos de FBref y los combina con información
-de Fantasy para generar datasets de entrenamiento.
-"""
-
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 import re
 from io import StringIO
-import logging
 from datetime import datetime
 import time
 import json
@@ -26,14 +18,8 @@ from main.scrapping.roles import ROLES_DESTACADOS
 from main.scrapping.matching import generar_propuestas, resolver_matching
 
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-)
-logger = logging.getLogger(__name__)
-
 TEMPORADA_ACTUAL = "25_26"
-CARPETA_HTML, CARPETA_CSV = construir_rutas_temporada(TEMPORADA_ACTUAL)
+CARPETA_HTML, CARPETA_CSV = build_rutas_temporada(TEMPORADA_ACTUAL)
 
 MAPEO_POSICIONES_FANTASY = {
     "Portero": "PT",
@@ -45,17 +31,6 @@ MAPEO_POSICIONES_FANTASY = {
 
 
 def buscar_estadisticas_portero(estadisticas_porteros, resumen_stats, clave_jugador):
-    """
-    Busca las estadísticas de un portero en los datos de porteros o resumen.
-    
-    Args:
-        estadisticas_porteros: Diccionario con estadísticas de porteros
-        resumen_stats: Diccionario con estadísticas resumidas
-        clave_jugador: Clave del jugador a buscar
-    
-    Returns:
-        Fila de estadísticas del portero o None
-    """
     fila_portero = estadisticas_porteros.get(clave_jugador)
     if fila_portero is not None:
         return fila_portero
@@ -81,15 +56,13 @@ def buscar_estadisticas_portero(estadisticas_porteros, resumen_stats, clave_juga
 
 def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo_tabla=None):
     """
-    Parsea una tabla HTML de FBref y extrae información de jugadores.
-    
-    Args:
-        tabla_html: Elemento BeautifulSoup con la tabla
+
+        tabla_html: tabla de bs4
         equipo_local: Nombre del equipo local
         equipo_visitante: Nombre del equipo visitante
         tipo_tabla: Tipo de tabla (summary, keepers, etc)
     
-    Returns:
+
         Dict {nombre_normalizado: fila_stats}
     """
     caption = tabla_html.find("caption")
@@ -114,7 +87,6 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo_tabla=N
     id_tabla = tabla_html.get("id", "")
     jugadores = {}
 
-    # Procesar filas del dataframe
     for _, fila in df.iterrows():
         nombre_jugador = str(fila["Player"]).strip()
         
@@ -131,7 +103,7 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo_tabla=N
         else:
             equipo = ""
 
-        equipo_norm = normalizar_equipo_temporada(equipo)
+        equipo_norm = normalizar_equipo(equipo)
         jugador_con_alias = aplicar_alias_jugador_temporada(nombre_jugador, equipo_norm, TEMPORADA_ACTUAL)
         nombre_norm = normalizar_texto(jugador_con_alias)
         nombre_base_norm = normalizar_texto(nombre_jugador)
@@ -140,7 +112,6 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo_tabla=N
         fila_copia["__nombre_norm"] = nombre_norm
         fila_copia["__equipo_norm"] = equipo_norm
         
-        # Extraer nacionalidad de la columna "Nation" (ej: "co COL")
         nacionalidad = ""
         if "Nation" in fila.index:
             val = fila["Nation"]
@@ -150,13 +121,12 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo_tabla=N
                 nacionalidad = partes[-1] if partes else ""
         fila_copia["__nacionalidad"] = nacionalidad
         
-        # Extraer edad de la columna "Age" (ej: "21-269" -> 21)
         edad = None
         if "Age" in fila.index:
             val = fila["Age"]
             if pd.notna(val):
                 texto = str(val).strip()
-                edad_str = texto.split("-")[0]  # Tomar solo el primer número
+                edad_str = texto.split("-")[0] 
                 try:
                     edad = int(edad_str)
                 except (ValueError, TypeError):
@@ -173,9 +143,6 @@ def parsear_tabla_fbref(tabla_html, equipo_local, equipo_visitante, tipo_tabla=N
 
 def rellenar_estadisticas_jugador(fila_jugador, estadisticas_por_tipo, clave_jugador, posicion):
     """
-    Rellena las estadísticas de un jugador en su fila de datos.
-    
-    Args:
         fila_jugador: Diccionario con los datos del jugador
         estadisticas_por_tipo: Estadísticas organizadas por tipo
         clave_jugador: Clave del jugador en las estadísticas
@@ -188,17 +155,16 @@ def rellenar_estadisticas_jugador(fila_jugador, estadisticas_por_tipo, clave_jug
         if stats_jugador is None:
             continue
 
-        # Procesar valores enteros
+        #   enteros
         for columna_fb, columna_dest in configuracion["enteros"].items():
             valor = stats_jugador.get(columna_fb, 0)
             fila_jugador[columna_dest] = to_int(valor)
 
-        # Procesar valores decimales
+        #   decimales
         for columna_fb, columna_dest in configuracion["decimales"].items():
             valor = stats_jugador.get(columna_fb, 0)
             fila_jugador[columna_dest] = to_float(valor)
 
-    # Procesar resumen y tiros
     resumen = estadisticas_por_tipo.get("summary", {})
     fila_resumen = resumen.get(clave_jugador)
 
@@ -230,8 +196,7 @@ def rellenar_estadisticas_jugador(fila_jugador, estadisticas_por_tipo, clave_jug
 
 
 def obtener_calendario(codigo_temporada: str) -> dict:
-    # Convertir el código de temporada de '23_24' a '2023-2024'
-    anio_inicio, anio_fin = codigo_temporada.split('_')
+    anio_inicio, anio_fin = codigo_temporada.split('_') #'23_24' a '2023-2024'
     codigo_temporada_formateado = f"20{anio_inicio}-20{anio_fin}"
 
     ruta_html = os.path.join("main", "html", "html", f"temporada_{codigo_temporada}", "calendario.html")
@@ -261,7 +226,7 @@ def obtener_calendario(codigo_temporada: str) -> dict:
             away_cell = row.find(attrs={"data-stat": "away_team"})
             score_cell = row.find(attrs={"data-stat": "score"})
             
-            # Extraer fecha y hora
+            #  fecha y hora
             date_cell = row.find(attrs={"data-stat": "date"})
 
             if not (round_cell and home_cell and away_cell):
@@ -271,20 +236,19 @@ def obtener_calendario(codigo_temporada: str) -> dict:
             home_name = home_cell.get_text(strip=True)
             away_name = away_cell.get_text(strip=True)
             
-            # Extraer fecha del atributo csk en formato YYYYMMDD
+            # formato YYYYMMDD
             fecha_str = ""
             hora_str = ""
             if date_cell:
                 fecha_csk = date_cell.get("csk", "")
                 if fecha_csk:
                     try:
-                        # Convertir YYYYMMDD a dd/mm/yyyy
+                        #  YYYYMMDD a dd/mm/yyyy
                         fecha_obj = datetime.strptime(fecha_csk, "%Y%m%d")
                         fecha_str = fecha_obj.strftime("%d/%m/%Y")
                     except:
                         fecha_str = ""
             
-            # Extraer hora del span venuetime
             time_span = row.find("span", class_="venuetime")
             if time_span:
                 hora_text = time_span.get("data-venue-time", "")
@@ -316,27 +280,24 @@ def obtener_calendario(codigo_temporada: str) -> dict:
                         except:
                             pass
 
-            home_norm = normalizar_equipo_temporada(home_name)
-            away_norm = normalizar_equipo_temporada(away_name)
+            home_norm = normalizar_equipo(home_name)
+            away_norm = normalizar_equipo(away_name)
 
             if round_num not in matches_by_round:
                 matches_by_round[round_num] = []
 
-            # Crear diccionario con fecha, hora y resultado
             match_info = {
                 "match": f"{home_norm} vs {away_norm}",
                 "fecha": fecha_str,
                 "hora": hora_str
             }
             
-            # Agregar resultado si el partido ya se jugó
             if resultado:
                 match_info["resultado"] = resultado
             
             matches_by_round[round_num].append(match_info)
 
-        except Exception as e:
-            logger.warning(f"Error procesando fila de calendario: {e}")
+        except Exception:
             continue
 
     calendar_ordered = dict(sorted(matches_by_round.items()))
@@ -348,7 +309,7 @@ def obtener_calendario(codigo_temporada: str) -> dict:
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(calendar_ordered, f, ensure_ascii=False, indent=2)
 
-    logger.info(f"✅ Calendario guardado en {output_file}")
+    print(f"Calendario guardado en {output_file}")
     return calendar_ordered
 
 
@@ -356,7 +317,6 @@ def obtener_fantasy_jornada(jornada):
     puntos_path = os.path.join(CARPETA_HTML, f"j{jornada}", "puntos.html")
 
     if not os.path.exists(puntos_path):
-        logger.warning(f"No se encuentra puntos.html en j{jornada}")
         return {}
 
     html = leer_html(puntos_path)
@@ -373,8 +333,8 @@ def obtener_fantasy_jornada(jornada):
 
         home_div = header.select_one(".equipo.local .nombre")
         away_div = header.select_one(".equipo.visitante .nombre")
-        home_norm = normalizar_equipo_temporada(home_div.get_text(strip=True))
-        away_norm = normalizar_equipo_temporada(away_div.get_text(strip=True))
+        home_norm = normalizar_equipo(home_div.get_text(strip=True))
+        away_norm = normalizar_equipo(away_div.get_text(strip=True))
 
         match_key = f"{home_norm}-{away_norm}"
         players_points = {}
@@ -394,7 +354,7 @@ def obtener_fantasy_jornada(jornada):
                 posicion = POSICION_MAP.get(pos_raw, "MC")
 
 
-                puntos = 6767
+                puntos = 6767 
                 puntos_span = player_row.select_one("span.laliga-fantasy")
                 if puntos_span:
                     try:
@@ -447,7 +407,6 @@ def obtener_nombres_equipos(html_partido) -> tuple:
         home = title_text.split(" vs. ")[0]
         away = title_text.split(" vs. ")[1].split(" Match")[0]
     except Exception:
-        logger.error("No se pudieron extraer nombres de equipos")
         home = "Local"
         away = "Visitante"
 
@@ -455,7 +414,6 @@ def obtener_nombres_equipos(html_partido) -> tuple:
 
 
 def obtener_fecha_partido(html_partido):
-    """Extrae solo la fecha del HTML del partido (sin hora)."""
     soup = BeautifulSoup(html_partido, "lxml")
     scorebox = soup.find("div", class_="scorebox_meta")
 
@@ -503,7 +461,6 @@ def extraer_titulares(sopa):
 
 
 def parsear_tablas_partido(soup, equipo_local, equipo_visitante):
-   
     estadisticas_por_tipo = {}
     tipos_tabla = ["summary", "passing", "defense", "possession", "misc", "keepers"]
 
@@ -611,10 +568,7 @@ def construir_dataframe_partido(propuestas, estadisticas_por_tipo, mapeo_fbref_f
 
 def procesar_partido(html_partido, datos_fantasy, jornada_num):
     """
-    Procesa un partido completo extrayendo y combinando datos de FBref y Fantasy.
-    
-    Args:
-        html_partido: Contenido HTML del partido
+            html_partido: Contenido HTML del partido
         datos_fantasy: Datos de Fantasy del partido
         jornada_num: Número de la jornada
     
@@ -625,8 +579,8 @@ def procesar_partido(html_partido, datos_fantasy, jornada_num):
     fecha_partido = obtener_fecha_partido(html_partido)
     equipo_local, equipo_visitante = obtener_nombres_equipos(html_partido)
     
-    local_norm = normalizar_equipo_temporada(equipo_local)
-    away_norm = normalizar_equipo_temporada(equipo_visitante)
+    local_norm = normalizar_equipo(equipo_local)
+    away_norm = normalizar_equipo(equipo_visitante)
     titulares, jugadores_local = extraer_titulares(sopa)
 
     estadisticas_por_tipo = parsear_tablas_partido(sopa, equipo_local, equipo_visitante)
@@ -636,7 +590,6 @@ def procesar_partido(html_partido, datos_fantasy, jornada_num):
     jugadores_apellido, fantasy_norm = construir_fantasy_por_norm(datos_fantasy)
     mapeo_fbref_fantasy, _ = resolver_matching(propuestas, jugadores_apellido, fantasy_norm)
 
-    # Extraer nacionalidades y edades del resumen
     nacionalidades_map = {}
     edades_map = {}
     for nombre_fb_norm, fila_resumen in resumen.items():
@@ -665,35 +618,22 @@ def procesar_partido(html_partido, datos_fantasy, jornada_num):
 
 
 def procesar_y_guardar_partido(jornada: int, idx_partido: int, datos_fantasy_por_partido):
-    """
-    Procesa y guarda un partido en CSV.
-    
-    Args:
-        jornada: Número de la jornada
-        idx_partido: Índice del partido dentro de la jornada
-        datos_fantasy_por_partido: Datos de Fantasy organizados por partido
-    
-    Returns:
-        Tupla (DataFrame, equipo_local, equipo_visitante) o (None, None, None)
-    """
     carpeta_html_j, carpeta_csv_j = obtener_rutas_jornada(CARPETA_HTML, CARPETA_CSV, jornada)
     ruta_html = os.path.join(carpeta_html_j, f"p{idx_partido}.html")
-    contenido_html = leer_html(ruta_html, logger=logger)
+    contenido_html = leer_html(ruta_html)
 
     if not contenido_html:
-        logger.warning(f"No se pudo leer {ruta_html}")
         return None, None, None
 
     equipo_local, equipo_visitante = obtener_nombres_equipos(contenido_html)
-    local_norm = normalizar_equipo_temporada(equipo_local)
-    away_norm = normalizar_equipo_temporada(equipo_visitante)
+    local_norm = normalizar_equipo(equipo_local)
+    away_norm = normalizar_equipo(equipo_visitante)
     clave_partido = f"{local_norm}-{away_norm}"
     datos_fantasy = datos_fantasy_por_partido.get(clave_partido, {})
 
     df, equipo_local_csv, equipo_visitante_csv = procesar_partido(contenido_html, datos_fantasy, jornada)
 
     if df is None or df.empty:
-        logger.warning(f"DataFrame vacío para J{jornada} P{idx_partido}")
         return None, None, None
 
     local_norm_txt = normalizar_texto(equipo_local_csv)
@@ -702,13 +642,13 @@ def procesar_y_guardar_partido(jornada: int, idx_partido: int, datos_fantasy_por
     ruta_csv = os.path.join(carpeta_csv_j, nombre_csv)
 
     df.to_csv(ruta_csv, index=False, encoding="utf-8-sig")
-    logger.info(f"✅ CSV generado: J{jornada} P{idx_partido} {local_norm_txt}-{away_norm_txt}")
+    print(f"✅ CSV generado: J{jornada} P{idx_partido} {local_norm_txt}-{away_norm_txt}")
 
     return df, equipo_local_csv, equipo_visitante_csv
 
 
 def procesar_jornada(jornada: int):
-    logger.info(f"\n=== JORNADA {jornada} (temp {TEMPORADA_ACTUAL}) ===")
+    print(f"\n=== JORNADA {jornada} (temp {TEMPORADA_ACTUAL}) ===")
 
     datos_fantasy_por_partido = obtener_fantasy_jornada(jornada)
     tarjetas_banquillo = []
@@ -722,9 +662,9 @@ def procesar_jornada(jornada: int):
                 tarjetas_banquillo.extend(jugadores_banquillo.to_dict("records"))
 
     if tarjetas_banquillo:
-        logger.info("\n📋 Jugadores con tarjetas en banquillo:")
+        print("\nJugadores con tarjetas en banquillo:")
         for jugador in tarjetas_banquillo:
-            logger.info(
+            print(
                 f"- {jugador.get('player', '')} ({jugador.get('Equipo_propio', '')}) | "
                 f"Amarillas: {jugador.get('Amarillas', 0)}, Rojas: {jugador.get('Rojas', 0)}"
             )
@@ -741,22 +681,22 @@ def analizar_temporada(codigo_temporada: str, j_ini: int = 1, j_fin: int = 38):
     TEMPORADA_ACTUAL = codigo_temporada
     CARPETA_HTML, CARPETA_CSV = build_rutas_temporada(codigo_temporada)
 
-    logger.info(f"\n=== ANALIZANDO TEMPORADA {codigo_temporada} ===")
+    print(f"\n=== ANALIZANDO TEMPORADA {codigo_temporada} ===")
     procesar_rango_jornadas(jornada_inicio=1, jornada_fin=38)
 
 
 def scrappear_calendario_para_bd():
     """Función para scrappear calendarios con resultados (usada por popularDB)."""
-    logger.info("\n" + "=" * 70)
-    logger.info("FBREF: SCRAPPEAR CALENDARIO CON RESULTADOS")
-    logger.info("=" * 70)
+    print("\n" + "="*70)
+    print("FBREF: SCRAPPEAR CALENDARIO CON RESULTADOS")
+    print("="*70)
     
     for temporada in ["23_24", "24_25", "25_26"]:
         try:
-            logger.info(f"\n[{temporada}] Extrayendo calendario y resultados...")
+            print(f"\n[{temporada}] Extrayendo calendario y resultados...")
             obtener_calendario(temporada)
         except Exception as e:
-            logger.error(f"❌ Error en la temporada {temporada}: {e}")
+            pass
             continue
 
 
@@ -772,4 +712,4 @@ if __name__ == "__main__":
 
     fin = time.perf_counter()
     duracion = fin - inicio
-    logger.info(f"\n⏱️ Tiempo total: {duracion:.2f}s")
+    print(f"\nTiempo total: {duracion:.2f}s")

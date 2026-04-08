@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup, Comment
 
 from main.scrapping.commons import (
     normalizar_texto,
-    normalizar_equipo_temporada,
+    normalizar_equipo,
     aplicar_alias_jugador_temporada,
 )
 
@@ -67,7 +67,7 @@ DESCRIPCIONES_ROLES = {
 
 
 def _normalizar_nombre_jugador_fbref(nombre_raw: str, equipo_raw: str, temporada: str) -> str:
-    equipo_norm = normalizar_equipo_temporada(equipo_raw) if equipo_raw else None
+    equipo_norm = normalizar_equipo(equipo_raw) if equipo_raw else None
     nombre_con_alias = aplicar_alias_jugador_temporada(
         nombre_raw, equipo_norm, temporada
     )

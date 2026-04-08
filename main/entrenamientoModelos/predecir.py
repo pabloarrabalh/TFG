@@ -24,11 +24,6 @@ warnings.filterwarnings("ignore")
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from explicaciones import (
-    obtener_explicacion, es_valor_alto, generar_explicaciones_shap,
-    formatear_explicaciones_texto
-)
-
 # ─── Django setup (solo si es necesario) ─────────────────────────────────────
 def _django_setup():
     try:
@@ -183,6 +178,11 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
     4. Genera explicaciones SHAP
     
     Args:
+    # Lazy import para evitar cargar SHAP durante Django setup
+    from explicaciones import (
+        obtener_explicacion, es_valor_alto, generar_explicaciones_shap,
+        formatear_explicaciones_texto
+    )
         modelo_tipo: str - 'RF', 'Ridge', 'ElasticNet', 'Baseline' (MC solo), None (usa default)
     """
     _django_setup()
@@ -682,6 +682,12 @@ def _predecir_portero(jugador_id, jornada_actual=None, verbose=False, modelo_tip
     """
     Predicción de portero usando CSV (lógica extraída de predecir_portero.py).
     """
+    # Lazy import para evitar cargar SHAP durante Django setup
+    from explicaciones import (
+        obtener_explicacion, es_valor_alto, generar_explicaciones_shap,
+        formatear_explicaciones_texto
+    )
+    
     if modelo_tipo and str(modelo_tipo).upper() == 'BASELINE':
         return _predecir_desde_db(jugador_id, 'PT', jornada_actual, verbose, modelo_tipo='Baseline')
 

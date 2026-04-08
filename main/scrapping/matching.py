@@ -1,30 +1,15 @@
-"""
-Módulo de lógica fuzzy matching para emparejar jugadores entre FBref y Fantasy.
-
-Contiene funciones para:
-- Generar propuestas de matching usando fuzzy matching
-- Agrupar propuestas por nombre normalizado
-- Resolver conflictos de matching
-"""
-
 from rapidfuzz import process as rf_process, fuzz as rf_fuzz
-from main.scrapping.commons import (
-    obten_coincidencia_nombre, construir_clave_normalizacion,
-    limpiar_minuto, mapear_posicion, to_int,
-)
+from main.scrapping.commons import *
 from main.scrapping.alias import UMBRAL_MATCH
 
 
 def generar_propuestas(resumen_summary, fantasy_partido, local_norm, visit_norm, nombres_local):
     """
-    Genera propuestas de matching entre jugadores de FBref y Fantasy.
-    
-    Args:
         resumen_summary: dict {nombre_fb_norm -> fila_summary} de FBref.
         fantasy_partido: dict con todos los jugadores Fantasy de ese partido.
         local_norm: nombre normalizado del equipo local.
         visit_norm: nombre normalizado del equipo visitante.
-        nombres_local: lista de nombres "humanos" del once + banquillo del local.
+        nombres_local: lista de nombres del once + banquillo 
     
     Returns:
         propuestas: lista de dicts, una por jugador FBref con info del matching.
@@ -49,14 +34,13 @@ def generar_propuestas(resumen_summary, fantasy_partido, local_norm, visit_norm,
         nombres_fantasy_norm = [info["nombre_norm"] for info in candidatos_equipo.values()] 
         nombre_html_norm = nombre_fb_norm
 
-        mejor_norm, mejor_score = obten_coincidencia_nombre(
+        mejor_norm, mejor_score = obtener_match_nombre(
             nombre_html_norm, 
             nombres_fantasy_norm,
             equipo_norm=equipo_fb_norm,
         )
 
         if mejor_norm is None or mejor_score < UMBRAL_MATCH: 
-            # plan B usar WRatio
             mejor_basico = rf_process.extractOne(  
                 nombre_html_norm,  
                 nombres_fantasy_norm,
@@ -92,13 +76,9 @@ def generar_propuestas(resumen_summary, fantasy_partido, local_norm, visit_norm,
 
 def agrupar_propuestas_por_norm(propuestas, jugadores_por_apellido_equipo):
     """
-    Agrupa propuestas de matching por clave normalizada.
+        -propuestas: lista de propuestas generadas por generar_propuestas.
+        -jugadores_por_apellido_equipo: dict de jugadores agrupados por (apellido, equipo).
     
-    Args:
-        propuestas: lista de propuestas generadas por generar_propuestas.
-        jugadores_por_apellido_equipo: dict de jugadores agrupados por (apellido, equipo).
-    
-    Returns:
         propuestas_por_norm: dict {clave_norm -> lista de propuestas}.
     """
     propuestas_por_norm = {} 
@@ -112,7 +92,7 @@ def agrupar_propuestas_por_norm(propuestas, jugadores_por_apellido_equipo):
         if not nombre_norm:
             continue 
 
-        clave_norm = construir_clave_normalizacion(nombre_norm, equipo_fb_norm, pos_val, jugadores_por_apellido_equipo)
+        clave_norm = construir_clave_norm(nombre_norm, equipo_fb_norm, pos_val, jugadores_por_apellido_equipo)
 
         if score < UMBRAL_MATCH: 
             apellido = nombre_norm.split()[-1]
@@ -193,7 +173,7 @@ def resolver_matching(propuestas, jugadores_por_apellido_equipo, fantasy_por_nor
         score = propuesta["score"] 
         clave_ff_asignada = asignacion_fbref_a_fantasy.get(clave_fbref) 
 
-        clave_norm = construir_clave_normalizacion(mejor_norm, equipo_fb_norm, pos_val, jugadores_por_apellido_equipo)
+        clave_norm = construir_clave_norm(mejor_norm, equipo_fb_norm, pos_val, jugadores_por_apellido_equipo)
 
         debug_matching_por_fbref[clave_fbref] = {
             "mejor_norm": mejor_norm,

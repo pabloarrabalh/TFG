@@ -16,6 +16,58 @@ ALIAS_EQUIPOS = {
     "atletico madrid": "atletico madrid",
 }
 
+# Nombre normalizado -> nombre exacto en BD
+EQUIPOS_BD_ALIAS = {
+    "rayo vallecano": "Rayo Vallecano",
+    "rayo": "Rayo Vallecano",
+    "sevilla": "Sevilla",
+    "sevilla fc": "Sevilla",
+    "valencia": "Valencia",
+    "valencia cf": "Valencia",
+    "real sociedad": "Real Sociedad",
+    "girona": "Girona",
+    "girona fc": "Girona",
+    "villarreal": "Villarreal",
+    "real betis": "Real Betis",
+    "betis": "Real Betis",
+    "athletic": "Athletic Club",
+    "athletic club": "Athletic Club",
+    "barcelona": "Barcelona",
+    "fc barcelona": "Barcelona",
+    "real madrid": "Real Madrid",
+    "getafe": "Getafe",
+    "getafe cf": "Getafe",
+    "celta vigo": "Celta Vigo",
+    "celta": "Celta Vigo",
+    "rc celta": "Celta Vigo",
+    "alaves": "Alavés",
+    "osasuna": "Osasuna",
+    "ca osasuna": "Osasuna",
+    "levante": "Levante",
+    "mallorca": "Real Mallorca",
+    "real mallorca": "Real Mallorca",
+    "rcd mallorca": "Real Mallorca",
+    "las palmas": "Las Palmas",
+    "ud las palmas": "Las Palmas",
+    "cadiz": "Cádiz",
+    "cadiz cf": "Cádiz",
+    "oviedo": "Real Oviedo",
+    "real oviedo": "Real Oviedo",
+    "elche": "Elche",
+    "almeria": "Almería",
+    "ud almeria": "Almería",
+    "granada": "Granada",
+    "granada cf": "Granada",
+    "atletico madrid": "Atlético Madrid",
+    "atletico": "Atlético Madrid",
+    "espanyol": "RCD Espanyol",
+    "rcd espanyol": "RCD Espanyol",
+    "leganes": "Leganés",
+    "cd leganes": "Leganés",
+    "valladolid": "Real Valladolid",
+    "real valladolid": "Real Valladolid",
+}
+
 # (CSV/FBRef) -> (Fantasy/HTML)
 ALIAS_JUGADORES_POR_TEMPORADA = {
     "25_26": {
@@ -99,13 +151,11 @@ POSICION_MAP = {
 
 MAPEO_STATS = {
     "summary": {
-        "enteros": {"Min": "min_partido", "Gls": "gol_partido", "Ast": "asist_partido",
-                    "Sh": "tiros", "Att": "pases_totales","#":"dorsal"},
+        "enteros": {"Min": "min_partido", "Gls": "gol_partido", "Ast": "asist_partido","Sh": "tiros", "Att": "pases_totales","#":"dorsal"},
         "decimales": {"xG": "xg_partido", "xAG": "xag"},
     },
     "defense": {
-        "enteros": {"Tkl": "entradas", "Att": "duelos", "Won": "duelos_ganados",
-                    "Lost": "duelos_perdidos", "Blocks": "bloqueos", "Sh": "bloqueo_tiros",
+        "enteros": {"Tkl": "entradas", "Att": "duelos", "Won": "duelos_ganados","Lost": "duelos_perdidos", "Blocks": "bloqueos", "Sh": "bloqueo_tiros",
                     "Pass": "bloqueo_pase", "Clr": "despejes"},
         "decimales": {},
     },
@@ -137,11 +187,10 @@ COLUMNAS_MODELO = [
 ]
 
 UMBRAL_MATCH = 72.0
-# Mapeo inverso: códigos fantasy -> posiciones de base de datos
-# Convierte PT/DF/MC/DT a Portero/Defensa/Centrocampista/Delantero
+
 MAPEO_POSICIONES_INVERSO = {
-    "PT": "Portero",           # Portero
-    "DF": "Defensa",           # Defensa
-    "MC": "Centrocampista",    # Mediocampista/Centrocampista
-    "DT": "Delantero",         # Delantero
+    "PT": "Portero",          
+    "DF": "Defensa",           
+    "MC": "Centrocampista",    
+    "DT": "Delantero",         
 }

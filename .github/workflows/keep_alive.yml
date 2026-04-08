@@ -1,0 +1,22 @@
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    # GitHub Actions interpreta este cron por día del mes; es la aproximación habitual a un intervalo de 6 días.
+    - cron: '0 0 */6 * *'
+  workflow_dispatch: # Permite ejecutarlo a mano para probar
+
+jobs:
+  ping_db:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Ping Supabase
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          psql "$DB_URL" -c "SELECT 1;"

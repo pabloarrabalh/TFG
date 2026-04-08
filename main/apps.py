@@ -19,11 +19,24 @@ class MainConfig(AppConfig):
 
     def ready(self):
         """Se ejecuta al iniciar Django"""
-        # Importar signals para autoindexacion
-        try:
-            import main.signals  # noqa: F401
-        except ImportError:
-            pass
+        logger.info("[apps.ready()] Inicializando MainConfig...")
+        
+        # Detectar si es un script de data loading (no cargar signals costosos)
+        is_data_script = any(
+            'popularDB' in arg or 'manage.py' not in sys.argv[0]
+            for arg in sys.argv
+        )
+        
+        if not is_data_script:
+            # Importar signals para autoindexacion SOLO si no es un script de datos
+            logger.info("[apps.ready()] Cargando signals...")
+            try:
+                import main.signals  # noqa: F401
+                logger.info("[apps.ready()] Signals cargadas")
+            except Exception as e:
+                logger.warning('[apps.ready()] Error cargando signals: %s', e)
+        else:
+            logger.info("[apps.ready()] Script de datos detectado, signals omitidos")
 
         # Pre-importar predecir para que el auto-reloader lo rastree desde el arranque.
         # Sin esto, la primera peticion que lo importa hace que el reloader lo vea como
@@ -33,15 +46,20 @@ class MainConfig(AppConfig):
                 _p = Path(__file__).parent / 'entrenamientoModelos'
                 if str(_p) not in sys.path:
                     sys.path.insert(0, str(_p))
+                logger.info("[apps.ready()] Pre-importando predecir...")
                 importlib.import_module('predecir')
+                logger.info("[apps.ready()] Predecir pre-importado")
             except Exception as _e:
                 logger.warning('Could not pre-load predecir: %s', _e)
 
         # Solo ejecutar durante runserver (desarrollo local).
         # En Docker, entrypoint.sh llama a los comandos explícitamente.
         if 'runserver' in sys.argv:
+            logger.info("[apps.ready()] runserver detectado, iniciando thread de datos...")
             init_thread = threading.Thread(target=self._initialize_data, daemon=True)
             init_thread.start()
+        
+        logger.info("[apps.ready()] Inicialización completada")
 
     @staticmethod
     def _mostrar_banner():

@@ -1,48 +1,37 @@
-import json
-import sys
-from pathlib import Path
-
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
-from django.db import transaction
-import logging
 import threading
 
-logger = logging.getLogger(__name__)
+from django.contrib.auth.models import User
+from django.db import transaction
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
+from .entrenamientoModelos.predecir import predecir_puntos
+from .models import *
+
+POS_CODE_MAP = {
+    'Portero': 'PT',
+    'Defensa': 'DF',
+    'Centrocampista': 'MC',
+    'Delantero': 'DT',
+}
 
 try:
-    from .models import Jugador, Equipo, UserProfile
-    from django.contrib.auth.models import User
-    MODELS_AVAILABLE = True
-except ImportError:
-    MODELS_AVAILABLE = False
-
-
-# ── Create UserProfile automatically when User is created ──────────────────────
-try:
-    from django.contrib.auth.models import User
-    from .models import UserProfile as UP_Model
-    
-    @receiver(post_save, sender=User)
-    def create_user_profile(sender, instance, created, **kwargs):
-        """Crea automáticamente UserProfile cuando se crea un User"""
-        if created:
-            UP_Model.objects.get_or_create(user=instance)
-except Exception as e:
-    logger.warning(f"No se pudo registrar signal de UserProfile: {e}")
-
-
-try:
-    from .opensearch_docs import opensearch_client, OPENSEARCH_AVAILABLE
+    from .opensearch_docs import OPENSEARCH_AVAILABLE, opensearch_client
 except ImportError:
     opensearch_client = None
     OPENSEARCH_AVAILABLE = False
 
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.get_or_create(user=instance)
 
-if MODELS_AVAILABLE and OPENSEARCH_AVAILABLE and opensearch_client:
+
+if OPENSEARCH_AVAILABLE and opensearch_client:
     @receiver(post_save, sender=Jugador)
     def indexar_jugador_al_guardar(sender, instance, created, **kwargs):
-        """Indexa automáticamente un jugador cuando se guarda en OpenSearch"""
         try:
             doc = {
                 'id': instance.id,
@@ -57,24 +46,22 @@ if MODELS_AVAILABLE and OPENSEARCH_AVAILABLE and opensearch_client:
                 id=instance.id,
                 body=doc
             )
-        except Exception as e:
-            logger.warning(f"Error indexando jugador {instance.id}: {str(e)}")
+        except Exception:
+            return
 
     @receiver(post_delete, sender=Jugador)
     def eliminar_jugador_del_indice(sender, instance, **kwargs):
-        """Elimina automáticamente un jugador del índice OpenSearch cuando se borra"""
         try:
             opensearch_client.delete(
                 index='jugadores',
                 id=instance.id,
                 ignore=404
             )
-        except Exception as e:
-            logger.warning(f"Error eliminando jugador {instance.id} del índice: {str(e)}")
+        except Exception:
+            return
 
     @receiver(post_save, sender=Equipo)
     def indexar_equipo_al_guardar(sender, instance, created, **kwargs):
-        """Indexa automáticamente un equipo cuando se guarda en OpenSearch"""
         try:
             doc = {
                 'id': instance.id,
@@ -86,58 +73,33 @@ if MODELS_AVAILABLE and OPENSEARCH_AVAILABLE and opensearch_client:
                 id=instance.id,
                 body=doc
             )
-        except Exception as e:
-            logger.warning(f"Error indexando equipo {instance.id}: {str(e)}")
+        except Exception:
+            return
 
     @receiver(post_delete, sender=Equipo)
     def eliminar_equipo_del_indice(sender, instance, **kwargs):
-        """Elimina automáticamente un equipo del índice OpenSearch cuando se borra"""
         try:
             opensearch_client.delete(
                 index='equipos',
                 id=instance.id,
                 ignore=404
             )
-        except Exception as e:
-            logger.warning(f"Error eliminando equipo {instance.id} del índice: {str(e)}")
-else:
-    logger.info("⚠️ OpenSearch no está disponible, signals de indexación desactivados")
+        except Exception:
+            return
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# AUTO-PREDICCIÓN: cuando se guardan stats de un jugador, genera predicción
-# en segundo plano si todavía no existe para esa jornada.
-# ─────────────────────────────────────────────────────────────────────────────
-
+# Generación de predicciones en seugndo plano al arrancar
 def _generar_prediccion_background(jugador_id, jornada_id, posicion):
-    """Ejecuta en un hilo demonio: predice puntos y guarda en PrediccionJugador."""
     try:
-        from main.models import PrediccionJugador, Jornada
-
         jornada = Jornada.objects.get(pk=jornada_id)
 
         # Saltar si ya existe
-        if PrediccionJugador.objects.filter(
-            jugador_id=jugador_id, jornada=jornada, modelo='rf'
-        ).exists():
+        if PrediccionJugador.objects.filter(jugador_id=jugador_id, jornada=jornada, modelo='rf').exists():
             return
 
-        # Cargar predictor según posición
-        entrenamientos_path = Path(__file__).resolve().parent / 'entrenamientoModelos'
-        if str(entrenamientos_path) not in sys.path:
-            sys.path.insert(0, str(entrenamientos_path))
+        pos_code = POS_CODE_MAP.get(posicion, 'DT')
 
-        import importlib
-        mod = importlib.import_module('predecir')
-        func = getattr(mod, 'predecir_puntos')
-
-        pos_code_map = {
-            'Portero': 'PT', 'Defensa': 'DF',
-            'Centrocampista': 'MC', 'Delantero': 'DT',
-        }
-        pos_code = pos_code_map.get(posicion, 'DT')
-
-        resultado = func(jugador_id, pos_code, jornada.numero_jornada, verbose=False)
+        resultado = predecir_puntos(jugador_id, pos_code, jornada.numero_jornada, verbose=False)
         if not isinstance(resultado, dict) or resultado.get('error'):
             return
 
@@ -151,61 +113,41 @@ def _generar_prediccion_background(jugador_id, jornada_id, posicion):
             modelo='rf',
             defaults={'prediccion': float(pts)},
         )
-        logger.debug(f"[AutoPredicción] J{jugador_id} J{jornada.numero_jornada}: {pts:.2f} pts guardados")
-
-    except Exception as exc:
-        logger.debug(f"[AutoPredicción] error para jugador {jugador_id}: {exc}")
+    except Exception:
+        return
 
 
-try:
-    from main.models import EstadisticasPartidoJugador
+@receiver(post_save, sender=EstadisticasPartidoJugador)
+def auto_generar_prediccion(sender, instance, created, **kwargs):
+    if not created:
+        return
 
-    @receiver(post_save, sender=EstadisticasPartidoJugador)
-    def auto_generar_prediccion(sender, instance, created, **kwargs):
-        """
-        Cuando se guarda una estadística de partido, lanza en segundo plano
-        la predicción para ese jugador+jornada si todavía no existe.
-        Solo actúa en registros nuevos para no ralentizar updates masivos.
-        """
-        if not created:
-            return
+    jugador_id = instance.jugador_id
+    jornada_id = instance.partido.jornada_id
+    posicion = instance.posicion or ''
 
-        jugador_id = instance.jugador_id
-        jornada_id = instance.partido.jornada_id
-        posicion = instance.posicion or ''
+    # Esperar a que la transacción termine antes de lanzar el hilo
+    def _lanzar():
+        t = threading.Thread(
+            target=_generar_prediccion_background,
+            args=(jugador_id, jornada_id, posicion),
+            daemon=True,
+        )
+        t.start()
 
-        # Esperar a que la transacción termine antes de lanzar el hilo
-        def _lanzar():
-            t = threading.Thread(
-                target=_generar_prediccion_background,
-                args=(jugador_id, jornada_id, posicion),
-                daemon=True,
-            )
-            t.start()
-
-        transaction.on_commit(_lanzar)
-
-except Exception:
-    logger.info("AutoPrediccion: EstadisticasPartidoJugador no disponible aun")
+    transaction.on_commit(_lanzar)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# NOTIFICACIONES: push por WebSocket cuando se crea una nueva notificacion
-# ─────────────────────────────────────────────────────────────────────────────
-from .models import Notificacion as _Notificacion
-
-@receiver(post_save, sender=_Notificacion)
+# WebSocket cuando se crea una nueva notificacion
+@receiver(post_save, sender=Notificacion)
 def notificacion_creada_ws(sender, instance, created, **kwargs):
-    """Push the new notification to the user's WebSocket group."""
     if not created:
         return
     try:
-        from channels.layers import get_channel_layer
-        from asgiref.sync import async_to_sync
         channel_layer = get_channel_layer()
         if channel_layer is None:
             return
-        no_leidas = _Notificacion.objects.filter(
+        no_leidas = Notificacion.objects.filter(
             usuario=instance.usuario, leida=False
         ).count()
         async_to_sync(channel_layer.group_send)(
@@ -224,5 +166,5 @@ def notificacion_creada_ws(sender, instance, created, **kwargs):
                 'no_leidas': no_leidas,
             },
         )
-    except Exception as exc:
-        logger.warning('No se pudo enviar notificacion WS: %s', exc)
+    except Exception:
+        return
