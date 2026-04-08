@@ -43,9 +43,9 @@ jobs:
           user = unquote(parsed.username or "")
           password = unquote(parsed.password or "")
 
-            print(f"::add-mask::{db_url}")
-            print(f"::add-mask::{user}")
-            print(f"::add-mask::{password}")
+          print(f"::add-mask::{db_url}")
+          print(f"::add-mask::{user}")
+          print(f"::add-mask::{password}")
 
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
               env_file.write(f"PGHOSTADDR={ipv4}\n")
