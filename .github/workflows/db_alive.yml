@@ -1,0 +1,20 @@
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    # Se ejecuta a las 00:00 cada 3 días
+    - cron: '0 0 */3 * *'
+  workflow_dispatch: # Permite ejecutarlo manualmente para probar
+
+jobs:
+  ping_db:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Ping Supabase Database
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          psql "$DB_URL" -c "SELECT 1;"
