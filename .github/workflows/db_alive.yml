@@ -2,24 +2,31 @@ name: Supabase Keep Alive
 
 on:
   schedule:
-    # Se ejecuta a las 00:00 cada 3 días
     - cron: '0 0 */3 * *'
-  workflow_dispatch: # Permite ejecutarlo manualmente para probar
+  workflow_dispatch:
 
 jobs:
   ping_db:
     runs-on: ubuntu-latest
     steps:
-      - name: Install psql client
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql-client
+          sudo apt-get install -y postgresql-client dnsutils
 
       - name: Ping Supabase Database
         env:
           DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
-          # Añadimos flags para que sea más robusto:
-          # -w: No pedir contraseña (usa la de la URL)
-          # sslmode=require: Obligatorio para Supabase
-          psql "$DB_URL?sslmode=require" -w -c "SELECT 1;"
+          # 1. Extraemos el host de la URL (db.cmkw...supabase.co)
+          HOST=$(echo $DB_URL | sed -e 's|.*@||' -e 's|:.*||' -e 's|/.*||')
+          
+          # 2. Forzamos obtener la IP IPv4
+          IPV4=$(dig +short A $HOST | head -n1)
+          
+          # 3. Construimos la URL final usando la IP en lugar del nombre
+          # Esto evita que psql intente usar IPv6
+          FINAL_URL=$(echo $DB_URL | sed "s|$HOST|$IPV4|")
+          
+          echo "Conectando a la IP: $IPV4"
+          psql "$FINAL_URL?sslmode=verify-full" -t -c "SELECT 1;"
