@@ -11,10 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install psql client
-        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
 
       - name: Ping Supabase Database
         env:
           DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
-          psql "$DB_URL" -c "SELECT 1;"
+          # Añadimos flags para que sea más robusto:
+          # -w: No pedir contraseña (usa la de la URL)
+          # sslmode=require: Obligatorio para Supabase
+          psql "$DB_URL?sslmode=require" -w -c "SELECT 1;"
