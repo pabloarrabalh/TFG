@@ -8,6 +8,7 @@ Endpoints:
 """
 import json
 import logging
+import time
 
 from django.middleware.csrf import get_token
 from django.contrib.auth import authenticate
@@ -35,7 +36,7 @@ def _user_info(user):
         try:
             p = user.profile
             if p.foto:
-                profile_photo = p.foto.url
+                profile_photo = f"{p.foto.url}?v={int(time.time())}"
             nickname = p.nickname
             estado = p.estado or 'active'
         except Exception:

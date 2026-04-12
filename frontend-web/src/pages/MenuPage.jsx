@@ -6,88 +6,13 @@ import GlassPanel from '../components/ui/GlassPanel'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import TeamShield from '../components/ui/TeamShield'
 import HelpButton from '../components/ui/HelpButton'
+import PlayerPredictionModal from '../components/prediction/PlayerPredictionModal'
 import { Riple } from 'react-loading-indicators'
 import { useTour } from '../context/TourContext'
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
 
 const BACKEND = 'http://localhost:8000'
-
-// ─── Mapa de explicaciones de features XAI ─────────────────────────────────
-const FEATURE_EXPLICACIONES = {
-  // ── Forma y puntuación ───────────────────────────────────────────────
-  num_roles:                  { positiva: 'Jugador versátil. Ha ocupado muchos roles distintos esta temporada.',         negativa: 'Rol limitado. Juega casi siempre en la misma posición sin variación.' },
-  num_roles_criticos:         { positiva: 'Roles clave. Ocupa posiciones decisivas en el esquema del equipo.',            negativa: 'Sin rol protagonista. No suele ocupar posiciones decisivas.' },
-  pf_roll5:                   { positiva: 'Buena racha. Lleva 5 partidos puntuando por encima de su media.',               negativa: 'Mala racha. Ha bajado el rendimiento en los últimos 5 partidos.' },
-  pf_ewma5:                   { positiva: 'Tendencia ascendente. Su puntuación mejora semana a semana.',                   negativa: 'Tendencia bajista. Su puntuación cae en las últimas jornadas.' },
-  // ── Portero ──────────────────────────────────────────────────────────
-  psxg_ewma5:                 { positiva: 'Portero sólido. Para más de lo que se espera estadísticamente.',                negativa: 'Portero con dificultades. Encaja más de lo que el xG predice.' },
-  psxg_roll5:                 { positiva: 'Racha de grandes paradas. Ha superado el xG en los últimos 5 partidos.',        negativa: 'Racha floja bajo palos. Ha encajado más de lo esperado en los últimos 5 partidos.' },
-  save_advantage:             { positiva: 'Por encima del xG. Realiza paradas que el modelo no predice.',                  negativa: 'Por debajo del xG. Encaja más goles de los que el modelo esperaría.' },
-  // ── Ataque / remates ─────────────────────────────────────────────────
-  shots_ewma5:                { positiva: 'Muy disparador. Genera muchos remates y pone en aprietos al rival.',           negativa: 'Poco rematador. No genera suficientes disparos a puerta.' },
-  xg_ewma5:                   { positiva: 'Muchas ocasiones claras. Recibe balones en posición de gol con frecuencia.',    negativa: 'Pocas oportunidades claras. No llega habitualmente al área con peligro.' },
-  goals_ewma5:                { positiva: 'Tendencia goleadora al alza. Está marcando con más frecuencia semana a semana.',negativa: 'Tendencia goleadora a la baja. Marca cada vez menos goles.' },
-  shots_on_target_ewma5:      { positiva: 'Tendencia de disparos a puerta al alza. Cada vez más preciso y peligroso.',    negativa: 'Tendencia de disparos a puerta a la baja. Pierde precisión en el remate.' },
-  // ── Conducción y regates ─────────────────────────────────────────────
-  succ_dribbles_roll5:        { positiva: 'Regates completados. Ha superado con éxito a rivales en los últimos 5 partidos.', negativa: 'Pocos regates completados. No logra superar rivales en conducción últimamente.' },
-  dribble_attempts_roll5:     { positiva: 'Muy intentador en regate. Busca superar rivales con mucha frecuencia.',         negativa: 'Pocos intentos de regate. No busca superar rivales ni avanzar con el balón.' },
-  prog_dribbles_roll5:        { positiva: 'Conducciones progresivas. Avanza con el balón haciendo daño hacia el área rival.', negativa: 'Pocas conducciones progresivas. No lleva el balón hacia zonas de peligro.' },
-  progressive_pressure:       { positiva: 'Gran avance con balón. Conduce y progresa metros con el esférico.',             negativa: 'Poca conducción en progresión. No avanza con el balón hacia la portería.' },
-  prog_dist_ewma5:            { positiva: 'Gran movilidad ofensiva. Recorre muchos metros en zona de progresión.',         negativa: 'Poca movilidad progresiva. No avanza mucho en zona de creación.' },
-  distance_per_dribble:       { positiva: 'Regateador efectivo. Avanza mucho terreno por regate completado.',              negativa: 'Regates poco productivos. Avanza poco terreno por cada regate.' },
-  // ── Pases ────────────────────────────────────────────────────────────
-  pass_comp_pct_ewma5:        { positiva: 'Pases precisos. Tiene una tasa de acierto alta en la distribución reciente.',   negativa: 'Impreciso en el pase. Ha fallado muchos pases en las últimas jornadas.' },
-  pass_comp_pct_roll5:        { positiva: 'Sólido en el juego de pase. Muy fiable con el balón en los últimos 5 partidos.', negativa: 'Bajo porcentaje de pases completados en los últimos 5 partidos.' },
-  passes_ewma5:               { positiva: 'Tendencia de pases al alza. Cada vez más implicado en la circulación del juego.', negativa: 'Tendencia de pases a la baja. Pierde protagonismo en la distribución.' },
-  pass_productivity:          { positiva: 'Alta productividad en pases. Muchos pases completados con gran precisión.',      negativa: 'Baja productividad en pases. Poco volumen o poca precisión de pase.' },
-  // ── Defensa ──────────────────────────────────────────────────────────
-  def_actions_ewma5:          { positiva: 'Muy activo defensivamente. Realiza entradas, despejes e intercepciones.',       negativa: 'Poca acción defensiva. No registra acciones de recuperación recientemente.' },
-  tackles_ewma5:              { positiva: 'Tendencia de entradas al alza. Cada vez más activo en la recuperación defensiva.', negativa: 'Tendencia de entradas a la baja. Menos actividad defensiva en las últimas jornadas.' },
-  intercepts_ewma5:           { positiva: 'Tendencia de interceptaciones al alza. Mejora su lectura defensiva semana a semana.', negativa: 'Tendencia de interceptaciones a la baja. Pierde lecturas defensivas.' },
-  defensive_intensity:        { positiva: 'Alta intensidad defensiva. Mucha presión, duelos y recuperaciones de balón.',    negativa: 'Baja intensidad defensiva. Poca presión ni acciones de recuperación.' },
-  // ── Rival y contexto ─────────────────────────────────────────────────
-  opp_gc_ewma5:               { positiva: 'Rival con fuga defensiva. El equipo contrario encaja muchos goles últimamente.', negativa: 'Rival sólido atrás. El equipo contrario ha encajado poco recientemente.' },
-  opp_form_ewma5:             { positiva: 'Rival en mal momento. Ha perdido varios puntos en sus últimas jornadas.',       negativa: 'Rival en buena forma. Ha sumado muchos puntos últimamente.' },
-  odds_prob_loss:             { positiva: 'Favorito según las casas. Las apuestas le dan pocas opciones al rival.',        negativa: 'Probable derrota. Las cuotas le dan posibilidades bajas de ganar.' },
-  odds_expected_goals_against:{ positiva: 'Pocas llegadas esperadas del rival. El equipo defenderá bien según las cuotas.', negativa: 'Muchas llegadas esperadas del rival. Se esperan oportunidades en contra.' },
-  is_home:                    { positiva: 'Juega en casa. El factor local suele ayudar al rendimiento.',                   negativa: 'Juega fuera. Actuar de visitante penaliza estadísticamente.' },
-  // ── Disponibilidad y minutos ─────────────────────────────────────────
-  minutes_pct_ewma5:          { positiva: 'Minutos elevados. Ha jugado muchos minutos en sus últimos partidos.',           negativa: 'Pocos minutos recientes. Ha tenido poco protagonismo en las últimas jornadas.' },
-  minutes_pct_roll5:          { positiva: 'Continuidad de juego. Ha completado la mayoría de los últimos 5 partidos.',     negativa: 'Intermitente. No ha jugado completo con regularidad en los últimos 5 partidos.' },
-  starter_pct_roll3:          { positiva: 'Titular asegurado. Ha salido de inicio en los últimos 3 partidos.',             negativa: 'Sin sitio en el once. Ha sido suplente en varios de los últimos 3 partidos.' },
-  availability_momentum:      { positiva: 'Disponibilidad al alza. Ha estado apto y sin lesiones en las últimas semanas.',  negativa: 'Historial de ausencias. Ha perdido partidos por lesión o sanción recientemente.' },
-  // ── Features avanzados / índices ─────────────────────────────────────
-  creativity_index:           { positiva: 'Alto índice de creatividad. Combina pases precisos y regates para crear juego.', negativa: 'Bajo índice de creatividad. Escasa inventiva y poca generación de ocasiones.' },
-  availability_threat:        { positiva: 'Disponible y peligroso. Sin lesiones y generando ocasiones de gol.',            negativa: 'Dudas de disponibilidad o con poca peligrosidad ofensiva.' },
-  goal_productivity:          { positiva: 'Alta productividad goleadora. Combina tiros, xG y precisión de forma eficiente.', negativa: 'Baja productividad goleadora. No convierte ni genera suficiente peligro de gol.' },
-  es_mediocampista_elite:     { positiva: 'Mediocampista de élite. Sus métricas de pase y control están al máximo nivel.',  negativa: 'Por debajo del nivel élite en el mediocampo. Métricas por debajo de la media.' },
-  tiene_rol_mediocampista_core:{ positiva: 'Mediocentro titular. Ocupa el rol central del mediocampo con continuidad.',    negativa: 'Fuera del centro del juego. No ocupa el eje del mediocampo habitualmente.' },
-}
-
-function getFeatureExpl(f, isPositive) {
-  // 1. Exact match
-  const mapa = FEATURE_EXPLICACIONES[f.feature]
-  if (mapa) return isPositive ? mapa.positiva : mapa.negativa
-
-  // 2. Prefix match: strip _roll5/_ewma5/_roll3/_ewma3 suffix and find any key sharing same base
-  const base = f.feature.replace(/_(roll|ewma)\d+$/, '')
-  if (base !== f.feature) {
-    const altKey = Object.keys(FEATURE_EXPLICACIONES).find(k => {
-      const kb = k.replace(/_(roll|ewma)\d+$/, '')
-      return kb !== k && kb === base
-    })
-    if (altKey) {
-      const mapaAlt = FEATURE_EXPLICACIONES[altKey]
-      return isPositive ? mapaAlt.positiva : mapaAlt.negativa
-    }
-  }
-
-  // 3. Backend fallback (if not a generic "Factor: xxx" text)
-  const backendText = isPositive ? f.explicacion_positiva : f.explicacion_negativa
-  if (backendText && !backendText.startsWith('Factor:')) return backendText
-  return f.explicacion && !f.explicacion.startsWith('Factor:') ? f.explicacion : f.feature
-}
 
 function formatTime(hora) {
   if (!hora) return 'Por definir'
@@ -640,113 +565,17 @@ export default function MenuPage() {
         </div>
       </div>
 
-      {/* ══ MODAL: Predicción de jugador ════════════════════════════════════ */}
-      {modalDet && (
-        <div className="fixed inset-0 bg-black/70 z-[99999] flex items-center justify-center p-4" onClick={() => setModalDet(null)}>
-          <div className="bg-surface-dark border border-border-dark rounded-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-black text-white truncate">{modalDet.nombre} {modalDet.apellido}</h2>
-              <button onClick={() => setModalDet(null)} className="text-gray-400 hover:text-white flex-shrink-0"><span className="material-symbols-outlined">close</span></button>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400 text-sm">Equipo</span>
-                <div className="flex items-center gap-2"><EscudoImg nombre={modalDet.equipo} size={24} /><span className="text-white text-sm font-bold">{modalDet.equipo || '-'}</span></div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400 text-sm">Próximo rival</span>
-                <div className="flex items-center gap-2">
-                  {modalDet.proximo_rival && <EscudoImg nombre={modalDet.proximo_rival} size={24} />}
-                  <span className="text-white text-sm font-bold">{modalDet.proximo_rival || 'TBD'}</span>
-                </div>
-              </div>
-              <div className="border-t border-border-dark pt-3">
-                <p className="text-sm font-bold text-white mb-2">Predicción</p>
-                {detLoadingPred ? (
-                  <div className="flex items-center gap-2 text-xs text-gray-400 italic">
-                    <span className="animate-spin inline-block w-3 h-3 border-2 border-yellow-400 border-t-transparent rounded-full" />
-                    Analizando al jugador...
-                  </div>
-                ) : detPrediccion != null ? (
-                  <div>
-                    {detPrediccion.type === 'media' ? (
-                      <div className="bg-blue-500/20 border border-blue-500/40 rounded-lg p-3 mb-3">
-                        <p className="text-xs font-bold text-blue-300 mb-1">📊 MEDIA HISTÓRICA</p>
-                        <div className="text-2xl font-black text-blue-400">{Number(detPrediccion.value).toFixed(2)} pts</div>
-                        <p className="text-xs text-blue-200/70 mt-1">Promedio de puntos en partidos anteriores sin IA</p>
-                      </div>
-                    ) : (
-                      <div className="bg-yellow-500/20 border border-yellow-500/40 rounded-lg p-3 mb-3">
-                        <p className="text-xs font-bold text-yellow-300 mb-1">🤖 PREDICCIÓN CON IA</p>
-                        <div className="text-2xl font-black text-yellow-400">{Number(detPrediccion.value).toFixed(2)} pts</div>
-                        <p className="text-xs text-yellow-200/70 mt-1">Estimación basada en modelo de machine learning</p>
-                      </div>
-                    )}
-                    {detPrediccion.modelo && (
-                      <p className="text-xs text-gray-400 mb-3">Modelo: <span className="text-primary font-bold">{detPrediccion.modelo}</span></p>
-                    )}
-                    {detPrediccion.type !== 'media' && detFeaturesImpacto.length > 0 && (() => {
-                      const getImpacto = f => f.impacto_pts ?? f.impacto ?? 0
-                      const positivos = detFeaturesImpacto
-                        .filter(f => getImpacto(f) > 0)
-                        .sort((a, b) => Math.abs(getImpacto(b)) - Math.abs(getImpacto(a)))
-                        .slice(0, 3)
-                      const negativos = detFeaturesImpacto
-                        .filter(f => getImpacto(f) < 0)
-                        .sort((a, b) => Math.abs(getImpacto(b)) - Math.abs(getImpacto(a)))
-                        .slice(0, 3)
-                      return (
-                        <div className="space-y-2">
-                          {positivos.length > 0 && (
-                            <div>
-                              <p className="text-xs font-bold text-green-400 mb-1 uppercase tracking-wider">↑ A favor</p>
-                              <div className="space-y-1">
-                                {positivos.map((f, i) => (
-                                  <div key={i} className="rounded-lg px-2.5 py-2 bg-green-500/10 border border-green-500/20">
-                                    <div className="flex items-center justify-between gap-2">
-                                      <span className="text-white/85 text-xs leading-tight font-semibold flex-1">{getFeatureExpl(f, true)}</span>
-                                      <span className="text-xs font-black whitespace-nowrap text-green-400">+{Math.abs(getImpacto(f)).toFixed(2)} pts</span>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          {negativos.length > 0 && (
-                            <div>
-                              <p className="text-xs font-bold text-red-400 mb-1 uppercase tracking-wider">↓ En contra</p>
-                              <div className="space-y-1">
-                                {negativos.map((f, i) => (
-                                  <div key={i} className="rounded-lg px-2.5 py-2 bg-red-500/10 border border-red-500/20">
-                                    <div className="flex items-center justify-between gap-2">
-                                      <span className="text-white/85 text-xs leading-tight font-semibold flex-1">{getFeatureExpl(f, false)}</span>
-                                      <span className="text-xs font-black whitespace-nowrap text-red-400">−{Math.abs(getImpacto(f)).toFixed(2)} pts</span>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )
-                    })()}
-                  </div>
-                ) : (
-                  <span className="text-xs text-gray-500">Sin predicción disponible para esta jornada</span>
-                )}
-              </div>
-              <div className="border-t border-border-dark pt-4">
-                <Link
-                  to={`/jugador/${modalDet.id}`}
-                  className="w-full block text-center bg-primary hover:bg-primary-dark text-black px-4 py-2 rounded-lg font-bold text-sm transition-colors"
-                >
-                  Ver perfil completo
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <PlayerPredictionModal
+        player={modalDet}
+        onClose={() => setModalDet(null)}
+        loading={detLoadingPred}
+        prediction={detPrediccion}
+        featureImpacts={detFeaturesImpacto}
+        predictionTitle="Prediccion"
+        renderShield={(nombre, size) => <EscudoImg nombre={nombre} size={size} />}
+        showProfileLink
+        profileUrl={modalDet ? `/jugador/${modalDet.id}` : null}
+      />
       
     </div>
   )

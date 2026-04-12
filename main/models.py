@@ -275,7 +275,7 @@ class UserProfile(models.Model):
     
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='profile')
     nickname = models.CharField(max_length=100, blank=True, default='')
-    foto = models.FileField(upload_to='profile_pics/', null=True, blank=True)
+    foto = models.FileField(upload_to='frontend-web/userprofilefotos/', null=True, blank=True)
     estado = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
     plantilla_guardada = models.TextField(blank=True, default='{}')  
     preferencias_notificaciones = models.CharField(max_length=10, choices=NOTIF_CHOICES, default='all')

@@ -2,6 +2,8 @@
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import api from '../services/apiClient'
 import HelpButton from '../components/ui/HelpButton'
+import ComparisonMetricsCards from '../components/comparison/ComparisonMetricsCards'
+import { COMPARISON_DOMAINS } from '../components/comparison/comparisonConfig'
 import '../styles/jugador.css'
 import { useTour } from '../context/TourContext'
 import { driver } from 'driver.js'
@@ -75,7 +77,7 @@ export default function JugadorPage() {
   const chartInstanceRef = useRef(null)
   const histogramScrollRef = useRef(null)
   
-  const [comparisonData, setComparisonData] = useState(null)
+  const [comparisonEntries, setComparisonEntries] = useState([])
   const [season1, setSeason1] = useState('')
   const [season2, setSeason2] = useState('')
   const [domain, setDomain] = useState('general')
@@ -311,58 +313,150 @@ export default function JugadorPage() {
     setTimeout(waitForChart, 200)
   }
 
+  const normalizeHistoricoStats = (row = {}) => {
+    const goles = Number(row.goles || 0)
+    const xg = Number(row.xg || 0)
+    const asistencias = Number(row.asistencias || 0)
+    const xag = Number(row.xag || 0)
+
+    return {
+      puntos_por_partido: Number(row.puntos_por_partido || 0),
+      partidos: Number(row.pj || row.partidos || 0),
+      minutos: Number(row.minutos || 0),
+      goles,
+      asistencias,
+      xg,
+      xag,
+      goles_vs_xg: Number((goles - xg).toFixed(2)),
+      asistencias_vs_xag: Number((asistencias - xag).toFixed(2)),
+      tiros: Number(row.tiros || 0),
+      tiros_puerta: Number(row.tiros_puerta || 0),
+      pases: Number(row.pases || 0),
+      pases_accuracy: Number(row.pases_accuracy || 0),
+      regates_completados: Number(row.regates_completados || 0),
+      regates_fallidos: Number(row.regates_fallidos || 0),
+      conducciones: Number(row.conducciones || 0),
+      conducciones_progresivas: Number(row.conducciones_progresivas || 0),
+      entradas: Number(row.entradas || 0),
+      despejes: Number(row.despejes || 0),
+      duelos_totales: Number(row.duelos_totales || 0),
+      duelos_ganados: Number(row.duelos_ganados || 0),
+      duelos_perdidos: Number(row.duelos_perdidos || 0),
+      duelos_aereos_totales: Number(row.duelos_aereos_totales || 0),
+      amarillas: Number(row.amarillas || 0),
+      rojas: Number(row.rojas || 0),
+    }
+  }
+
+  const buildTotalHistoricoStats = (historicoData = []) => {
+    if (!historicoData.length) return {}
+
+    const totals = historicoData.reduce((acc, row) => ({
+      puntos_totales: acc.puntos_totales + Number(row.puntos_totales || 0),
+      partidos: acc.partidos + Number(row.pj || 0),
+      minutos: acc.minutos + Number(row.minutos || 0),
+      goles: acc.goles + Number(row.goles || 0),
+      asistencias: acc.asistencias + Number(row.asistencias || 0),
+      tiros: acc.tiros + Number(row.tiros || 0),
+      tiros_puerta: acc.tiros_puerta + Number(row.tiros_puerta || 0),
+      xg: acc.xg + Number(row.xg || 0),
+      xag: acc.xag + Number(row.xag || 0),
+      pases: acc.pases + Number(row.pases || 0),
+      pases_accuracy_sum: acc.pases_accuracy_sum + Number(row.pases_accuracy || 0),
+      regates_completados: acc.regates_completados + Number(row.regates_completados || 0),
+      regates_fallidos: acc.regates_fallidos + Number(row.regates_fallidos || 0),
+      conducciones: acc.conducciones + Number(row.conducciones || 0),
+      conducciones_progresivas: acc.conducciones_progresivas + Number(row.conducciones_progresivas || 0),
+      entradas: acc.entradas + Number(row.entradas || 0),
+      despejes: acc.despejes + Number(row.despejes || 0),
+      duelos_totales: acc.duelos_totales + Number(row.duelos_totales || 0),
+      duelos_ganados: acc.duelos_ganados + Number(row.duelos_ganados || 0),
+      duelos_perdidos: acc.duelos_perdidos + Number(row.duelos_perdidos || 0),
+      duelos_aereos_totales: acc.duelos_aereos_totales + Number(row.duelos_aereos_totales || 0),
+      amarillas: acc.amarillas + Number(row.amarillas || 0),
+      rojas: acc.rojas + Number(row.rojas || 0),
+    }), {
+      puntos_totales: 0,
+      partidos: 0,
+      minutos: 0,
+      goles: 0,
+      asistencias: 0,
+      tiros: 0,
+      tiros_puerta: 0,
+      xg: 0,
+      xag: 0,
+      pases: 0,
+      pases_accuracy_sum: 0,
+      regates_completados: 0,
+      regates_fallidos: 0,
+      conducciones: 0,
+      conducciones_progresivas: 0,
+      entradas: 0,
+      despejes: 0,
+      duelos_totales: 0,
+      duelos_ganados: 0,
+      duelos_perdidos: 0,
+      duelos_aereos_totales: 0,
+      amarillas: 0,
+      rojas: 0,
+    })
+
+    return {
+      puntos_por_partido: totals.partidos > 0 ? totals.puntos_totales / totals.partidos : 0,
+      pj: totals.partidos,
+      minutos: totals.minutos,
+      goles: totals.goles,
+      asistencias: totals.asistencias,
+      tiros: totals.tiros,
+      tiros_puerta: totals.tiros_puerta,
+      xg: totals.xg,
+      xag: totals.xag,
+      pases: totals.pases,
+      pases_accuracy: historicoData.length > 0 ? totals.pases_accuracy_sum / historicoData.length : 0,
+      regates_completados: totals.regates_completados,
+      regates_fallidos: totals.regates_fallidos,
+      conducciones: totals.conducciones,
+      conducciones_progresivas: totals.conducciones_progresivas,
+      entradas: totals.entradas,
+      despejes: totals.despejes,
+      duelos_totales: totals.duelos_totales,
+      duelos_ganados: totals.duelos_ganados,
+      duelos_perdidos: totals.duelos_perdidos,
+      duelos_aereos_totales: totals.duelos_aereos_totales,
+      amarillas: totals.amarillas,
+      rojas: totals.rojas,
+    }
+  }
+
   const executeComparison = () => {
     if (!season1 || !season2 || !data) return
-    
-    // Reset expand states when executing comparison
+
     setExpandDuelosTotales(false)
     setExpandDuelosAereos(false)
-    
+
     const historicoData = data.historico || []
-    
-    // Nuevos dominios expandidos
-    const dominioFields = {
-      'general': ['puntos_totales', 'pj', 'minutos', 'puntos_por_partido'],
-      'ataque': ['goles', 'tiros', 'tiros_puerta', 'xg'],
-      'pase': ['asistencias', 'xag', 'pases', 'pases_accuracy'],
-      'regates': ['regates_completados', 'regates_fallidos', 'conducciones', 'conducciones_progresivas'],
-      'defensa': ['entradas', 'despejes', 'duelos_totales', 'duelos_ganados', 'duelos_perdidos', 'duelos_aereos_ganados', 'duelos_aereos_perdidos'],
-    }
-    
     const getSeasonStats = (season) => {
-      let aggregated = {}
-      if (season === 'total') {
-        aggregated = historicoData.reduce((acc, row) => {
-          Object.keys(row).forEach(key => {
-            if (typeof row[key] === 'number') {
-              acc[key] = (acc[key] || 0) + row[key]
-            }
-          })
-          return acc
-        }, {})
-      } else {
-        aggregated = historicoData.find(r => r.temporada === season) || {}
-      }
-      
-      // Always include key fields
-      const fieldsToShow = dominioFields[domain] || Object.keys(aggregated)
-      return Object.keys(aggregated).reduce((acc, key) => {
-        if (fieldsToShow.includes(key) || key === 'temporada' || key === 'equipo' || key === 'minutos' || key === 'pj') {
-          acc[key] = aggregated[key]
-        }
-        return acc
-      }, {})
+      if (season === 'total') return buildTotalHistoricoStats(historicoData)
+      return historicoData.find((row) => row.temporada === season) || {}
     }
-    
-    const stats1 = getSeasonStats(season1)
-    const stats2 = getSeasonStats(season2)
-    
-    setComparisonData({
-      season1,
-      season2,
-      stats1,
-      stats2
-    })
+
+    const stats1 = normalizeHistoricoStats(getSeasonStats(season1))
+    const stats2 = normalizeHistoricoStats(getSeasonStats(season2))
+
+    setComparisonEntries([
+      {
+        id: `season-${season1}`,
+        label: season1 === 'total' ? 'Ultimas 3 temporadas' : season1,
+        minutes: stats1.minutos,
+        stats: stats1,
+      },
+      {
+        id: `season-${season2}`,
+        label: season2 === 'total' ? 'Ultimas 3 temporadas' : season2,
+        minutes: stats2.minutos,
+        stats: stats2,
+      },
+    ])
   }
 
   // ── Tour guiado ──────────────────────────────────────────────────────────────
@@ -1431,6 +1525,7 @@ export default function JugadorPage() {
                   setCompareModalOpen(false)
                   setExpandDuelosTotales(false)
                   setExpandDuelosAereos(false)
+                  setComparisonEntries([])
                 }}
                 className="text-gray-400 hover:text-white transition-colors"
               >
@@ -1443,14 +1538,17 @@ export default function JugadorPage() {
                 <label className="block text-sm font-bold text-gray-300 mb-2">Primera Temporada</label>
                 <select 
                   value={season1}
-                  onChange={(e) => setSeason1(e.target.value)}
+                  onChange={(e) => {
+                    setSeason1(e.target.value)
+                    setComparisonEntries([])
+                  }}
                   className="w-full px-3 py-2 bg-black border border-border-dark/50 rounded-lg text-white focus:border-primary focus:outline-none"
                 >
                   <option value="">Selecciona una temporada</option>
                   {historico.map((row, idx) => (
                     <option key={idx} value={row.temporada}>{row.temporada}</option>
                   ))}
-                  <option value="total">TOTAL (Todas las temporadas)</option>
+                  <option value="total">ULTIMAS 3 TEMPORADAS</option>
                 </select>
               </div>
 
@@ -1458,14 +1556,17 @@ export default function JugadorPage() {
                 <label className="block text-sm font-bold text-gray-300 mb-2">Segunda Temporada</label>
                 <select 
                   value={season2}
-                  onChange={(e) => setSeason2(e.target.value)}
+                  onChange={(e) => {
+                    setSeason2(e.target.value)
+                    setComparisonEntries([])
+                  }}
                   className="w-full px-3 py-2 bg-black border border-border-dark/50 rounded-lg text-white focus:border-primary focus:outline-none"
                 >
                   <option value="">Selecciona una temporada</option>
                   {historico.map((row, idx) => (
                     <option key={idx} value={row.temporada}>{row.temporada}</option>
                   ))}
-                  <option value="total">TOTAL (Todas las temporadas)</option>
+                  <option value="total">ULTIMAS 3 TEMPORADAS</option>
                 </select>
               </div>
 
@@ -1476,11 +1577,9 @@ export default function JugadorPage() {
                   onChange={(e) => setDomain(e.target.value)}
                   className="w-full px-3 py-2 bg-black border border-border-dark/50 rounded-lg text-white focus:border-primary focus:outline-none"
                 >
-                  <option value="general">General</option>
-                  <option value="ataque">Ataque</option>
-                  <option value="pase">Pase y Asistencias</option>
-                  <option value="regates">Regates</option>
-                  <option value="defensa">Defensa</option>
+                  {COMPARISON_DOMAINS.map((dom) => (
+                    <option key={dom.key} value={dom.key}>{dom.label}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -1491,180 +1590,11 @@ export default function JugadorPage() {
             >
               Ejecutar Comparación
             </button>
-
-            {comparisonData ? (
-              <div className="space-y-6">
-                {/* Helper para obtener nombre amigable de campo */}
-                {(() => {
-                  const getFieldLabel = (field) => {
-                    const labels = {
-                      'puntos_totales': 'Puntos Fantasy',
-                      'pj': 'Partidos',
-                      'minutos': 'Minutos',
-                      'puntos_por_partido': 'Puntos/PJ',
-                      'goles': 'Goles',
-                      'tiros': 'Tiros',
-                      'tiros_puerta': 'Tiros a Puerta',
-                      'xg': 'xG (Goles Esperados)',
-                      'asistencias': 'Asistencias',
-                      'xag': 'xAG (Asistencias Esperadas)',
-                      'pases': 'Pases Totales',
-                      'pases_accuracy': 'Precisión Pases',
-                      'regates_completados': 'Regates Exitosos',
-                      'regates_fallidos': 'Regates Fallidos',
-                      'conducciones': 'Conducciones',
-                      'conducciones_progresivas': 'Conducciones Progresivas',
-                      'entradas': 'Entradas',
-                      'despejes': 'Despejes',
-                      'duelos_totales': 'Duelos Totales',
-                      'duelos_ganados': 'Duelos Ganados',
-                      'duelos_perdidos': 'Duelos Perdidos',
-                      'duelos_aereos_ganados': 'Duelos Aéreos Ganados',
-                      'duelos_aereos_perdidos': 'Duelos Aéreos Perdidos',
-                    }
-                    return labels[field] || field.replace(/_/g, ' ')
-                  }
-
-                  const getEstatDisplay = (field, val1, val2) => {
-                    const minutos1 = comparisonData.stats1.minutos || 1
-                    const minutos2 = comparisonData.stats2.minutos || 1
-                    const per90Stats = ['goles', 'tiros', 'tiros_puerta', 'xg', 'asistencias', 'xag', 'pases', 'regates_completados', 'regates_fallidos', 'conducciones', 'conducciones_progresivas', 'entradas', 'despejes', 'duelos_totales', 'duelos_aereos_ganados', 'duelos_aereos_perdidos']
-                    
-                    return (
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-300">{comparisonData.season1}</span>
-                          <span className="text-white font-bold">{val1.toFixed(2)}</span>
-                          {per90Stats.includes(field) && <span className="text-gray-400 text-xs">{(val1 / (minutos1 / 90)).toFixed(2)}/90min</span>}
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-300">{comparisonData.season2}</span>
-                          <span className="text-white font-bold">{val2.toFixed(2)}</span>
-                          {per90Stats.includes(field) && <span className="text-gray-400 text-xs">{(val2 / (minutos2 / 90)).toFixed(2)}/90min</span>}
-                        </div>
-                        <div className={`flex justify-between items-center pt-2 border-t border-border-dark/50 ${(val2 - val1) > 0 ? 'text-green-400' : (val2 - val1) < 0 ? 'text-red-400' : 'text-gray-400'}`}>
-                          <span className="text-xs uppercase">Diferencia</span>
-                          <span className="font-bold">{(val2 - val1) > 0 ? '+' : ''}{(val2 - val1).toFixed(2)}</span>
-                        </div>
-                      </div>
-                    )
-                  }
-
-                  const statsByDomain = {
-                    'general': ['puntos_totales', 'pj', 'minutos', 'puntos_por_partido'],
-                    'ataque': ['goles', 'tiros', 'tiros_puerta', 'xg'],
-                    'pase': ['asistencias', 'xag', 'pases', 'pases_accuracy'],
-                    'regates': ['regates_completados', 'regates_fallidos', 'conducciones', 'conducciones_progresivas'],
-                    'defensa': ['entradas', 'despejes', 'duelos_totales', 'duelos_ganados', 'duelos_perdidos', 'duelos_aereos_ganados', 'duelos_aereos_perdidos'],
-                  }
-
-                  const statsToShow = statsByDomain[domain] || statsByDomain.general
-
-                  return (
-                    <>
-                      {statsToShow.map((field) => {
-                        if (!(field in comparisonData.stats1)) return null
-                        const val1 = comparisonData.stats1[field] || 0
-                        const val2 = comparisonData.stats2[field] || 0
-
-                        // Duelos Totales colapsable
-                        if (field === 'duelos_totales' && domain === 'defensa') {
-                          return (
-                            <div key="duelos-totales-group" className="bg-surface-dark rounded-xl p-4 border border-border-dark/50">
-                              <button
-                                onClick={() => setExpandDuelosTotales(!expandDuelosTotales)}
-                                className="w-full flex items-center justify-between text-white font-bold hover:text-primary transition-colors"
-                              >
-                                <span className="flex items-center gap-2">
-                                  <span className="material-symbols-outlined text-lg">expand_more</span>
-                                  Duelos Totales
-                                </span>
-                                <span className={`text-gray-400 transition-transform ${expandDuelosTotales ? 'rotate-180' : ''}`}>
-                                  <span className="material-symbols-outlined">expand_more</span>
-                                </span>
-                              </button>
-
-                              {expandDuelosTotales && (
-                                <div className="mt-4 space-y-3 pt-4 border-t border-border-dark/50">
-                                  <div className="bg-black/30 rounded-lg p-3">
-                                    <p className="text-xs text-gray-400 font-bold mb-2 uppercase">Duelos Ganados</p>
-                                    {getEstatDisplay('duelos_ganados', comparisonData.stats1.duelos_ganados || 0, comparisonData.stats2.duelos_ganados || 0)}
-                                  </div>
-                                  <div className="bg-black/30 rounded-lg p-3">
-                                    <p className="text-xs text-gray-400 font-bold mb-2 uppercase">Duelos Perdidos</p>
-                                    {getEstatDisplay('duelos_perdidos', comparisonData.stats1.duelos_perdidos || 0, comparisonData.stats2.duelos_perdidos || 0)}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )
-                        }
-
-                        // Duelos Aéreos colapsable
-                        if (field === 'duelos_aereos_ganados' && domain === 'defensa') {
-                          return (
-                            <div key="duelos-aereos-group" className="bg-surface-dark rounded-xl p-4 border border-border-dark/50">
-                              <button
-                                onClick={() => setExpandDuelosAereos(!expandDuelosAereos)}
-                                className="w-full flex items-center justify-between text-white font-bold hover:text-primary transition-colors"
-                              >
-                                <span className="flex items-center gap-2">
-                                  <span className="material-symbols-outlined text-lg">expand_more</span>
-                                  Duelos Aéreos
-                                </span>
-                                <span className={`text-gray-400 transition-transform ${expandDuelosAereos ? 'rotate-180' : ''}`}>
-                                  <span className="material-symbols-outlined">expand_more</span>
-                                </span>
-                              </button>
-
-                              {expandDuelosAereos && (
-                                <div className="mt-4 space-y-3 pt-4 border-t border-border-dark/50">
-                                  <div className="bg-black/30 rounded-lg p-3">
-                                    <p className="text-xs text-gray-400 font-bold mb-2 uppercase">Duelos Aéreos Ganados</p>
-                                    {getEstatDisplay('duelos_aereos_ganados', val1, val2)}
-                                  </div>
-                                  <div className="bg-black/30 rounded-lg p-3">
-                                    <p className="text-xs text-gray-400 font-bold mb-2 uppercase">Duelos Aéreos Perdidos</p>
-                                    {getEstatDisplay('duelos_aereos_perdidos', comparisonData.stats1.duelos_aereos_perdidos || 0, comparisonData.stats2.duelos_aereos_perdidos || 0)}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )
-                        }
-
-                        // Despejes colapsable
-                        if (field === 'despejes' && domain === 'defensa') {
-                          return (
-                            <div key="despejes-group" className="bg-surface-dark rounded-xl p-4 border border-border-dark/50">
-                              <p className="text-xs text-gray-400 font-bold mb-3 uppercase">Despejes</p>
-                              {getEstatDisplay(field, val1, val2)}
-                            </div>
-                          )
-                        }
-
-                        // Omitir duelos totales perdidos/ganados si ya se mostró en la sección colapsable
-                        if ((field === 'duelos_ganados' || field === 'duelos_perdidos') && domain === 'defensa') return null
-                        
-                        // Omitir duelos aéreos perdidos si ya se mostró en la sección colapsable
-                        if (field === 'duelos_aereos_perdidos' && domain === 'defensa') return null
-
-                        return (
-                          <div key={field} className="bg-surface-dark rounded-xl p-4 border border-border-dark/50">
-                            <p className="text-xs text-gray-400 font-bold mb-3 uppercase">{getFieldLabel(field)}</p>
-                            {getEstatDisplay(field, val1, val2)}
-                          </div>
-                        )
-                      })}
-                    </>
-                  )
-                })()}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                <p>Selecciona dos temporadas y un dominio para ver la comparación</p>
-              </div>
-            )}
+            <ComparisonMetricsCards
+              entries={comparisonEntries}
+              domain={domain}
+              emptyMessage={'Selecciona dos temporadas y pulsa "Ejecutar comparacion"'}
+            />
           </div>
         </div>
       )}

@@ -1,57 +1,11 @@
-"""
-Genera predicciones de puntos fantasy para todos los jugadores de una jornada
-y las almacena en PrediccionJugador.
-
-🎯 SISTEMA DE 3 NIVELES:
-  1. INIT (al arrancar): --init-active-only → 60+ min primeros 10 juegos 25/26 (~4-5 min FAST)
-  2. BACKGROUND: generar_predicciones_background → Resto de jugadores sin bloquear app
-  3. ON-DEMAND: @ensure_predictions decorator → Cuando accedes al jugador o plantilla
-
-⚡ OPTIMIZACIÓN: Usa --init-active-only para INIT o --active-only para generarse normal
-   Reduce el tiempo de ejecución en ~70% (de 15min → 4-5min)
-   Los jugadores inactivos recibirán predicciones bajo demanda/background.
-
-Uso básico (predice próxima jornada de la temporada más reciente):
-    python manage.py generar_predicciones
-
-🚀 MODO INICIALIZACIÓN (INIT - recomendado):
-    python manage.py generar_predicciones --all-jornadas --init-active-only --workers 32 --batch 300
-
-Opciones principales:
-    --all-jornadas            Generar para TODAS las jornadas 1-38
-    --init-active-only        [INIT] Solo 60+ min en primeros 10 juegos de 25/26 ⚡
-    --active-only             Solo jugadores con 60+ minutos en últimas 10 jornadas
-    --workers 32              Hilos paralelos (default: 32 máximo recomendado)
-    --force                   Sobreescribe predicciones existentes
-    --min-minutes 60          Minutos mínimos para jugador activo (default: 60)
-
-Opciones específicas:
-    --jornada 15              Número de jornada objetivo
-    --temporada 25_26         Temporada (formato BD: 25_26)
-    --jugador 123             Solo para un jugador específico
-    --modelo RF               Tipo de modelo: RF | XGB | ElasticNet
-    --mark-incomplete         Marca no-generadas como pendientes para background
-
-Ejemplos de uso:
-    # INICIALIZACIÓN RÁPIDA (solo activos primeros 10 juegos, ~4-5 minutos):
-    python manage.py generar_predicciones --all-jornadas --init-active-only --workers 32 --batch 300
-    
-    # Predicciones estándar (últimas 10 jornadas, activos):
-    python manage.py generar_predicciones --all-jornadas --active-only --workers 32
-    
-    # Todas las predicciones (completo pero lento, ~15-20 minutos):
-    python manage.py generar_predicciones --all-jornadas --workers 32
-
-📚 Ver main/utils/PREDICCIONES_3NIVELES.md para arquitectura completa.
-"""
-
 import sys
 import logging
 from pathlib import Path
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from django.core.management.base import BaseCommand
-from django.db import transaction
+from django.db.models import Max
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +18,7 @@ class Command(BaseCommand):
         parser.add_argument('--temporada', type=str,  default=None,  help='Nombre de temporada BD: 25_26')
         parser.add_argument('--jugador',   type=int,  default=None,  help='Solo predecir para este jugador_id')
         parser.add_argument('--modelo',    type=str,  default='RF',  help='RF | XGB | ElasticNet (default: RF)')
+        parser.add_argument('--all-modelos', action='store_true',    help='Genera baseline + rf + ridge + xgb + elasticnet para cada jugador/jornada')
         parser.add_argument('--workers',   type=int,  default=32,    help='Hilos paralelos (default: 32 - máximo recomendado)')
         parser.add_argument('--force',     action='store_true',       help='Sobreescribe predicciones existentes')
         parser.add_argument('--batch',     type=int,  default=300,   help='Tamaño de batch para guardar (default: 300 - más rápido)')
@@ -72,6 +27,7 @@ class Command(BaseCommand):
         parser.add_argument('--active-only', action='store_true',     help='Solo genera para jugadores con 60+ minutos en últimas 10 jornadas (reduce tiempo ~70%)')
         parser.add_argument('--init-active-only', action='store_true', help='[INIT] Solo primeros 10 partidos de 25/26 con 60+ minutos')
         parser.add_argument('--min-minutes', type=int, default=60,    help='Minutos mínimos para considerar jugador activo (default: 60)')
+        parser.add_argument('--sin-filtro-minutos', action='store_true', help='Desactiva el filtro de minutos y considera a todos los jugadores')
         parser.add_argument('--mark-incomplete', action='store_true', help='Marca predicciones no generadas como pendientes para background')
 
     # ─────────────────────────────────────────────────────────────────────────
@@ -242,12 +198,14 @@ class Command(BaseCommand):
 
         num_jugadores = len(jugadores_lista)
         num_jornadas = len(jornadas_target)
-        total_predicciones = num_jugadores * num_jornadas
+        modelos_por_tarea = 5 if options.get('all_modelos') else 1
+        total_predicciones = num_jugadores * num_jornadas * modelos_por_tarea
+        modelos_label = 'baseline+rf+ridge+xgb+elasticnet' if options.get('all_modelos') else options['modelo']
         
         if verbosity >= 2:
             self.stdout.write(
                 f"Jugadores: {num_jugadores}  |  Jornadas: {num_jornadas}  "
-                f"|  Total predicciones: {total_predicciones}  |  Modelo: {options['modelo']}  "
+                f"|  Total predicciones: {total_predicciones}  |  Modelo(s): {modelos_label}  "
                 f"|  Workers: {options['workers']}"
             )
 
@@ -282,39 +240,173 @@ class Command(BaseCommand):
 
         jornadas_target = list(jornadas_objs.keys())
 
+        # Reglas de negocio:
+        # - J1..J5: predicción baseline (media)
+        # - Desde J6: solo jugadores con >= min_minutes en CADA una de las 5 jornadas previas
+        min_minutes_required = int(options.get('min_minutes') or 60)
+        ventana_jornadas = 5
+        inicio_filtro_jornada = 6
+        baseline_hasta_jornada = inicio_filtro_jornada - 1
+
+        from main.models import EstadisticasPartidoJugador
+
+        jugadores_ids_set = {jid for jid, _ in jugadores_lista}
+        minutos_por_jugador_jornada = defaultdict(dict)
+
+        if jugadores_ids_set:
+            max_jornada_hist = max(jornadas_target) - 1
+            if max_jornada_hist >= 1:
+                minutos_qs = (
+                    EstadisticasPartidoJugador.objects
+                    .filter(
+                        partido__jornada__temporada=temporada,
+                        jugador_id__in=jugadores_ids_set,
+                        partido__jornada__numero_jornada__lte=max_jornada_hist,
+                    )
+                    .values('jugador_id', 'partido__jornada__numero_jornada')
+                    .annotate(min_partido_max=Max('min_partido'))
+                )
+                for row in minutos_qs:
+                    minutos_por_jugador_jornada[row['jugador_id']][row['partido__jornada__numero_jornada']] = int(row['min_partido_max'] or 0)
+
+        elegibles_por_jornada = {}
+        for jornada_num in jornadas_target:
+            if jornada_num < inicio_filtro_jornada:
+                elegibles_por_jornada[jornada_num] = jugadores_ids_set
+                continue
+
+            jornadas_previas = range(jornada_num - ventana_jornadas, jornada_num)
+            elegibles = set()
+            for jugador_id in jugadores_ids_set:
+                mins = minutos_por_jugador_jornada.get(jugador_id, {})
+                if all(mins.get(prev_jornada, 0) >= min_minutes_required for prev_jornada in jornadas_previas):
+                    elegibles.add(jugador_id)
+            elegibles_por_jornada[jornada_num] = elegibles
+
+        if verbosity >= 2:
+            total_candidatos = len(jugadores_ids_set)
+            for jornada_num in jornadas_target:
+                if jornada_num >= inicio_filtro_jornada:
+                    elegibles = len(elegibles_por_jornada.get(jornada_num, set()))
+                    self.stdout.write(
+                        f"  [FILTRO MINUTOS] J{jornada_num}: {elegibles}/{total_candidatos} elegibles "
+                        f"({min_minutes_required}+ min en J{jornada_num - ventana_jornadas}-J{jornada_num - 1})"
+                    )
+
         _POS_CODE = {
             'Portero': 'PT', 'Defensa': 'DF',
             'Centrocampista': 'MC', 'Delantero': 'DT',
         }
+        _MODELO_A_DB = {
+            'rf': 'rf',
+            'random forest': 'rf',
+            'ridge': 'ridge',
+            'ridge regression': 'ridge',
+            'elasticnet': 'elasticnet',
+            'elastic net': 'elasticnet',
+            'xgb': 'xgb',
+            'xgboost': 'xgb',
+            'baseline': 'baseline',
+        }
+        _DB_A_MODELO_TIPO = {
+            'baseline': 'Baseline',
+            'rf': 'RF',
+            'ridge': 'Ridge',
+            'xgb': 'XGB',
+            'elasticnet': 'ElasticNet',
+        }
+
+        if options.get('all_modelos'):
+            modelos_objetivo = ['baseline', 'rf', 'ridge', 'xgb', 'elasticnet']
+        else:
+            modelo_norm = _MODELO_A_DB.get(str(options['modelo']).lower(), str(options['modelo']).lower())
+            if modelo_norm not in _DB_A_MODELO_TIPO:
+                self.stderr.write(self.style.ERROR(
+                    f"Modelo '{options['modelo']}' no soportado. Usa: baseline, rf, ridge, xgb, elasticnet o --all-modelos"
+                ))
+                return
+            modelos_objetivo = [modelo_norm]
+
+        # Si se piden todos los modelos, el objetivo es cubrir todos los jugadores.
+        aplicar_filtro_minutos = not options.get('sin_filtro_minutos', False)
+        if options.get('all_modelos'):
+            aplicar_filtro_minutos = False
 
         # ── Predecir ────────────────────────────────────────────────────────
         ok = error = skip = 0
         predicciones_buffer = []  # Buffer global para batch saving
         batch_size = options.get('batch', 100)
 
-        def predecir_uno(jugador_id, posicion, numero_jornada):
+        def predecir_uno(jugador_id, posicion, numero_jornada, modelo_db):
             """Wrapper que llama al predictor correcto (sin guardar)."""
             from main.models import PrediccionJugador
             pos_code = _POS_CODE.get(posicion, 'DT')
             jornada_obj = jornadas_objs[numero_jornada]
+
+            # Regla principal: desde J6 solo si jugó >= 60 min en las 5 jornadas previas
+            if aplicar_filtro_minutos and numero_jornada >= inicio_filtro_jornada:
+                elegibles = elegibles_por_jornada.get(numero_jornada, set())
+                if jugador_id not in elegibles:
+                    return 'skip', None
+
+            # Compatibilidad de negocio histórica: J1..J5 baseline en modo simple.
+            modelo_db_final = modelo_db
+            if (not options.get('all_modelos')) and numero_jornada <= baseline_hasta_jornada:
+                modelo_db_final = 'baseline'
+
+            modelo_tipo_prediccion = _DB_A_MODELO_TIPO[modelo_db_final]
 
             # Saltar si ya existe y no --force
             if not options['force']:
                 existe = PrediccionJugador.objects.filter(
                     jugador_id=jugador_id,
                     jornada=jornada_obj,
-                    modelo=options['modelo'].lower(),
+                    modelo=modelo_db_final,
                 ).exists()
                 if existe:
                     return 'skip', None
 
             try:
-                resultado = _predecir_puntos(jugador_id, pos_code, numero_jornada, verbose=False)
-                if not isinstance(resultado, dict) or resultado.get('error'):
-                    return 'error', None
+                def _extraer_puntos(res):
+                    if not isinstance(res, dict):
+                        return None, True
+                    if res.get('error'):
+                        return None, True
+                    pts_local = res.get('prediccion', res.get('puntos_predichos'))
+                    return pts_local, False
 
-                pts = resultado.get('prediccion', resultado.get('puntos_predichos'))
+                resultado = _predecir_puntos(
+                    jugador_id,
+                    pos_code,
+                    numero_jornada,
+                    verbose=False,
+                    modelo_tipo=modelo_tipo_prediccion,
+                )
+                pts, fallo = _extraer_puntos(resultado)
+
+                # En modo all-modelos, si falla un modelo no-baseline, usar baseline de respaldo
+                if options.get('all_modelos') and modelo_db_final != 'baseline' and (fallo or pts is None):
+                    resultado_base = _predecir_puntos(
+                        jugador_id,
+                        pos_code,
+                        numero_jornada,
+                        verbose=False,
+                        modelo_tipo='Baseline',
+                    )
+                    pts_base, _ = _extraer_puntos(resultado_base)
+                    pts = pts_base
+                    fallo = False if pts is not None else True
+
                 if pts is None:
+                    # Sin nulos en modo all-modelos: fallback final conservador.
+                    if options.get('all_modelos'):
+                        pts = 0.0
+                    elif fallo:
+                        return 'error', None
+                    else:
+                        return 'skip', None
+
+                if fallo and not options.get('all_modelos'):
                     return 'error', None
 
                 # Devolver objeto sin guardar (lo haremos en batch después)
@@ -323,30 +415,36 @@ class Command(BaseCommand):
                     jugador_id=jugador_id,
                     jornada=jornada_obj,
                     prediccion=float(pts),
-                    modelo=options['modelo'].lower()
+                    modelo=modelo_db_final,
                 )
                 return 'ok', pred_obj
             except Exception as exc:
-                logger.debug(f"Error predicción {jugador_id} J{numero_jornada}: {exc}")
+                logger.exception(f"Error predicción {jugador_id} J{numero_jornada}: {exc}")
                 return 'error', None
 
         # ── Construir lista de tareas (jugador, jornada) ────────────────────
         tareas = []
         for jid, pos in jugadores_lista:
             for num_jornada in jornadas_target:
-                tareas.append((jid, pos, num_jornada))
+                for modelo_db in modelos_objetivo:
+                    tareas.append((jid, pos, num_jornada, modelo_db))
 
         total_tareas = len(tareas)
 
         with ThreadPoolExecutor(max_workers=options['workers']) as pool:
             futures = {
-                pool.submit(predecir_uno, jid, pos, num_j): (jid, num_j)
-                for jid, pos, num_j in tareas
+                pool.submit(predecir_uno, jid, pos, num_j, modelo_db): (jid, num_j, modelo_db)
+                for jid, pos, num_j, modelo_db in tareas
             }
             for i, future in enumerate(as_completed(futures), 1):
                 status, pred_obj = future.result()
                 if status == 'ok':
                     ok += 1
+                    if verbosity >= 1 and ok % 100 == 0:
+                        self.stdout.write(
+                            f"[PROGRESO] {ok} predicciones generadas "
+                            f"(procesadas: {i}/{total_tareas}, errores: {error}, omitidas: {skip})"
+                        )
                     if pred_obj:
                         predicciones_buffer.append(pred_obj)
                         # Guardar batch cuando alcance el tamaño
@@ -365,7 +463,7 @@ class Command(BaseCommand):
                 if verbosity >= 2:
                     if i % 50 == 0 or i == total_tareas:
                         self.stdout.write(
-                            f"  {i}/{total_tareas} — ✓{ok}  ✗{error}  →{skip} omitidos  (buffer: {len(predicciones_buffer)})",
+                            f"  {i}/{total_tareas} — [+]{ok}  [!]{error}  [>]{skip} omitidos  (buffer: {len(predicciones_buffer)})",
                             ending='\r'
                         )
                         self.stdout.flush()

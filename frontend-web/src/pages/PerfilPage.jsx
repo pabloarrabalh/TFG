@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import api from '../services/apiClient'
+import Cropper from 'react-easy-crop'
 import GlassPanel from '../components/ui/GlassPanel'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import TeamShield from '../components/ui/TeamShield'
@@ -10,14 +11,78 @@ import { useTour } from '../context/TourContext'
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
 
-const BACKEND = 'http://localhost:8000'
 const ESTADOS = [
   { value: 'active', label: 'Activo', color: 'bg-green-500' },
   { value: 'away', label: 'Ausente', color: 'bg-gray-500' },
   { value: 'dnd', label: 'No molestar', color: 'bg-yellow-500' },
 ]
 
-const AVATAR_COUNT = 5
+const AVATAR_COUNT = 6
+
+const normalizePhotoUrl = (photo) => {
+  if (!photo) return null
+  const value = `${photo}`.trim()
+  if (!value) return null
+  if (value.startsWith('http://') || value.startsWith('https://')) return value
+  const normalizedPath = value.startsWith('/') ? value : `/${value}`
+  try {
+    return new URL(normalizedPath, api.defaults.baseURL).toString()
+  } catch {
+    return normalizedPath
+  }
+}
+
+const createImage = (url) => new Promise((resolve, reject) => {
+  const img = new Image()
+  img.addEventListener('load', () => resolve(img))
+  img.addEventListener('error', (error) => reject(error))
+  img.src = url
+})
+
+async function getCroppedAvatarFile(imageSrc, cropPixels, originalName = 'perfil.png') {
+  if (!imageSrc || !cropPixels) return null
+
+  const image = await createImage(imageSrc)
+  const canvas = document.createElement('canvas')
+  const size = 512
+
+  canvas.width = size
+  canvas.height = size
+
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return null
+
+  ctx.clearRect(0, 0, size, size)
+
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2)
+  ctx.closePath()
+  ctx.clip()
+  ctx.drawImage(
+    image,
+    cropPixels.x,
+    cropPixels.y,
+    cropPixels.width,
+    cropPixels.height,
+    0,
+    0,
+    size,
+    size
+  )
+  ctx.restore()
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error('No se pudo generar la imagen recortada'))
+        return
+      }
+      const baseName = (originalName || 'perfil').replace(/\.[^.]+$/, '')
+      resolve(new File([blob], `${baseName}.png`, { type: 'image/png' }))
+    }, 'image/png')
+  })
+}
 
 export default function PerfilPage() {
   const { user, refetchUser } = useAuth()
@@ -44,11 +109,35 @@ export default function PerfilPage() {
   const [photoModal, setPhotoModal] = useState(false)
   const [avatarIdx, setAvatarIdx] = useState(0)
   const [uploading, setUploading] = useState(false)
+  const [cropModalOpen, setCropModalOpen] = useState(false)
+  const [cropImageSrc, setCropImageSrc] = useState('')
+  const [cropImageName, setCropImageName] = useState('perfil.png')
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+  const [profileImageError, setProfileImageError] = useState(false)
   const fileRef = useRef()
+
+  const rawPhoto = perfil?.profile_photo || perfil?.foto_url
+  const profilePic = normalizePhotoUrl(rawPhoto)
+  const fallbackName = `${perfil?.first_name || ''} ${perfil?.last_name || ''}`.trim() || perfil?.username || 'Usuario'
+  const fallbackProfilePic = `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName)}&background=39ff14&color=050505&bold=true&size=256`
 
   useEffect(() => {
     loadPerfil()
   }, [])
+
+  useEffect(() => {
+    return () => {
+      if (cropImageSrc && cropImageSrc.startsWith('blob:')) {
+        URL.revokeObjectURL(cropImageSrc)
+      }
+    }
+  }, [cropImageSrc])
+
+  useEffect(() => {
+    setProfileImageError(false)
+  }, [profilePic])
 
   useEffect(() => {
     if (!tourActive || isPhaseCompleted('perfil') || loading || !perfil) return
@@ -129,7 +218,7 @@ export default function PerfilPage() {
     setSaving(true)
     setMessage(null)
     try {
-      await api.post('/api/perfil/update/', editData)
+      await api.patch('/api/perfil/update/', editData)
       setMessage({ type: 'success', text: 'Perfil actualizado correctamente' })
       setEditOpen(false)
       await loadPerfil()
@@ -144,7 +233,7 @@ export default function PerfilPage() {
 
   async function updateStatus(estado) {
     try {
-      await api.post('/api/perfil/status/', { estado })
+      await api.patch('/api/perfil/status/', { estado })
       setPerfil(prev => ({ ...prev, estado }))
       await refetchUser()
     } catch {
@@ -168,7 +257,13 @@ export default function PerfilPage() {
   async function useAvatar(idx) {
     setUploading(true)
     try {
-      await api.post('/api/perfil/foto/', { default_avatar: `default${idx + 1}` })
+      const fd = new FormData()
+      fd.append('default_avatar', `default${idx + 1}`)
+      const res = await api.post('/api/perfil/foto/', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+      const nextPhoto = res?.data?.photo_url
+      if (nextPhoto) {
+        setPerfil(prev => prev ? { ...prev, foto_url: nextPhoto, profile_photo: nextPhoto } : prev)
+      }
       setMessage({ type: 'success', text: 'Avatar actualizado' })
       setPhotoModal(false)
       await loadPerfil()
@@ -186,8 +281,13 @@ export default function PerfilPage() {
     try {
       const fd = new FormData()
       fd.append('foto', file)
-      await api.post('/api/perfil/foto/', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+      const res = await api.post('/api/perfil/foto/', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+      const nextPhoto = res?.data?.photo_url
+      if (nextPhoto) {
+        setPerfil(prev => prev ? { ...prev, foto_url: nextPhoto, profile_photo: nextPhoto } : prev)
+      }
       setMessage({ type: 'success', text: 'Foto actualizada' })
+      closeCropModal()
       setPhotoModal(false)
       await loadPerfil()
       await refetchUser()
@@ -195,13 +295,14 @@ export default function PerfilPage() {
       setMessage({ type: 'error', text: 'Error al subir foto' })
     } finally {
       setUploading(false)
+      if (fileRef.current) fileRef.current.value = ''
     }
   }
 
   async function updatePref(value) {
     setSavingPref(true)
     try {
-      await api.post('/api/perfil/preferencias-notificaciones/', { preferencia: value })
+      await api.patch('/api/perfil/preferencias-notificaciones/', { preferencias_notificaciones: value })
       setPref(value)
       setMessage({ type: 'success', text: 'Preferencias actualizadas' })
     } catch {
@@ -239,8 +340,50 @@ export default function PerfilPage() {
     }
   }
 
+  function closeCropModal() {
+    setCropModalOpen(false)
+    setCrop({ x: 0, y: 0 })
+    setZoom(1)
+    setCroppedAreaPixels(null)
+    setCropImageName('perfil.png')
+    if (fileRef.current) fileRef.current.value = ''
+    setCropImageSrc((prev) => {
+      if (prev && prev.startsWith('blob:')) URL.revokeObjectURL(prev)
+      return ''
+    })
+  }
+
+  function openCropper(file) {
+    if (!file) return
+
+    const objectUrl = URL.createObjectURL(file)
+    setCropImageSrc((prev) => {
+      if (prev && prev.startsWith('blob:')) URL.revokeObjectURL(prev)
+      return objectUrl
+    })
+    setCropImageName(file.name || 'perfil.png')
+    setCrop({ x: 0, y: 0 })
+    setZoom(1)
+    setCroppedAreaPixels(null)
+    setCropModalOpen(true)
+  }
+
+  async function confirmCroppedUpload() {
+    if (!cropImageSrc || !croppedAreaPixels) return
+    try {
+      const croppedFile = await getCroppedAvatarFile(cropImageSrc, croppedAreaPixels, cropImageName)
+      if (!croppedFile) {
+        setMessage({ type: 'error', text: 'No se pudo recortar la imagen' })
+        return
+      }
+      await uploadPhoto(croppedFile)
+    } catch {
+      setMessage({ type: 'error', text: 'No se pudo procesar la imagen seleccionada' })
+    }
+  }
+
   const estadoActual = ESTADOS.find(e => e.value === perfil?.estado) || ESTADOS[0]
-  const avatarSrc = (idx) => `${BACKEND}/static/logos/default${idx + 1}.png`
+  const avatarSrc = (idx) => `/static/logos/default${idx + 1}.png`
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
@@ -248,11 +391,7 @@ export default function PerfilPage() {
     </div>
   )
 
-  const initials = `${perfil?.first_name?.[0] || ''}${perfil?.last_name?.[0] || ''}`.toUpperCase() || '?'
-  const rawPhoto = perfil?.profile_photo || perfil?.foto_url
-  const profilePic = rawPhoto
-    ? (rawPhoto.startsWith('http') ? rawPhoto : `${BACKEND}${rawPhoto}`)
-    : `https://ui-avatars.com/api/?name=${encodeURIComponent((perfil?.first_name || '') + '+' + (perfil?.last_name || ''))}&background=39ff14&color=050505&bold=true&size=256`
+  const profilePicSrc = profilePic && !profileImageError ? profilePic : fallbackProfilePic
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
@@ -267,10 +406,14 @@ export default function PerfilPage() {
         <div className="flex flex-col sm:flex-row items-center gap-6">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
-            <div
-              className="size-32 rounded-2xl bg-cover bg-center bg-no-repeat ring-2 ring-primary shadow-lg"
-              style={{ backgroundImage: `url("${profilePic}")` }}
-            />
+            <div className="size-32 rounded-full ring-2 ring-primary shadow-lg overflow-hidden bg-background-dark">
+              <img
+                src={profilePicSrc}
+                alt="Foto de perfil"
+                className="w-full h-full object-cover"
+                onError={() => setProfileImageError(true)}
+              />
+            </div>
             <button
               onClick={() => setPhotoModal(true)}
               className="absolute bottom-0 right-0 bg-primary text-black p-2.5 rounded-full hover:bg-primary-dark transition-colors shadow-lg"
@@ -524,11 +667,11 @@ export default function PerfilPage() {
                 >
                   <span className="material-symbols-outlined">chevron_left</span>
                 </button>
-                <div className="size-28 rounded-2xl overflow-hidden border-2 border-primary flex-shrink-0 bg-gray-800">
+                <div className="size-28 rounded-full overflow-hidden border-2 border-primary flex-shrink-0 bg-gray-800">
                   <img
                     src={avatarSrc(avatarIdx)}
                     alt="Avatar"
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-cover"
                     onError={e => { e.target.src = `https://ui-avatars.com/api/?name=A${avatarIdx + 1}&background=39ff14&color=050505&bold=true&size=256` }}
                   />
                 </div>
@@ -569,9 +712,69 @@ export default function PerfilPage() {
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={e => uploadPhoto(e.target.files[0])}
+                  onChange={e => openCropper(e.target.files[0])}
                 />
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {cropModalOpen && (
+        <div className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4">
+          <div className="bg-surface-dark rounded-2xl w-full max-w-xl border border-border-dark p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-white">Recorta tu foto</h3>
+              <button onClick={closeCropModal} className="text-gray-400 hover:text-white" disabled={uploading}>
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="relative h-80 w-full rounded-xl overflow-hidden bg-black">
+              <Cropper
+                image={cropImageSrc}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                cropShape="round"
+                showGrid={false}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={(_, pixels) => setCroppedAreaPixels(pixels)}
+              />
+            </div>
+
+            <div className="mt-4">
+              <label className="block text-sm text-gray-300 mb-2">Zoom</label>
+              <input
+                type="range"
+                min={1}
+                max={3}
+                step={0.01}
+                value={zoom}
+                onChange={(e) => setZoom(Number(e.target.value))}
+                className="w-full"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                La imagen se guardará en formato circular para que encaje mejor en tu perfil.
+              </p>
+            </div>
+
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={closeCropModal}
+                disabled={uploading}
+                className="flex-1 px-4 py-2.5 bg-surface-dark border border-border-dark text-white rounded-xl font-semibold hover:bg-white/5 transition-colors text-sm disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmCroppedUpload}
+                disabled={uploading || !cropImageSrc || !croppedAreaPixels}
+                className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary-dark text-black rounded-xl font-bold transition-colors text-sm disabled:opacity-60"
+              >
+                {uploading ? 'Subiendo...' : 'Aplicar recorte'}
+              </button>
             </div>
           </div>
         </div>

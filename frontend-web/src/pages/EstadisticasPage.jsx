@@ -1,12 +1,42 @@
-﻿import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/apiClient'
 import GlassPanel from '../components/ui/GlassPanel'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import TeamShield from '../components/ui/TeamShield'
 import HelpButton from '../components/ui/HelpButton'
+import ComparisonMetricsCards from '../components/comparison/ComparisonMetricsCards'
+import { COMPARISON_DOMAINS } from '../components/comparison/comparisonConfig'
+import {
+  ResponsiveContainer,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  Legend,
+  Tooltip as RechartsTooltip,
+} from 'recharts'
 
-const BACKEND = 'http://localhost:8000'
+const MAX_COMPARE_PLAYERS = 8
+const COMPARE_COLORS = ['#22d3ee', '#fb7185', '#a3e635', '#facc15', '#60a5fa', '#f97316', '#34d399', '#c084fc']
+
+const createEmptyComparisonSlot = () => ({
+  player: null,
+  temporada: '',
+  data: null,
+  radar: null,
+  availableSeasons: [],
+  search: '',
+  searchResults: [],
+  searchLoading: false,
+})
+
+const getCompareCardMinWidth = (count) => {
+  if (count >= 6) return 160
+  if (count >= 4) return 180
+  return 220
+}
 
 export default function EstadisticasPage() {
   const navigate = useNavigate()
@@ -25,13 +55,9 @@ export default function EstadisticasPage() {
   const [sortBy, setSortBy] = useState(null) // null, 'alfabetico', 'puntos_fantasy', 'goles', etc.
   const [sortOrder, setSortOrder] = useState('asc') // 'asc' o 'desc'
   const [compareModalOpen, setCompareModalOpen] = useState(false)
-  const [jugadoresComparacion, setJugadoresComparacion] = useState([null, null, null, null])
-  const [comparisonTemporales, setComparisonTemporales] = useState(['', '', '', ''])
-  const [comparisonDatas, setComparisonDatas] = useState([null, null, null, null])
-  const [comparisonAvailableSeasons, setComparisonAvailableSeasons] = useState([[], [], [], []])
+  const [compareSlots, setCompareSlots] = useState([createEmptyComparisonSlot(), createEmptyComparisonSlot()])
   const [comparisonLoading, setComparisonLoading] = useState(false)
   const [comparisonDomain, setComparisonDomain] = useState('general')
-  const [searchJugadores, setSearchJugadores] = useState(['', '', '', ''])
   const [topStats, setTopStats] = useState({})
   const [topViewMode, setTopViewMode] = useState('total') // 'total', 'per90', 'percentil'
   const [posicionPercentiles, setPosicionPercentiles] = useState('')
@@ -73,6 +99,7 @@ export default function EstadisticasPage() {
 
   // Ref para debounce de búsqueda
   const searchTimerRef = useRef(null)
+  const compareSearchTimerRef = useRef({})
 
   // Leer jornada actual del sidebar (solo actualiza jornadaActual, no la selección)
   useEffect(() => {
@@ -297,9 +324,7 @@ export default function EstadisticasPage() {
 
   const fetchComparacionData = async (jugadorId, temporadaStr) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/jugador/${jugadorId}/?temporada=${temporadaStr}`)
-      if (!response.ok) return null
-      const data = await response.json()
+      const { data } = await api.get(`/api/jugador/${jugadorId}/?temporada=${encodeURIComponent(temporadaStr)}`)
       return data
     } catch (e) {
       console.error('Error fetching comparison data:', e)
@@ -307,84 +332,257 @@ export default function EstadisticasPage() {
     }
   }
 
-  // Al seleccionar un jugador para comparar, carga sus temporadas disponibles
-  const fetchPlayerSeasons = async (jugadorId, slotIdx) => {
+  const fetchComparacionRadar = async (jugadorId, temporadaStr) => {
+    if (!temporadaStr || temporadaStr === 'carrera') return null
+
     try {
-      const response = await fetch(`http://localhost:8000/api/jugador/${jugadorId}/`)
-      if (!response.ok) return
-      const data = await response.json()
-      const seasons = data.temporadas_disponibles || []
-      setComparisonAvailableSeasons(prev => {
-        const n = [...prev]
-        n[slotIdx] = seasons
-        return n
-      })
+      const temporadaApi = temporadaStr.replace('/', '_')
+      const { data } = await api.get(`/api/radar/${jugadorId}/${temporadaApi}/`)
+      if (data?.status !== 'success') return null
+      return data.data
     } catch (e) {
-      console.error('Error fetching player seasons:', e)
+      console.error('Error fetching comparison radar:', e)
+      return null
     }
   }
 
-  const COMPARISON_DOMAINS = [
-    { key: 'general',  label: 'General' },
-    { key: 'ataque',   label: 'Ataque' },
-    { key: 'pase',     label: 'Pase' },
-    { key: 'regates',  label: 'Regates' },
-    { key: 'defensa',  label: 'Defensa' },
-  ]
+  const normalizeComparisonStats = (payload) => {
+    const s = payload?.stats || {}
+    const ataque = s.ataque || {}
+    const organizacion = s.organizacion || {}
+    const regates = s.regates || {}
+    const defensa = s.defensa || {}
+    const comportamiento = s.comportamiento || {}
 
-  const getStatsByDomain = (d, domain) => {
-    if (!d?.stats) return []
-    const s = d.stats
-    switch (domain) {
-      case 'general':  return [
-        { label: 'Partidos',  value: s.partidos || 0 },
-        { label: 'Minutos',   value: s.minutos || 0 },
-        { label: 'Goles',     value: s.goles || 0,     color: 'text-green-400' },
-        { label: 'Asistencias', value: s.asistencias || 0, color: 'text-blue-400' },
-        { label: 'Fantasy',   value: s.puntos_fantasy || 0, color: 'text-yellow-400' },
-      ]
-      case 'ataque': return [
-        { label: 'Goles',         value: s.ataque?.goles || 0,         color: 'text-green-400' },
-        { label: 'xG',            value: s.ataque?.xg || 0 },
-        { label: 'Tiros',         value: s.ataque?.tiros || 0 },
-        { label: 'Tiros Puerta',  value: s.ataque?.tiros_puerta || 0 },
-      ]
-      case 'pase': return [
-        { label: 'Asistencias',  value: s.asistencias || 0,                      color: 'text-blue-400' },
-        { label: 'xAG',          value: s.organizacion?.xag || 0 },
-        { label: 'Pases',        value: s.organizacion?.pases || 0 },
-        { label: 'Precisión %',  value: s.organizacion?.pases_accuracy || 0 },
-      ]
-      case 'regates': return [
-        { label: 'Regates ✓',    value: s.regates?.regates_completados || 0,    color: 'text-purple-400' },
-        { label: 'Regates ✗',    value: s.regates?.regates_fallidos || 0,       color: 'text-red-400' },
-        { label: 'Conducciones', value: s.regates?.conducciones || 0 },
-        { label: 'Cond. Prog.',  value: s.regates?.conducciones_progresivas || 0 },
-      ]
-      case 'defensa': return [
-        { label: 'Entradas',     value: s.defensa?.entradas || 0 },
-        { label: 'Despejes',     value: s.defensa?.despejes || 0 },
-        { label: 'Duelos',       value: s.defensa?.duelos_totales || 0 },
-        { label: 'D. Ganados',   value: s.defensa?.duelos_ganados || 0,          color: 'text-green-400' },
-        { label: 'D. Aéreos',    value: s.defensa?.duelos_aereos_totales || 0 },
-        { label: 'Amarillas',    value: s.comportamiento?.amarillas || 0,        color: 'text-yellow-400' },
-        { label: 'Rojas',        value: s.comportamiento?.rojas || 0,            color: 'text-red-500' },
-      ]
-      default: return []
+    const goles = Number(s.goles ?? ataque.goles ?? 0)
+    const xg = Number(s.xg ?? ataque.xg ?? 0)
+    const asistencias = Number(s.asistencias ?? 0)
+    const xag = Number(s.xag ?? organizacion.xag ?? 0)
+    const partidos = Number(s.partidos ?? 0)
+    const minutos = Number(s.minutos ?? 0)
+    const puntosPorPartido = Number(s.promedio_puntos ?? s.puntos_por_partido ?? 0)
+
+    return {
+      puntos_por_partido: Number(puntosPorPartido.toFixed(2)),
+      partidos,
+      minutos,
+      goles,
+      asistencias,
+      xg,
+      xag,
+      goles_vs_xg: Number((goles - xg).toFixed(2)),
+      asistencias_vs_xag: Number((asistencias - xag).toFixed(2)),
+      tiros: Number(ataque.tiros ?? 0),
+      tiros_puerta: Number(ataque.tiros_puerta ?? 0),
+      pases: Number(organizacion.pases ?? 0),
+      pases_accuracy: Number(organizacion.pases_accuracy ?? 0),
+      regates_completados: Number(regates.regates_completados ?? 0),
+      regates_fallidos: Number(regates.regates_fallidos ?? 0),
+      conducciones: Number(regates.conducciones ?? 0),
+      conducciones_progresivas: Number(regates.conducciones_progresivas ?? 0),
+      entradas: Number(defensa.entradas ?? 0),
+      despejes: Number(defensa.despejes ?? 0),
+      duelos_totales: Number(defensa.duelos_totales ?? 0),
+      duelos_ganados: Number(defensa.duelos_ganados ?? 0),
+      duelos_perdidos: Number(defensa.duelos_perdidos ?? 0),
+      duelos_aereos_totales: Number(defensa.duelos_aereos_totales ?? 0),
+      amarillas: Number(comportamiento.amarillas ?? 0),
+      rojas: Number(comportamiento.rojas ?? 0),
     }
   }
 
-  const toggleComparacion = (jugador) => {
-    setJugadoresComparacion(prev => {
-      const existe = prev.find(j => j.jugador_id === jugador.jugador_id)
-      if (existe) {
-        return prev.filter(j => j.jugador_id !== jugador.jugador_id)
-      } else if (prev.length < 4) {
-        return [...prev, jugador]
-      }
-      return prev
+  const updateCompareSlot = (slotIdx, patch) => {
+    setCompareSlots(prev => prev.map((slot, idx) => {
+      if (idx !== slotIdx) return slot
+      const patchObj = typeof patch === 'function' ? patch(slot) : patch
+      return { ...slot, ...patchObj }
+    }))
+  }
+
+  const resetComparison = () => {
+    setCompareSlots([createEmptyComparisonSlot(), createEmptyComparisonSlot()])
+    setComparisonDomain('general')
+    setComparisonLoading(false)
+  }
+
+  const addCompareSlot = () => {
+    setCompareSlots(prev => {
+      if (prev.length >= MAX_COMPARE_PLAYERS) return prev
+      return [...prev, createEmptyComparisonSlot()]
     })
   }
+
+  const removeCompareSlot = (slotIdx) => {
+    setCompareSlots(prev => {
+      if (prev.length <= 2) return prev
+      return prev.filter((_, idx) => idx !== slotIdx)
+    })
+  }
+
+  const handleCompareSearch = (slotIdx, query) => {
+    updateCompareSlot(slotIdx, { search: query })
+    clearTimeout(compareSearchTimerRef.current[slotIdx])
+
+    if (query.trim().length < 2) {
+      updateCompareSlot(slotIdx, { searchResults: [], searchLoading: false })
+      return
+    }
+
+    updateCompareSlot(slotIdx, { searchLoading: true })
+
+    compareSearchTimerRef.current[slotIdx] = setTimeout(async () => {
+      try {
+        const { data } = await api.get(`/api/buscar/?q=${encodeURIComponent(query.trim())}`)
+        const selectedIds = compareSlots
+          .map(slot => slot.player?.jugador_id)
+          .filter(Boolean)
+
+        const results = (data?.results || [])
+          .filter(item => item.type === 'jugador' && !selectedIds.includes(item.id))
+          .map(item => ({
+            jugador_id: item.id,
+            nombreCompleto: item.nombre,
+            posicion: item.posicion,
+          }))
+
+        updateCompareSlot(slotIdx, { searchResults: results, searchLoading: false })
+      } catch (error) {
+        updateCompareSlot(slotIdx, { searchResults: [], searchLoading: false })
+      }
+    }, 320)
+  }
+
+  const handleSelectComparePlayer = async (slotIdx, selectedPlayer) => {
+    const alreadySelected = compareSlots.some(
+      (slot, idx) => idx !== slotIdx && slot.player?.jugador_id === selectedPlayer.jugador_id
+    )
+    if (alreadySelected) return
+
+    updateCompareSlot(slotIdx, { searchLoading: true })
+
+    try {
+      const { data } = await api.get(`/api/jugador/${selectedPlayer.jugador_id}/`)
+      const seasons = data?.temporadas_disponibles || []
+      const defaultSeason = seasons[0]?.display || ''
+
+      updateCompareSlot(slotIdx, {
+        player: {
+          jugador_id: data?.jugador?.id || selectedPlayer.jugador_id,
+          nombre: data?.jugador?.nombre || selectedPlayer.nombreCompleto,
+          apellido: data?.jugador?.apellido || '',
+          equipo: data?.equipo_temporada?.equipo?.nombre || '',
+          equipo_escudo: data?.equipo_temporada?.equipo?.escudo || '',
+          posicion: data?.jugador?.posicion || selectedPlayer.posicion || '',
+        },
+        temporada: defaultSeason,
+        availableSeasons: seasons,
+        data: null,
+        radar: null,
+        search: '',
+        searchResults: [],
+        searchLoading: false,
+      })
+    } catch (error) {
+      updateCompareSlot(slotIdx, { searchLoading: false })
+    }
+  }
+
+  const clearComparePlayer = (slotIdx) => {
+    updateCompareSlot(slotIdx, createEmptyComparisonSlot())
+  }
+
+  const handleCompareSeasonChange = (slotIdx, temporadaValue) => {
+    updateCompareSlot(slotIdx, {
+      temporada: temporadaValue,
+      data: null,
+      radar: null,
+    })
+  }
+
+  const runComparison = async () => {
+    const readySlots = compareSlots.filter(slot => slot.player && slot.temporada)
+    if (readySlots.length < 2) return
+
+    setComparisonLoading(true)
+    try {
+      const updatedSlots = await Promise.all(
+        compareSlots.map(async (slot) => {
+          if (!slot.player || !slot.temporada) {
+            return { ...slot, data: null, radar: null }
+          }
+
+          const [comparisonData, radarData] = await Promise.all([
+            fetchComparacionData(slot.player.jugador_id, slot.temporada),
+            fetchComparacionRadar(slot.player.jugador_id, slot.temporada),
+          ])
+
+          return {
+            ...slot,
+            data: comparisonData,
+            radar: radarData,
+          }
+        })
+      )
+
+      setCompareSlots(updatedSlots)
+    } finally {
+      setComparisonLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      Object.values(compareSearchTimerRef.current).forEach(timerId => clearTimeout(timerId))
+    }
+  }, [])
+
+  const comparisonReadyCount = useMemo(
+    () => compareSlots.filter(slot => slot.player && slot.temporada).length,
+    [compareSlots]
+  )
+
+  const activeComparisonSlots = useMemo(
+    () => compareSlots.map((slot, idx) => ({ slot, idx })).filter(({ slot }) => slot.player && slot.data),
+    [compareSlots]
+  )
+
+  const activeRadarSlots = useMemo(
+    () => compareSlots.map((slot, idx) => ({ slot, idx })).filter(({ slot }) => slot.player && slot.radar),
+    [compareSlots]
+  )
+
+  const comparisonRadarData = useMemo(() => {
+    if (activeRadarSlots.length === 0) return []
+
+    const labels = activeRadarSlots[0]?.slot?.radar?.labels || []
+    return labels.map((label, radarIdx) => {
+      const row = { metric: label }
+      activeRadarSlots.forEach(({ slot, idx }) => {
+        row[`player_${idx}`] = slot.radar?.radar_values?.[radarIdx] ?? 0
+      })
+      return row
+    })
+  }, [activeRadarSlots])
+
+  const comparisonCardMinWidth = useMemo(
+    () => getCompareCardMinWidth(compareSlots.length),
+    [compareSlots.length]
+  )
+
+  const comparisonEntries = useMemo(
+    () => activeComparisonSlots.map(({ slot, idx }) => {
+      const playerName = `${slot.player?.nombre || ''} ${slot.player?.apellido || ''}`.trim()
+      const stats = normalizeComparisonStats(slot.data)
+      return {
+        id: `${slot.player?.jugador_id || idx}-${slot.temporada || 'temp'}`,
+        label: slot.temporada || 'Temporada',
+        subLabel: playerName,
+        minutes: stats.minutos,
+        stats,
+      }
+    }),
+    [activeComparisonSlots]
+  )
 
   const getFilteredEstadisticas = () => {
     return estadisticas.filter(jug => {
@@ -875,23 +1073,21 @@ export default function EstadisticasPage() {
         </div>
       )}
 
-      {/* Modal de Comparación - 4 Jugadores */}
+      {/* Modal de Comparación Dinámica */}
       {compareModalOpen && (
-        <div className="fixed inset-0 bg-black/80 z-[99999] flex items-center justify-center" onClick={() => setCompareModalOpen(false)}>
-          <div className="bg-surface-dark rounded-2xl max-w-6xl w-full mx-4 max-h-[92vh] overflow-y-auto glass-panel flex flex-col" onClick={e => e.stopPropagation()}>
-            {/* Header */}
-            <div className="sticky top-0 bg-surface-dark rounded-t-2xl flex justify-between items-center px-8 py-5 border-b border-border-dark z-10">
-              <h3 className="text-2xl font-black text-white uppercase tracking-wider">
-                Comparar <span className="text-primary">Jugadores</span>
-              </h3>
-              <button 
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center" onClick={() => setCompareModalOpen(false)}>
+          <div className="bg-surface-dark rounded-2xl p-8 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto glass-panel" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h3 className="text-2xl font-black text-white uppercase tracking-wider">
+                  Comparar <span className="text-primary">Jugadores</span>
+                </h3>
+                <p className="text-xs text-gray-400 mt-1">Radar superpuesto y comparación por dominio</p>
+              </div>
+              <button
                 onClick={() => {
                   setCompareModalOpen(false)
-                  setJugadoresComparacion([null, null, null, null])
-                  setComparisonTemporales(['', '', '', ''])
-                  setComparisonDatas([null, null, null, null])
-                  setComparisonAvailableSeasons([[], [], [], []])
-                  setSearchJugadores(['', '', '', ''])
+                  resetComparison()
                 }}
                 className="text-gray-400 hover:text-white transition-colors"
               >
@@ -899,80 +1095,83 @@ export default function EstadisticasPage() {
               </button>
             </div>
 
-            <div className="px-8 py-6 space-y-6">
-              {/* PASO 1: Selección de jugadores y temporadas */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {[0, 1, 2, 3].map(slotIdx => (
-                  <div key={slotIdx} className="border border-border-dark rounded-xl p-4 bg-white/5 flex flex-col gap-3">
-                    <h4 className="text-xs font-black text-gray-400 uppercase tracking-wider">Jugador {slotIdx + 1}</h4>
+            <div className="space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-gray-300">
+                  Jugadores listos para comparar: <span className="font-black text-white">{comparisonReadyCount}</span>
+                </p>
+                <button
+                  onClick={addCompareSlot}
+                  disabled={compareSlots.length >= MAX_COMPARE_PLAYERS}
+                  className="px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold transition-all flex items-center gap-2"
+                >
+                  <span className="material-symbols-outlined text-sm">person_add</span>
+                  Añadir jugador
+                </button>
+              </div>
 
-                    {!jugadoresComparacion[slotIdx] ? (
+              <div
+                className="grid gap-4"
+                style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${comparisonCardMinWidth}px, 1fr))` }}
+              >
+                {compareSlots.map((slot, slotIdx) => (
+                  <div key={`${slotIdx}-${slot.player?.jugador_id || 'empty'}`} className="border border-border-dark rounded-xl p-4 bg-white/5 flex flex-col gap-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="text-xs font-black text-gray-400 uppercase tracking-wider">Jugador {slotIdx + 1}</h4>
+                      {compareSlots.length > 2 && (
+                        <button
+                          onClick={() => removeCompareSlot(slotIdx)}
+                          className="text-xs text-red-300 hover:text-red-200"
+                        >
+                          Quitar
+                        </button>
+                      )}
+                    </div>
+
+                    {!slot.player ? (
                       <>
                         <input
                           type="text"
                           placeholder="Buscar jugador..."
-                          value={searchJugadores[slotIdx]}
-                          onChange={(e) => {
-                            const n = [...searchJugadores]
-                            n[slotIdx] = e.target.value
-                            setSearchJugadores(n)
-                          }}
+                          value={slot.search}
+                          onChange={(e) => handleCompareSearch(slotIdx, e.target.value)}
                           className="w-full px-3 py-2 bg-background-dark border border-border-dark text-white rounded-lg focus:outline-none focus:border-primary text-xs"
                         />
-                        <div className="max-h-48 overflow-y-auto border border-border-dark rounded-lg bg-black/30 divide-y divide-border-dark">
-                          {estadisticas
-                            .filter(j => {
-                              const fullName = (j.nombre + ' ' + j.apellido).toLowerCase()
-                              const alreadySelected = jugadoresComparacion.some(jug => jug?.jugador_id === j.jugador_id)
-                              return fullName.includes(searchJugadores[slotIdx].toLowerCase()) && !alreadySelected
-                            })
-                            .slice(0, 8)
-                            .map(jug => {
-                              const capturedJug = jug
-                              const capturedSlot = slotIdx
-                              return (
-                                <button
-                                  key={jug.jugador_id}
-                                  onClick={() => {
-                                    const n = [...jugadoresComparacion]
-                                    n[capturedSlot] = capturedJug
-                                    setJugadoresComparacion(n)
-                                    // Limpiar datos previos de este slot
-                                    setComparisonTemporales(prev => { const t = [...prev]; t[capturedSlot] = ''; return t })
-                                    setComparisonDatas(prev => { const d = [...prev]; d[capturedSlot] = null; return d })
-                                    fetchPlayerSeasons(capturedJug.jugador_id, capturedSlot)
-                                  }}
-                                  className="w-full text-left p-2 hover:bg-white/10 transition-colors flex items-center gap-2"
-                                >
-                                  {jug.equipo_escudo && (
-                                    <TeamShield escudo={jug.equipo_escudo} nombre={jug.equipo} className="w-5 h-5 flex-shrink-0" />
-                                  )}
-                                  <div className="min-w-0">
-                                    <p className="font-bold text-white text-xs truncate">{jug.nombre} {jug.apellido}</p>
-                                    <p className="text-xs text-gray-400 truncate">{jug.equipo}</p>
-                                  </div>
-                                </button>
-                              )
-                            })}
+
+                        <div className="max-h-44 overflow-y-auto border border-border-dark rounded-lg bg-black/30 divide-y divide-border-dark">
+                          {slot.searchLoading && (
+                            <p className="p-3 text-xs text-gray-400">Buscando jugadores...</p>
+                          )}
+
+                          {!slot.searchLoading && slot.search.trim().length >= 2 && slot.searchResults.length === 0 && (
+                            <p className="p-3 text-xs text-gray-500">Sin resultados</p>
+                          )}
+
+                          {!slot.searchLoading && slot.searchResults.map(result => (
+                            <button
+                              key={`${slotIdx}-${result.jugador_id}`}
+                              onClick={() => handleSelectComparePlayer(slotIdx, result)}
+                              className="w-full text-left p-2 hover:bg-white/10 transition-colors"
+                            >
+                              <p className="font-bold text-white text-xs truncate">{result.nombreCompleto}</p>
+                              <p className="text-xs text-gray-400">{result.posicion || 'Jugador'}</p>
+                            </button>
+                          ))}
                         </div>
                       </>
                     ) : (
                       <>
-                        <div className="bg-primary/20 border border-primary rounded-lg p-2">
-                          {jugadoresComparacion[slotIdx].equipo_escudo && (
-                            <TeamShield escudo={jugadoresComparacion[slotIdx].equipo_escudo} nombre={jugadoresComparacion[slotIdx].equipo} className="w-6 h-6 mb-1" />
+                        <div className="bg-primary/20 border border-primary rounded-lg p-3">
+                          {slot.player.equipo_escudo && (
+                            <TeamShield escudo={slot.player.equipo_escudo} nombre={slot.player.equipo} className="w-6 h-6 mb-2" />
                           )}
-                          <p className="font-bold text-white text-xs">{jugadoresComparacion[slotIdx].nombre} {jugadoresComparacion[slotIdx].apellido}</p>
-                          <p className="text-xs text-gray-400">{jugadoresComparacion[slotIdx].equipo}</p>
+                          <p className="font-bold text-white text-xs truncate">
+                            {slot.player.nombre} {slot.player.apellido}
+                          </p>
+                          <p className="text-xs text-gray-400 truncate">{slot.player.equipo}</p>
                           <button
-                            onClick={() => {
-                              const s = slotIdx
-                              setJugadoresComparacion(prev => { const n = [...prev]; n[s] = null; return n })
-                              setComparisonTemporales(prev => { const n = [...prev]; n[s] = ''; return n })
-                              setComparisonDatas(prev => { const n = [...prev]; n[s] = null; return n })
-                              setComparisonAvailableSeasons(prev => { const n = [...prev]; n[s] = []; return n })
-                            }}
-                            className="text-primary hover:text-white text-xs mt-1 font-bold"
+                            onClick={() => clearComparePlayer(slotIdx)}
+                            className="text-primary hover:text-white text-xs mt-2 font-bold"
                           >
                             Cambiar jugador
                           </button>
@@ -981,18 +1180,14 @@ export default function EstadisticasPage() {
                         <div>
                           <label className="block text-xs font-bold text-gray-300 mb-1">Temporada</label>
                           <select
-                            value={comparisonTemporales[slotIdx]}
-                            onChange={(e) => {
-                              const val = e.target.value
-                              const s = slotIdx
-                              setComparisonTemporales(prev => { const n = [...prev]; n[s] = val; return n })
-                            }}
+                            value={slot.temporada}
+                            onChange={(e) => handleCompareSeasonChange(slotIdx, e.target.value)}
                             className="w-full px-2 py-1 bg-black border border-border-dark/50 rounded-lg text-white focus:border-primary focus:outline-none text-xs"
                           >
                             <option value="">Elige temporada</option>
                             <option value="carrera">Últimas 3 temporadas</option>
-                            {comparisonAvailableSeasons[slotIdx].map(temp => (
-                              <option key={temp.nombre} value={temp.display}>{temp.display}</option>
+                            {slot.availableSeasons.map(temp => (
+                              <option key={`${slotIdx}-${temp.nombre}`} value={temp.display}>{temp.display}</option>
                             ))}
                           </select>
                         </div>
@@ -1002,115 +1197,82 @@ export default function EstadisticasPage() {
                 ))}
               </div>
 
-              {/* SELECTOR DE DOMINIO */}
-              <div className="flex gap-2 flex-wrap items-center pt-2">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2">Ver:</span>
-                {COMPARISON_DOMAINS.map(dom => (
-                  <button
-                    key={dom.key}
-                    onClick={() => setComparisonDomain(dom.key)}
-                    className={`px-4 py-1 rounded-lg font-bold text-sm transition-all ${
-                      comparisonDomain === dom.key
-                        ? 'bg-primary text-black'
-                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                    }`}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-300 mb-2">Dominio</label>
+                  <select
+                    value={comparisonDomain}
+                    onChange={(e) => setComparisonDomain(e.target.value)}
+                    className="w-full px-3 py-2 bg-black border border-border-dark/50 rounded-lg text-white focus:border-primary focus:outline-none"
                   >
-                    {dom.label}
+                    {COMPARISON_DOMAINS.map(dom => (
+                      <option key={dom.key} value={dom.key}>{dom.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-end">
+                  <button
+                    onClick={runComparison}
+                    disabled={comparisonLoading || comparisonReadyCount < 2}
+                    className="w-full px-4 py-3 bg-primary hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-colors uppercase"
+                  >
+                    {comparisonLoading ? 'Cargando...' : 'Ejecutar comparación'}
                   </button>
-                ))}
+                </div>
               </div>
 
-              {/* BOTÓN ÚNICO CARGAR */}
-              {jugadoresComparacion.some(j => j) && comparisonTemporales.some((t, i) => t && jugadoresComparacion[i]) && (
-                <button
-                  onClick={async () => {
-                    setComparisonLoading(true)
-                    // Capturar los valores actuales para evitar stale closures
-                    const jugadoresSnapshot = [...jugadoresComparacion]
-                    const temporalesSnapshot = [...comparisonTemporales]
-                    const promises = [0, 1, 2, 3].map(async (i) => {
-                      if (jugadoresSnapshot[i] && temporalesSnapshot[i]) {
-                        return fetchComparacionData(jugadoresSnapshot[i].jugador_id, temporalesSnapshot[i])
-                      }
-                      return null
-                    })
-                    const results = await Promise.all(promises)
-                    setComparisonDatas(results)
-                    setComparisonLoading(false)
-                  }}
-                  disabled={comparisonLoading}
-                  className="w-full px-6 py-3 bg-primary hover:bg-primary/80 disabled:opacity-50 text-white font-black rounded-xl transition-colors uppercase tracking-wider flex items-center justify-center gap-2"
-                >
-                  {comparisonLoading ? (
-                    <><span className="material-symbols-outlined animate-spin text-sm">refresh</span> Cargando...</>
-                  ) : (
-                    <><span className="material-symbols-outlined text-sm">compare_arrows</span> Cargar comparación</>
-                  )}
-                </button>
-              )}
-
-              {/* TABLA DE COMPARACIÓN */}
-              {comparisonDatas.some(d => d) && (() => {
-                const activeSlots = [0, 1, 2, 3].filter(i => comparisonDatas[i] && jugadoresComparacion[i])
-                if (activeSlots.length === 0) return null
-
-                const allStats = activeSlots.map(i => getStatsByDomain(comparisonDatas[i], comparisonDomain))
-                const statLabels = allStats[0]?.map(s => s.label) || []
-
-                return (
-                  <div className="rounded-xl border border-border-dark overflow-hidden">
-                    {/* Cabecera jugadores */}
-                    <div className={`grid border-b border-border-dark bg-surface-dark/60`} style={{ gridTemplateColumns: `180px repeat(${activeSlots.length}, 1fr)` }}>
-                      <div className="px-4 py-3 text-xs font-bold text-gray-400 uppercase">Estadística</div>
-                      {activeSlots.map(i => (
-                        <div key={i} className="px-4 py-3 text-center">
-                          {jugadoresComparacion[i].equipo_escudo && (
-                            <TeamShield escudo={jugadoresComparacion[i].equipo_escudo} nombre={jugadoresComparacion[i].equipo} className="w-5 h-5 inline-block mr-1" />
-                          )}
-                          <p className="text-xs font-black text-white truncate">{jugadoresComparacion[i].nombre} {jugadoresComparacion[i].apellido}</p>
-                          <p className="text-xs text-gray-400">{comparisonTemporales[i]}</p>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Filas de stats */}
-                    {statLabels.map((label, rowIdx) => {
-                      const values = activeSlots.map(i => allStats[activeSlots.indexOf(i)][rowIdx]?.value ?? 0)
-                      const maxVal = Math.max(...values)
-                      return (
-                        <div
-                          key={label}
-                          className={`grid border-b border-border-dark/50 ${ rowIdx % 2 === 0 ? 'bg-white/3' : 'bg-transparent'}`}
-                          style={{ gridTemplateColumns: `180px repeat(${activeSlots.length}, 1fr)` }}
-                        >
-                          <div className="px-4 py-3 text-xs text-gray-400 font-bold flex items-center">{label}</div>
-                          {activeSlots.map((i, colIdx) => {
-                            const stat = allStats[colIdx][rowIdx]
-                            const isTop = stat?.value === maxVal && maxVal > 0
-                            return (
-                              <div key={i} className={`px-4 py-3 text-center font-bold text-sm ${ isTop ? 'bg-primary/10' : '' }`}>
-                                <span className={stat?.color || (isTop ? 'text-primary' : 'text-white')}>
-                                  {stat?.value ?? 0}
-                                </span>
-                                {isTop && values.filter(v => v === maxVal).length === 1 && (
-                                  <span className="ml-1 text-xs text-primary">↑</span>
-                                )}
-                              </div>
-                            )
-                          })}
-                        </div>
-                      )
-                    })}
+              {activeRadarSlots.length >= 2 ? (
+                <div className="rounded-xl border border-border-dark bg-black/20 p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <h4 className="text-sm font-black uppercase text-white">Radar superpuesto</h4>
+                    <p className="text-xs text-gray-400">Perfil táctico (percentiles 0-100)</p>
                   </div>
-                )
-              })()}
 
-              {!comparisonDatas.some(d => d) && (
-                <div className="text-center py-10 text-gray-400">
-                  <span className="material-symbols-outlined text-4xl block mb-3 opacity-30">compare_arrows</span>
-                  <p>Selecciona jugadores, elige temporadas y pulsa "Cargar comparación"</p>
+                  <div className="h-[360px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadarChart data={comparisonRadarData}>
+                        <PolarGrid stroke="rgba(255,255,255,0.15)" />
+                        <PolarAngleAxis dataKey="metric" tick={{ fill: '#d1d5db', fontSize: 11 }} />
+                        <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#9ca3af', fontSize: 10 }} />
+                        {activeRadarSlots.map(({ slot, idx }) => {
+                          const color = COMPARE_COLORS[idx % COMPARE_COLORS.length]
+                          return (
+                            <Radar
+                              key={`radar-${slot.player.jugador_id}-${idx}`}
+                              name={`${slot.player.nombre} ${slot.player.apellido}`.trim()}
+                              dataKey={`player_${idx}`}
+                              stroke={color}
+                              fill={color}
+                              fillOpacity={0.18}
+                              strokeWidth={2}
+                            />
+                          )
+                        })}
+                        <RechartsTooltip
+                          formatter={(value) => `${Number(value || 0).toFixed(1)}%`}
+                          contentStyle={{
+                            backgroundColor: '#111827',
+                            border: '1px solid #374151',
+                            color: '#f9fafb',
+                          }}
+                        />
+                        <Legend wrapperStyle={{ color: '#d1d5db', fontSize: 12 }} />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-border-dark bg-black/20 p-4 text-center text-sm text-gray-400">
+                  El radar comparativo aparece cuando cargas al menos 2 jugadores con temporada.
                 </div>
               )}
+
+              <ComparisonMetricsCards
+                entries={comparisonEntries}
+                domain={comparisonDomain}
+                emptyMessage={'Selecciona al menos 2 jugadores y pulsa "Ejecutar comparacion"'}
+              />
             </div>
           </div>
         </div>

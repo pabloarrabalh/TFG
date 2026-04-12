@@ -4,12 +4,24 @@ import { useAuth } from '../../context/AuthContext'
 import apiClient from '../../services/apiClient'
 import NotificacionesBell from '../ui/NotificacionesBell'
 
-const BACKEND = 'http://localhost:8000'
+const normalizePhotoUrl = (photo) => {
+  if (!photo) return null
+  const value = `${photo}`.trim()
+  if (!value) return null
+  if (value.startsWith('http://') || value.startsWith('https://')) return value
+  const normalizedPath = value.startsWith('/') ? value : `/${value}`
+  try {
+    return new URL(normalizedPath, apiClient.defaults.baseURL).toString()
+  } catch {
+    return normalizedPath
+  }
+}
 
 export default function Header({ onToggleSidebar }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [avatarError, setAvatarError] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [showResults, setShowResults] = useState(false)
@@ -46,9 +58,11 @@ export default function Header({ onToggleSidebar }) {
     navigate('/login')
   }
 
-  const profilePhotoUrl = user?.profile_photo
-    ? (user.profile_photo.startsWith('http') ? user.profile_photo : `${BACKEND}${user.profile_photo}`)
-    : null
+  const profilePhotoUrl = normalizePhotoUrl(user?.profile_photo)
+
+  useEffect(() => {
+    setAvatarError(false)
+  }, [profilePhotoUrl])
 
   return (
     <header className="sticky top-0 z-[100002] flex items-center justify-between h-16 px-6 bg-surface-dark/80 backdrop-blur-md border-b border-border-dark shrink-0">
@@ -110,8 +124,13 @@ export default function Header({ onToggleSidebar }) {
             onClick={() => setDropdownOpen((o) => !o)}
             className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors"
           >
-            {profilePhotoUrl ? (
-              <img src={profilePhotoUrl} alt="avatar" className="w-8 h-8 rounded-full object-cover border border-border-dark" />
+            {profilePhotoUrl && !avatarError ? (
+              <img
+                src={profilePhotoUrl}
+                alt="avatar"
+                className="w-8 h-8 rounded-full object-cover border border-border-dark"
+                onError={() => setAvatarError(true)}
+              />
             ) : (
               <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
                 <span className="text-primary text-xs font-bold">{(user.first_name || user.username || '?')[0].toUpperCase()}</span>

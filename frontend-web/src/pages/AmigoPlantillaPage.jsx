@@ -6,6 +6,19 @@ import CampoPlantilla from '../components/campo/CampoPlantilla'
 
 const BACKEND = 'http://localhost:8000'
 
+const normalizePhotoUrl = (photo) => {
+  if (!photo) return null
+  const value = `${photo}`.trim()
+  if (!value) return null
+  if (value.startsWith('http://') || value.startsWith('https://')) return value
+  const normalizedPath = value.startsWith('/') ? value : `/${value}`
+  try {
+    return new URL(normalizedPath, BACKEND).toString()
+  } catch {
+    return normalizedPath
+  }
+}
+
 const FORMACIONES = {
   '4-3-3': { Portero: 1, Defensa: 4, Centrocampista: 3, Delantero: 3 },
   '4-4-2': { Portero: 1, Defensa: 4, Centrocampista: 4, Delantero: 2 },
@@ -83,11 +96,16 @@ export default function AmigoPlantillaPage() {
   const [detLoadingPred, setDetLoadingPred] = useState(false)
   const [detPrediccion, setDetPrediccion] = useState(null)
   const [detFeaturesImpacto, setDetFeaturesImpacto] = useState([])
+  const [friendAvatarError, setFriendAvatarError] = useState(false)
   const fetchingRef = useRef(new Set())
 
   useEffect(() => {
     loadData()
   }, [userId])
+
+  useEffect(() => {
+    setFriendAvatarError(false)
+  }, [amigoInfo?.profile_photo])
 
   async function loadData() {
     setLoading(true)
@@ -246,14 +264,15 @@ export default function AmigoPlantillaPage() {
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
         <div className="flex items-center gap-3">
-          {amigoInfo?.profile_photo ? (
+          {normalizePhotoUrl(amigoInfo?.profile_photo) && !friendAvatarError ? (
             <img 
-              src={amigoInfo.profile_photo.startsWith('http') ? amigoInfo.profile_photo : `${BACKEND}${amigoInfo.profile_photo}`}
+              src={normalizePhotoUrl(amigoInfo.profile_photo)}
               alt=""
-              className="w-10 h-10 rounded-xl object-cover border border-border-dark"
+              className="w-10 h-10 rounded-full object-cover border border-border-dark"
+              onError={() => setFriendAvatarError(true)}
             />
           ) : (
-            <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/40 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
               <span className="text-primary font-bold">{(amigoInfo?.nombre || amigoInfo?.username || '?')[0].toUpperCase()}</span>
             </div>
           )}

@@ -10,6 +10,10 @@ Endpoints:
 """
 import logging
 import os
+import re
+import time
+import uuid
+from pathlib import Path
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -32,6 +36,53 @@ _SHIELD_MAP = {
     'Valencia': 'valencia.png',
     'Sevilla': 'sevilla.png',
 }
+
+
+def _build_unique_name(prefix: str, source_name: str) -> str:
+    ext = Path(source_name or '').suffix.lower() or '.png'
+    return f'{prefix}_{uuid.uuid4().hex}{ext}'
+
+
+def _cache_busted_url(file_field) -> str | None:
+    if not file_field:
+        return None
+    return f"{file_field.url}?v={int(time.time())}"
+
+
+def _store_user_upload_copy(file_bytes: bytes, original_name: str) -> None:
+    """Guarda una copia física de las subidas del usuario en frontend-web/userprofilefotos."""
+    target_dir = os.path.join(settings.BASE_DIR, 'frontend-web', 'userprofilefotos')
+    os.makedirs(target_dir, exist_ok=True)
+    filename = _build_unique_name('upload', original_name)
+    with open(os.path.join(target_dir, filename), 'wb') as f:
+        f.write(file_bytes)
+
+
+def _resolve_default_avatar_path(raw_avatar: str) -> Path | None:
+    avatar = (raw_avatar or '').strip()
+    if not avatar:
+        return None
+
+    avatar = avatar[:-4] if avatar.lower().endswith('.png') else avatar
+    if not re.fullmatch(r'[A-Za-z0-9_-]+', avatar):
+        return None
+
+    static_root = Path(settings.BASE_DIR) / 'static'
+    direct_candidates = [
+        static_root / 'logos' / f'{avatar}.png',
+        static_root / 'logos' / f'{avatar.lower()}.png',
+        static_root / 'escudos' / f'{avatar}.png',
+        static_root / 'escudos' / f'{avatar.lower()}.png',
+    ]
+    for candidate in direct_candidates:
+        if candidate.exists():
+            return candidate
+
+    for folder in ('logos', 'escudos'):
+        for candidate in (static_root / folder).glob('*.png'):
+            if candidate.stem.lower() == avatar.lower():
+                return candidate
+    return None
 
 
 # ── 1. GET PERFIL ─────────────────────────────────────────────────────────────
@@ -58,7 +109,7 @@ class PerfilView(APIView):
             'nickname': profile.nickname,
             'estado': profile.estado,
             'preferencias_notificaciones': profile.preferencias_notificaciones,
-            'foto_url': profile.foto.url if profile.foto else None,
+            'foto_url': _cache_busted_url(profile.foto),
             'equipos_favoritos': [
                 {
                     'id': f.equipo.id,
@@ -138,9 +189,11 @@ class UploadPhotoView(APIView):
 
     def post(self, request):
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        shield_team = request.data.get('shield_team')
+        default_avatar = request.data.get('default_avatar')
+        uploaded_photo = request.FILES.get('foto')
 
-        if request.POST.get('shield_team'):
-            shield_team = request.POST['shield_team']
+        if shield_team:
             filename = _SHIELD_MAP.get(shield_team)
             if not filename:
                 return Response(
@@ -155,39 +208,45 @@ class UploadPhotoView(APIView):
                 )
             try:
                 with open(path, 'rb') as f:
+                    file_bytes = f.read()
+                    generated_name = _build_unique_name(
+                        f'shield_{shield_team.lower().replace(" ", "_")}',
+                        filename,
+                    )
                     profile.foto.save(
-                        f'shield_{shield_team.lower().replace(" ", "_")}.png',
-                        ContentFile(f.read()),
+                        generated_name,
+                        ContentFile(file_bytes),
                         save=True,
                     )
-                return Response({'status': 'success', 'photo_url': profile.foto.url})
+                return Response({'status': 'success', 'photo_url': _cache_busted_url(profile.foto)})
             except Exception as exc:
                 logger.error(f"Error guardando escudo: {exc}")
                 return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
-        elif request.FILES.get('foto'):
+        elif uploaded_photo:
             try:
-                profile.foto = request.FILES['foto']
-                profile.save()
-                return Response({'status': 'success', 'photo_url': profile.foto.url})
+                file_bytes = uploaded_photo.read()
+                generated_name = _build_unique_name('user_photo', uploaded_photo.name)
+                profile.foto.save(generated_name, ContentFile(file_bytes), save=True)
+                _store_user_upload_copy(file_bytes, uploaded_photo.name)
+                return Response({'status': 'success', 'photo_url': _cache_busted_url(profile.foto)})
             except Exception as exc:
                 logger.error(f"Error guardando foto: {exc}")
                 return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
-        elif request.POST.get('default_avatar'):
-            avatar = request.POST['default_avatar']
-            path = os.path.join(settings.BASE_DIR, 'static', 'logos', f'{avatar}.png')
-            if not os.path.exists(path):
-                path = os.path.join(settings.BASE_DIR, 'static', 'escudos', f'{avatar}.png')
-            if not os.path.exists(path):
+        elif default_avatar:
+            avatar_path = _resolve_default_avatar_path(default_avatar)
+            if not avatar_path:
                 return Response(
-                    {'error': 'Archivo no encontrado'},
+                    {'error': 'Avatar predeterminado no encontrado'},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             try:
-                with open(path, 'rb') as f:
-                    profile.foto.save(f'{avatar}.png', ContentFile(f.read()), save=True)
-                return Response({'status': 'success', 'photo_url': profile.foto.url})
+                with open(avatar_path, 'rb') as f:
+                    file_bytes = f.read()
+                    generated_name = _build_unique_name(avatar_path.stem, avatar_path.name)
+                    profile.foto.save(generated_name, ContentFile(file_bytes), save=True)
+                return Response({'status': 'success', 'photo_url': _cache_busted_url(profile.foto)})
             except Exception as exc:
                 logger.error(f"Error guardando avatar: {exc}")
                 return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)

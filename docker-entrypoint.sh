@@ -95,9 +95,9 @@ if [ "$NEEDS_INIT" = "true" ]; then
     python manage.py generar_medias_historicas --workers 16 --verbosity=0 2>&1 || true
     echo "  Tiempo medias: $(($(date +%s) - _T))s"
 
-    echo "[STEP 4/5] Generando predicciones ML para jugadores activos (60+ min, jornadas 1-38)..."
+    echo "[STEP 4/5] Generando predicciones ML para TODOS los jugadores, TODAS las jornadas (igual a Supabase)..."
     _T=$(date +%s)
-    python manage.py generar_predicciones --all-jornadas --init-active-only --workers 32 --batch 300 --force --verbosity=0 2>&1 || true
+    python manage.py generar_predicciones --all-jornadas --sin-filtro-minutos --workers 32 --batch 300 --force --verbosity=0 2>&1 || true
     echo "  Tiempo predicciones: $(($(date +%s) - _T))s"
 
     echo "[STEP 5/5] Indexando en OpenSearch..."
@@ -139,10 +139,10 @@ except Exception:
 fi
 
 # ── 4. Lanzar background worker de predicciones pendientes ────────────────────
-echo "[BACKGROUND] Iniciando generador de predicciones en background..."
-python manage.py generar_predicciones_background --batch 50 --wait 2 --tempo 25_26 --verbosity=0 2>&1 &
-BG_PID=$!
-echo "  PID background: $BG_PID"
+# echo "[BACKGROUND] Iniciando generador de predicciones en background..."
+# python manage.py generar_predicciones_background --batch 50 --wait 2 --tempo 25_26 --verbosity=0 2>&1 &
+# BG_PID=$!
+# echo "  PID background: $BG_PID"
 
 # ── 5. Arrancar servidor Django (ASGI) ────────────────────────────────────────
 echo "[LAUNCH] Iniciando Daphne en 0.0.0.0:8000..."

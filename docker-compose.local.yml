@@ -70,7 +70,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.local
     environment:
       DB_HOST: db
       DB_PORT: "5432"
@@ -84,6 +84,7 @@ services:
       - ./static:/app/static:ro
       - ./data:/app/data:ro
       - ./csv:/app/csv:ro
+      - ./frontend-web/userprofilefotos:/app/frontend-web/userprofilefotos
     ports:
       - "8000:8000"
     depends_on:

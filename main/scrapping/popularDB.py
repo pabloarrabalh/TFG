@@ -35,6 +35,39 @@ logging.basicConfig(
 _log.info("Django setup completado correctamente")
 sys.stdout.flush()
 
+# ─── Importar funciones a nivel de módulo (para que el comando cargar_datos_iniciales las pueda importar)
+from main.scrapping.fbref import scrappear_calendario_para_bd
+from main.scrapping.populardb.fases_calendario import (
+    fase_2g_cargar_goles_desde_calendario,
+    fase_3_cargar_calendario,
+)
+from main.scrapping.populardb.fases_complementarias import (
+    fase_2_cargar_roles,
+    fase_2b_cargar_goles,
+    fase_2c_cargar_clasificacion,
+    fase_2d_cargar_rendimiento,
+    fase_2e_poblar_equipo_jugador_temporada,
+    fase_2f_completar_estadios,
+)
+from main.scrapping.populardb.fases_partidos import (
+    actualizar_fechas_jornadas,
+    fase_0_scrapear_plantillas_y_estadios,
+    fase_0a_crear_todas_las_jornadas,
+    fase_1_cargar_partidos_y_estadisticas,
+    procesar_csv_partido,
+)
+from main.scrapping.populardb.fases_percentiles import fase_4_precalcular_percentiles
+from main.scrapping.populardb.helpers import (
+    _puntos_fantasy_sin_outlier,
+    obtener_o_crear_equipo,
+    obtener_o_crear_equipo_jugador_temporada,
+    obtener_o_crear_equipo_temporada,
+    obtener_o_crear_jornada,
+    obtener_o_crear_jugador,
+    obtener_o_crear_partido,
+    obtener_o_crear_temporada,
+)
+
 
 def main():
     """Función principal: ejecuta todas las fases."""

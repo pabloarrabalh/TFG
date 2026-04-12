@@ -82,8 +82,8 @@ export const renombrarPlantilla = (id, nombre) =>
 
 // ── Perfil ───────────────────────────────────────────────────
 export const fetchPerfil = () => apiClient.get('/api/perfil/')
-export const updatePerfil = (data) => apiClient.post('/api/perfil/update/', data)
-export const updateStatus = (status) => apiClient.post('/api/perfil/status/', { estado: status })
+export const updatePerfil = (data) => apiClient.patch('/api/perfil/update/', data)
+export const updateStatus = (status) => apiClient.patch('/api/perfil/status/', { estado: status })
 export const uploadProfilePhoto = (formData) =>
   apiClient.post('/api/perfil/foto/', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },

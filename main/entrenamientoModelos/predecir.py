@@ -169,6 +169,65 @@ def crear_features_temporales_serie(series, vc=3, vl=5, ve=7):
     return features
 
 
+def _valor_impacto(feature_impact):
+    """Obtiene el impacto numerico en puntos para una feature de explicabilidad."""
+    if not isinstance(feature_impact, dict):
+        return 0.0
+    raw_value = feature_impact.get('impacto_pts', feature_impact.get('impacto', 0.0))
+    try:
+        return float(raw_value)
+    except Exception:
+        return 0.0
+
+
+def seleccionar_features_balanceadas(impacts, max_por_signo=6, max_total=12):
+    """
+    Selecciona explicaciones priorizando equilibrio positivo/negativo.
+    Mantiene el orden final por impacto absoluto para conservar interpretabilidad.
+    """
+    if not isinstance(impacts, list):
+        return []
+
+    positivos, negativos, neutros = [], [], []
+    for item in impacts:
+        if not isinstance(item, dict):
+            continue
+        value = _valor_impacto(item)
+        enriched = dict(item)
+        enriched.setdefault('impacto_pts', value)
+        enriched.setdefault('impacto', value)
+
+        if value > 0:
+            positivos.append(enriched)
+        elif value < 0:
+            negativos.append(enriched)
+        else:
+            neutros.append(enriched)
+
+    positivos.sort(key=lambda x: abs(_valor_impacto(x)), reverse=True)
+    negativos.sort(key=lambda x: abs(_valor_impacto(x)), reverse=True)
+    neutros.sort(key=lambda x: abs(_valor_impacto(x)), reverse=True)
+
+    seleccion = positivos[:max_por_signo] + negativos[:max_por_signo]
+
+    def _ya_esta(candidato):
+        c_name = candidato.get('feature')
+        c_impact = _valor_impacto(candidato)
+        for elem in seleccion:
+            if elem.get('feature') == c_name and _valor_impacto(elem) == c_impact:
+                return True
+        return False
+
+    for item in positivos + negativos + neutros:
+        if len(seleccion) >= max_total:
+            break
+        if not _ya_esta(item):
+            seleccion.append(item)
+
+    seleccion.sort(key=lambda x: abs(_valor_impacto(x)), reverse=True)
+    return seleccion[:max_total]
+
+
 def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=False, modelo_tipo=None):
     """
     Pipeline común para DF, MC, DT:
@@ -178,11 +237,6 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
     4. Genera explicaciones SHAP
     
     Args:
-    # Lazy import para evitar cargar SHAP durante Django setup
-    from explicaciones import (
-        obtener_explicacion, es_valor_alto, generar_explicaciones_shap,
-        formatear_explicaciones_texto
-    )
         modelo_tipo: str - 'RF', 'Ridge', 'ElasticNet', 'Baseline' (MC solo), None (usa default)
     """
     _django_setup()
@@ -191,6 +245,9 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
         from django.db.models import Avg
     except Exception as e:
         return {'error': f'Django no disponible: {e}', 'jugador_id': jugador_id, 'prediccion': None}
+
+    # Lazy import para evitar cargar SHAP durante Django setup.
+    from explicaciones import generar_explicaciones_shap, formatear_explicaciones_texto
 
     # Si es Baseline, calcular media y retornar (para TODAS las posiciones)
     if modelo_tipo and str(modelo_tipo).upper() == 'BASELINE':
@@ -221,10 +278,36 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
             jornada_actual = int(jornada_actual)
             
             stats_hist = stats_qs.filter(partido__jornada__numero_jornada__lt=jornada_actual)
+            usando_historial_global = False
             if not stats_hist.exists():
-                return {'status': 'success', 'jugador_id': jugador_id, 'posicion': posicion_code, 'prediccion': None, 'explicacion_texto': 'Sin datos anteriores a esta jornada', 'jornada': jornada_actual, 'modelo': 'Baseline (Media)', 'features_impacto': []}
+                # Para jornadas tempranas (p.ej. J1..J5), usar media histórica global disponible
+                # en lugar de devolver vacío.
+                stats_hist = stats_qs
+                usando_historial_global = True
+
+            if not stats_hist.exists():
+                return {
+                    'status': 'success',
+                    'jugador_id': jugador_id,
+                    'posicion': posicion_code,
+                    'prediccion': None,
+                    'explicacion_texto': 'Sin datos históricos',
+                    'jornada': jornada_actual,
+                    'modelo': 'Baseline (Media)',
+                    'features_impacto': []
+                }
             
             media_pts = float(stats_hist.aggregate(media=Avg('puntos_fantasy'))['media'] or 0.0)
+            num_partidos_base = stats_hist.count()
+
+            if usando_historial_global:
+                explicacion_media = (
+                    f'Media histórica global de {media_pts:.2f} pts basada en {num_partidos_base} partidos'
+                )
+            else:
+                explicacion_media = (
+                    f'Media histórica de {media_pts:.2f} pts basada en {num_partidos_base} partidos anteriores'
+                )
             
             puntos_reales = None
             try:
@@ -244,7 +327,7 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
                 'jornada': jornada_actual,
                 'modelo': 'Baseline (Media)',
                 'features_impacto': [],
-                'explicacion_texto': f'Media histórica de {media_pts:.2f} pts basada en {stats_hist.count()} partidos anteriores',
+                'explicacion_texto': explicacion_media,
                 'error': None,
             }
         except Exception as e:
@@ -342,7 +425,7 @@ def _predecir_desde_db(jugador_id, posicion_code, jornada_actual=None, verbose=F
             'puntos_reales_texto': f"{round(float(puntos_reales), 2)}" if puntos_reales is not None else "Aún no jugado",
             'jornada': jornada_actual,
             'modelo': nombre_modelo_legible,
-            'features_impacto': impacts[:7],
+            'features_impacto': seleccionar_features_balanceadas(impacts),
             'explicacion_texto': explicacion_texto,
             'error': None,
         }
@@ -778,7 +861,7 @@ def _predecir_portero(jugador_id, jornada_actual=None, verbose=False, modelo_tip
             'puntos_reales_texto': f"{round(puntos_reales, 2)}" if puntos_reales is not None else "Aún no jugado",
             'jornada': jornada_actual,
             'modelo': nombre_modelo_pt,
-            'features_impacto': impacts[:7],
+            'features_impacto': seleccionar_features_balanceadas(impacts),
             'explicacion_texto': explicacion_texto,
             'error': None,
         }

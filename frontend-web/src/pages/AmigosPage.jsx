@@ -22,15 +22,41 @@ const FILTROS = [
   { key: 'dnd',    label: 'No molestar' },
 ]
 
+const AVATAR_SIZE_CLASS = {
+  8: 'w-8 h-8',
+  9: 'w-9 h-9',
+  10: 'w-10 h-10',
+}
+
+const normalizePhotoUrl = (photo) => {
+  if (!photo) return null
+  const value = `${photo}`.trim()
+  if (!value) return null
+  if (value.startsWith('http://') || value.startsWith('https://')) return value
+  const normalizedPath = value.startsWith('/') ? value : `/${value}`
+  try {
+    return new URL(normalizedPath, api.defaults.baseURL).toString()
+  } catch {
+    return normalizedPath
+  }
+}
+
 function Avatar({ name, photo, size = 10 }) {
-  if (photo) {
-    const src = photo.startsWith('http') ? photo : `http://localhost:8000${photo}`
+  const [imageError, setImageError] = useState(false)
+  const src = normalizePhotoUrl(photo)
+  const sizeClass = AVATAR_SIZE_CLASS[size] || AVATAR_SIZE_CLASS[10]
+
+  useEffect(() => {
+    setImageError(false)
+  }, [src])
+
+  if (src && !imageError) {
     return (
       <img
         src={src}
         alt={name}
-        className={`size-${size} rounded-xl object-cover`}
-        onError={e => { e.target.style.display = 'none' }}
+        className={`${sizeClass} rounded-full object-cover border border-border-dark flex-shrink-0`}
+        onError={() => setImageError(true)}
       />
     )
   }
@@ -44,7 +70,7 @@ function Avatar({ name, photo, size = 10 }) {
   ]
   const color = colors[(name?.charCodeAt(0) || 0) % colors.length]
   return (
-    <div className={`size-${size} bg-gradient-to-br ${color} rounded-xl flex items-center justify-center flex-shrink-0`}>
+    <div className={`${sizeClass} bg-gradient-to-br ${color} rounded-full border border-border-dark flex items-center justify-center flex-shrink-0`}>
       <span className="text-sm font-bold text-white">{initials}</span>
     </div>
   )
