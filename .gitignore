@@ -22,8 +22,8 @@ logs/
 # Test outputs
 scripts/test_output.txt
 
-opensearch-3.5.0/
-opensearch-3.5.0/*
+*search-3.5.0/
+*search-3.5.0/*
 
 # SonarQube files — KEEP OUT OF REPO
 sonar-scanner-*/

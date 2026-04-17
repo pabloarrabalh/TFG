@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from ..models import *
-from ..opensearch_docs import OPENSEARCH_AVAILABLE, opensearch_client
+from ..meilisearch_docs import MEILISEARCH_AVAILABLE, meilisearch_client
 
 logger = logging.getLogger(__name__)
 
@@ -133,7 +133,7 @@ class RadarJugadorView(APIView):
 class BuscarView(APIView):
     """GET /api/buscar/?q=QUERY
 
-    Full-text search over players and teams using OpenSearch.
+    Full-text search over players and teams using Meilisearch.
     Requires at least 2 characters. Returns up to 5 combined results.
     """
     permission_classes = [AllowAny]
@@ -146,11 +146,11 @@ class BuscarView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if not OPENSEARCH_AVAILABLE or not opensearch_client:
+        if not MEILISEARCH_AVAILABLE or not meilisearch_client:
             return Response(
                 {
                     'status': 'error',
-                    'message': 'OpenSearch no está disponible. Asegúrate de que esté corriendo en localhost:9200 y reinicia el servidor.',
+                    'message': 'Meilisearch no está disponible. Asegúrate de que esté corriendo en localhost:7700 y reinicia el servidor.',
                     'results': [],
                 },
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -176,7 +176,7 @@ class BuscarView(APIView):
                 },
                 'size': 10,
             }
-            response = opensearch_client.search(index='jugadores', body=search_body_jugador)
+            response = meilisearch_client.search(index='jugadores', body=search_body_jugador)
             for hit in response['hits']['hits']:
                 src = hit['_source']
                 try:
@@ -221,7 +221,7 @@ class BuscarView(APIView):
                 },
                 'size': 10,
             }
-            response = opensearch_client.search(index='equipos', body=search_body_equipo)
+            response = meilisearch_client.search(index='equipos', body=search_body_equipo)
             for hit in response['hits']['hits']:
                 src = hit['_source']
                 resultados.append({
@@ -232,7 +232,7 @@ class BuscarView(APIView):
                 })
 
         except Exception as exc:
-            logger.error(f"Error en búsqueda OpenSearch: {exc}", exc_info=True)
+            logger.error(f"Error en búsqueda Meilisearch: {exc}", exc_info=True)
             return Response(
                 {'status': 'error', 'message': f'Error en búsqueda: {exc}', 'results': []},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,

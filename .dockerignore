@@ -38,7 +38,7 @@ data/temporada_*/
 media/
 profile_pics/
 staticfiles/
-opensearch-3.5.0/
+*search-3.5.0/
 
 # Documentation
 *.md

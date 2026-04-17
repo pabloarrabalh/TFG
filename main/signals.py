@@ -18,10 +18,10 @@ POS_CODE_MAP = {
 }
 
 try:
-    from .opensearch_docs import OPENSEARCH_AVAILABLE, opensearch_client
+    from .meilisearch_docs import MEILISEARCH_AVAILABLE, meilisearch_client
 except ImportError:
-    opensearch_client = None
-    OPENSEARCH_AVAILABLE = False
+    meilisearch_client = None
+    MEILISEARCH_AVAILABLE = False
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -29,7 +29,7 @@ def create_user_profile(sender, instance, created, **kwargs):
         UserProfile.objects.get_or_create(user=instance)
 
 
-if OPENSEARCH_AVAILABLE and opensearch_client:
+if MEILISEARCH_AVAILABLE and meilisearch_client:
     @receiver(post_save, sender=Jugador)
     def indexar_jugador_al_guardar(sender, instance, created, **kwargs):
         try:
@@ -41,7 +41,7 @@ if OPENSEARCH_AVAILABLE and opensearch_client:
                 'nacionalidad': instance.nacionalidad,
                 'posicion': instance.get_posicion_mas_frecuente() or 'Desconocida'
             }
-            opensearch_client.index(
+            meilisearch_client.index(
                 index='jugadores',
                 id=instance.id,
                 body=doc
@@ -52,7 +52,7 @@ if OPENSEARCH_AVAILABLE and opensearch_client:
     @receiver(post_delete, sender=Jugador)
     def eliminar_jugador_del_indice(sender, instance, **kwargs):
         try:
-            opensearch_client.delete(
+            meilisearch_client.delete(
                 index='jugadores',
                 id=instance.id,
                 ignore=404
@@ -68,7 +68,7 @@ if OPENSEARCH_AVAILABLE and opensearch_client:
                 'nombre': instance.nombre,
                 'estadio': instance.estadio or 'Desconocido'
             }
-            opensearch_client.index(
+            meilisearch_client.index(
                 index='equipos',
                 id=instance.id,
                 body=doc
@@ -79,7 +79,7 @@ if OPENSEARCH_AVAILABLE and opensearch_client:
     @receiver(post_delete, sender=Equipo)
     def eliminar_equipo_del_indice(sender, instance, **kwargs):
         try:
-            opensearch_client.delete(
+            meilisearch_client.delete(
                 index='equipos',
                 id=instance.id,
                 ignore=404

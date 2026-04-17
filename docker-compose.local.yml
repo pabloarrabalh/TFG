@@ -18,30 +18,21 @@ services:
     networks:
       - app-network
 
-  # ── OpenSearch 2.x ─────────────────────────────────────────────────────────
-  opensearch:
-    image: opensearchproject/opensearch:2.11.0
+  # ── Meilisearch ────────────────────────────────────────────────────────────
+  meilisearch:
+    image: getmeili/meilisearch:v1.12
     restart: unless-stopped
     environment:
-      - discovery.type=single-node
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_PASSWORD:-Admin_Password1!}
-      - plugins.security.disabled=true
-      - DISABLE_INSTALL_DEMO_CONFIG=true
-      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
-      - bootstrap.memory_lock=true
+      - MEILI_NO_ANALYTICS=true
+      - MEILI_ENV=development
+      - MEILI_MASTER_KEY=${MEILISEARCH_API_KEY:-masterKey-local-dev}
+      - MEILI_LOG_LEVEL=warn
     volumes:
-      - opensearch_data:/usr/share/opensearch/data
+      - meilisearch_data:/meili_data
     ports:
-      - "9200:9200"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
+      - "7700:7700"
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:7700/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 12
@@ -75,9 +66,8 @@ services:
       DB_HOST: db
       DB_PORT: "5432"
       REDIS_URL: redis://redis:6379/1
-      OPENSEARCH_HOST: opensearch:9200
-      OPENSEARCH_USER: ${OPENSEARCH_USER:-admin}
-      OPENSEARCH_PASSWORD: ${OPENSEARCH_PASSWORD:-Admin_Password1!}
+      MEILISEARCH_HOST: http://meilisearch:7700
+      MEILISEARCH_API_KEY: ${MEILISEARCH_API_KEY:-masterKey-local-dev}
     volumes:
       - media_data:/app/media
       - static_data:/app/staticfiles
@@ -90,7 +80,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      opensearch:
+      meilisearch:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -116,7 +106,7 @@ services:
 
 volumes:
   postgres_data:
-  opensearch_data:
+  meilisearch_data:
   media_data:
   static_data:
 

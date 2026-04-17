@@ -308,12 +308,12 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'opensearchpy': {
+        'meilisearch': {
             'handlers': ['console'],
             'level': 'ERROR',
             'propagate': False,
         },
-        'opensearch': {
+        'meilisearch.http': {
             'handlers': ['console'],
             'level': 'ERROR',
             'propagate': False,

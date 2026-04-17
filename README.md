@@ -1,7 +1,7 @@
 # LigaMaster – Backend
 
 Aplicación de gestión y predicción de La Liga española.  
-Stack: **Django 5.1.4** · **DRF** · **OpenSearch 3.5.0** · **React 18 + Vite** (frontend separado).
+Stack: **Django 5.1.4** · **DRF** · **Meilisearch 1.x** · **React 18 + Vite** (frontend separado).
 
 ---
 
@@ -22,23 +22,23 @@ Stack: **Django 5.1.4** · **DRF** · **OpenSearch 3.5.0** · **React 18 + Vite*
 
 - Python 3.11 · venv en `.venv311/`
 - Node.js 18+ (solo para el frontend)
-- OpenSearch 3.5.0 (descargado automáticamente por `start-opensearch-local.ps1`)
+- Meilisearch 1.x (recomendado vía Docker)
 - Docker Desktop (solo para la opción Docker)
 
 ---
 
 ## Inicio rápido (local, sin Docker)
 
-### Terminal 1 – OpenSearch
+### Terminal 1 – Meilisearch
 
 ```powershell
-.\start-opensearch-local.ps1
+docker compose -f docker-compose.local.yml up -d meilisearch
 ```
 
-Primera ejecución: descarga OpenSearch (~700 MB) y lo inicia.  
+Primera ejecución: descarga la imagen y levanta Meilisearch.  
 Ejecuciones siguientes: lo inicia directamente.
 
-Deja esta terminal abierta — el endpoint queda en `http://localhost:9200`.
+El endpoint queda en `http://localhost:7700`.
 
 ### Terminal 2 – Django
 
@@ -50,8 +50,8 @@ python manage.py runserver
 Al arrancar verás:
 
 ```
-🔍 Indexando documentos en OpenSearch...
-✓ OpenSearch indexado correctamente
+🔍 Indexando documentos en Meilisearch...
+✓ Meilisearch indexado correctamente
 Starting development server at http://127.0.0.1:8000/
 ```
 
@@ -89,7 +89,7 @@ Acceso: **http://localhost:8000** (Django + Nginx)
 |-------------|--------|------------------------------------|
 | `db`        | 5432   | PostgreSQL 16-alpine               |
 | `redis`     | 6379   | Cache distribuida + Channels       |
-| `opensearch`| 9200   | OpenSearch                  |
+| `meilisearch`| 7700 | Meilisearch                 |
 | `backend`   | 8000   | Django + Gunicorn                  |
 | `frontend`  | 80     | React + Nginx                      |
 
@@ -101,9 +101,8 @@ Copia `.env.local` o `.env.docker` como `.env` según el modo de ejecución.
 
 | Variable            | Local               | Docker                    |
 |---------------------|---------------------|---------------------------|
-| `OPENSEARCH_HOST`   | `localhost:9200`    | `opensearch:9200`         |
-| `OPENSEARCH_USER`   | `admin`             | `admin`                   |
-| `OPENSEARCH_PASSWORD`| `admin`            | `Admin_Password1!`        |
+| `MEILISEARCH_HOST`  | `http://localhost:7700` | `http://meilisearch:7700` |
+| `MEILISEARCH_API_KEY` | `masterKey-local-dev` | `masterKey-local-dev`   |
 | `DB_HOST`           | `localhost`         | `db`                      |
 | `DB_PORT`           | `5432`              | `5432`                    |
 | `REDIS_URL`         | `redis://localhost:6379/1` | `redis://redis:6379/1` |
@@ -149,10 +148,9 @@ TFG/
 │   └── logos/
 ├── media/
 │   └── profile_pics/       # Fotos de perfil de usuario (carpeta plana)
-├── docker-compose.yml
+├── docker-compose.local.yml
 ├── Dockerfile
 ├── requirements.txt
-├── start-opensearch-local.ps1   # Único script PS1: inicia OpenSearch localmente
 └── docs/
     └── TECHNICAL_DOCUMENTATION.md   # Documentación técnica detallada
 ```
@@ -175,7 +173,7 @@ TFG/
 | GET | `/api/equipo/<nombre>/` | Detalle de equipo |
 | GET | `/api/jugador/<id>/` | Detalle de jugador |
 | GET | `/api/radar/<id>/<temporada>/` | Datos radar chart (percentiles) |
-| GET | `/api/buscar/?q=QUERY` | Búsqueda OpenSearch (jugadores + equipos) |
+| GET | `/api/buscar/?q=QUERY` | Búsqueda Meilisearch (jugadores + equipos) |
 | GET | `/api/perfil/` | Perfil del usuario autenticado |
 | PATCH | `/api/perfil/update/` | Actualizar datos del perfil |
 | PATCH | `/api/perfil/status/` | Cambiar estado (active/away/dnd) |
@@ -275,19 +273,19 @@ La configuración está en `.coveragerc` y actualmente mide estos módulos crít
 
 ## Troubleshooting
 
-### OpenSearch no responde
+### Meilisearch no responde
 
 ```powershell
-# Verificar proceso Java
-Get-Process java
+# Verificar estado del contenedor
+docker compose -f docker-compose.local.yml ps meilisearch
 
 # Reiniciar
-.\start-opensearch-local.ps1
+docker compose -f docker-compose.local.yml restart meilisearch
 ```
 
 ### Error 503 en `/api/buscar/`
 
-OpenSearch no está indexado. Reinicia Django tras asegurarte de que OpenSearch está corriendo — el servidor indexa automáticamente al arrancar.
+Meilisearch no está indexado. Reinicia Django tras asegurarte de que Meilisearch está corriendo — el servidor indexa automáticamente al arrancar.
 
 ### Migraciones pendientes
 
@@ -296,14 +294,12 @@ OpenSearch no está indexado. Reinicia Django tras asegurarte de que OpenSearch 
 python manage.py migrate
 ```
 
-### Credenciales OpenSearch local
+### Credenciales Meilisearch local
 
-- Host: `http://localhost:9200`
-- Usuario: `admin`
-- Contraseña: `admin`
+- Host: `http://localhost:7700`
+- API Key: `masterKey-local-dev`
 
-### Credenciales OpenSearch Docker
+### Credenciales Meilisearch Docker
 
-- Host: `http://localhost:9200`
-- Usuario: `admin`
-- Contraseña: `Admin_Password1!`
+- Host: `http://localhost:7700`
+- API Key: `masterKey-local-dev`

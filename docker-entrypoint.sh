@@ -3,7 +3,7 @@
 # Docker entrypoint unificado (local / Render / Azure)
 #
 # Lógica de arranque:
-#   1. Esperar PostgreSQL y OpenSearch
+#   1. Esperar PostgreSQL y Meilisearch
 #   2. Ejecutar migraciones siempre (idempotente)
 #   3. Comprobar si la BD ya está poblada:
 #        - ≥500 jugadores  Y  ≥100 predicciones  → SKIP población (BD persistente)
@@ -71,7 +71,7 @@ else
     echo "       - Percentiles:            ~1 min"
     echo "       - Medias históricas:      ~1 min"
     echo "       - Predicciones ML:        ~5-10 min"
-    echo "       - Indexado OpenSearch:    ~1 min"
+    echo "       - Indexado Meilisearch:   ~1 min"
     NEEDS_INIT=true
 fi
 
@@ -100,41 +100,41 @@ if [ "$NEEDS_INIT" = "true" ]; then
     python manage.py generar_predicciones --all-jornadas --sin-filtro-minutos --workers 32 --batch 300 --force --verbosity=0 2>&1 || true
     echo "  Tiempo predicciones: $(($(date +%s) - _T))s"
 
-    echo "[STEP 5/5] Indexando en OpenSearch..."
+    echo "[STEP 5/5] Indexando en Meilisearch..."
     _T=$(date +%s)
-    python manage.py indexar_opensearch --verbosity=0 2>&1 || true
+    python manage.py indexar_meilisearch --verbosity=0 2>&1 || true
     echo "  Tiempo indexado: $(($(date +%s) - _T))s"
 
     echo "============================================================"
     echo "[OK] Carga inicial completada en $(($(date +%s) - _TOTAL_START))s"
     echo "============================================================"
 else
-    # BD ya poblada: solo re-indexar OpenSearch si está vacío
-    echo "[CHECK] Verificando índice OpenSearch..."
+    # BD ya poblada: solo re-indexar Meilisearch si está vacío
+    echo "[CHECK] Verificando índice Meilisearch..."
     python -c "
 import os, django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
-from main.opensearch_docs import OPENSEARCH_AVAILABLE, opensearch_client
-if not OPENSEARCH_AVAILABLE:
-    print('OPENSEARCH_NOT_AVAILABLE')
+from main.meilisearch_docs import MEILISEARCH_AVAILABLE, meilisearch_client
+if not MEILISEARCH_AVAILABLE:
+    print('MEILISEARCH_NOT_AVAILABLE')
     exit()
 try:
-    r = opensearch_client.count(index='jugadores')
+    r = meilisearch_client.count(index='jugadores')
     if r.get('count', 0) < 100:
         print('NEEDS_INDEX')
     else:
         print('INDEX_OK')
 except Exception:
     print('NEEDS_INDEX')
-" 2>/dev/null > /tmp/os_check.txt || echo "NEEDS_INDEX" > /tmp/os_check.txt
+" 2>/dev/null > /tmp/meili_check.txt || echo "NEEDS_INDEX" > /tmp/meili_check.txt
 
-    OS_STATUS=$(cat /tmp/os_check.txt)
+    OS_STATUS=$(cat /tmp/meili_check.txt)
     if [ "$OS_STATUS" = "NEEDS_INDEX" ]; then
-        echo "[OPENSEARCH] Índice vacío - re-indexando..."
-        python manage.py indexar_opensearch --verbosity=0 2>&1 || true
+        echo "[MEILISEARCH] Índice vacío - re-indexando..."
+        python manage.py indexar_meilisearch --verbosity=0 2>&1 || true
     else
-        echo "[OPENSEARCH] Índice OK (${OS_STATUS})"
+        echo "[MEILISEARCH] Índice OK (${OS_STATUS})"
     fi
 fi
 

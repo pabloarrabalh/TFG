@@ -299,7 +299,7 @@ def fase_1_cargar_partidos_y_estadisticas():
         csvs_temp = 0
         for idx, csv_path in enumerate(csvs, start=1):
             archivo = os.path.basename(csv_path)
-            _log.info("[FASE 1] CSV %d/%d -> %s", idx, len(csvs), archivo)
+            # _log.info("[FASE 1] CSV %d/%d -> %s", idx, len(csvs), archivo)  # Comentado para reducir spam de logs
             if procesar_csv_partido(csv_path, temp_obj):
                 csvs_temp += 1
                 total_csvs += 1

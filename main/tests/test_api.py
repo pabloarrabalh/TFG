@@ -413,7 +413,7 @@ class UnifiedAPICoverageTests(APITestCase):
         res = self.client.get("/api/buscar/?q=a")
         self.assertEqual(res.status_code, 400)
 
-        with patch("main.api.buscar.OPENSEARCH_AVAILABLE", False):
+        with patch("main.api.buscar.MEILISEARCH_AVAILABLE", False):
             res = self.client.get("/api/buscar/?q=vin")
             self.assertEqual(res.status_code, 503)
 
@@ -440,7 +440,7 @@ class UnifiedAPICoverageTests(APITestCase):
         }
         fake_client = SimpleNamespace(search=lambda index, body: fake_hits_j if index == "jugadores" else fake_hits_e)
 
-        with patch("main.api.buscar.OPENSEARCH_AVAILABLE", True), patch("main.api.buscar.opensearch_client", fake_client):
+        with patch("main.api.buscar.MEILISEARCH_AVAILABLE", True), patch("main.api.buscar.meilisearch_client", fake_client):
             res = self.client.get("/api/buscar/?q=vin")
             self.assertEqual(res.status_code, 200)
             self.assertIn("results", res.data)

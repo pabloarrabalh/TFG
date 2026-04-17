@@ -99,7 +99,7 @@ class MainConfig(AppConfig):
             from main.models import Partido, EstadisticasPartidoJugador
             from main import signals as main_signals
             from main.scrapping.popularDB import main as populardb_main, fase_2_cargar_roles
-            from main.opensearch_docs import reindexar_todo, OPENSEARCH_AVAILABLE
+            from main.meilisearch_docs import reindexar_todo, MEILISEARCH_AVAILABLE
 
             # ── Paso 1: Comprobar si la BD ya tiene datos ──
             paso = 1
@@ -152,16 +152,16 @@ class MainConfig(AppConfig):
             else:
                 logger.info(f"[OK] Paso {paso}/{total_pasos} - Roles OK ({sin_roles}/{total} sin roles)")
 
-            # ── Paso 4: Indexar en OpenSearch ──
+            # ── Paso 4: Indexar en Meilisearch ──
             paso = 4
-            logger.info(f"Paso {paso}/{total_pasos} - Indexando en OpenSearch...")
+            logger.info(f"Paso {paso}/{total_pasos} - Indexando en Meilisearch...")
             try:
-                if not OPENSEARCH_AVAILABLE:
-                    raise RuntimeError("OpenSearch no disponible")
+                if not MEILISEARCH_AVAILABLE:
+                    raise RuntimeError("Meilisearch no disponible")
                 reindexar_todo()
-                logger.info(f"[OK] Paso {paso}/{total_pasos} - OpenSearch indexado correctamente")
+                logger.info(f"[OK] Paso {paso}/{total_pasos} - Meilisearch indexado correctamente")
             except Exception as e:
-                logger.warning(f"[WARN] Paso {paso}/{total_pasos} - OpenSearch desactivado: {e}")
+                logger.warning(f"[WARN] Paso {paso}/{total_pasos} - Meilisearch desactivado: {e}")
 
             # ── Paso 5: Generar predicciones para jornadas pendientes ──
             paso = 5
