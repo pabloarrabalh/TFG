@@ -10,11 +10,12 @@ Stack: **Django 5.1.4** · **DRF** · **Meilisearch 1.x** · **React 18 + Vite**
 1. [Requisitos](#requisitos)
 2. [Inicio rápido (local, sin Docker)](#inicio-rápido-local-sin-docker)
 3. [Inicio con Docker](#inicio-con-docker)
-4. [Variables de entorno](#variables-de-entorno)
-5. [Estructura del proyecto](#estructura-del-proyecto)
-6. [API REST](#api-rest)
-7. [Pruebas y Coverage](#pruebas-y-coverage)
-8. [Troubleshooting](#troubleshooting)
+4. [Despliegue Azure + Vercel](#despliegue-azure--vercel)
+5. [Variables de entorno](#variables-de-entorno)
+6. [Estructura del proyecto](#estructura-del-proyecto)
+7. [API REST](#api-rest)
+8. [Pruebas y Coverage](#pruebas-y-coverage)
+9. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -83,6 +84,56 @@ npm run dev
 
 Acceso: **http://localhost:8000** (Django + Nginx)
 
+### Producción mínima: backend + Meilisearch
+
+Para producción en Azure usa [docker-compose.prod.yml](docker-compose.prod.yml) y publica antes la imagen del backend en ACR o Docker Hub.
+
+```powershell
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+```
+
+Ese compose levanta backend, Meilisearch y un proxy Caddy con HTTPS. Supabase, Upstash y Vercel quedan fuera y se conectan por variables de entorno.
+
+### Despliegue Azure + Vercel
+
+1. Construye y publica la imagen del backend con el `Dockerfile` de la raíz.
+2. Crea un archivo `.env.prod` a partir de [.env.prod.example](.env.prod.example).
+3. En Azure, define estas variables en App Settings o en el entorno del contenedor:
+  `DATABASE_URL`, `REDIS_URL`, `MEILI_MASTER_KEY`, `MEILISEARCH_API_KEY`, `SECRET_KEY`, `BACKEND_PUBLIC_HOST`, `EXTRA_ALLOWED_HOSTS`, `EXTRA_CORS_ORIGINS`, `DB_SSL=true`.
+4. Si vas a usar la VM, pon `BACKEND_PUBLIC_HOST=api.<IP_DE_LA_VM>.sslip.io` y `EXTRA_ALLOWED_HOSTS` con ese mismo host.
+5. En Vercel define `VITE_BACKEND_URL=https://api.<IP_DE_LA_VM>.sslip.io` y redeploy del frontend.
+6. En Supabase usa la URL de conexión PostgreSQL con `sslmode=require`.
+7. En Upstash usa la URL `rediss://...` para `REDIS_URL`.
+8. Mantén `MEILISEARCH_HOST=http://meilisearch:7700` dentro del backend; es la URL interna del servicio del compose.
+9. Usa la misma clave para `MEILI_MASTER_KEY` y `MEILISEARCH_API_KEY`.
+
+Si necesitas persistir fotos de perfil o media en Azure, añade un volumen persistente aparte o muévelo a Blob Storage. El compose de producción no lo resuelve por sí solo.
+
+### Despliegue en tu VM de Azure
+
+Si vas a usar la VM `tfg-backend`, sigue este orden:
+
+1. En Azure, abre los puertos `80` y `443` en el NSG de la VM. Mantén abierto `22` para SSH. No hace falta exponer `7700` ni `8000` públicamente.
+2. Entra por SSH a la VM y actualiza paquetes:
+
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+3. Instala Docker y el plugin de Compose si no los tienes ya.
+4. Clona el repositorio en la VM y sube `.env.prod` con los valores reales.
+5. Publica o referencia la imagen del backend que has construido.
+6. Ejecuta:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+```
+
+7. Comprueba que el backend responde en `https://api.<IP_DE_LA_VM>.sslip.io/` y que Meilisearch está accesible solo dentro de la red Docker.
+8. En Vercel apunta `VITE_BACKEND_URL` a `https://api.<IP_DE_LA_VM>.sslip.io` y redeploy.
+
+Con la VM actual, `Standard B2ats v2` y `1 GiB` de RAM van muy justos para Django + Meilisearch + Docker. Puede arrancar, pero si ves cortes de memoria o Meilisearch cae, sube a una VM con más RAM antes de pelearte con el despliegue.
+
 ### Servicios Docker
 
 | Servicio    | Puerto | Descripción                        |
@@ -108,6 +159,7 @@ Copia `.env.local` o `.env.docker` como `.env` según el modo de ejecución.
 | `REDIS_URL`         | `redis://localhost:6379/1` | `redis://redis:6379/1` |
 | `DEBUG`             | `True`              | `False`                   |
 | `SECRET_KEY`        | cualquier valor     | clave segura larga        |
+| `VITE_BACKEND_URL`  | `http://localhost:8000` | `https://tu-backend.azurewebsites.net` |
 
 Generar una `SECRET_KEY` nueva:
 
@@ -149,7 +201,9 @@ TFG/
 ├── media/
 │   └── profile_pics/       # Fotos de perfil de usuario (carpeta plana)
 ├── docker-compose.local.yml
+├── docker-compose.prod.yml
 ├── Dockerfile
+├── .env.prod.example
 ├── requirements.txt
 └── docs/
     └── TECHNICAL_DOCUMENTATION.md   # Documentación técnica detallada

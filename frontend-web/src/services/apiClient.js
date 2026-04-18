@@ -1,6 +1,5 @@
 import axios from 'axios'
-
-const BASE_URL = 'http://localhost:8000'
+import { BACKEND_URL } from '../config/backend'
 
 // Read CSRF token from Django's cookie
 function getCsrfToken() {
@@ -14,7 +13,7 @@ function getCsrfToken() {
 }
 
 const apiClient = axios.create({
-  baseURL: BASE_URL,
+  baseURL: BACKEND_URL,
   withCredentials: true, // send session cookie
   headers: { 'Content-Type': 'application/json' },
 })

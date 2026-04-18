@@ -1,0 +1,62 @@
+services:
+  meilisearch:
+    image: getmeili/meilisearch:v1.12
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+      MEILI_ENV: production
+      MEILI_LOG_LEVEL: warn
+    volumes:
+      - meilisearch_data:/meili_data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:7700/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks:
+      - app-network
+
+  backend:
+    image: ${BACKEND_IMAGE:-tfg-backend:latest}
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    environment:
+      DEBUG: "False"
+      DJANGO_SETTINGS_MODULE: config.settings
+      MEILISEARCH_HOST: http://meilisearch:7700
+    expose:
+      - "8000"
+    depends_on:
+      meilisearch:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  meilisearch_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  app-network:
+    driver: bridge

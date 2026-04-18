@@ -11,8 +11,7 @@ import { Riple } from 'react-loading-indicators'
 import { useTour } from '../context/TourContext'
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
-
-const BACKEND = 'http://localhost:8000'
+import { backendUrl } from '../config/backend'
 
 function formatTime(hora) {
   if (!hora) return 'Por definir'
@@ -42,7 +41,7 @@ function EscudoImg({ nombre, size = 28 }) {
   if (!s) return <span className="text-gray-400 text-xs font-bold">{(nombre || '?')[0]}</span>
   return (
     <img
-      src={`/static/escudos/${s}.png`}
+      src={backendUrl(`/static/escudos/${s}.png`)}
       alt={nombre}
       style={{ width: size, height: size }}
       className="object-contain rounded"
@@ -320,7 +319,7 @@ export default function MenuPage() {
             <div className="p-6 border-b border-white/10">
               <div className="flex items-center justify-between gap-3 mb-4">
                 <div className="flex items-center gap-2">
-                  <img src={`${BACKEND}/static/logos/laliga.png`} alt="LaLiga" className="h-8 object-contain" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                  <img src={backendUrl('/static/logos/laliga.png')} alt="LaLiga" className="h-8 object-contain" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                   <span className="text-sm font-bold text-white">LaLiga</span>
                 </div>
                 {jornada_actual && <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">J{jornada_actual.numero}</span>}

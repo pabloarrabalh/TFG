@@ -1,6 +1,5 @@
 import { useState } from 'react'
-
-const BACKEND = 'http://localhost:8000'
+import { backendUrl } from '../../config/backend'
 
 /**
  * Displays a team shield image with fallback.
@@ -12,7 +11,7 @@ const BACKEND = 'http://localhost:8000'
 export default function TeamShield({ escudo, nombre = '', className = 'size-8', size = 32 }) {
   const [imageError, setImageError] = useState(false)
 
-  const src = escudo ? `/static/escudos/${escudo}.png` : null
+  const src = escudo ? backendUrl(`/static/escudos/${escudo}.png`) : null
   const fallbackInitial = (nombre || '?')[0].toUpperCase()
 
   if (imageError || !src) {

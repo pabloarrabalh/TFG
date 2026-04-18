@@ -1,12 +1,11 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useState, useEffect, useRef } from 'react'
-
-const BACKEND = 'http://localhost:8000'
+import { backendUrl } from '../../config/backend'
 
 async function cargarEventosJornada(jornada) {
   try {
-    const res = await fetch(`${BACKEND}/api/plantilla-notificaciones/${jornada}/`, { credentials: 'include' })
+    const res = await fetch(backendUrl(`/api/plantilla-notificaciones/${jornada}/`), { credentials: 'include' })
     if (!res.ok) return
     // Los eventos se crean como notificaciones bell en el backend automáticamente
   } catch {}
@@ -46,7 +45,7 @@ export default function Sidebar({ open, onClose }) {
       setInputJornada(String(newJornada))
       localStorage.setItem('jornada_global', String(newJornada))
       window.dispatchEvent(new CustomEvent('jornadaChanged', { detail: { jornada: newJornada } }))
-      fetch(`${BACKEND}/api/menu/top-jugadores/?jornada=${newJornada + 1}`).catch(() => {})
+      fetch(backendUrl(`/api/menu/top-jugadores/?jornada=${newJornada + 1}`)).catch(() => {})
       if (newJornada > prev) cargarEventosJornada(newJornada)
     }
   }

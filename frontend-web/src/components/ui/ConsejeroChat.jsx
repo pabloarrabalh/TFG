@@ -1,6 +1,5 @@
 import { useState } from 'react'
-
-const BACKEND = 'http://localhost:8000'
+import { backendUrl } from '../../config/backend'
 
 export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
   const [step, setStep] = useState('select') // 'select', 'loading', 'result'
@@ -22,7 +21,7 @@ export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
     setLoading(true)
 
     try {
-      const response = await fetch(`${BACKEND}/api/consejero/`, {
+      const response = await fetch(backendUrl('/api/consejero/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

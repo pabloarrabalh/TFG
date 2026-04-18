@@ -286,19 +286,3 @@ if MEILISEARCH_AVAILABLE:
         limpiar_indices()
         indexar_jugadores()
         indexar_equipos()
-
-else:
-    # Solo en local, no debería llegar nunca al desplegar.
-    meilisearch_client = None
-
-    def limpiar_indices():
-        pass
-
-    def indexar_jugadores():
-        pass
-
-    def indexar_equipos():
-        pass
-
-    def reindexar_todo():
-        pass

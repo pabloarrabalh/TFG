@@ -8,8 +8,7 @@ import apiClient from '../services/apiClient'
 import { useTour } from '../context/TourContext'
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
-
-const BACKEND = 'http://localhost:8000'
+import { BACKEND_URL, backendUrl } from '../config/backend'
 
 const FORMACIONES = {
   '4-3-3': { Portero: 1, Defensa: 4, Centrocampista: 3, Delantero: 3 },
@@ -94,7 +93,7 @@ function EscudoImg({ nombre, size = 28 }) {
   if (!s) return <span className="text-gray-400 text-xs font-bold">{(nombre || '?')[0]}</span>
   return (
     <img
-      src={`/static/escudos/${s}.png`}
+      src={backendUrl(`/static/escudos/${s}.png`)}
       alt={nombre}
       style={{ width: size, height: size }}
       className="object-contain rounded"
@@ -373,7 +372,7 @@ export default function MiPlantillaPage() {
   // ── API helpers ──────────────────────────────────────────────────────────
   async function loadJornada(jornada) {
     try {
-      const res = await fetch(`${BACKEND}/api/cambiar-jornada/`, {
+      const res = await fetch(`${BACKEND_URL}/api/cambiar-jornada/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         credentials: 'include',
@@ -424,7 +423,7 @@ export default function MiPlantillaPage() {
 
   async function loadPlantillas() {
     try {
-      const res = await fetch(`${BACKEND}/api/plantillas/usuario/`, { credentials: 'include' })
+      const res = await fetch(`${BACKEND_URL}/api/plantillas/usuario/`, { credentials: 'include' })
       if (!res.ok) return
       const data = await res.json()
       const ps = data.plantillas || []
@@ -530,7 +529,7 @@ export default function MiPlantillaPage() {
   async function guardarPlantilla() {
     setSaving(true)
     try {
-      const res = await fetch(`${BACKEND}/api/plantillas/usuario/`, {
+      const res = await fetch(`${BACKEND_URL}/api/plantillas/usuario/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         credentials: 'include',
@@ -560,7 +559,7 @@ export default function MiPlantillaPage() {
       return
     }
     try {
-      const res = await fetch(`${BACKEND}/api/plantillas/usuario/${plantillaId}/renombrar/`, {
+      const res = await fetch(`${BACKEND_URL}/api/plantillas/usuario/${plantillaId}/renombrar/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         credentials: 'include',
@@ -580,7 +579,7 @@ export default function MiPlantillaPage() {
   async function eliminarPlantilla() {
     if (!plantillaId || !window.confirm(`¿Eliminar "${plantillaNombre}"?`)) return
     try {
-      await fetch(`${BACKEND}/api/plantillas/usuario/${plantillaId}/`, {
+      await fetch(`${BACKEND_URL}/api/plantillas/usuario/${plantillaId}/`, {
         method: 'DELETE', headers: { 'X-CSRFToken': getCsrfToken() }, credentials: 'include',
       })
       setPlantillaId(null); setPlantillaNombre('Mi Team')
@@ -603,7 +602,7 @@ export default function MiPlantillaPage() {
     }
     setSaving(true)
     try {
-      const res = await fetch(`${BACKEND}/api/plantilla/${plantillaId}/predeterminada/`, {
+      const res = await fetch(`${BACKEND_URL}/api/plantilla/${plantillaId}/predeterminada/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         credentials: 'include',
@@ -633,7 +632,7 @@ export default function MiPlantillaPage() {
     if (!pendientes.length) return
 
     try {
-      const res = await fetch(`${BACKEND}/api/jugador-partidos-batch/`, {
+      const res = await fetch(`${BACKEND_URL}/api/jugador-partidos-batch/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         credentials: 'include',
@@ -663,7 +662,7 @@ export default function MiPlantillaPage() {
   async function cargarPartidosJugador(jugadorId) {
     if (jugadorPartidos[jugadorId]) return  // Ya cargado
     try {
-      const res = await fetch(`${BACKEND}/api/jugador-partidos/?jugador_id=${jugadorId}&jornada_actual=${jornadaActual}`)
+      const res = await fetch(`${BACKEND_URL}/api/jugador-partidos/?jugador_id=${jugadorId}&jornada_actual=${jornadaActual}`)
       const data = await res.json()
       setJugadorPartidos(prev => ({
         ...prev,
@@ -697,7 +696,7 @@ export default function MiPlantillaPage() {
           posicion: jug.posicion,
           modelo: modeloBackend
         }
-        const res = await fetch(`${BACKEND}/api/explicar-prediccion/`, {
+        const res = await fetch(`${BACKEND_URL}/api/explicar-prediccion/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
           credentials: 'include',
@@ -726,7 +725,7 @@ export default function MiPlantillaPage() {
       // Endpoint unificado XAI para TODAS las posiciones (PT, DF, MC, DT)
       const modeloUI = modelosPorPos[jugador.posicion] || 'RF'
       const modeloBackend = MODEL_TO_BACKEND[modeloUI] || 'RF'
-      const res = await fetch(`${BACKEND}/api/explicar-prediccion/`, {
+      const res = await fetch(`${BACKEND_URL}/api/explicar-prediccion/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         credentials: 'include',

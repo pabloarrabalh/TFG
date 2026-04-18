@@ -4,6 +4,7 @@ import api from '../services/apiClient'
 import HelpButton from '../components/ui/HelpButton'
 import ComparisonMetricsCards from '../components/comparison/ComparisonMetricsCards'
 import { COMPARISON_DOMAINS } from '../components/comparison/comparisonConfig'
+import { backendUrl } from '../config/backend'
 import '../styles/jugador.css'
 import { useTour } from '../context/TourContext'
 import { driver } from 'driver.js'
@@ -116,7 +117,7 @@ export default function JugadorPage() {
   useEffect(() => {
     if (!data) return
     setInsightsLoading(true)
-    fetch(`http://localhost:8000/api/jugador-insight/?jugador_id=${id}&temporada=${encodeURIComponent(temporada)}`)
+    fetch(backendUrl(`/api/jugador-insight/?jugador_id=${id}&temporada=${encodeURIComponent(temporada)}`))
       .then(r => r.json())
       .then(d => setInsights(d.insights || []))
       .catch(() => setInsights([]))
@@ -601,7 +602,7 @@ export default function JugadorPage() {
               {equipo_temporada && (
                 <div className="flex items-center gap-4 mb-2">
                   <img 
-                    src={`http://localhost:8000${equipo_temporada.equipo.escudo}`}
+                    src={backendUrl(equipo_temporada.equipo.escudo)}
                     alt={equipo_temporada.equipo.nombre}
                     className="h-16 w-16 object-contain"
                     onError={(e) => e.target.style.display = 'none'}

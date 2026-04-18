@@ -10,6 +10,7 @@ import HelpButton from '../components/ui/HelpButton'
 import { useTour } from '../context/TourContext'
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
+import { backendUrl } from '../config/backend'
 
 const ESTADOS = [
   { value: 'active', label: 'Activo', color: 'bg-green-500' },
@@ -391,7 +392,7 @@ export default function PerfilPage() {
   }
 
   const estadoActual = ESTADOS.find(e => e.value === perfil?.estado) || ESTADOS[0]
-  const avatarSrc = (idx) => `/static/logos/default${idx + 1}.png`
+  const avatarSrc = (idx) => backendUrl(`/static/logos/default${idx + 1}.png`)
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">

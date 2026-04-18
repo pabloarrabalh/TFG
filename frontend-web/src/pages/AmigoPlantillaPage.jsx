@@ -3,8 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import HelpButton from '../components/ui/HelpButton'
 import CampoPlantilla from '../components/campo/CampoPlantilla'
-
-const BACKEND = 'http://localhost:8000'
+import { backendUrl } from '../config/backend'
 
 const normalizePhotoUrl = (photo) => {
   if (!photo) return null
@@ -13,7 +12,7 @@ const normalizePhotoUrl = (photo) => {
   if (value.startsWith('http://') || value.startsWith('https://')) return value
   const normalizedPath = value.startsWith('/') ? value : `/${value}`
   try {
-    return new URL(normalizedPath, BACKEND).toString()
+    return new URL(normalizedPath, backendUrl()).toString()
   } catch {
     return normalizedPath
   }
@@ -64,7 +63,7 @@ function EscudoImg({ nombre, size = 28 }) {
   if (!s) return <span className="text-gray-400 text-xs font-bold">{(nombre || '?')[0]}</span>
   return (
     <img
-      src={`/static/escudos/${s}.png`}
+      src={backendUrl(`/static/escudos/${s}.png`)}
       alt={nombre}
       style={{ width: size, height: size }}
       className="object-contain rounded"
@@ -111,7 +110,7 @@ export default function AmigoPlantillaPage() {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${BACKEND}/api/amigos/${userId}/plantillas/`, { credentials: 'include' })
+      const res = await fetch(backendUrl(`/api/amigos/${userId}/plantillas/`), { credentials: 'include' })
       if (!res.ok) {
         const d = await res.json()
         setError(d.error || 'No se pudo cargar la plantilla')
@@ -152,7 +151,7 @@ export default function AmigoPlantillaPage() {
         if (fetchingRef.current.has(jug.id)) return
         fetchingRef.current.add(jug.id)
         try {
-          const resp = await fetch(`${BACKEND}/api/explicar-prediccion/`, {
+          const resp = await fetch(backendUrl('/api/explicar-prediccion/'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
             credentials: 'include',
@@ -176,7 +175,7 @@ export default function AmigoPlantillaPage() {
     setDetFeaturesImpacto([])
     setDetLoadingPred(true)
     try {
-      const resp = await fetch(`${BACKEND}/api/explicar-prediccion/`, {
+      const resp = await fetch(backendUrl('/api/explicar-prediccion/'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
         credentials: 'include',
@@ -314,7 +313,6 @@ export default function AmigoPlantillaPage() {
         formaciones={FORMACIONES}
         predicciones={predicciones}
         onCardClick={abrirDetalles}
-        BACKEND={BACKEND}
       />
 
       {modalDet && (

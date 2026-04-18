@@ -1,3 +1,5 @@
+import { backendUrl } from '../../config/backend'
+
 const POSICIONES_CAMPO = ['Portero', 'Defensa', 'Centrocampista', 'Delantero']
 
 const POS_COLOR = {
@@ -14,7 +16,7 @@ const POS_BADGE = {
   Delantero: { bg: 'bg-red-500', text: 'DT' },
 }
 
-function EscudoImg({ nombre, size = 24, BACKEND }) {
+function EscudoImg({ nombre, size = 24 }) {
   const escudoMap = {
     'Real Madrid': 'madrid',
     'Barcelona': 'barcelona',
@@ -42,7 +44,7 @@ function EscudoImg({ nombre, size = 24, BACKEND }) {
   if (!s) return <span className="text-gray-400 text-xs font-bold">{(nombre || '?')[0]}</span>
   return (
     <img
-      src={`/static/escudos/${s}.png`}
+      src={backendUrl(`/static/escudos/${s}.png`)}
       alt={nombre}
       style={{ width: size, height: size }}
       className="object-contain rounded"
@@ -51,7 +53,7 @@ function EscudoImg({ nombre, size = 24, BACKEND }) {
   )
 }
 
-export default function CampoPlantilla({ alineacion, formaciones, predicciones, onCardClick, BACKEND }) {
+export default function CampoPlantilla({ alineacion, formaciones, predicciones, onCardClick }) {
   const formacion = Object.keys(formaciones).find(f => JSON.stringify(formaciones[f]) === JSON.stringify(formaciones[Object.keys(formaciones)[0]])) || '4-3-3'
   const cfg = formaciones[formacion]
 
@@ -76,7 +78,7 @@ export default function CampoPlantilla({ alineacion, formaciones, predicciones, 
             >
               {j.proximo_rival_nombre && (
                 <div className="absolute top-2 right-2 opacity-90">
-                  <EscudoImg nombre={j.proximo_rival_nombre} size={20} BACKEND={BACKEND} />
+                  <EscudoImg nombre={j.proximo_rival_nombre} size={20} />
                 </div>
               )}
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center mx-auto text-white font-black text-sm">

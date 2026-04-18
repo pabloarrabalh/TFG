@@ -5,8 +5,6 @@ import GlassPanel from '../components/ui/GlassPanel'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import TeamShield from '../components/ui/TeamShield'
 
-const BACKEND = 'http://localhost:8000'
-
 // Caché de banderas
 const flagCache = JSON.parse(localStorage.getItem('flag_cache') || '{}')
 
