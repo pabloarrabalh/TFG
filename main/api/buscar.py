@@ -4,8 +4,6 @@ Endpoints:
   GET  /api/radar/<jugador_id>/<temporada>/
   GET  /api/buscar/?q=QUERY
 """
-import logging
-
 from django.db.models import Count, Q, Sum
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -15,18 +13,9 @@ from rest_framework.views import APIView
 from ..models import *
 from ..meilisearch_docs import MEILISEARCH_AVAILABLE, meilisearch_client
 
-logger = logging.getLogger(__name__)
-
-
-# ── 1. RADAR CHART ────────────────────────────────────────────────────────────
 
 class RadarJugadorView(APIView):
-    """GET /api/radar/<jugador_id>/<temporada>/
-
-    Returns normalised (0-100 percentile) radar-chart values for a player in
-    a given season. Values are read from the pre-calculated EquipoJugadorTemporada.percentiles
-    field (a single DB lookup) instead of being computed on every request.
-    """
+    """GET /api/radar/<jugador_id>/<temporada>/"""
     permission_classes = [AllowAny]
 
     def get(self, request, jugador_id, temporada):
@@ -40,10 +29,7 @@ class RadarJugadorView(APIView):
         except Temporada.DoesNotExist:
             return Response({'error': 'Temporada no encontrada'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Single DB query: gives us posicion + percentiles already pre-calculated
-        ejt = EquipoJugadorTemporada.objects.filter(
-            jugador=jugador, temporada=temp_obj
-        ).first()
+        ejt = EquipoJugadorTemporada.objects.filter(jugador=jugador, temporada=temp_obj).first()
 
         posicion = (ejt.posicion if ejt else None) or jugador.get_posicion_mas_frecuente()
         if not posicion:
@@ -51,7 +37,6 @@ class RadarJugadorView(APIView):
 
         pct = (ejt.percentiles if ejt and ejt.percentiles else {})
 
-        # One aggregate query for minutos/puntos (season-ongoing, not worth pre-storing)
         stats_jugador = (
             EstadisticasPartidoJugador.objects
             .filter(jugador=jugador, partido__jornada__temporada=temp_obj)
@@ -69,7 +54,7 @@ class RadarJugadorView(APIView):
         puntos_percentil = min(100, (puntos_promedio / 10) * 100) if puntos_promedio > 0 else 0
 
         def _p(grupo, campo, default=50):
-            """Read a pre-calculated percentile, falling back to default."""
+            #Percentiles
             return pct.get(grupo, {}).get(campo, default)
 
         if posicion == 'Portero':
@@ -84,18 +69,10 @@ class RadarJugadorView(APIView):
             ]
             labels = ['Pases', 'Minutos', 'Puntos', 'Comportamiento', 'Paradas %', 'GEC', 'PSxG']
         else:
-            ataque_avg = (
-                _p('ataque', 'goles') + _p('ataque', 'tiros_puerta') + _p('ataque', 'xg')
-            ) / 3
-            defensa_avg = (
-                _p('defensa', 'despejes') + _p('defensa', 'entradas') + _p('regates_block', 'duelos')
-            ) / 3
-            regates_avg = (
-                _p('regates_block', 'regates_completados') + _p('regates_block', 'conducciones')
-            ) / 2
-            pases_avg = (
-                _p('organizacion', 'pases_totales') + _p('ataque', 'asistencias')
-            ) / 2
+            ataque_avg = (_p('ataque', 'goles') + _p('ataque', 'tiros_puerta') + _p('ataque', 'xg')) / 3
+            defensa_avg = (_p('defensa', 'despejes') + _p('defensa', 'entradas') + _p('regates_block', 'duelos')) / 3
+            regates_avg = (_p('regates_block', 'regates_completados') + _p('regates_block', 'conducciones')) / 2
+            pases_avg = (_p('organizacion', 'pases_totales') + _p('ataque', 'asistencias')) / 2
             comportamiento_avg = 100 - _p('comportamiento', 'amarillas')
 
             radar_values = [
@@ -110,10 +87,6 @@ class RadarJugadorView(APIView):
             labels = ['Ataque', 'Defensa', 'Regate', 'Pases', 'Comportamiento', 'Minutos', 'Fantasy']
 
         media_general = sum(radar_values) / len(radar_values) if radar_values else 0
-        logger.info(
-            "Radar generado para jugador %s (%s) en %s: %s",
-            jugador_id, posicion, temporada, radar_values,
-        )
         return Response({
             'status': 'success',
             'data': {
@@ -127,15 +100,8 @@ class RadarJugadorView(APIView):
             },
         })
 
-
-# ── 2. BUSCAR ─────────────────────────────────────────────────────────────────
-
 class BuscarView(APIView):
-    """GET /api/buscar/?q=QUERY
-
-    Full-text search over players and teams using Meilisearch.
-    Requires at least 2 characters. Returns up to 5 combined results.
-    """
+    """GET /api/buscar/?q=QUERY"""
     permission_classes = [AllowAny]
 
     def get(self, request):
@@ -150,7 +116,7 @@ class BuscarView(APIView):
             return Response(
                 {
                     'status': 'error',
-                    'message': 'Meilisearch no está disponible. Asegúrate de que esté corriendo en localhost:7700 y reinicia el servidor.',
+                    'message': 'La búsqueda no está disponible.',
                     'results': [],
                 },
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -159,7 +125,6 @@ class BuscarView(APIView):
         resultados = []
 
         try:
-            # ── Jugadores ──────────────────────────────────────────────────
             search_body_jugador = {
                 'query': {
                     'bool': {
@@ -200,10 +165,9 @@ class BuscarView(APIView):
                             'posicion': src.get('posicion', 'Desconocida'),
                             'url': f'/jugador/{jugador_pk}/',
                         })
-                except Exception as exc:
-                    logger.warning(f"Error procesando resultado de jugador: {exc}")
+                except Exception:
+                    continue
 
-            # ── Equipos ────────────────────────────────────────────────────
             temporadas = Temporada.objects.all().order_by('-nombre')
             temporada_nombre = temporadas.first().nombre if temporadas.exists() else '25_26'
 
@@ -232,7 +196,6 @@ class BuscarView(APIView):
                 })
 
         except Exception as exc:
-            logger.error(f"Error en búsqueda Meilisearch: {exc}", exc_info=True)
             return Response(
                 {'status': 'error', 'message': f'Error en búsqueda: {exc}', 'results': []},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,

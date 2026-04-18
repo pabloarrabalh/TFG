@@ -274,6 +274,20 @@ export default function MiPlantillaPage() {
   const [dropTarget, setDropTarget] = useState(null)
   const modelosPrevRef = useRef(null)
 
+  // Jugadores filtrados para modal (debe declararse antes de efectos que lo usan)
+  const jugadoresModal = (() => {
+    if (!modalSel) return []
+    const { posicion, esSuplente } = modalSel
+    const usados = new Set([...POSICIONES, 'Suplentes'].flatMap(p => alineacion[p] || []).filter(Boolean).map(j => j.id))
+    const lista = esSuplente ? Object.values(jugadoresDisponibles).flat() : (jugadoresDisponibles[posicion] || [])
+    return lista
+      .filter(j => !usados.has(j.id))
+      .filter(j => `${j.nombre} ${j.apellido}`.toLowerCase().includes(searchTerm.toLowerCase()))
+      .filter(j => !equipoFiltro || j.equipo_id == equipoFiltro)
+      .filter(j => !posFiltro || j.posicion === posFiltro)
+      .sort((a, b) => (b.puntos_fantasy_25_26 || 0) - (a.puntos_fantasy_25_26 || 0))
+  })()
+
   // ── Init ──────────────────────────────────────────────────────────────────
   useEffect(() => {
     // Usar jornada_global + 1 para predecir la PRÓXIMA jornada, igual que el menú
@@ -339,9 +353,9 @@ export default function MiPlantillaPage() {
   // Cargar partidos cuando el modal de selección se abre
   useEffect(() => {
     if (modalSel && jugadoresModal.length > 0) {
-      jugadoresModal.forEach(j => cargarPartidosJugador(j.id))
+      cargarPartidosJugadoresBatch(jugadoresModal.map(j => j.id))
     }
-  }, [modalSel])
+  }, [modalSel, jugadoresModal, jornadaActual])
 
   // Ref para evitar closure stale en el event listener
   const loadJornadaRef = useRef(null)
@@ -614,6 +628,38 @@ export default function MiPlantillaPage() {
   const predictedRef = useRef(new Set())
 
   // ── Cargar partidos de jugador ───────────────────────────────────────────
+  async function cargarPartidosJugadoresBatch(jugadorIds) {
+    const pendientes = [...new Set((jugadorIds || []).filter(id => id && !jugadorPartidos[id]))]
+    if (!pendientes.length) return
+
+    try {
+      const res = await fetch(`${BACKEND}/api/jugador-partidos-batch/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
+        credentials: 'include',
+        body: JSON.stringify({ jugador_ids: pendientes, jornada_actual: jornadaActual }),
+      })
+
+      if (!res.ok) throw new Error('Batch endpoint unavailable')
+      const data = await res.json()
+      const mapa = data.partidos_por_jugador || {}
+
+      setJugadorPartidos(prev => {
+        const next = { ...prev }
+        pendientes.forEach(id => {
+          const partidos = mapa[String(id)] ?? mapa[id] ?? []
+          next[id] = Array.isArray(partidos) ? partidos : []
+        })
+        return next
+      })
+    } catch (e) {
+      // Fallback sin cambiar funcionalidad: si batch falla, mantener estrategia previa
+      pendientes.forEach(id => {
+        cargarPartidosJugador(id)
+      })
+    }
+  }
+
   async function cargarPartidosJugador(jugadorId) {
     if (jugadorPartidos[jugadorId]) return  // Ya cargado
     try {
@@ -803,20 +849,6 @@ export default function MiPlantillaPage() {
       </div>
     )
   }
-
-  // ── Jugadores filtrados para modal ────────────────────────────────────────
-  const jugadoresModal = (() => {
-    if (!modalSel) return []
-    const { posicion, esSuplente } = modalSel
-    const usados = new Set([...POSICIONES, 'Suplentes'].flatMap(p => alineacion[p] || []).filter(Boolean).map(j => j.id))
-    const lista = esSuplente ? Object.values(jugadoresDisponibles).flat() : (jugadoresDisponibles[posicion] || [])
-    return lista
-      .filter(j => !usados.has(j.id))
-      .filter(j => `${j.nombre} ${j.apellido}`.toLowerCase().includes(searchTerm.toLowerCase()))
-      .filter(j => !equipoFiltro || j.equipo_id == equipoFiltro)
-      .filter(j => !posFiltro || j.posicion === posFiltro)
-      .sort((a, b) => (b.puntos_fantasy_25_26 || 0) - (a.puntos_fantasy_25_26 || 0))
-  })()
 
   // ── Tour guiado ──────────────────────────────────────────────────────────────
   useEffect(() => {

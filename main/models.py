@@ -1,5 +1,6 @@
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count, Q
+from django.db.models.functions import Lower
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -284,6 +285,13 @@ class UserProfile(models.Model):
     class Meta:
         verbose_name = 'Perfil de Usuario'
         verbose_name_plural = 'Perfiles de Usuarios'
+        constraints = [
+            models.UniqueConstraint(
+                Lower('nickname'),
+                condition=~Q(nickname=''),
+                name='uniq_userprofile_nickname_ci_nonempty',
+            )
+        ]
 
     def __str__(self):
         return f"{self.user.username} - {self.nickname}"

@@ -1,10 +1,3 @@
-"""
-DRF API views – Teams
-Endpoints:
-  GET /api/equipos/
-  GET /api/equipo/<nombre>/?temporada=25/26&jornada=N
-"""
-import logging
 from datetime import datetime, time
 from difflib import SequenceMatcher
 
@@ -14,10 +7,9 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 
+from .common import get_temporada_by_display, parse_int, temporada_display_from_name
 from ..models import *
 from ..views.utils import *
-
-logger = logging.getLogger(__name__)
 
 
 class EquipoListView(APIView):
@@ -28,15 +20,12 @@ class EquipoListView(APIView):
         favoritos_ids = set()
         if request.user.is_authenticated:
             try:
-                favoritos_ids = set(
-                    request.user.equipos_favoritos.values_list('equipo_id', flat=True)
-                )
+                favoritos_ids = set(request.user.equipos_favoritos.values_list('equipo_id', flat=True))
             except Exception:
                 pass
 
         temporada = Temporada.objects.order_by('-nombre').first()
 
-        # Precompute counts for the latest season (avoid N queries)
         counts_current = {}
         if temporada:
             for row in (
@@ -47,12 +36,8 @@ class EquipoListView(APIView):
             ):
                 counts_current[row['equipo_id']] = row['cnt']
 
-        # Precompute latest season with players per equipo
         latest_season_map = {}
-        for row in (
-            EquipoJugadorTemporada.objects
-            .values('equipo_id')
-            .annotate(latest=Max('temporada__nombre'))
+        for row in ( EquipoJugadorTemporada.objects.values('equipo_id').annotate(latest=Max('temporada__nombre'))
         ):
             latest_season_map[row['equipo_id']] = row['latest']
 
@@ -83,7 +68,6 @@ class EquipoDetailView(APIView):
 
     def get(self, request, equipo_nombre):
         temporada_display = request.GET.get('temporada', '25/26')
-        temporada_nombre = temporada_display.replace('/', '_')
         jornada_param = request.GET.get('jornada')
 
         try:
@@ -96,31 +80,22 @@ class EquipoDetailView(APIView):
             {'nombre': t.nombre, 'display': t.nombre.replace('_', '/')} for t in temporadas
         ]
 
-        try:
-            temporada = Temporada.objects.get(nombre=temporada_nombre)
-        except Temporada.DoesNotExist:
+        temporada = get_temporada_by_display(temporada_display)
+        if not temporada:
             temporada = temporadas.first()
-            if temporada:
-                temporada_nombre = temporada.nombre
-                temporada_display = temporada_nombre.replace('_', '/')
+        if temporada:
+            temporada_display = temporada_display_from_name(temporada.nombre)
 
         jornadas_temp = Jornada.objects.filter(temporada=temporada).order_by('numero_jornada')
         jornadas_disponibles = [{'numero': j.numero_jornada} for j in jornadas_temp]
 
         ultima_jornada_clasificacion = (
-            Jornada.objects.filter(
-                temporada=temporada, clasificacionjornada__isnull=False
-            )
-            .order_by('numero_jornada')
-            .last()
+            Jornada.objects.filter(temporada=temporada, clasificacionjornada__isnull=False).last()
         )
 
         jornada_actual = None
         if jornada_param:
-            try:
-                jornada_actual = int(jornada_param)
-            except (ValueError, TypeError):
-                pass
+            jornada_actual = parse_int(jornada_param, default=None, min_value=1)
 
         if jornada_actual is None:
             jornada_actual = (
@@ -139,12 +114,7 @@ class EquipoDetailView(APIView):
         except Jornada.DoesNotExist:
             jornada_actual_obj = ultima_jornada_clasificacion
 
-        # ── Plantilla con estadísticas ──
-        jugadores_equipo_temp = (
-            EquipoJugadorTemporada.objects.filter(equipo=equipo, temporada=temporada)
-            .select_related('jugador')
-            .order_by('dorsal')
-        )
+        jugadores_equipo_temp = (EquipoJugadorTemporada.objects.filter(equipo=equipo, temporada=temporada).select_related('jugador').order_by('dorsal'))
 
         jugadores_agrupados = {}
         puntos_dorsal_cero = {}
@@ -161,12 +131,8 @@ class EquipoDetailView(APIView):
             valid_stats = stats_query.exclude(puntos_fantasy__gt=40)
 
             total_goles = valid_stats.aggregate(Sum('gol_partido'))['gol_partido__sum'] or 0
-            total_asistencias = (
-                valid_stats.aggregate(Sum('asist_partido'))['asist_partido__sum'] or 0
-            )
-            total_puntos = (
-                valid_stats.aggregate(Sum('puntos_fantasy'))['puntos_fantasy__sum'] or 0
-            )
+            total_asistencias = (valid_stats.aggregate(Sum('asist_partido'))['asist_partido__sum'] or 0)
+            total_puntos = (valid_stats.aggregate(Sum('puntos_fantasy'))['puntos_fantasy__sum'] or 0)
             partidos_jugados = valid_stats.count()
             total_minutos = valid_stats.aggregate(Sum('min_partido'))['min_partido__sum'] or 0
 
@@ -177,13 +143,11 @@ class EquipoDetailView(APIView):
                 puntos_dorsal_cero[nombre_completo] = {'puntos': total_puntos}
                 continue
 
-            # No mostrar jugadores que aún no han jugado ni un minuto hasta jornada_actual
+            # Solo los que hayan jugado
             if partidos_jugados == 0 and total_minutos == 0:
                 continue
 
-            posicion_frecuente = (
-                valid_stats.values('posicion').annotate(count=Count('id')).order_by('-count').first()
-            )
+            posicion_frecuente = (valid_stats.values('posicion').annotate(count=Count('id')).order_by('-count').first())
 
             jug_id = eq_jug_temp.jugador.id
             if jug_id not in jugadores_agrupados:
@@ -203,15 +167,9 @@ class EquipoDetailView(APIView):
                 jugadores_agrupados[jug_id]['total_goles'] += total_goles
                 jugadores_agrupados[jug_id]['total_asistencias'] += total_asistencias
 
-        # Fallback: buscar por estadísticas directas si hay pocos jugadores
         if len(jugadores_agrupados) < 10:
-            jugadores_con_stats = (
-                EstadisticasPartidoJugador.objects.filter(
-                    partido__jornada__temporada=temporada
-                )
-                .filter(
-                    Q(partido__equipo_local=equipo) | Q(partido__equipo_visitante=equipo)
-                )
+            jugadores_con_stats = (EstadisticasPartidoJugador.objects.filter(partido__jornada__temporada=temporada)
+                .filter(Q(partido__equipo_local=equipo) | Q(partido__equipo_visitante=equipo))
                 .values_list('jugador_id', flat=True)
                 .distinct()
             )
@@ -246,7 +204,7 @@ class EquipoDetailView(APIView):
                         'apellido': jugador.apellido,
                     }
 
-        # Matching jugadores con dorsal 0
+        # dorsal 0
         def _similitud(n1, n2):
             return SequenceMatcher(None, n1.lower(), n2.lower()).ratio()
 
@@ -285,24 +243,17 @@ class EquipoDetailView(APIView):
         top_3_puntos = sorted(jugadores, key=lambda x: x['puntos_fantasy'], reverse=True)[:3]
         top_3_minutos = sorted(jugadores, key=lambda x: x['minutos'], reverse=True)[:3]
 
-        # ── Clasificación y racha ──
         clasificacion_actual = (
-            ClasificacionJornada.objects.filter(
-                equipo=equipo,
-                temporada=temporada,
-                jornada__numero_jornada__lte=jornada_actual,
-            )
+            ClasificacionJornada.objects.filter(equipo=equipo, temporada=temporada,jornada__numero_jornada__lte=jornada_actual,)
             .order_by('-jornada__numero_jornada')
             .first()
         )
 
         goles_equipo_favor = clasificacion_actual.goles_favor if clasificacion_actual else 0
         goles_equipo_contra = clasificacion_actual.goles_contra if clasificacion_actual else 0
-        racha_actual_detalles = (
-            get_racha_detalles(equipo, temporada, jornada_actual_obj) if jornada_actual_obj else []
-        )
+        racha_actual_detalles = (get_racha_detalles(equipo, temporada, jornada_actual_obj) if jornada_actual_obj else [])
 
-        # ── Próximo partido ──
+        #P´roximo partido
         proximo_partido = None
         rival_info = None
 
@@ -310,24 +261,14 @@ class EquipoDetailView(APIView):
             proximo_encontrado = None
             for offset in range(1, (jornada_max - jornada_actual) + 1):
                 intento_num = jornada_actual + offset
-                # 1º: buscar en Calendario (partidos futuros / programados)
-                p_cal = (
-                    Calendario.objects.filter(
-                        jornada__temporada=temporada,
-                        jornada__numero_jornada=intento_num,
-                    )
+                p_cal = (Calendario.objects.filter(jornada__temporada=temporada,jornada__numero_jornada=intento_num,)
                     .filter(Q(equipo_local=equipo) | Q(equipo_visitante=equipo))
                     .first()
                 )
                 if p_cal:
                     proximo_encontrado = ('calendario', p_cal)
                     break
-                # 2º: fallback a Partido (temporadas pasadas donde Calendario puede estar vacío)
-                p_partido = (
-                    Partido.objects.filter(
-                        jornada__temporada=temporada,
-                        jornada__numero_jornada=intento_num,
-                    )
+                p_partido = (Partido.objects.filter(jornada__temporada=temporada,jornada__numero_jornada=intento_num,)
                     .filter(Q(equipo_local=equipo) | Q(equipo_visitante=equipo))
                     .select_related('equipo_local', 'equipo_visitante', 'jornada')
                     .first()
@@ -345,23 +286,13 @@ class EquipoDetailView(APIView):
                     rival = pc.equipo_local
                     es_local = False
 
-                # Obtener fecha del partido
                 if tipo_fuente == 'calendario':
-                    fecha_partido_iso = (
-                        datetime.combine(pc.fecha, pc.hora or time(18, 0)).isoformat()
-                        if pc.fecha else None
-                    )
-                else:  # Partido histórico
-                    fecha_partido_iso = (
-                        pc.fecha_partido.isoformat() if pc.fecha_partido else None
-                    )
+                    fecha_partido_iso = (datetime.combine(pc.fecha, pc.hora or time(18, 0)).isoformat()if pc.fecha else None)
+                else:  
+                    fecha_partido_iso = (pc.fecha_partido.isoformat() if pc.fecha_partido else None)
 
                 clas_rival = (
-                    ClasificacionJornada.objects.filter(
-                        equipo=rival,
-                        temporada=temporada,
-                        jornada__numero_jornada__lte=jornada_actual,
-                    )
+                    ClasificacionJornada.objects.filter(equipo=rival, temporada=temporada,jornada__numero_jornada__lte=jornada_actual)
                     .order_by('-jornada__numero_jornada')
                     .first()
                 )
@@ -414,8 +345,7 @@ class EquipoDetailView(APIView):
         try:
             ultimas_3_stats = get_estadisticas_equipo_temporadas(equipo, num_temporadas=3)
             ultimas_3_jugadores = get_jugadores_ultimas_temporadas(equipo, num_temporadas=3)
-        except Exception as exc:
-            logger.error('Error getting ultimas 3 temporadas for %s: %s', equipo.nombre, exc)
+        except Exception:
             ultimas_3_stats = {
                 'temporadas': [],
                 'total_goles': 0,
@@ -424,10 +354,9 @@ class EquipoDetailView(APIView):
             }
             ultimas_3_jugadores = []
 
-        # If no players in the requested season, suggest the most recent one with players
         suggested_temporada = None
         if not jugadores:
-            for t in temporadas:  # ordered by -nombre (most recent first)
+            for t in temporadas:  
                 if EquipoJugadorTemporada.objects.filter(equipo=equipo, temporada=t).exists():
                     suggested_temporada = t.nombre
                     break
@@ -447,7 +376,7 @@ class EquipoDetailView(APIView):
             'racha_actual_detalles': racha_actual_detalles,
             'temporadas_display': temporadas_display,
             'temporada_actual': temporada_display,
-            'temporada_actual_db': temporada_nombre,
+            'temporada_actual_db': temporada.nombre if temporada else None,
             'jornadas_disponibles': jornadas_disponibles,
             'jornada_actual': jornada_actual,
             'jornada_min': jornada_min,

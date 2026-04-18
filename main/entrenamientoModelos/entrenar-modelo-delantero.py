@@ -70,7 +70,7 @@ def visualizar_feature_importance(fi, titulo, nombre, top_n=20):
 
 def cargar_datos():
     df = BaseTrainer.cargar_datos(CONFIG['archivo'], {'DT', 'ST'}, low_memory=False, empty_msg="❌ No se encontraron columnas de posición")
-    print(f"✅ {df.shape[0]} delanteros (ST) cargados\n")
+    print(f" {df.shape[0]} delanteros (ST) cargados\n")
     return df
 
 
@@ -237,44 +237,25 @@ def aplicar_feature_selection(X, y):
 
 def definir_variables_finales(df):
     variables = [
-        # ATAQUE (CORE)
         "goals_roll5", "goals_ewma5",
         "xg_roll5", "xg_ewma5",
         "shots_roll5", "shots_ewma5",
         "shots_on_target_roll5", "shots_on_target_ewma5",
-        
-        # MOVIMIENTO OFENSIVO
         "dribbles_roll5", "dribbles_ewma5",
         "succ_dribbles_roll5", "succ_dribbles_ewma5",
         "prog_dribbles_roll5", "prog_dribbles_ewma5",
         "prog_dist_roll5", "prog_dist_ewma5",
-        
-        # CREATIVIDAD
         "key_passes_roll5", "key_passes_ewma5",
-        
-        # FORMA (FANTASY)
         "pf_roll5", "pf_ewma5",
-        
-        # DISPONIBILIDAD
         "minutes_pct_roll5", "minutes_pct_ewma5",
         "starter_pct_roll3", "starter_pct_ewma3",
-        
-        # CONTEXTO
         "is_home",
-        
-        # ODDS (MERCADO)
         "odds_prob_win", "odds_prob_loss", "odds_expected_goals_against",
         "odds_is_favored", "odds_market_confidence",
-        
-        # RIVAL (HISTÓRICOS)
         "opp_gf_roll5", "opp_gf_ewma5",
         "opp_gc_roll5", "opp_gc_ewma5",
         "opp_form_roll5", "opp_form_ewma5",
-        
-        # ROLES
-        "tiene_rol_delantero_core",  # Solo este feature
-        
-        # FEATURES AVANZADOS
+        "tiene_rol_delantero_core",  
         "shot_efficiency", "shot_accuracy", "offensive_threat",
         "creativity_index", "availability_threat", "offensive_form",
         "progressive_pressure", "goal_productivity",
@@ -316,43 +297,23 @@ class DelanteroTrainer(BaseTrainer):
     def run(self):
         BaseTrainer.print_banner("ENTRENA MODELO DE PREDICCIÓN: DELANTEROS (ST)")
         
-        # 1. Cargar datos
         df = cargar_datos()
-        
-        # 2. Diagnosticar y limpiar
         df = diagnosticar_y_limpiar(df)
-        
-        # 3. Cargar y procesar odds (ANTES de borrar jornada)
         df = cargar_y_procesar_odds(df)
-        
-        # 4. Preparar básicos (borra jornada DESPUÉS de odds)
         df = preparar_basicos(df)
-        
-        # 5. Crear features delanteros
         df = crear_features_delanteros_basicos(df)
-        
-        # 6. Features form, disponibilidad, contexto
         df = crear_features_form(df)
         df = crear_features_disponibilidad(df)
         df = crear_features_contexto(df)
         df = crear_features_rival(df)
-        # 7. Features avanzados
         df = crear_features_avanzados(df)
-        
-        # 8. Roles
         df = integrar_roles(df)
-        
-        # 9. Aplicar mejoras
         df = aplicar_mejoras(df)
-        
-        # 10. Preparar variables finales
         variables_finales = definir_variables_finales(df)
         
-        # Verificar que existan todas las variables
         variables_finales = [v for v in variables_finales if v in df.columns]
         print(f"Variables finales disponibles: {len(variables_finales)}\n")
         
-        # 11. Split train/test
         BaseTrainer.print_section("SPLIT TRAIN/TEST")
         
         X = df[variables_finales].fillna(0)
@@ -365,15 +326,13 @@ class DelanteroTrainer(BaseTrainer):
         BaseTrainer.print_split_summary(X_train, X_test)
         print(f"Features: {len(variables_finales)}\n")
         
-        # 12. Application feature selection
         variables_finales = aplicar_feature_selection(X_train, y_train)
         X_train = X_train[variables_finales]
         X_test = X_test[variables_finales]
         
-        # 13. Entrenar modelos
         entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables_finales)
         
-        BaseTrainer.print_banner("✅ ENTRENAMIENTO COMPLETADO EXITOSAMENTE")
+        BaseTrainer.print_banner(" ENTRENAMIENTO COMPLETADO EXITOSAMENTE")
 
 
 def main():

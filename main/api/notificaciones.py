@@ -1,13 +1,3 @@
-"""
-DRF API views – Notifications
-Endpoints:
-  GET  /api/notificaciones/
-  POST /api/notificaciones/<id>/leer/
-  POST /api/notificaciones/leer-todas/
-  POST /api/notificaciones/<id>/borrar/
-  POST /api/notificaciones/borrar-todas/
-"""
-import logging
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,8 +5,6 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from ..models import Notificacion
-
-logger = logging.getLogger(__name__)
 
 
 class NotificacionesView(APIView):

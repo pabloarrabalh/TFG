@@ -1,25 +1,22 @@
-import { useState, useEffect } from 'react'
-import apiClient from '../../services/apiClient'
+import { useState } from 'react'
 
 const BACKEND = 'http://localhost:8000'
 
 export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
-  const [step, setStep] = useState('select') // 'select', 'action', 'loading', 'result'
+  const [step, setStep] = useState('select') // 'select', 'loading', 'result'
   const [selectedJugador, setSelectedJugador] = useState(null)
-  const [selectedAction, setSelectedAction] = useState(null)
   const [resultado, setResultado] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
   const handleSelectJugador = (jugador) => {
     setSelectedJugador(jugador)
-    setStep('action')
     setError(null)
+    analizarJugador(jugador)
   }
 
-  const handleSelectAction = async (action) => {
-    if (!selectedJugador) return
-    setSelectedAction(action)
+  const analizarJugador = async (jugador) => {
+    if (!jugador) return
     setStep('loading')
     setError(null)
     setLoading(true)
@@ -33,8 +30,7 @@ export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
         },
         credentials: 'include',
         body: JSON.stringify({
-          jugador_id: selectedJugador.id,
-          accion: action,
+          jugador_id: jugador.id,
           plantilla_id: plantillaId,
         }),
       })
@@ -48,7 +44,7 @@ export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
       setStep('result')
     } catch (err) {
       setError(err?.message || 'Error al analizar al jugador')
-      setStep('action')
+      setStep('select')
     } finally {
       setLoading(false)
     }
@@ -56,7 +52,6 @@ export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
 
   const handleReset = () => {
     setSelectedJugador(null)
-    setSelectedAction(null)
     setResultado(null)
     setError(null)
     setStep('select')
@@ -69,8 +64,52 @@ export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
     return ''
   }
 
+  const toNumber = (value, fallback = 0) => {
+    const n = Number(value)
+    return Number.isFinite(n) ? n : fallback
+  }
+
+  const formatActionLabel = (value) => {
+    if (value === 'fichar') return 'Fichar'
+    if (value === 'vender') return 'Vender'
+    return 'Vender'
+  }
+
+  const confidence = resultado ? Math.max(0, Math.min(100, toNumber(resultado.confianza, 0))) : 0
+  const vsPromedio = resultado ? toNumber(resultado.vs_promedio, 0) : 0
+  const rendimiento = resultado ? toNumber(resultado.rendimiento, 0) : 0
+  const factores = Array.isArray(resultado?.factores) ? resultado.factores : []
+  const driversStack = factores
+    .filter((factor) => {
+      // Excluir estos factores de la visualización con barras
+      const excluded = ['sot_last5', 'shots_last5', 'pf_last8', 'form_trend_3_8', 'tackles_last5', 'clears_last5', 'min_last5', 'pf_std5']
+      return !excluded.includes(factor.nombre)
+    })
+    .map((factor, idx) => {
+      const impactoRel = Math.max(0, toNumber(factor.impacto_rel_pct ?? factor.impacto, 0))
+      return {
+        ...factor,
+        idx,
+        impactoRel,
+        esPositivo: factor.direccion === 'positivo',
+      }
+    })
+  const driversTotal = Math.max(
+    1,
+    driversStack.reduce((acc, factor) => acc + factor.impactoRel, 0)
+  )
+  const driversConPct = driversStack.map((factor) => ({
+    ...factor,
+    pctLinea: (factor.impactoRel / driversTotal) * 100,
+  }))
+
+  const confidenceColor =
+    resultado?.recomendacion === 'fichar'
+      ? 'bg-green-500/20 border-green-500/50 text-green-300'
+      : 'bg-red-500/20 border-red-500/50 text-red-300'
+
   return (
-    <div className="fixed bottom-6 right-6 w-96 bg-surface-dark border border-primary/40 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-[9999]">
+    <div className="fixed bottom-4 left-3 right-3 sm:left-auto sm:right-6 sm:w-96 bg-surface-dark border border-primary/40 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-[9999]">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary/20 to-primary/10 border-b border-primary/20 px-5 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -112,38 +151,7 @@ export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
           </div>
         )}
 
-        {/* STEP 2: Select action */}
-        {step === 'action' && selectedJugador && (
-          <div className="space-y-3">
-            <p className="text-sm text-gray-300 font-semibold">
-              Vale, ¿qué deseas hacer con <span className="text-primary">{selectedJugador.nombre}</span>?
-            </p>
-            <div className="space-y-2">
-              {[
-                { id: 'fichar', label: 'Fichar', icon: 'arrow_downward', color: 'border-blue-500/40 hover:bg-blue-500/10' },
-                { id: 'vender', label: 'Vender', icon: 'arrow_upward', color: 'border-red-500/40 hover:bg-red-500/10' },
-                { id: 'mantener', label: 'Mantener', icon: 'lock', color: 'border-green-500/40 hover:bg-green-500/10' },
-              ].map((action) => (
-                <button
-                  key={action.id}
-                  onClick={() => handleSelectAction(action.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all text-left font-bold text-white ${action.color}`}
-                >
-                  <span className="material-symbols-outlined text-lg">{action.icon}</span>
-                  {action.label}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={handleReset}
-              className="w-full px-4 py-2 text-xs text-gray-400 hover:text-white transition-colors border border-border-dark rounded-lg"
-            >
-              Volver atrás
-            </button>
-          </div>
-        )}
-
-        {/* STEP 3: Loading */}
+        {/* STEP 2: Loading */}
         {step === 'loading' && (
           <div className="flex flex-col items-center justify-center py-8 gap-3">
             <div className="animate-spin inline-block w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full" />
@@ -151,25 +159,35 @@ export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
           </div>
         )}
 
-        {/* STEP 4: Result */}
+        {/* STEP 3: Result */}
         {step === 'result' && resultado && (
           <div className="space-y-4">
             {/* Header: accion + modelo recommendation */}
             <div className="bg-primary/20 border border-primary/40 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-1">
-                <p className="text-xs font-bold text-primary uppercase tracking-wider">
-                  {resultado.accion === 'fichar' ? 'Fichar' : resultado.accion === 'vender' ? 'Vender' : 'Mantener'} — Análisis Inteligente
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <p className="text-xs font-bold text-primary uppercase tracking-wider leading-relaxed">
+                  Recomendación automática - Análisis Inteligente
                 </p>
                 {resultado.confianza > 0 && (
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${
-                    resultado.recomendacion === 'fichar'   ? 'bg-green-500/20 border-green-500/50 text-green-300' :
-                    resultado.recomendacion === 'vender'   ? 'bg-red-500/20 border-red-500/50 text-red-300' :
-                                                             'bg-yellow-500/20 border-yellow-500/50 text-yellow-300'
-                  }`}>
-                    Modelo: {resultado.recomendacion} {resultado.confianza}%
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full border whitespace-nowrap ${confidenceColor}`}>
+                    Recomendación: {formatActionLabel(resultado.recomendacion)} ({resultado.confianza}%)
                   </span>
                 )}
               </div>
+              {resultado.confianza > 0 && (
+                <div className="mb-3">
+                  <div className="w-full h-2 rounded-full bg-black/30 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        resultado.recomendacion === 'fichar'
+                          ? 'bg-green-400'
+                          : 'bg-red-400'
+                      }`}
+                      style={{ width: `${confidence}%` }}
+                    />
+                  </div>
+                </div>
+              )}
               <p className="text-sm text-white leading-relaxed font-semibold">{resultado.veredicto}</p>
             </div>
 
@@ -177,13 +195,13 @@ export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
             <div className="grid grid-cols-3 gap-2">
               <div className="bg-background-dark border border-border-dark rounded-lg p-3 text-center">
                 <p className="text-xs text-gray-400 mb-1">Rendimiento</p>
-                <p className="text-lg font-black text-yellow-400">{resultado.rendimiento}</p>
+                <p className="text-lg font-black text-yellow-400">{rendimiento.toFixed(2)}</p>
                 <p className="text-xs text-gray-500">media temp.</p>
               </div>
               <div className="bg-background-dark border border-border-dark rounded-lg p-3 text-center">
                 <p className="text-xs text-gray-400 mb-1">vs Promedio</p>
-                <p className={`text-lg font-black ${resultado.vs_promedio > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {resultado.vs_promedio > 0 ? '+' : ''}{resultado.vs_promedio.toFixed(1)}
+                <p className={`text-lg font-black ${vsPromedio > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {vsPromedio > 0 ? '+' : ''}{vsPromedio.toFixed(1)}
                 </p>
                 <p className="text-xs text-gray-500">posición</p>
               </div>
@@ -198,8 +216,8 @@ export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
 
             {resultado.razon && (
               <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
-                <p className="text-xs font-bold text-blue-300 mb-2">Motivos</p>
-                <p className="text-xs text-blue-200 leading-relaxed">{resultado.razon}</p>
+                <p className="text-xs font-bold text-blue-300 mb-2">Resumen contextual</p>
+                <p className="text-xs text-blue-200 whitespace-pre-wrap leading-relaxed">{resultado.razon}</p>
               </div>
             )}
 

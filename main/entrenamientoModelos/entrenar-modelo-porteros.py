@@ -217,44 +217,27 @@ def aplicar_feature_selection(X, y):
 
 def definir_variables_finales(df):
     variables = [
-        # GK STATS (ventana 5 only) - SIN duelos aéreos ni despejes
         "save_pct_roll5", "save_pct_ewma5",
         "psxg_roll5", "psxg_ewma5",
         "goles_contra_roll5",
         "pass_comp_pct_roll5", "pass_comp_pct_ewma5",
-        
-        # FORM (ventana 5)
         "pf_roll5", "pf_ewma5",
-        
-        # AVAILABILITY (ventana 5)
         "minutes_pct_roll5", "minutes_pct_ewma5",
         "starter_pct_roll5",
-        
-        # CONTEXT
         "is_home",
-
-        # RIVAL (forma real calculada desde GF/GC, con shift para no leakage)
         "opp_gf_roll5", "opp_gf_ewma5",
         "opp_gc_roll5", "opp_gc_ewma5",
         "opp_form_roll5", "opp_form_ewma5",
-        
-        # ODDS - NUEVAS VARIABLES DE MERCADO
         "odds_prob_win",
         "odds_prob_loss",
         "odds_expected_goals_against",
         "odds_is_favored",
         "odds_market_confidence",
-        
-        # ROLES
         "elite_paradas_interact", "porterias_cero_eficiencia",
-        "num_roles_criticos",      # Total de roles críticos (SOLO ESTE)
-        
-        # FANTASY FEATURES
+        "num_roles_criticos",      
         "cs_probability", "cs_rate_recent", "cs_expected_points",
         "save_per_90_ewma5", "psxg_per_90_ewma5",
         "expected_gk_core_points",
-        
-        # ADVANCED FEATURES
         "defensive_combo", "form_ratio", "save_pct_power2", "minutes_form_combo",
         "weak_opponent", "momentum_factor", "total_strength", "save_advantage", "availability_form",
     ]
@@ -354,10 +337,7 @@ class PorteroTrainer(BaseTrainer):
         
         print(f"\n Modelo guardado: {DIRECTORIO_MODELOS / f'best_model_{mejor_nombre}.pkl'}")
         print(f" Parámetros: {DIRECTORIO_MODELOS / f'best_model_params_{mejor_nombre}.json'}")
-        
-        # ═════════════════════════════════════════════════════════════════════════════
-        # GUARDAR RANDOM FOREST SÍ O SÍ (aunque no sea el mejor)
-        # ═════════════════════════════════════════════════════════════════════════════
+       
         if 'RF' in resultados:
             rf_metrics = resultados['RF']
             with open(DIRECTORIO_MODELOS / "best_model_RF.pkl", 'wb') as f:

@@ -1,15 +1,3 @@
-"""
-DRF API views - Friends / Social
-Endpoints:
-  GET  /api/amigos/
-  POST /api/amigos/solicitud/
-  POST /api/amigos/aceptar/<id>/
-  POST /api/amigos/rechazar/<id>/
-  POST /api/amigos/eliminar/<id>/
-  GET  /api/amigos/<user_id>/plantillas/
-"""
-import logging
-
 from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework.response import Response
@@ -19,8 +7,6 @@ from rest_framework.permissions import IsAuthenticated
 
 from .auth import _user_info
 from ..models import Amistad, Notificacion, Plantilla, SolicitudAmistad
-
-logger = logging.getLogger(__name__)
 
 
 class AmigosView(APIView):
@@ -63,7 +49,6 @@ class AmigosView(APIView):
                 'solicitudes_enviadas': solicitudes_enviadas,
             })
         except Exception as exc:
-            logger.error('api_amigos error: %s', exc)
             return Response({
                 'amigos': [], 'solicitudes_pendientes': [], 'solicitudes_enviadas': []
             })
@@ -76,13 +61,7 @@ class EnviarSolicitudView(APIView):
     def post(self, request):
         try:
             username_raw = (request.data.get('username') or '').strip().lstrip('@').strip()
-            receptor = None
-            try:
-                receptor = User.objects.get(username__iexact=username_raw)
-            except User.DoesNotExist:
-                receptor = User.objects.filter(
-                    username__icontains=username_raw
-                ).first()
+            receptor = User.objects.filter(username__iexact=username_raw).first()
             if receptor is None:
                 return Response(
                     {'error': 'Usuario no encontrado. Usa el nombre de usuario exacto (sin @).'},
@@ -102,16 +81,15 @@ class EnviarSolicitudView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             
-            # Obtener preferencias de notificación del receptor, con default a 'all'
+            #Por defecto todas las notis
             pref = 'all'
             try:
                 if hasattr(receptor, 'profile') and receptor.profile:
                     pref = receptor.profile.preferencias_notificaciones or 'all'
-            except Exception as exc:
-                logger.warning(f'Error getting notification preference for user {receptor.id}: {exc}')
+            except Exception:
                 pref = 'all'
             
-            # Crear notificación si las preferencias lo permiten
+        
             if pref in ('all', 'friends'):
                 try:
                     Notificacion.objects.create(
@@ -130,13 +108,11 @@ class EnviarSolicitudView(APIView):
                             'estado': 'pendiente',
                         },
                     )
-                    logger.info(f'Notification created for friend request from {request.user.id} to {receptor.id}')
-                except Exception as exc:
-                    logger.error(f'Error creating notification for friend request: {exc}')
+                except Exception:
+                    pass
             
             return Response({'status': 'ok'})
         except Exception as exc:
-            logger.error(f'EnviarSolicitud error: {exc}')
             return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -153,7 +129,6 @@ class AceptarSolicitudView(APIView):
             sol.save()
             Amistad.objects.get_or_create(usuario1=sol.emisor, usuario2=request.user)
             
-            # Actualizar notificación existente
             for rn in Notificacion.objects.filter(
                 usuario=request.user, tipo='solicitud_amistad', datos__solicitud_id=sol.id
             ):
@@ -163,18 +138,15 @@ class AceptarSolicitudView(APIView):
                     rn.datos = d
                     rn.leida = True
                     rn.save()
-                except Exception as exc:
-                    logger.warning(f'Error updating notification {rn.id}: {exc}')
+                except Exception:
                     rn.leida = True
                     rn.save()
             
-            # Crear notificación para el emisor
             pref = 'all'
             try:
                 if hasattr(sol.emisor, 'profile') and sol.emisor.profile:
                     pref = sol.emisor.profile.preferencias_notificaciones or 'all'
-            except Exception as exc:
-                logger.warning(f'Error getting notification preference for user {sol.emisor.id}: {exc}')
+            except Exception:
                 pref = 'all'
             
             if pref in ('all', 'friends'):
@@ -193,13 +165,11 @@ class AceptarSolicitudView(APIView):
                             'estado': 'aceptada',
                         },
                     )
-                    logger.info(f'Notification created for accepted friend request to {sol.emisor.id}')
-                except Exception as exc:
-                    logger.error(f'Error creating notification for accepted friend request: {exc}')
+                except Exception:
+                    pass
             
             return Response({'status': 'ok'})
         except Exception as exc:
-            logger.error(f'AceptarSolicitud error: {exc}')
             return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -215,7 +185,6 @@ class RechazarSolicitudView(APIView):
             sol.estado = 'rechazada'
             sol.save()
             
-            # Actualizar notificación existente
             for rn in Notificacion.objects.filter(
                 usuario=request.user, tipo='solicitud_amistad', datos__solicitud_id=sol.id
             ):
@@ -225,18 +194,15 @@ class RechazarSolicitudView(APIView):
                     rn.datos = d
                     rn.leida = True
                     rn.save()
-                except Exception as exc:
-                    logger.warning(f'Error updating notification {rn.id}: {exc}')
+                except Exception:
                     rn.leida = True
                     rn.save()
             
-            # Crear notificación para el emisor (opcional, según preferencias)
             pref = 'all'
             try:
                 if hasattr(sol.emisor, 'profile') and sol.emisor.profile:
                     pref = sol.emisor.profile.preferencias_notificaciones or 'all'
-            except Exception as exc:
-                logger.warning(f'Error getting notification preference for user {sol.emisor.id}: {exc}')
+            except Exception:
                 pref = 'all'
             
             if pref in ('all', 'friends'):
@@ -256,13 +222,11 @@ class RechazarSolicitudView(APIView):
                             'estado': 'rechazada',
                         },
                     )
-                    logger.info(f'Notification created for rejected friend request to {sol.emisor.id}')
-                except Exception as exc:
-                    logger.error(f'Error creating notification for rejected friend request: {exc}')
+                except Exception:
+                    pass
             
             return Response({'status': 'ok'})
         except Exception as exc:
-            logger.error(f'RechazarSolicitud error: {exc}')
             return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -272,11 +236,24 @@ class EliminarAmigoView(APIView):
 
     def post(self, request, user_id):
         try:
-            amigo = User.objects.get(id=user_id)
-            Amistad.objects.filter(
+            if user_id == request.user.id:
+                return Response(
+                    {'error': 'No puedes eliminarte como amigo.'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            amigo = User.objects.filter(id=user_id).first()
+            if amigo is None:
+                return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+            deleted, _ = Amistad.objects.filter(
                 Q(usuario1=request.user, usuario2=amigo)
                 | Q(usuario1=amigo, usuario2=request.user)
             ).delete()
+
+            if deleted == 0:
+                return Response({'error': 'No sois amigos'}, status=status.HTTP_404_NOT_FOUND)
+
             return Response({'status': 'ok'})
         except Exception as exc:
             return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)

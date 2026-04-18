@@ -1,14 +1,4 @@
-"""
-DRF API views – User Profile
-Endpoints:
-  GET    /api/perfil/
-  PATCH  /api/perfil/update/
-  PATCH  /api/perfil/status/
-  POST   /api/perfil/foto/
-  PATCH  /api/perfil/preferencias-notificaciones/
-  POST   /api/perfil/cambiar-jornada/
-"""
-import logging
+
 import os
 import re
 import time
@@ -18,6 +8,7 @@ from pathlib import Path
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
+from django.db import IntegrityError
 from django.db.models import Count, Sum
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -26,16 +17,6 @@ from rest_framework.views import APIView
 
 from ..models import *
 from ..views.utils import shield_name
-
-logger = logging.getLogger(__name__)
-
-_SHIELD_MAP = {
-    'Barcelona': 'barcelona.png',
-    'Real Madrid': 'madrid.png',
-    'Atlético Madrid': 'atletico_madrid.png',
-    'Valencia': 'valencia.png',
-    'Sevilla': 'sevilla.png',
-}
 
 
 def _build_unique_name(prefix: str, source_name: str) -> str:
@@ -50,7 +31,6 @@ def _cache_busted_url(file_field) -> str | None:
 
 
 def _store_user_upload_copy(file_bytes: bytes, original_name: str) -> None:
-    """Guarda una copia física de las subidas del usuario en frontend-web/userprofilefotos."""
     target_dir = os.path.join(settings.BASE_DIR, 'frontend-web', 'userprofilefotos')
     os.makedirs(target_dir, exist_ok=True)
     filename = _build_unique_name('upload', original_name)
@@ -85,10 +65,9 @@ def _resolve_default_avatar_path(raw_avatar: str) -> Path | None:
     return None
 
 
-# ── 1. GET PERFIL ─────────────────────────────────────────────────────────────
 
 class PerfilView(APIView):
-    """GET /api/perfil/ – returns the authenticated user's full profile data."""
+    """GET /api/perfil/ """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -121,10 +100,8 @@ class PerfilView(APIView):
         })
 
 
-# ── 2. UPDATE PERFIL ──────────────────────────────────────────────────────────
-
 class UpdatePerfilView(APIView):
-    """PATCH /api/perfil/update/ – update editable user / profile fields."""
+    """PATCH /api/perfil/update/."""
     permission_classes = [IsAuthenticated]
 
     def patch(self, request):
@@ -140,7 +117,9 @@ class UpdatePerfilView(APIView):
                 errors['email'] = 'Este email ya está registrado'
 
         if new_nickname != user.profile.nickname:
-            if UserProfile.objects.filter(nickname=new_nickname).exclude(user=user).exists():
+            if new_nickname and UserProfile.objects.filter(nickname__iexact=new_nickname).exclude(user=user).exists():
+                errors['nickname'] = 'Este nickname ya está en uso'
+            if new_nickname and User.objects.filter(username__iexact=new_nickname).exclude(pk=user.pk).exists():
                 errors['nickname'] = 'Este nickname ya está en uso'
 
         if errors:
@@ -152,15 +131,19 @@ class UpdatePerfilView(APIView):
         user.save()
 
         user.profile.nickname = new_nickname
-        user.profile.save()
+        try:
+            user.profile.save()
+        except IntegrityError:
+            return Response(
+                {'errors': {'nickname': 'Este nickname ya está en uso'}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         return Response({'status': 'ok'})
 
 
-# ── 3. UPDATE STATUS ──────────────────────────────────────────────────────────
-
 class UpdateStatusView(APIView):
-    """PATCH /api/perfil/status/ – change presence status."""
+    """PATCH /api/perfil/status/"""
     permission_classes = [IsAuthenticated]
 
     def patch(self, request):
@@ -175,55 +158,16 @@ class UpdateStatusView(APIView):
         return Response({'status': 'ok', 'estado': nuevo_estado})
 
 
-# ── 4. UPLOAD PHOTO ───────────────────────────────────────────────────────────
-
 class UploadPhotoView(APIView):
-    """POST /api/perfil/foto/ – upload or set profile photo.
-
-    Accepts one of:
-      - multipart field ``foto``         (file upload)
-      - POST field ``shield_team``       (use a club shield from /static/escudos/)
-      - POST field ``default_avatar``    (use a default avatar from /static/logos/ or /static/escudos/)
-    """
+    """POST /api/perfil/foto/"""
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
-        shield_team = request.data.get('shield_team')
         default_avatar = request.data.get('default_avatar')
         uploaded_photo = request.FILES.get('foto')
 
-        if shield_team:
-            filename = _SHIELD_MAP.get(shield_team)
-            if not filename:
-                return Response(
-                    {'error': 'Equipo no encontrado'},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            path = os.path.join(settings.BASE_DIR, 'static', 'escudos', filename)
-            if not os.path.exists(path):
-                return Response(
-                    {'error': f'Archivo no encontrado: {path}'},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            try:
-                with open(path, 'rb') as f:
-                    file_bytes = f.read()
-                    generated_name = _build_unique_name(
-                        f'shield_{shield_team.lower().replace(" ", "_")}',
-                        filename,
-                    )
-                    profile.foto.save(
-                        generated_name,
-                        ContentFile(file_bytes),
-                        save=True,
-                    )
-                return Response({'status': 'success', 'photo_url': _cache_busted_url(profile.foto)})
-            except Exception as exc:
-                logger.error(f"Error guardando escudo: {exc}")
-                return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
-
-        elif uploaded_photo:
+        if uploaded_photo:
             try:
                 file_bytes = uploaded_photo.read()
                 generated_name = _build_unique_name('user_photo', uploaded_photo.name)
@@ -231,7 +175,6 @@ class UploadPhotoView(APIView):
                 _store_user_upload_copy(file_bytes, uploaded_photo.name)
                 return Response({'status': 'success', 'photo_url': _cache_busted_url(profile.foto)})
             except Exception as exc:
-                logger.error(f"Error guardando foto: {exc}")
                 return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
         elif default_avatar:
@@ -248,7 +191,6 @@ class UploadPhotoView(APIView):
                     profile.foto.save(generated_name, ContentFile(file_bytes), save=True)
                 return Response({'status': 'success', 'photo_url': _cache_busted_url(profile.foto)})
             except Exception as exc:
-                logger.error(f"Error guardando avatar: {exc}")
                 return Response({'error': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
@@ -256,8 +198,6 @@ class UploadPhotoView(APIView):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-
-# ── 5. UPDATE PREFERENCIAS NOTIFICACIONES ─────────────────────────────────────
 
 class UpdatePreferenciasNotificacionesView(APIView):
     """PATCH /api/perfil/preferencias-notificaciones/"""
@@ -277,134 +217,3 @@ class UpdatePreferenciasNotificacionesView(APIView):
         return Response({'status': 'ok', 'preferencias_notificaciones': valor})
 
 
-# ── 6. CAMBIAR JORNADA ────────────────────────────────────────────────────────
-
-class CambiarJornadaView(APIView):
-    """POST /api/perfil/cambiar-jornada/ {jornada: int}
-
-    Returns the player roster split by position for the requested jornada,
-    enriched with next-fixture and fantasy-points data.
-    """
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        nueva_jornada = request.data.get('jornada')
-        if not isinstance(nueva_jornada, int):
-            return Response(
-                {'error': 'jornada debe ser un entero'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        temporada_actual = Temporada.objects.last()
-        if not temporada_actual:
-            return Response(
-                {'error': 'No hay temporada disponible'},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        jornada_obj = Jornada.objects.filter(
-            temporada=temporada_actual, numero_jornada=nueva_jornada
-        ).first()
-        if not jornada_obj:
-            return Response(
-                {'error': f'Jornada {nueva_jornada} no existe'},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        # Build fixture lookup {equipo_id: {rival_id, rival_nombre, es_local}}
-        partidos_por_equipo: dict = {}
-        for partido in (
-            Partido.objects.filter(jornada=jornada_obj)
-            .select_related('equipo_local', 'equipo_visitante')
-        ):
-            partidos_por_equipo[partido.equipo_local.id] = {
-                'rival_id': partido.equipo_visitante.id,
-                'rival_nombre': partido.equipo_visitante.nombre,
-                'es_local': True,
-            }
-            partidos_por_equipo[partido.equipo_visitante.id] = {
-                'rival_id': partido.equipo_local.id,
-                'rival_nombre': partido.equipo_local.nombre,
-                'es_local': False,
-            }
-
-        # Fallback to Calendario if no Partido rows yet
-        if not partidos_por_equipo:
-            for cal in (
-                Calendario.objects.filter(jornada=jornada_obj)
-                .select_related('equipo_local', 'equipo_visitante')
-            ):
-                partidos_por_equipo[cal.equipo_local.id] = {
-                    'rival_id': cal.equipo_visitante.id,
-                    'rival_nombre': cal.equipo_visitante.nombre,
-                    'es_local': True,
-                }
-                partidos_por_equipo[cal.equipo_visitante.id] = {
-                    'rival_id': cal.equipo_local.id,
-                    'rival_nombre': cal.equipo_local.nombre,
-                    'es_local': False,
-                }
-
-        # Players with < 60 min in their last 4 games → flagged as 'pocos_minutos'
-        _min_map: dict = {}
-        for row in (
-            EstadisticasPartidoJugador.objects
-            .filter(partido__jornada__temporada=temporada_actual)
-            .values('jugador_id', 'min_partido')
-            .order_by('jugador_id', '-partido__jornada__numero_jornada')
-        ):
-            jid = row['jugador_id']
-            if jid not in _min_map:
-                _min_map[jid] = []
-            if len(_min_map[jid]) < 4:
-                _min_map[jid].append(row['min_partido'] or 0)
-
-        pocos_minutos = {
-            jid for jid, mins in _min_map.items()
-            if mins and sum(mins) < 60
-        }
-
-        jugadores_por_posicion: dict = {
-            'Portero': [], 'Defensa': [], 'Centrocampista': [], 'Delantero': [],
-        }
-        seen: set = set()
-        for ejt in (
-            EquipoJugadorTemporada.objects
-            .filter(temporada=temporada_actual)
-            .select_related('jugador', 'equipo')
-            .order_by('jugador__nombre')
-        ):
-            jugador = ejt.jugador
-            if jugador.id in seen:
-                continue
-            seen.add(jugador.id)
-
-            posicion = ejt.posicion or 'Delantero'
-            if posicion not in jugadores_por_posicion:
-                continue
-
-            stats = EstadisticasPartidoJugador.objects.filter(
-                partido__jornada__temporada=temporada_actual,
-                jugador=jugador,
-                puntos_fantasy__lte=50,
-            ).aggregate(total_puntos=Sum('puntos_fantasy'))
-
-            rival = partidos_por_equipo.get(ejt.equipo.id)
-            jugadores_por_posicion[posicion].append({
-                'id': jugador.id,
-                'nombre': jugador.nombre,
-                'apellido': jugador.apellido,
-                'posicion': posicion,
-                'equipo_id': ejt.equipo.id,
-                'equipo_nombre': ejt.equipo.nombre,
-                'puntos_fantasy_25_26': stats['total_puntos'] or 0,
-                'proximo_rival_id': rival['rival_id'] if rival else None,
-                'proximo_rival_nombre': rival['rival_nombre'] if rival else None,
-                'pocos_minutos': jugador.id in pocos_minutos,
-            })
-
-        return Response({
-            'status': 'success',
-            'jornada': nueva_jornada,
-            'jugadores_por_posicion': jugadores_por_posicion,
-        })

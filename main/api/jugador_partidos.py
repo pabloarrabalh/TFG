@@ -1,93 +1,142 @@
-"""
-API endpoint para obtener últimos partidos de un jugador
-GET /api/jugador_partidos/?jugador_id=123&jornada_actual=12
-"""
+from collections import defaultdict
+
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
-from ..models import (
-    Jugador, Jornada, Partido, EstadisticasPartidoJugador, 
-    EquipoJugadorTemporada, Temporada
-)
+
+from .common import get_latest_temporada, jugador_payload_basic, parse_unique_positive_int_ids
+from ..models import EquipoJugadorTemporada, EstadisticasPartidoJugador, Jugador
+
+
+def _partidos_info(stats, jugador_equipo_id):
+    partidos = []
+    for stat in stats[:5]:
+        p = stat.partido
+        if jugador_equipo_id and p.equipo_local_id == jugador_equipo_id:
+            rival_nombre = p.equipo_visitante.nombre
+        elif jugador_equipo_id and p.equipo_visitante_id == jugador_equipo_id:
+            rival_nombre = p.equipo_local.nombre
+        else:
+            rival_nombre = "TBD"
+
+        fecha_str = p.fecha_partido.strftime("%d/%m") if p.fecha_partido else None
+        partidos.append(
+            {
+                "jornada": p.jornada.numero_jornada,
+                "rival": rival_nombre,
+                "minutos": stat.min_partido or 0,
+                "puntos": stat.puntos_fantasy if stat.puntos_fantasy and stat.puntos_fantasy > 0 else None,
+                "fecha": fecha_str,
+            }
+        )
+    return partidos
 
 
 class JugadorPartidosView(APIView):
-    """GET /api/jugador_partidos/?jugador_id=123&jornada_actual=12"""
+    """GET /api/jugador-partidos/?jugador_id=123&jornada_actual=12"""
+
     permission_classes = [AllowAny]
 
     def get(self, request):
-        jugador_id = request.GET.get('jugador_id')
-        jornada_actual = request.GET.get('jornada_actual')
-        
+        jugador_id = request.GET.get("jugador_id")
+        jornada_actual = request.GET.get("jornada_actual")
+
         if not jugador_id or not jornada_actual:
-            return Response({'error': 'Parámetros requeridos', 'partidos': []}, status=200)
-        
+            return Response({"error": "Parámetros requeridos", "partidos": []}, status=200)
+
         try:
             jugador = Jugador.objects.get(id=jugador_id)
-            jornada_num = int(jornada_actual)
-            # Obtener temporada actual
-            temporada = Temporada.objects.order_by('-nombre').first()
-        except (Jugador.DoesNotExist, ValueError, AttributeError):
-            return Response({'jugador': {'id': jugador_id}, 'partidos': []}, status=200)
-        
+        except (Jugador.DoesNotExist, ValueError, TypeError):
+            return Response({"jugador": {"id": jugador_id}, "partidos": []}, status=200)
+
+        temporada = get_latest_temporada()
         if not temporada:
-            return Response({'jugador': {'id': jugador_id}, 'partidos': []}, status=200)
-        
+            return Response({"jugador": {"id": jugador_id}, "partidos": []}, status=200)
+
         try:
-            # Obtener últimos 5 partidos del jugador (sin unir con EquipoJugadorTemporada)
-            ultimos_partidos = (
-                EstadisticasPartidoJugador.objects
-                .filter(jugador=jugador, partido__jornada__temporada=temporada)
-                .select_related('partido', 'partido__equipo_local', 'partido__equipo_visitante', 'partido__jornada')
-                .order_by('-partido__jornada__numero_jornada')[:5]
+            ultimos_partidos = list(
+                EstadisticasPartidoJugador.objects.filter( jugador=jugador,partido__jornada__temporada=temporada,)
+                .select_related("partido", "partido__equipo_local", "partido__equipo_visitante", "partido__jornada")
+                .order_by("-partido__jornada__numero_jornada")[:5]
             )
-            
-            # Obtener equipo actual del jugador
-            ejt = (
-                EquipoJugadorTemporada.objects
-                .filter(jugador=jugador, temporada=temporada)
-                .select_related('equipo')
-                .first()
-            )
-            
-            partidos_info = []
-            for stat in ultimos_partidos:
-                p = stat.partido
-                
-                # Determinar rival
-                if ejt:
-                    jugador_equipo_id = ejt.equipo_id
-                    rival_nombre = (
-                        p.equipo_visitante.nombre if p.equipo_local_id == jugador_equipo_id
-                        else p.equipo_local.nombre
-                    )
-                else:
-                    rival_nombre = 'TBD'
-                
-                # Determinar fecha del partido
-                fecha_str = None
-                if p.fecha_partido:
-                    fecha_str = p.fecha_partido.strftime('%d/%m')
-                
-                partidos_info.append({
-                    'jornada': p.jornada.numero_jornada,
-                    'rival': rival_nombre,
-                    'minutos': stat.min_partido or 0,
-                    'puntos': stat.puntos_fantasy if stat.puntos_fantasy and stat.puntos_fantasy > 0 else None,
-                    'fecha': fecha_str,
-                })
-            
-            return Response({
-                'jugador': {
-                    'id': jugador.id,
-                    'nombre': jugador.nombre,
-                    'apellido': jugador.apellido,
+
+            ejt = (EquipoJugadorTemporada.objects.filter(jugador=jugador, temporada=temporada).select_related("equipo").first())
+            jugador_equipo_id = ejt.equipo_id if ejt else None
+
+            return Response(
+                {
+                    "jugador": jugador_payload_basic(jugador.id, jugador),
+                    "partidos": _partidos_info(ultimos_partidos, jugador_equipo_id),
                 },
-                'partidos': partidos_info[:5],  # Últimos 5
-            }, status=200)
-        except Exception as e:
-            # En caso de cualquier otro error, devolver lista vacía
-            return Response({
-                'jugador': {'id': jugador_id},
-                'partidos': []
-            }, status=200)
+                status=200,
+            )
+        except Exception:
+            return Response({"jugador": {"id": jugador_id}, "partidos": []}, status=200)
+
+
+class JugadorPartidosBatchView(APIView):
+    """POST /api/jugador-partidos-batch/."""
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        jornada_actual = request.data.get("jornada_actual")
+        if jornada_actual is None:
+            return Response({"error": "Parámetros requeridos", "partidos_por_jugador": {}}, status=200)
+
+        try:
+            int(jornada_actual) 
+        except (ValueError, TypeError):
+            return Response({"error": "Parámetros requeridos", "partidos_por_jugador": {}}, status=200)
+
+        jugador_ids = parse_unique_positive_int_ids(request.data.get("jugador_ids"))
+        if not jugador_ids:
+            return Response({"partidos_por_jugador": {}}, status=200)
+
+        temporada = get_latest_temporada()
+        if not temporada:
+            return Response({"partidos_por_jugador": {}}, status=200)
+
+        try:
+            jugadores = {j.id: j for j in Jugador.objects.filter(id__in=jugador_ids)}
+            eq_map = {
+                row["jugador_id"]: row["equipo_id"]
+                for row in EquipoJugadorTemporada.objects.filter(
+                    jugador_id__in=jugador_ids,
+                    temporada=temporada,
+                ).values("jugador_id", "equipo_id")
+            }
+
+            stats = (
+                EstadisticasPartidoJugador.objects.filter(jugador_id__in=jugador_ids, partido__jornada__temporada=temporada,)
+                .select_related("partido", "partido__equipo_local", "partido__equipo_visitante", "partido__jornada")
+                .order_by("jugador_id", "-partido__jornada__numero_jornada")
+            )
+
+            grouped_stats = defaultdict(list)
+            for stat in stats:
+                if len(grouped_stats[stat.jugador_id]) >= 5:
+                    continue
+                grouped_stats[stat.jugador_id].append(stat)
+
+            partidos_por_jugador = {}
+            for jid in jugador_ids:
+                partidos_por_jugador[str(jid)] = _partidos_info(grouped_stats.get(jid, []), eq_map.get(jid))
+
+            return Response(
+                {
+                    "partidos_por_jugador": partidos_por_jugador,
+                    "jugadores": {
+                        str(jid): jugador_payload_basic(jid, jugadores.get(jid))
+                        for jid in jugador_ids
+                    },
+                },
+                status=200,
+            )
+        except Exception:
+            return Response(
+                {
+                    "error": "Error procesando lote de jugadores",
+                    "partidos_por_jugador": {str(jid): [] for jid in jugador_ids},
+                },
+                status=200,
+            )

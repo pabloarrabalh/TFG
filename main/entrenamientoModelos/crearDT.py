@@ -119,27 +119,9 @@ def construir_dataset_completo():
 
 
 def agregar_standings_lagged_y_crear_target(df_players: pd.DataFrame, standings: pd.DataFrame) -> pd.DataFrame:
-    """
-    Enriquece datos de jugadores con standings de la jornada anterior (lagged)
-    y crea el target (puntos fantasy de la próxima jornada).
-    
-    Usado para TRAINING: proporciona features + targets históricos.
-    
-    Args:
-        df_players: DataFrame con datos de jugadores (todas las jornadas)
-        standings: DataFrame con clasificación por jornada
-    
-    Returns:
-        DataFrame enriquecido con:
-        - jornada_anterior: referencia a jornada previa
-        - Columnas standings del equipo propio (jornada anterior) con sufijo "_equipo"
-        - Columnas standings del rival (jornada anterior) con sufijo "_rival"
-        - target_pf_next: puntos fantasy que sacará en la próxima jornada (LABEL para ML)
-    """
     df = df_players.copy()
     df["jornada_anterior"] = df["jornada"] - 1
 
-    # Detectar nombres de columnas de equipo (case-insensitive)
     equipo_propio_col = next((col for col in df.columns if 'equipo' in col.lower() and 'propio' in col.lower()), None)
     equipo_rival_col = next((col for col in df.columns if 'equipo' in col.lower() and 'rival' in col.lower()), None)
     
@@ -154,7 +136,7 @@ def agregar_standings_lagged_y_crear_target(df_players: pd.DataFrame, standings:
     # Detectar columna de puntos
     puntos_col = next((col for col in df.columns if 'puntos' in col.lower()), 'puntos')
     
-    print(f"\n📋 Detectadas columnas:")
+    print(f"\n Detectadas columnas:")
     print(f"   - Equipo propio: {equipo_propio_col}")
     print(f"   - Equipo rival: {equipo_rival_col}")
     print(f"   - Puntos: {puntos_col}")
@@ -166,19 +148,18 @@ def agregar_standings_lagged_y_crear_target(df_players: pd.DataFrame, standings:
 
         st_rival = standings.rename(columns={equipo_col_standings: equipo_rival_col, "jornada": "jornada_anterior"})
         df = df.merge(st_rival, on=["temporada", "jornada_anterior", equipo_rival_col], how="left", suffixes=("", "_rival"))
-        print(f"✅ Merge con standings completado")
+        print(f" Merge con standings completado")
     except Exception as e:
-        print(f"⚠️ Warning en merge de clasificación: {e}")
+        print(f" Warning en merge de clasificación: {e}")
         print(f"   Columnas en df: {df.columns.tolist()[:15]}")
 
     df = df.sort_values(["player", "temporada", "jornada", "fecha_partido"])
     
-    # Crear target usando la columna detectada
     if puntos_col in df.columns:
         df["target_pf_next"] = df.groupby(["player", "temporada"])[puntos_col].shift(-1)
-        print(f"✅ Target creado desde columna '{puntos_col}'")
+        print(f" Target creado desde columna '{puntos_col}'")
     else:
-        print(f"⚠️ Columna '{puntos_col}' no encontrada")
+        print(f" Columna '{puntos_col}' no encontrada")
 
     return df
 
@@ -193,15 +174,15 @@ if __name__ == "__main__":
         standings = pd.read_csv("csv/csvGenerados/standings_all_seasons.csv")
         print("\n✅ Datos cargados desde CSV")
     except FileNotFoundError:
-        print("\n⚠️ CSV no encontrados, construyendo desde carpetas...")
+        print("\n CSV no encontrados, construyendo desde carpetas...")
         df_players, standings = construir_dataset_completo()
 
     print("\n" + "="*60)
     print("Preparando datos con clasificación lagged y target")
     print("="*60)
     df = agregar_standings_lagged_y_crear_target(df_players, standings)
-    print(f"✅ Shape: {df.shape}")
+    print(f" Shape: {df.shape}")
 
     df.to_csv("csv/csvGenerados/players_with_features.csv", index=False)
-    print(f"\n✅ Dataset guardado: csv/csvGenerados/players_with_features.csv")
-    print("\n✅ PROCESO COMPLETADO")
+    print(f"\n Dataset guardado: csv/csvGenerados/players_with_features.csv")
+    print("\n PROCESO COMPLETADO")

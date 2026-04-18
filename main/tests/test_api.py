@@ -259,6 +259,7 @@ class UnifiedAPICoverageTests(APITestCase):
         res = self.client.post(
             "/api/auth/register/",
             {
+                "first_name": "Nuevo",
                 "username": "new_user",
                 "email": "new_user@example.com",
                 "password1": "pass1234",
@@ -271,6 +272,7 @@ class UnifiedAPICoverageTests(APITestCase):
         res = self.client.post(
             "/api/auth/register/",
             {
+                "first_name": "Nuevo",
                 "username": "new_user",
                 "email": "new_user@example.com",
                 "password1": "pass1234",
@@ -279,6 +281,36 @@ class UnifiedAPICoverageTests(APITestCase):
             format="json",
         )
         self.assertEqual(res.status_code, 400)
+
+    def test_register_rejects_duplicate_nickname(self):
+        res = self.client.post(
+            "/api/auth/register/",
+            {
+                "first_name": "Otro",
+                "username": "otro_user",
+                "nickname": "tester",
+                "email": "otro_user@example.com",
+                "password1": "pass1234",
+                "password2": "pass1234",
+            },
+            format="json",
+        )
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("errors", res.data)
+
+    def test_register_legacy_payload_without_first_name(self):
+        res = self.client.post(
+            "/api/auth/register/",
+            {
+                "username": "legacy_user",
+                "email": "legacy_user@example.com",
+                "password1": "pass1234",
+                "password2": "pass1234",
+            },
+            format="json",
+        )
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.data["status"], "ok")
 
     # menu.py
     def test_menu_and_top_jugadores(self):
@@ -496,13 +528,6 @@ class UnifiedAPICoverageTests(APITestCase):
         )
         self.assertEqual(res.status_code, 200)
 
-        res = self.client.post(
-            "/api/perfil/foto/",
-            {"shield_team": "Equipo Invalido"},
-            format="multipart",
-        )
-        self.assertEqual(res.status_code, 400)
-
     # favoritos.py
     def test_favoritos_endpoints(self):
         res = self.client.get("/api/favoritos/")
@@ -611,6 +636,15 @@ class UnifiedAPICoverageTests(APITestCase):
 
         res = self.client.delete(f"/api/plantillas/usuario/{pid}/")
         self.assertEqual(res.status_code, 200)
+
+    def test_plantilla_endpoints_block_cross_user_access(self):
+        self.client.force_login(self.friend)
+
+        res = self.client.post(f"/api/plantilla/{self.plantilla.id}/privacidad/", {}, format="json")
+        self.assertEqual(res.status_code, 404)
+
+        res = self.client.post(f"/api/plantilla/{self.plantilla.id}/predeterminada/", {}, format="json")
+        self.assertEqual(res.status_code, 404)
 
     # plantilla_notificaciones.py + notificaciones.py
     def test_plantilla_notificaciones_and_notificaciones(self):
@@ -747,10 +781,10 @@ class UnifiedAPICoverageTests(APITestCase):
         stats = list(
             EstadisticasPartidoJugador.objects.filter(jugador=self.jg4).order_by("-partido__jornada__numero_jornada")
         )
-        features = cons._computar_features(stats, "DT", 8.2, 6.5, self.temp)
-        self.assertEqual(features.shape[1], 7)
+        features = cons._computar_features(stats, self.jg4, "DT", 8.2, 6.5, self.temp)
+        self.assertEqual(features.shape[1], len(cons._FEATURES))
 
-        veredicto, razon = cons._fallback_veredicto(self.jg4, "mantener", 8.0, 6.5, 1.5, 3, 270)
+        veredicto, razon = cons._fallback_veredicto(self.jg4, "vender", 8.0, 6.5, 1.5, 3, 270)
         self.assertTrue(veredicto)
         self.assertTrue(razon)
 
@@ -781,12 +815,12 @@ class UnifiedAPICoverageTests(APITestCase):
         cons._explainer = _Explainer()
 
         rec, conf, factors = cons._predecir(np.array([[1, 2, 3, 0.5, 1.0, 0.8, 3]]))
-        self.assertIn(rec, ["vender", "mantener", "fichar"])
+        self.assertIn(rec, ["vender", "fichar"])
         self.assertGreaterEqual(conf, 0)
         self.assertIsInstance(factors, list)
 
-        for accion in ["fichar", "vender", "mantener"]:
-            for recomendacion in ["fichar", "vender", "mantener"]:
+        for accion in ["fichar", "vender"]:
+            for recomendacion in ["fichar", "vender"]:
                 v, r = cons._generar_veredicto_ml(
                     self.jg4,
                     accion,

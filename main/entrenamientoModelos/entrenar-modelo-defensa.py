@@ -67,7 +67,7 @@ def visualizar_feature_importance(fi, titulo, nombre, top_n=20):
 
 def cargar_datos():
     df = BaseTrainer.cargar_datos(CONFIG['archivo'], {'DF'}, low_memory=False)
-    print(f"✅ {df.shape[0]} defensas (DF) cargadas\n")
+    print(f" {df.shape[0]} defensas (DF) cargadas\n")
     return df
 
 
@@ -105,7 +105,7 @@ def preparar_basicos(df):
             lambda x: x.count("W") / len(x) if isinstance(x, str) and len(x) > 0 else 0.0
         )
     
-    print("✅ Limpieza completada\n")
+    print(" Limpieza completada\n")
     return df
 
 
@@ -121,7 +121,6 @@ def crear_features_defensivos_basicos(df):
     
     vc, vl = CONFIG['ventana_corta'], CONFIG['ventana_larga']
     
-    # Features defensivos detectados del CSV - columnas con minúsculas
     df_specs = [
         ("entradas", 0, "tackles"),
         ("intercepciones", 0, "intercepts"),
@@ -237,9 +236,6 @@ def aplicar_feature_selection(X, y):
 
 def definir_variables_finales(df):
     variables = [
-        # ============================================================
-        # DEFENSIVE STATS (VENTANA 5 - HISTÓRICOS, SIN LEAKAGE)
-        # ============================================================
         "tackles_roll5", "tackles_ewma5",
         "intercepts_roll5", "intercepts_ewma5",
         "clearances_roll5", "clearances_ewma5",
@@ -250,53 +246,23 @@ def definir_variables_finales(df):
         "aerial_won_roll5", "aerial_won_ewma5",
         "aerial_lost_roll5", "aerial_lost_ewma5",
         "blocks_roll5", "blocks_ewma5",
-        
-        # ============================================================
-        # FORM (VENTANA 5 - HISTÓRICO CON SHIFT)
-        # ============================================================
         "pf_roll5", "pf_ewma5",
-        
-        # ============================================================
-        # AVAILABILITY (VENTANA 5 - HISTÓRICO)
-        # ============================================================
         "minutes_pct_roll5", "minutes_pct_ewma5",
         "starter_pct_roll5", "starter_pct_ewma5",
-        
-        # ============================================================
-        # CONTEXT & ODDS (MERCADO PRE-PARTIDO)
-        # ============================================================
         "is_home",
         "odds_prob_win",
         "odds_prob_loss",
         "odds_expected_goals_against",
         "odds_is_favored",
         "odds_market_confidence",
-        
-        # ============================================================
-        # RIVAL STATS (HISTÓRICOS - PARTIDOS ANTERIORES + SHIFT)
-        # ============================================================
-        "opp_gf_roll5", "opp_gf_ewma5",          # Goles a favor del rival (pasado)
-        "opp_gc_roll5", "opp_gc_ewma5",          # Goles en contra del rival (pasado)
-        "opp_form_roll5", "opp_form_ewma5",      # Forma del rival (pasado)
-        
-        # ============================================================
-        # ROLES INTERACTION (FBRef - DF SPECIFIC, HISTÓRICO)
-        # ============================================================
+        "opp_gf_roll5", "opp_gf_ewma5",      
+        "opp_gc_roll5", "opp_gc_ewma5",        
+        "opp_form_roll5", "opp_form_ewma5",     
         "elite_entradas_interact", 
         "elite_intercepciones_interact", 
         "elite_despejes_interact",
-        "num_roles_criticos",      # Solo este feature de roles
-        
-        # ============================================================
-        # FANTASY FEATURES (DEFENSIVOS - HISTÓRICOS SIN LEAKAGE)
-        # ============================================================
-        # ✅ SOLO: def_actions_ewma5 (usa shift + ewm)
-        # ❌ REMOVIDOS: defensive_actions_total, def_actions_per_90 (sin shift previo = LEAKAGE)
+        "num_roles_criticos",     
         "def_actions_ewma5",
-        
-        # ============================================================
-        # ADVANCED FEATURES (DEFENSIVOS AGRESIVOS - SIN LEAKAGE)
-        # ============================================================
         "defensive_efficiency", 
         "defensive_activity", 
         "duel_win_rate",

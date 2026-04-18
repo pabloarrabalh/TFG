@@ -1,12 +1,3 @@
-"""
-Módulo ÚNICO de Explicaciones XAI para todas las posiciones
-============================================================
-Contiene todas las explicaciones de features y funciones de utilidad.
-Reemplaza: explicaciones_unificadas.py, explicaciones_gk.py, explicaciones_posiciones.py
-
-Uso:
-    from explicaciones import obtener_explicacion, generar_explicaciones_features
-"""
 
 import numpy as np
 import pandas as pd
@@ -16,14 +7,7 @@ try:
 except ImportError:
     shap_lib = None
 
-# =============================================================================
-# DICCIONARIO UNIFICADO DE EXPLICACIONES (todas las posiciones)
-# Formato: { feature_name: { 'positivo': str, 'negativo': str } }
-# =============================================================================
-
 EXPLICACIONES_FEATURES = {
-
-    # ── COMUNES ──────────────────────────────────────────────────────────────
 
     'is_home': {
         'positivo': 'Juega en su estadio. Ventaja de localía, mejor ambiente y apoyo del público.',
@@ -122,8 +106,6 @@ EXPLICACIONES_FEATURES = {
         'negativo': 'Su equipo no es favorito según las apuestas.'
     },
 
-    # ── PORTERO (PT) ─────────────────────────────────────────────────────────
-
     'pass_comp_pct_ewma5': {
         'positivo': 'Excelente con los pies. Completa casi todos sus pases de salida.',
         'negativo': 'Impreciso en la salida. Sus pases generan peligro propio.'
@@ -189,8 +171,6 @@ EXPLICACIONES_FEATURES = {
         'negativo': 'Tendencia de paradas a la baja. Cada vez para menos.'
     },
 
-    # ── DEFENSA (DF) ─────────────────────────────────────────────────────────
-
     'intercepts_roll5': {
         'positivo': 'Gran lectura defensiva. Muchas interceptaciones en los últimos 5.',
         'negativo': 'Mala lectura del juego. Se le escapan muchos balones al rival.'
@@ -215,8 +195,6 @@ EXPLICACIONES_FEATURES = {
         'positivo': 'Alta contribución defensiva total en los últimos 5 partidos.',
         'negativo': 'Baja contribución defensiva total en los últimos 5 partidos.'
     },
-
-    # ── MEDIOCAMPISTA (MC) ────────────────────────────────────────────────────
 
     'passes_roll5': {
         'positivo': 'Controlador del juego. Muchos pases y alto dominio de la posesión.',
@@ -246,8 +224,6 @@ EXPLICACIONES_FEATURES = {
         'positivo': 'Tiene roles core de mediocampista (pases clave y asistencias).',
         'negativo': 'Sin roles core de mediocampista. No destaca en creación.'
     },
-
-    # ── DELANTERO (DT) ────────────────────────────────────────────────────────
 
     'goals_roll5': {
         'positivo': 'En racha goleadora. Ha marcado en los últimos 5 partidos.',
@@ -339,9 +315,6 @@ EXPLICACIONES_FEATURES = {
     },
 }
 
-# =============================================================================
-# ALIASES BACKWARD COMPATIBILITY
-# =============================================================================
 EXPLICACIONES_PORTERO = EXPLICACIONES_FEATURES
 EXPLICACIONES_DEFENSA = EXPLICACIONES_FEATURES
 EXPLICACIONES_MEDIOCAMPISTA = EXPLICACIONES_FEATURES
@@ -351,27 +324,12 @@ EXPLICACIONES_MC = EXPLICACIONES_FEATURES
 EXPLICACIONES_DT = EXPLICACIONES_FEATURES
 
 
-# =============================================================================
-# FUNCIONES DE UTILIDAD
-# =============================================================================
-
 def obtener_explicacion(feature_name, es_positivo):
-    """
-    Retorna la explicación de un feature según su dirección de impacto.
-
-    Args:
-        feature_name: Nombre del feature
-        es_positivo: True si el impacto SHAP es positivo
-
-    Returns:
-        str: Explicación en texto natural
-    """
     if not isinstance(feature_name, str):
         feature_name = str(feature_name)
     feature_name = feature_name.strip()
 
     if feature_name not in EXPLICACIONES_FEATURES:
-        # Try prefix match (e.g. goals_roll3 -> goals_roll5 pattern)
         for key in EXPLICACIONES_FEATURES:
             base = key.rsplit('_', 1)[0]
             feat_base = feature_name.rsplit('_', 1)[0]
@@ -385,15 +343,6 @@ def obtener_explicacion(feature_name, es_positivo):
 
 
 def obtener_ambas_explicaciones(feature_name):
-    """
-    Retorna AMBAS explicaciones (positiva y negativa) para un feature.
-
-    Args:
-        feature_name: Nombre del feature
-
-    Returns:
-        dict: { 'positivo': str, 'negativo': str }
-    """
     if not isinstance(feature_name, str):
         feature_name = str(feature_name)
     feature_name = feature_name.strip()
@@ -422,17 +371,6 @@ def obtener_ambas_explicaciones(feature_name):
 
 
 def es_valor_alto(feature_name, valor):
-    """
-    Determina si un valor de feature es considerado 'alto' (positivo).
-
-    Args:
-        feature_name: Nombre del feature
-        valor: Valor numérico
-
-    Returns:
-        bool: True si el valor es alto/positivo
-    """
-    # Features donde valor alto = malo (invertidos)
     FEATURES_INVERTIDOS = {
         'opp_gf_roll5', 'opp_gf_ewma5',
         'opp_form_roll5', 'opp_form_ewma5',
@@ -452,15 +390,6 @@ def es_valor_alto(feature_name, valor):
 
 
 def preparar_features_para_explicaciones(data):
-    """
-    Convierte un dict de features a lista de dicts para explicaciones.
-
-    Args:
-        data: dict {feature: valor} o lista de dicts
-
-    Returns:
-        lista de dicts con keys: feature, valor, es_alto
-    """
     if isinstance(data, dict):
         features_list = []
         for feature, valor in data.items():
@@ -483,12 +412,6 @@ def preparar_features_para_explicaciones(data):
 
 def generar_explicaciones_features(features_data):
     """
-    Genera explicaciones de texto natural para los features de mayor impacto.
-
-    Args:
-        features_data: Lista de dicts con keys: feature, valor, impacto_pts, es_alto
-
-    Returns:
         dict: {
             'features_impacto': [list of dicts],
             'explicacion_texto': str
@@ -529,7 +452,6 @@ def generar_explicaciones_features(features_data):
             'es_alto': es_alto
         })
 
-    # Top 7 por impacto absoluto
     feature_impacts.sort(key=lambda x: abs(x['impacto_pts']), reverse=True)
     top_features = feature_impacts[:7]
 
@@ -571,10 +493,6 @@ def _es_pipeline_lineal(modelo):
 
 
 def _shap_para_pipeline_lineal(modelo, X_pred_df, features_disponibles, verbose=False):
-    """
-    SHAP para Pipeline(StandardScaler + Ridge/ElasticNet).
-    Usa LinearExplainer sobre el estimador final, con X escalado.
-    """
     try:
         scaler  = modelo.named_steps.get('scaler', None)
         regresor = modelo.named_steps.get('regresor', None)
@@ -583,7 +501,6 @@ def _shap_para_pipeline_lineal(modelo, X_pred_df, features_disponibles, verbose=
 
         X_scaled = scaler.transform(X_pred_df)
 
-        # Datos de fondo para el explainer (media de entrenamiento escalada = 0 por definición del scaler)
         background = np.zeros((1, X_scaled.shape[1]))
 
         explainer  = shap_lib.LinearExplainer(regresor, background, feature_perturbation='interventional')
@@ -615,7 +532,6 @@ def _shap_para_pipeline_lineal(modelo, X_pred_df, features_disponibles, verbose=
                 'explicacion_negativa': ambas_explicaciones['negativo']
             })
 
-        # Filtrar features redundantes de roles: mantener solo num_roles_criticos
         ROLES_REDUNDANTES = {
             'num_roles_positivos', 'num_roles_negativos',
             'score_roles_normalizado', 'ratio_roles_positivos'
@@ -632,34 +548,18 @@ def _shap_para_pipeline_lineal(modelo, X_pred_df, features_disponibles, verbose=
 
 
 def generar_explicaciones_shap(modelo, X_pred_df, features_disponibles, verbose=False):
-    """
-    Genera explicaciones SHAP para una predicción.
-    Soporta Random Forest, XGBoost y Pipeline(Scaler+Ridge/ElasticNet).
-
-    Args:
-        modelo: Modelo entrenado (RF, XGB, Pipeline con Ridge/ElasticNet)
-        X_pred_df: DataFrame con una fila (features para predicción)
-        features_disponibles: Lista de nombres de features
-        verbose: Imprimir detalles
-
-    Returns:
-        list: Lista de dicts {feature, valor, impacto_pts, es_alto, explicacion, explicacion_positiva, explicacion_negativa}
-    """
     if shap_lib is None:
         if verbose:
             print("[XAI] SHAP no disponible, usando feature importance")
         return _generar_explicaciones_feature_importance(modelo, X_pred_df, features_disponibles)
 
-    # Pipeline lineal (Ridge, ElasticNet con StandardScaler)
     if _es_pipeline_lineal(modelo):
         return _shap_para_pipeline_lineal(modelo, X_pred_df, features_disponibles, verbose)
 
-    # Árbol (Random Forest, XGBoost, GradientBoosting…)
     try:
         explainer   = shap_lib.TreeExplainer(modelo)
         shap_values = explainer.shap_values(X_pred_df)
 
-        # Normalizar forma del array SHAP (regresión puede devolver lista)
         if isinstance(shap_values, (list, tuple)):
             shap_impacts = shap_values[0]
         else:
@@ -686,7 +586,6 @@ def generar_explicaciones_shap(modelo, X_pred_df, features_disponibles, verbose=
                 'explicacion_negativa': ambas_explicaciones['negativo']
             })
 
-        # Filtrar features redundantes de roles: mantener solo num_roles_criticos
         ROLES_REDUNDANTES = {
             'num_roles_positivos', 'num_roles_negativos',
             'score_roles_normalizado', 'ratio_roles_positivos'
@@ -703,12 +602,7 @@ def generar_explicaciones_shap(modelo, X_pred_df, features_disponibles, verbose=
 
 
 def _generar_explicaciones_feature_importance(modelo, X_pred_df, features_disponibles):
-    """
-    Fallback: usa feature importance o coeficientes para explicar.
-    Compatible con Random Forest, XGBoost, Pipeline(Scaler+Ridge/ElasticNet).
-    """
     try:
-        # Extraer el estimador interno si es un Pipeline
         estimador = modelo
         if _es_pipeline_lineal(modelo):
             estimador = modelo.named_steps.get('regresor', modelo)
@@ -739,7 +633,6 @@ def _generar_explicaciones_feature_importance(modelo, X_pred_df, features_dispon
                 'explicacion_negativa': ambas_explicaciones['negativo']
             })
 
-        # Filtrar features redundantes de roles: mantener solo num_roles_criticos
         ROLES_REDUNDANTES = {
             'num_roles_positivos', 'num_roles_negativos',
             'score_roles_normalizado', 'ratio_roles_positivos'
@@ -753,16 +646,6 @@ def _generar_explicaciones_feature_importance(modelo, X_pred_df, features_dispon
 
 
 def formatear_explicaciones_texto(feature_impacts, prediccion=None):
-    """
-    Genera texto legible a partir de lista de impactos.
-
-    Args:
-        feature_impacts: Lista de dicts de generar_explicaciones_shap
-        prediccion: float (opcional)
-
-    Returns:
-        str: Texto formateado
-    """
     lineas = []
     if prediccion is not None:
         lineas.append(f"Predicción: {prediccion:.1f} pts\n")
@@ -777,11 +660,6 @@ def formatear_explicaciones_texto(feature_impacts, prediccion=None):
     return "\n".join(lineas)
 
 
-# =============================================================================
-# COMPATIBILIDAD CON obtener_explicacion_posicion (explicaciones.py antiguo)
-# =============================================================================
-
 def obtener_explicacion_posicion(feature_name, es_positivo, posicion=None):
-    """Alias para backward compatibility. posicion es ignorado."""
     return obtener_explicacion(feature_name, es_positivo)
 

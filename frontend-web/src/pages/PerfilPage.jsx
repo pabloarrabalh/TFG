@@ -103,7 +103,7 @@ export default function PerfilPage() {
 
   // Edit form
   const [editOpen, setEditOpen] = useState(false)
-  const [editData, setEditData] = useState({ first_name: '', last_name: '', email: '' })
+  const [editData, setEditData] = useState({ first_name: '', last_name: '', email: '', nickname: '' })
 
   // Photo modal
   const [photoModal, setPhotoModal] = useState(false)
@@ -201,6 +201,7 @@ export default function PerfilPage() {
         first_name: res.data.first_name || '',
         last_name: res.data.last_name || '',
         email: res.data.email || '',
+        nickname: res.data.nickname || '',
       })
     } catch {
       setMessage({ type: 'error', text: 'Error al cargar el perfil' })
@@ -225,7 +226,14 @@ export default function PerfilPage() {
       await refetchUser()
     } catch (e) {
       const err = e.response?.data
-      setMessage({ type: 'error', text: err?.error || 'Error al guardar' })
+      const fieldErrors = err?.errors
+      if (fieldErrors && typeof fieldErrors === 'object') {
+        const firstKey = Object.keys(fieldErrors)[0]
+        const firstValue = Array.isArray(fieldErrors[firstKey]) ? fieldErrors[firstKey][0] : fieldErrors[firstKey]
+        setMessage({ type: 'error', text: firstValue || 'Error al guardar' })
+      } else {
+        setMessage({ type: 'error', text: err?.error || 'Error al guardar' })
+      }
     } finally {
       setSaving(false)
     }
@@ -612,6 +620,7 @@ export default function PerfilPage() {
             </div>
             <div className="space-y-4">
               {[
+                { key: 'nickname', label: 'Apodo' },
                 { key: 'first_name', label: 'Nombre' },
                 { key: 'last_name', label: 'Apellidos' },
                 { key: 'email', label: 'Email', type: 'email' },

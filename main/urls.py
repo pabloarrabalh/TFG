@@ -6,7 +6,7 @@ from .api.menu import MenuView, MenuTopJugadoresView
 from .api.clasificacion import ClasificacionView
 from .api.equipo import EquipoListView, EquipoDetailView
 from .api.jugador import JugadorDetailView, TopJugadoresPorPosicionView
-from .api.jugador_partidos import JugadorPartidosView
+from .api.jugador_partidos import JugadorPartidosBatchView, JugadorPartidosView
 from .api.jugador_insight import JugadorInsightView
 from .api.buscar import RadarJugadorView, BuscarView
 from .api.perfil import *
@@ -38,13 +38,14 @@ urlpatterns = [
     path('api/equipo/<str:equipo_nombre>/', EquipoDetailView.as_view(), name='api_equipo'),
     path('api/jugador/<int:jugador_id>/', JugadorDetailView.as_view(), name='api_jugador'),
     path('api/jugador-partidos/', JugadorPartidosView.as_view(), name='api_jugador_partidos'),
+    path('api/jugador-partidos-batch/', JugadorPartidosBatchView.as_view(), name='api_jugador_partidos_batch'),
     path('api/jugador-insight/', JugadorInsightView.as_view(), name='api_jugador_insight'),
     path('api/perfil/', PerfilView.as_view(), name='api_perfil'),
     path('api/perfil/update/', UpdatePerfilView.as_view(), name='api_update_perfil'),
     path('api/perfil/status/', UpdateStatusView.as_view(), name='api_update_status'),
     path('api/perfil/foto/', UploadPhotoView.as_view(), name='api_upload_photo'),
     path('api/perfil/preferencias-notificaciones/', UpdatePreferenciasNotificacionesView.as_view(), name='api_update_preferencias_notificaciones'),
-    path('api/perfil/cambiar-jornada/', CambiarJornadaView.as_view(), name='api_cambiar_jornada'),
+    path('api/perfil/cambiar-jornada/', CambiarJornadaLegacyView.as_view(), name='api_cambiar_jornada'),
     path('api/favoritos/', FavoritosView.as_view(), name='api_favoritos'),
     path('api/favoritos/toggle-v2/', ToggleFavoritoView.as_view(), name='api_toggle_favorito_v2'),
     path('api/favoritos/seleccionar/', FavoritosView.as_view(), name='api_select_favorites'),

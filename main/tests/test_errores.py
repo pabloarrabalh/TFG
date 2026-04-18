@@ -17,6 +17,7 @@ class NegativeAuthApiTests(TestCase):
     def test_register_with_password_mismatch_returns_400(self):
         url = reverse("api_auth_register")
         payload = {
+            "first_name": "X",
             "email": "x@example.com",
             "username": "x",
             "password1": "12345678",

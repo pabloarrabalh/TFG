@@ -1,6 +1,4 @@
-"""DRF API views – ML Prediction endpoints"""
 import sys
-import logging
 import traceback
 from pathlib import Path
 
@@ -12,8 +10,6 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 
 from ..models import *
-
-logger = logging.getLogger(__name__)
 
 _ENTRENAMIENTOS_PATH = Path(__file__).parent.parent / 'entrenamientoModelos'
 
@@ -82,13 +78,11 @@ class PredecirPorteroView(APIView):
             })
 
         except ImportError as e:
-            logger.error(f"[API] Error importando módulo: {e}", exc_info=True)
             return Response(
                 {'status': 'error', 'error': f'Error de módulo: {e}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
         except Exception as e:
-            logger.error(f"[API] Error inesperado: {e}", exc_info=True)
             return Response({
                 'status': 'error',
                 'error': str(e),
@@ -97,7 +91,6 @@ class PredecirPorteroView(APIView):
 
 
 class CambiarJornadaLegacyView(APIView):
-    """POST /api/cambiar-jornada/ – returns jugadores_por_posicion for the given jornada."""
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -151,7 +144,6 @@ class CambiarJornadaLegacyView(APIView):
 
             jugadores_por_posicion = {'Portero': [], 'Defensa': [], 'Centrocampista': [], 'Delantero': []}
 
-            # Jugadores con suma de minutos < 60 en los últimos 4 partidos (aviso en MI PLANTILLA)
             _min_sum: dict = {}
             for _row in (
                 EstadisticasPartidoJugador.objects
@@ -208,12 +200,10 @@ class CambiarJornadaLegacyView(APIView):
             })
 
         except Exception as e:
-            logger.error(f"[API] Error en cambiar_jornada: {e}\n{traceback.format_exc()}")
             return Response({'status': 'error', 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ExplicarPrediccionView(APIView):
-    """POST /api/explicar-prediccion/"""
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -288,16 +278,13 @@ class ExplicarPrediccionView(APIView):
                                     jugador=jugador, jornada=jornada_obj, modelo=modelo_bd,
                                     defaults={'prediccion': float(prediccion)}
                                 )
-                        except (ValueError, TypeError) as e_int:
-                            logger.debug(f'Error convirtiendo jornada a int ({jornada}): {e_int}')
+                        except (ValueError, TypeError):
+                            pass
                 except Exception as e_save:
-                    logger.debug(f'No se pudo guardar predicción en BD: {e_save}')
+                    pass
 
-            # El endpoint devuelve la respuesta tal cual del backend
-            # (sin datos históricos, sin datos anteriores, etc. son casos normales, no errores)
             return Response(resultado, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.error(f"[XAI API] Error inesperado: {e}", exc_info=True)
             return Response({
                 'status': 'error',
                 'error': str(e),
@@ -376,5 +363,4 @@ class PredecirJugadorView(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
-            logger.error(f"Error en PredecirJugadorView: {e}", exc_info=True)
             return Response({'status': 'error', 'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

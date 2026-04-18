@@ -15,6 +15,7 @@ class E2EAuthJourneyTests(TestCase):
         self.assertIn("csrftoken", initial_me.cookies)
 
         register_payload = {
+            "first_name": "Pablo",
             "email": "pablo@example.com",
             "username": "pablo",
             "password1": "super-segura-123",

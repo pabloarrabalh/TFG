@@ -1,12 +1,10 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { useTour } from '../context/TourContext'
 
 export default function LoginPage() {
   const { login, register } = useAuth()
   const navigate = useNavigate()
-  const { markTourOffered } = useTour()
   const [tab, setTab] = useState('login')
 
   // Login state
@@ -16,7 +14,14 @@ export default function LoginPage() {
   const [showLoginPwd, setShowLoginPwd] = useState(false)
 
   // Register state
-  const [regData, setRegData] = useState({ email: '', username: '', password1: '', password2: '' })
+  const [regData, setRegData] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    username: '',
+    password1: '',
+    password2: '',
+  })
   const [regErrors, setRegErrors] = useState({})
   const [regLoading, setRegLoading] = useState(false)
   const [showRegPwd, setShowRegPwd] = useState(false)
@@ -183,6 +188,34 @@ export default function LoginPage() {
             {tab === 'register' && (
               <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-gray-300">Nombre</label>
+                  <div className="relative flex items-center group/input">
+                    <span className="material-symbols-outlined absolute left-4 text-gray-500 group-focus-within/input:text-primary transition-colors select-none text-[20px]">badge</span>
+                    <input
+                      type="text" placeholder="Tu nombre" required
+                      value={regData.first_name}
+                      onChange={(e) => setRegData({ ...regData, first_name: e.target.value })}
+                      className="w-full rounded-lg border border-border-dark bg-background-dark px-4 py-3 pl-11 text-sm text-white placeholder-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                    />
+                  </div>
+                  {regErrors.first_name && <p className="text-red-400 text-xs">{regErrors.first_name}</p>}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-gray-300">Apellido (opcional)</label>
+                  <div className="relative flex items-center group/input">
+                    <span className="material-symbols-outlined absolute left-4 text-gray-500 group-focus-within/input:text-primary transition-colors select-none text-[20px]">person</span>
+                    <input
+                      type="text" placeholder="Tu apellido"
+                      value={regData.last_name}
+                      onChange={(e) => setRegData({ ...regData, last_name: e.target.value })}
+                      className="w-full rounded-lg border border-border-dark bg-background-dark px-4 py-3 pl-11 text-sm text-white placeholder-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                    />
+                  </div>
+                  {regErrors.last_name && <p className="text-red-400 text-xs">{regErrors.last_name}</p>}
+                </div>
+
+                <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium text-gray-300">Email</label>
                   <div className="relative flex items-center group/input">
                     <span className="material-symbols-outlined absolute left-4 text-gray-500 group-focus-within/input:text-primary transition-colors select-none text-[20px]">mail</span>
@@ -197,11 +230,11 @@ export default function LoginPage() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-gray-300">Nombre de usuario</label>
+                  <label className="text-sm font-medium text-gray-300">Apodo (unico)</label>
                   <div className="relative flex items-center group/input">
                     <span className="material-symbols-outlined absolute left-4 text-gray-500 group-focus-within/input:text-primary transition-colors select-none text-[20px]">alternate_email</span>
                     <input
-                      type="text" placeholder="jugador123" required
+                      type="text" placeholder="miapodo" required
                       value={regData.username}
                       onChange={(e) => setRegData({ ...regData, username: e.target.value })}
                       className="w-full rounded-lg border border-border-dark bg-background-dark px-4 py-3 pl-11 text-sm text-white placeholder-gray-600 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"

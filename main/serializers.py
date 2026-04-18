@@ -12,8 +12,9 @@ from .models import *
 # ── Auth ──────────────────────────────────────────────────────────────────────
 
 class RegisterSerializer(serializers.Serializer):
-    first_name = serializers.CharField(max_length=150)
-    last_name  = serializers.CharField(max_length=150, required=False, default='')
+    first_name = serializers.CharField(max_length=150, required=False, allow_blank=True, default='')
+    last_name  = serializers.CharField(max_length=150, required=False, allow_blank=True, default='')
+    nickname   = serializers.CharField(max_length=100, required=False, allow_blank=True, default='')
     email      = serializers.EmailField()
     username   = serializers.CharField(max_length=150)
     password1  = serializers.CharField(write_only=True)
@@ -23,6 +24,14 @@ class RegisterSerializer(serializers.Serializer):
         value = value.strip()
         if User.objects.filter(username__iexact=value).exists():
             raise serializers.ValidationError('Ese nombre de usuario ya está en uso.')
+        return value
+
+    def validate_nickname(self, value):
+        value = value.strip()
+        if value and User.objects.filter(username__iexact=value).exists():
+            raise serializers.ValidationError('Ese apodo ya está en uso.')
+        if value and UserProfile.objects.filter(nickname__iexact=value).exists():
+            raise serializers.ValidationError('Ese apodo ya está en uso.')
         return value
 
     def validate_email(self, value):
@@ -41,13 +50,19 @@ class RegisterSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
-        return User.objects.create_user(
+        nickname = (validated_data.get('nickname') or validated_data['username']).strip()
+        first_name = (validated_data.get('first_name') or validated_data['username']).strip()
+        user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password1'],
-            first_name=validated_data['first_name'],
+            first_name=first_name,
             last_name=validated_data.get('last_name', ''),
         )
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+        profile.nickname = nickname
+        profile.save(update_fields=['nickname'])
+        return user
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

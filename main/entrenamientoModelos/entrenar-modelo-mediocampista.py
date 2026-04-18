@@ -72,7 +72,7 @@ def visualizar_feature_importance(fi, titulo, nombre, top_n=20):
 
 def cargar_datos():
     df = BaseTrainer.cargar_datos(CONFIG['archivo'], {'MC'}, low_memory=False, empty_msg="❌ No se encontraron columnas de posición")
-    print(f"✅ {df.shape[0]} mediocampistas (MC) cargados\n")
+    print(f" {df.shape[0]} mediocampistas (MC) cargados\n")
     return df
 
 
@@ -121,7 +121,6 @@ def crear_features_mediocampistas_basicos(df):
     
     vc, vl = CONFIG['ventana_corta'], CONFIG['ventana_larga']
     
-    # Features mediocampistas detectados del CSV - columnas con minúsculas
     mc_specs = [
         ("pases_totales", 0, "passes"),
         ("pases_completados_pct", 50, "pass_comp_pct"),
@@ -229,14 +228,11 @@ def aplicar_feature_selection(X, y):
     if isinstance(resultado, tuple) and len(resultado) == 2:
         features_validos, df_corr = resultado
     else:
-        # Intentar interpretar el resultado como dataframe de correlaciones
         try:
             df_corr = resultado if isinstance(resultado, pd.DataFrame) else pd.DataFrame(resultado)
         except Exception:
-            # Fallback: crear dataframe vacío
             df_corr = pd.DataFrame(columns=['feature', 'spearman', 'p_value', 'abs_spearman'])
 
-        # Calcular features válidos a partir del df_corr
         if 'abs_spearman' in df_corr.columns:
             features_validos = df_corr[df_corr['abs_spearman'] >= 0.05]['feature'].tolist()
         elif 'feature' in df_corr.columns:
@@ -244,58 +240,38 @@ def aplicar_feature_selection(X, y):
         else:
             features_validos = []
 
-    # CRÍTICO: Filtrar solo features que existen en X
     features_validos = [f for f in features_validos if f in X.columns]
     
     if len(features_validos) == 0:
-        print(f" ⚠️  WARNING: Sin features válidos! Usando todos los features")
+        print(f"   WARNING: Sin features válidos! Usando todos los features")
         features_validos = list(X.columns)
     
     df_corr.to_csv(DIRECTORIO_CSVS / "feature_correlations_detailed.csv", index=False)
-    print(f"\n✅ {len(features_validos)} features seleccionados por correlación\n")
+    print(f"\n {len(features_validos)} features seleccionados por correlación\n")
     return features_validos
 
 
 def definir_variables_finales(df):
     variables = [
-        # ========== PASES Y CREACIÓN (CORE) ==========
         "passes_roll5", "passes_ewma5",
         "pass_comp_pct_roll5", "pass_comp_pct_ewma5",
-        
-        # ========== OFENSIVA (REGATES + CONDUCCIONES) ==========
         "dribble_attempts_roll5", "dribble_attempts_ewma5",
         "succ_dribbles_roll5", "succ_dribbles_ewma5",
         "prog_dribbles_roll5", "prog_dribbles_ewma5",
         "prog_dist_roll5", "prog_dist_ewma5",
-        
-        # ========== DEFENSA (RECUPERACIÓN) ==========
         "tackles_roll5", "tackles_ewma5",
         "intercepts_roll5", "intercepts_ewma5",
-        
-        # ========== FORMA (FANTASY) ==========
         "pf_roll5", "pf_ewma5",
-        
-        # ========== DISPONIBILIDAD ==========
         "minutes_pct_roll5", "minutes_pct_ewma5",
         "starter_pct_roll3", "starter_pct_ewma3",
-        
-        # ========== CONTEXTO ==========
         "is_home",
-        
-        # ========== ODDS (MERCADO) ==========
         "odds_prob_win", "odds_prob_loss", "odds_expected_goals_against",
         "odds_is_favored", "odds_market_confidence",
-        
-        # ========== RIVAL (HISTÓRICOS) ==========
         "opp_gf_roll5", "opp_gf_ewma5",
         "opp_gc_roll5", "opp_gc_ewma5",
         "opp_form_roll5", "opp_form_ewma5",
-        
-        # ========== ROLES ==========
         "es_mediocampista_elite",
         "tiene_rol_mediocampista_core", "num_roles_criticos",
-        
-        # ========== FEATURES AVANZADOS ==========
         "pass_efficiency", "offensive_action", "dribble_success_rate",
         "defensive_participation", "distance_per_dribble",
         "availability_form", "defensive_intensity", "pass_productivity",
@@ -325,7 +301,6 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     print("=" * 80)
     print(df_resultados.to_string(index=False))
     
-    # === ENSEMBLE: Combinar Ridge + ElasticNet (los 2 mejor rendimiento) ===
     print("\n" + "=" * 80)
     print(" ENSEMBLE: Ridge + ElasticNet (Promedio ponderado)")
     print("=" * 80)
@@ -333,11 +308,9 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
     pred_ridge_test = resultados_finales['Ridge']['modelo'].predict(X_test)
     pred_elastic_test = resultados_finales['ElasticNet']['modelo'].predict(X_test)
     
-    # Pesos basados en performance (mejor MAE = mayor peso)
     mae_ridge = df_resultados[df_resultados['Model'] == 'Ridge']['MAE'].values[0]
     mae_elastic = df_resultados[df_resultados['Model'] == 'ElasticNet']['MAE'].values[0]
     
-    # Pesos inversos: modelo con menor MAE recibe mayor peso
     peso_ridge = 1.0 / mae_ridge
     peso_elastic = 1.0 / mae_elastic
     total_peso = peso_ridge + peso_elastic
@@ -372,8 +345,8 @@ def entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables):
         with open(DIRECTORIO_MODELOS / "ensemble_mc_ridge_elastic.pkl", "wb") as f:
             pickle.dump(ensemble_data, f)
     
-    print(f"✅ Modelos guardados en {DIRECTORIO_MODELOS}")
-    print(f"✅ Mejor modelo: {df_resultados.iloc[0]['Model']} (MAE: {df_resultados.iloc[0]['MAE']:.4f})\n")
+    print(f"Modelos guardados en {DIRECTORIO_MODELOS}")
+    print(f"Mejor modelo: {df_resultados.iloc[0]['Model']} (MAE: {df_resultados.iloc[0]['MAE']:.4f})\n")
     
     return df_resultados
 
@@ -385,50 +358,27 @@ class MediocampistaTrainer(BaseTrainer):
     def run(self):
         BaseTrainer.print_banner("ENTRENA MODELO DE PREDICCIÓN: MEDIOCAMPISTAS (MC)")
         
-        # 1. Cargar datos
         df = cargar_datos()
-        
-        # 2. Diagnosticar y limpiar
         df = diagnosticar_y_limpiar(df)
-        
-        # 3. Cargar y procesar odds (ANTES de borrar jornada)
         df = cargar_y_procesar_odds(df)
-        
-        # 4. Preparar básicos (borra jornada DESPUÉS de odds)
         df = preparar_basicos(df)
-        
-        # 5. Crear features mediocampistas
         df = crear_features_mediocampistas_basicos(df)
-        
-        # 6. Features form, disponibilidad, contexto
         df = crear_features_form(df)
         df = crear_features_disponibilidad(df)
         df = crear_features_contexto(df)
         df = crear_features_rival(df)
-        
-        # 7. Features avanzados
         df = crear_features_avanzados(df)
-        
-        # 8. Roles
         df = integrar_roles(df)
-        
-        # 9. Aplicar mejoras
         df = aplicar_mejoras(df)
-        
-        # 10. Preparar variables finales
         variables_finales = definir_variables_finales(df)
-        
-        # Verificar que existan todas las variables
         variables_finales = [v for v in variables_finales if v in df.columns]
         print(f"Variables finales disponibles: {len(variables_finales)}\n")
         
-        # 11. Split train/test
         BaseTrainer.print_section("SPLIT TRAIN/TEST (ESTRATIFICADO POR JUGADOR)")
         
         X = df[variables_finales].fillna(0).reset_index(drop=True)
         y = df[CONFIG['columna_objetivo']].fillna(0).reset_index(drop=True)
         
-        # Split más cuidadoso: 80/20 temporal con validación
         split_idx = int(len(X) * (1 - CONFIG['test_size']))
         X_train, X_test = X[:split_idx].copy(), X[split_idx:].copy()
         y_train, y_test = y[:split_idx].copy(), y[split_idx:].copy()
@@ -436,17 +386,14 @@ class MediocampistaTrainer(BaseTrainer):
         BaseTrainer.print_split_summary(X_train, X_test, y_train, y_test)
         print(f"  Features: {len(variables_finales)}\n")
         
-        # 12. Application feature selection
         variables_finales = aplicar_feature_selection(X_train, y_train)
         X_train = X_train[variables_finales]
         X_test = X_test[variables_finales]
         
-        # 12.5 DIAGNÓSTICO DE FEATURES
         print("=" * 80)
         print(" DIAGNÓSTICO ANTES DE ENTRENAR")
         print("=" * 80 + "\n")
         
-        # Correlación directa con objetivo
         correlations = pd.DataFrame({
             'feature': variables_finales,
             'corr_with_target': [X_train[f].corr(y_train) for f in variables_finales]
@@ -457,11 +404,9 @@ class MediocampistaTrainer(BaseTrainer):
         print(f"\nPromedio correlación en valor absoluto: {correlations['corr_with_target'].abs().mean():.4f}")
         print(f"Std de correlación: {correlations['corr_with_target'].std():.4f}\n")
         
-        # Varianza explicada por features
         print(f"Varianza de y_train: {y_train.var():.4f}")
         print(f"Varianza de y_test: {y_test.var():.4f}\n")
         
-        # 13. Entrenar modelos
         entrenar_modelos_gridsearch(X_train, X_test, y_train, y_test, variables_finales)
         
         BaseTrainer.print_banner("✅ ENTRENAMIENTO COMPLETADO EXITOSAMENTE")

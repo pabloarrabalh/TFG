@@ -1,13 +1,4 @@
-"""
-DRF API views – Authentication & User Info
-Endpoints:
-  GET  /api/me/
-  POST /api/auth/login/
-  POST /api/auth/logout/
-  POST /api/auth/register/
-"""
 import json
-import logging
 import time
 
 from django.middleware.csrf import get_token
@@ -15,6 +6,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -22,11 +14,6 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
 
 from ..models import UserProfile
-
-logger = logging.getLogger(__name__)
-
-
-# ── helpers ───────────────────────────────────────────────────────────────────
 
 def _user_info(user):
     profile_photo = None
@@ -54,19 +41,14 @@ def _user_info(user):
         'foto_url': profile_photo,
     }
 
-
-# ── 1. ME ─────────────────────────────────────────────────────────────────────
-
 class MeView(APIView):
-    """GET /api/me/ – returns current user data + sets CSRF cookie"""
+    """GET /api/me/"""
     permission_classes = [AllowAny]
 
     def get(self, request):
         get_token(request)  # Ensures CSRF cookie is set
         return Response(_user_info(request.user))
 
-
-# ── 2. LOGIN / LOGOUT ─────────────────────────────────────────────────────────
 
 class LoginView(APIView):
     """POST /api/auth/login/"""
@@ -82,7 +64,6 @@ class LoginView(APIView):
 
         user = authenticate(request._request, username=username, password=password)
         if user is None:
-            # Fallback: try by email
             try:
                 u = User.objects.get(email=username)
                 user = authenticate(request._request, username=u.username, password=password)
@@ -105,16 +86,17 @@ class LogoutView(APIView):
         return Response({'status': 'ok'})
 
 
-# ── 3. REGISTER ───────────────────────────────────────────────────────────────
-
 class RegisterView(APIView):
     """POST /api/auth/register/"""
     permission_classes = [AllowAny]
 
     def post(self, request):
         data = request.data
+        first_name = (data.get('first_name') or '').strip()
+        last_name = (data.get('last_name') or '').strip()
         email = (data.get('email') or '').strip().lower()
         username = (data.get('username') or '').strip()
+        nickname = (data.get('nickname') or username).strip()
         password1 = data.get('password1') or ''
         password2 = data.get('password2') or ''
 
@@ -122,32 +104,46 @@ class RegisterView(APIView):
         if not email:
             errors['email'] = 'El email es obligatorio'
         if not username:
-            errors['username'] = 'El nombre de usuario es obligatorio'
+            errors['username'] = 'El apodo es obligatorio'
+        if not nickname:
+            errors['username'] = 'El apodo es obligatorio'
         if not password1:
             errors['password1'] = 'La contraseña es obligatoria'
         if password1 != password2:
             errors['password2'] = 'Las contraseñas no coinciden'
-        if User.objects.filter(username=username).exists():
-            errors['username'] = 'Ese nombre de usuario ya está en uso'
-        if User.objects.filter(email=email).exists():
+        if User.objects.filter(username__iexact=username).exists():
+            errors['username'] = 'Ese apodo ya está en uso'
+        if User.objects.filter(email__iexact=email).exists():
             errors['email'] = 'Ese email ya está registrado'
+        if nickname and User.objects.filter(username__iexact=nickname).exists():
+            errors['username'] = 'Ese apodo ya está en uso'
+        if nickname and UserProfile.objects.filter(nickname__iexact=nickname).exists():
+            errors['username'] = 'Ese apodo ya está en uso'
 
         if errors:
             return Response({'errors': errors}, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password1,
-        )
-        
-        # Crear perfil de usuario
-        profile, created = UserProfile.objects.get_or_create(user=user)
-        profile.save()
+        try:
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password1,
+                first_name=first_name,
+                last_name=last_name,
+            )
+
+            profile, _ = UserProfile.objects.get_or_create(user=user)
+            profile.nickname = nickname
+            profile.save(update_fields=['nickname'])
+        except IntegrityError:
+            return Response(
+                {'errors': {'username': 'Ese apodo ya está en uso'}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         
         auth_login(request._request, user)
         return Response({
             'status': 'ok',
             'user': _user_info(user),
-            'is_new_user': True  # Siempre es nuevo usuario en registro
+            'is_new_user': True  # Para el tour
         })

@@ -1,12 +1,3 @@
-"""
-DRF API views – Favourite Teams
-Endpoints:
-  GET    /api/favoritos/
-  POST   /api/favoritos/toggle-v2/
-  DELETE /api/favoritos/<fav_id>/
-  GET    /api/favoritos/seleccionar/
-"""
-import logging
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,11 +7,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from ..models import Equipo, EquipoFavorito
 from ..views.utils import shield_name
 
-logger = logging.getLogger(__name__)
-
 
 class FavoritosView(APIView):
-    """GET /api/favoritos/  —  also used by /api/favoritos/seleccionar/"""
+    """GET /api/favoritos/"""
     permission_classes = [AllowAny]
 
     def get(self, request):
