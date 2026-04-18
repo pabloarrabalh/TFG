@@ -1,10 +1,6 @@
-import json
 import time
 
-from django.middleware.csrf import get_token
 from django.contrib.auth import authenticate
-from django.contrib.auth import login as auth_login
-from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from rest_framework.response import Response
@@ -12,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import AccessToken
 
 from ..models import UserProfile
 
@@ -41,15 +38,18 @@ def _user_info(user):
         'foto_url': profile_photo,
     }
 
+
+def _issue_access_token(user):
+    token = AccessToken.for_user(user)
+    token['username'] = user.username
+    return str(token)
+
 class MeView(APIView):
     """GET /api/me/"""
     permission_classes = [AllowAny]
 
     def get(self, request):
-        csrf_token = get_token(request)  # Ensures CSRF cookie is set
-        payload = _user_info(request.user)
-        payload['csrf_token'] = csrf_token
-        return Response(payload)
+        return Response(_user_info(request.user))
 
 
 class LoginView(APIView):
@@ -75,8 +75,7 @@ class LoginView(APIView):
         if user is None:
             return Response({'error': 'Credenciales incorrectas'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        auth_login(request._request, user)
-        return Response({'status': 'ok', 'user': _user_info(user)})
+        return Response({'status': 'ok', 'user': _user_info(user), 'access': _issue_access_token(user)})
 
 
 class LogoutView(APIView):
@@ -84,7 +83,6 @@ class LogoutView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        auth_logout(request._request)
         return Response({'status': 'ok'})
 
 
@@ -143,9 +141,9 @@ class RegisterView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         
-        auth_login(request._request, user)
         return Response({
             'status': 'ok',
             'user': _user_info(user),
-            'is_new_user': True  # Para el tour
+            'is_new_user': True,  # Para el tour
+            'access': _issue_access_token(user),
         })

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getCsrfToken } from '../../services/apiClient'
+import { getAuthToken } from '../../services/apiClient'
 import { backendUrl } from '../../config/backend'
 
 export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
@@ -26,9 +26,8 @@ export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': getCsrfToken(),
+          Authorization: `Bearer ${getAuthToken()}`,
         },
-        credentials: 'include',
         body: JSON.stringify({
           jugador_id: jugador.id,
           plantilla_id: plantillaId,

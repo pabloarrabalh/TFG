@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import HelpButton from '../components/ui/HelpButton'
 import CampoPlantilla from '../components/campo/CampoPlantilla'
-import { getCsrfToken } from '../services/apiClient'
+import { getAuthToken } from '../services/apiClient'
 import { backendUrl } from '../config/backend'
 
 const normalizePhotoUrl = (photo) => {
@@ -106,7 +106,9 @@ export default function AmigoPlantillaPage() {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(backendUrl(`/api/amigos/${userId}/plantillas/`), { credentials: 'include' })
+      const res = await fetch(backendUrl(`/api/amigos/${userId}/plantillas/`), {
+        headers: { Authorization: `Bearer ${getAuthToken()}` },
+      })
       if (!res.ok) {
         const d = await res.json()
         setError(d.error || 'No se pudo cargar la plantilla')
@@ -149,8 +151,7 @@ export default function AmigoPlantillaPage() {
         try {
           const resp = await fetch(backendUrl('/api/explicar-prediccion/'), {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
-            credentials: 'include',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getAuthToken()}` },
             body: JSON.stringify({ jugador_id: jug.id, jornada: jornadaActual, posicion: jug.posicion }),
           })
           const data = await resp.json()
@@ -173,8 +174,7 @@ export default function AmigoPlantillaPage() {
     try {
       const resp = await fetch(backendUrl('/api/explicar-prediccion/'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
-        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getAuthToken()}` },
         body: JSON.stringify({ jugador_id: jugador.id, jornada: jornadaActual, posicion: jugador.posicion }),
       })
       const data = await resp.json()

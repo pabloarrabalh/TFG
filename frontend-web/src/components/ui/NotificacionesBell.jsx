@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import api from '../../services/apiClient'
 import { BACKEND_URL } from '../../config/backend'
+import { getAuthToken, clearAuthToken } from '../../services/apiClient'
 import { useAuth } from '../../context/AuthContext'
-
-const WS_URL = `${BACKEND_URL.startsWith('https:') ? 'wss:' : 'ws:'}//${new URL(BACKEND_URL).host}/ws/notificaciones/`
 const RECONNECT_DELAY_MS = 5000
 
 const TIPO_CFG = {
@@ -47,7 +46,12 @@ export default function NotificacionesBell() {
     if (!user) return
     if (wsRef.current && wsRef.current.readyState < 2) return // already open/connecting
 
-    const ws = new WebSocket(WS_URL)
+    const token = getAuthToken()
+    if (!token) return
+
+    const wsProtocol = BACKEND_URL.startsWith('https:') ? 'wss:' : 'ws:'
+    const wsUrl = `${wsProtocol}//${new URL(BACKEND_URL).host}/ws/notificaciones/?token=${encodeURIComponent(token)}`
+    const ws = new WebSocket(wsUrl)
     wsRef.current = ws
 
     ws.onmessage = (e) => {
@@ -66,7 +70,11 @@ export default function NotificacionesBell() {
       } catch { /* ignore parse errors */ }
     }
 
-    ws.onclose = () => {
+    ws.onclose = (event) => {
+      if (event?.code === 4401) {
+        clearAuthToken()
+        return
+      }
       if (!user) return
       reconnectTimer.current = setTimeout(connectWS, RECONNECT_DELAY_MS)
     }

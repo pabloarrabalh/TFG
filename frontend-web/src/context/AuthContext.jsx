@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import apiClient from '../services/apiClient'
+import apiClient, { setAuthToken, clearAuthToken, getAuthToken } from '../services/apiClient'
 
 const api_me = () => apiClient.get('/api/me/')
 const api_login = (username, password) =>
@@ -13,8 +13,13 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Fetch current user on mount (also sets Django CSRF cookie via ensure_csrf_cookie)
+  // Fetch current user on mount when a stored JWT is available.
   const fetchUser = useCallback(async () => {
+    if (!getAuthToken()) {
+      setUser(null)
+      setLoading(false)
+      return
+    }
     try {
       const { data } = await api_me()
       setUser(data.authenticated ? data : null)
@@ -27,19 +32,34 @@ export function AuthProvider({ children }) {
 
   useEffect(() => { fetchUser() }, [fetchUser])
 
+  useEffect(() => {
+    const handleTokenCleared = () => {
+      setUser(null)
+    }
+
+    window.addEventListener('auth-token-cleared', handleTokenCleared)
+    return () => window.removeEventListener('auth-token-cleared', handleTokenCleared)
+  }, [])
+
   const login = async (username, password) => {
     const { data } = await api_login(username, password)
+    if (data?.access) setAuthToken(data.access)
     setUser(data.user)
     return data
   }
 
   const logout = async () => {
-    await api_logout()
-    setUser(null)
+    try {
+      await api_logout()
+    } finally {
+      clearAuthToken()
+      setUser(null)
+    }
   }
 
   const register = async (formData) => {
     const { data } = await api_register(formData)
+    if (data?.access) setAuthToken(data.access)
     setUser(data.user)
     return data
   }

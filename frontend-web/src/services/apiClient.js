@@ -1,67 +1,85 @@
 import axios from 'axios'
 import { BACKEND_URL } from '../config/backend'
 
-let csrfTokenCache = ''
+const AUTH_TOKEN_KEY = 'auth_token'
 
-export function setCsrfToken(token) {
-  csrfTokenCache = token || ''
-}
-
-export function getCsrfToken() {
-  return csrfTokenCache || ''
-}
-
-async function ensureCsrfToken() {
-  if (csrfTokenCache) return csrfTokenCache
-  const { data } = await apiClient.get('/api/me/')
-  if (data?.csrf_token) {
-    csrfTokenCache = data.csrf_token
+function isJwtExpired(token) {
+  try {
+    const payloadPart = token.split('.')[1]
+    if (!payloadPart) return true
+    const base64 = payloadPart.replace(/-/g, '+').replace(/_/g, '/')
+    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=')
+    const payload = JSON.parse(atob(padded))
+    if (!payload?.exp) return false
+    return Date.now() >= payload.exp * 1000
+  } catch {
+    return true
   }
-  return csrfTokenCache
+}
+
+export function getAuthToken() {
+  try {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY) || ''
+    if (!token) return ''
+    if (isJwtExpired(token)) {
+      clearAuthToken()
+      return ''
+    }
+    return token
+  } catch {
+    return ''
+  }
+}
+
+export function setAuthToken(token) {
+  try {
+    if (token) localStorage.setItem(AUTH_TOKEN_KEY, token)
+    else localStorage.removeItem(AUTH_TOKEN_KEY)
+  } catch {}
+}
+
+export function clearAuthToken() {
+  setAuthToken('')
+  try {
+    window.dispatchEvent(new Event('auth-token-cleared'))
+  } catch {}
 }
 
 const apiClient = axios.create({
   baseURL: BACKEND_URL,
-  withCredentials: true, // send session cookie
   headers: { 'Content-Type': 'application/json' },
 })
 
-// Attach CSRF token to mutating requests
 apiClient.interceptors.request.use((config) => {
-  const method = (config.method || '').toLowerCase()
-  if (['post', 'put', 'patch', 'delete'].includes(method)) {
-    return ensureCsrfToken().then((token) => {
-      if (token) config.headers['X-CSRFToken'] = token
-      return config
-    })
+  const token = getAuthToken()
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  } else if (config.headers?.Authorization) {
+    delete config.headers.Authorization
   }
   return config
 })
 
 apiClient.interceptors.response.use((response) => {
-  if (response?.config?.url === '/api/me/' && response?.data?.csrf_token) {
-    csrfTokenCache = response.data.csrf_token
-  }
   return response
+}, (error) => {
+  if (error?.response?.status === 401) {
+    clearAuthToken()
+  }
+  return Promise.reject(error)
 })
 
 // ── Auth ─────────────────────────────────────────────────────
-export const fetchCsrf = () => apiClient.get('/login/')
+export const fetchMe = () => apiClient.get('/api/me/')
 
 export const login = (username, password) =>
-  apiClient.post('/login/submit/', new URLSearchParams({ username, password }), {
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  })
+  apiClient.post('/api/auth/login/', { username, password })
 
 export const register = (data) =>
-  apiClient.post('/register/submit/', new URLSearchParams(data), {
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  })
+  apiClient.post('/api/auth/register/', data)
 
 export const logout = () =>
-  apiClient.post('/logout/', new URLSearchParams(), {
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  })
+  apiClient.post('/api/auth/logout/', {})
 
 // ── Search ───────────────────────────────────────────────────
 export const buscar = (q) => apiClient.get(`/api/buscar/?q=${encodeURIComponent(q)}`)

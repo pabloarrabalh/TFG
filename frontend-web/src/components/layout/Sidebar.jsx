@@ -2,10 +2,13 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useState, useEffect, useRef } from 'react'
 import { backendUrl } from '../../config/backend'
+import { getAuthToken } from '../../services/apiClient'
 
 async function cargarEventosJornada(jornada) {
   try {
-    const res = await fetch(backendUrl(`/api/plantilla-notificaciones/${jornada}/`), { credentials: 'include' })
+    const res = await fetch(backendUrl(`/api/plantilla-notificaciones/${jornada}/`), {
+      headers: { Authorization: `Bearer ${getAuthToken()}` },
+    })
     if (!res.ok) return
     // Los eventos se crean como notificaciones bell en el backend automáticamente
   } catch {}
