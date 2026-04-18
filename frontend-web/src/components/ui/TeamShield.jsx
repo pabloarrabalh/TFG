@@ -11,7 +11,10 @@ import { backendUrl } from '../../config/backend'
 export default function TeamShield({ escudo, nombre = '', className = 'size-8', size = 32 }) {
   const [imageError, setImageError] = useState(false)
 
-  const src = escudo ? backendUrl(`/static/escudos/${escudo}.png`) : null
+  const normalizedShield = escudo
+    ? `${escudo}`.replace(/^\/+/, '').replace(/^static\/escudos\//, '').replace(/^escudos\//, '').replace(/\.png$/i, '')
+    : ''
+  const src = normalizedShield ? backendUrl(`/static/escudos/${normalizedShield}.png`) : null
   const fallbackInitial = (nombre || '?')[0].toUpperCase()
 
   if (imageError || !src) {

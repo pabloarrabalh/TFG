@@ -5,6 +5,7 @@ import HelpButton from '../components/ui/HelpButton'
 import ConsejeroChat from '../components/ui/ConsejeroChat'
 import PlayerPredictionModal from '../components/prediction/PlayerPredictionModal'
 import apiClient from '../services/apiClient'
+import { getCsrfToken } from '../services/apiClient'
 import { useTour } from '../context/TourContext'
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
@@ -63,11 +64,6 @@ const MEJOR_MODELO_POR_POS = {
   Defensa: 'Ridge',
   Centrocampista: 'Ridge',
   Delantero: 'ElasticNet',
-}
-
-function getCsrfToken() {
-  const match = document.cookie?.split(';').map(c => c.trim()).find(c => c.startsWith('csrftoken='))
-  return match ? match.split('=')[1] : ''
 }
 
 // ─── Notificaciones flotantes (cola) ───────────────────────────────────────────────

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import HelpButton from '../components/ui/HelpButton'
 import CampoPlantilla from '../components/campo/CampoPlantilla'
+import { getCsrfToken } from '../services/apiClient'
 import { backendUrl } from '../config/backend'
 
 const normalizePhotoUrl = (photo) => {
@@ -70,11 +71,6 @@ function EscudoImg({ nombre, size = 28 }) {
       onError={e => { e.target.style.display = 'none' }}
     />
   )
-}
-
-function getCsrfToken() {
-  const m = document.cookie?.split(';').map(c => c.trim()).find(c => c.startsWith('csrftoken='))
-  return m ? m.split('=')[1] : ''
 }
 
 export default function AmigoPlantillaPage() {

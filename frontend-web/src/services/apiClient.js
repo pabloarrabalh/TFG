@@ -1,15 +1,23 @@
 import axios from 'axios'
 import { BACKEND_URL } from '../config/backend'
 
-// Read CSRF token from Django's cookie
-function getCsrfToken() {
-  const name = 'csrftoken'
-  const cookies = document.cookie.split(';')
-  for (let c of cookies) {
-    const [key, val] = c.trim().split('=')
-    if (key === name) return decodeURIComponent(val)
+let csrfTokenCache = ''
+
+export function setCsrfToken(token) {
+  csrfTokenCache = token || ''
+}
+
+export function getCsrfToken() {
+  return csrfTokenCache || ''
+}
+
+async function ensureCsrfToken() {
+  if (csrfTokenCache) return csrfTokenCache
+  const { data } = await apiClient.get('/api/me/')
+  if (data?.csrf_token) {
+    csrfTokenCache = data.csrf_token
   }
-  return null
+  return csrfTokenCache
 }
 
 const apiClient = axios.create({
@@ -22,10 +30,19 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
   const method = (config.method || '').toLowerCase()
   if (['post', 'put', 'patch', 'delete'].includes(method)) {
-    const token = getCsrfToken()
-    if (token) config.headers['X-CSRFToken'] = token
+    return ensureCsrfToken().then((token) => {
+      if (token) config.headers['X-CSRFToken'] = token
+      return config
+    })
   }
   return config
+})
+
+apiClient.interceptors.response.use((response) => {
+  if (response?.config?.url === '/api/me/' && response?.data?.csrf_token) {
+    csrfTokenCache = response.data.csrf_token
+  }
+  return response
 })
 
 // ── Auth ─────────────────────────────────────────────────────

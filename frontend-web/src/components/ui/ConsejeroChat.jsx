@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { getCsrfToken } from '../../services/apiClient'
 import { backendUrl } from '../../config/backend'
 
 export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
@@ -25,7 +26,7 @@ export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': getCookie('csrftoken'),
+          'X-CSRFToken': getCsrfToken(),
         },
         credentials: 'include',
         body: JSON.stringify({
@@ -54,13 +55,6 @@ export default function ConsejeroChat({ jugadores11, plantillaId, onClose }) {
     setResultado(null)
     setError(null)
     setStep('select')
-  }
-
-  function getCookie(name) {
-    const value = `; ${document.cookie}`
-    const parts = value.split(`; ${name}=`)
-    if (parts.length === 2) return parts.pop().split(';').shift()
-    return ''
   }
 
   const toNumber = (value, fallback = 0) => {

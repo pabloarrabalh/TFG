@@ -46,8 +46,10 @@ class MeView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        get_token(request)  # Ensures CSRF cookie is set
-        return Response(_user_info(request.user))
+        csrf_token = get_token(request)  # Ensures CSRF cookie is set
+        payload = _user_info(request.user)
+        payload['csrf_token'] = csrf_token
+        return Response(payload)
 
 
 class LoginView(APIView):

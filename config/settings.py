@@ -126,12 +126,13 @@ else:
 # PostgreSQL siempre (no SQLite)
 # Soporte para DATABASE_URL (Render inyecta esto automáticamente)
 _DATABASE_URL = os.environ.get('DATABASE_URL', '')
+_db_conn_max_age = int(os.environ.get('DB_CONN_MAX_AGE', '0' if _DATABASE_URL else '600'))
 if _DATABASE_URL:
     import dj_database_url
     DATABASES = {
         'default': dj_database_url.config(
             default=_DATABASE_URL,
-            conn_max_age=600,
+            conn_max_age=_db_conn_max_age,
             ssl_require=os.environ.get('DB_SSL', 'false').lower() in ('true', 'require', '1'),
         )
     }
@@ -147,7 +148,7 @@ else:
             'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
             'HOST': os.environ.get('DB_HOST', 'localhost'),
             'PORT': os.environ.get('DB_PORT', '5432'),
-            'CONN_MAX_AGE': 600,
+            'CONN_MAX_AGE': _db_conn_max_age,
             'OPTIONS': _db_options,
         }
     }
