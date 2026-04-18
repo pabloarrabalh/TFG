@@ -34,3 +34,6 @@ coverage.xml
 .coverage.*
 .sonarqube/
 .scannerwork/
+
+# Large generated ML artifacts
+csv/csvGenerados/entrenamiento/consejero/
