@@ -29,6 +29,9 @@ services:
       MEILISEARCH_HOST: http://meilisearch:7700
     expose:
       - "8000"
+    volumes:
+      - static_data:/app/staticfiles
+      - media_data:/app/media
     depends_on:
       meilisearch:
         condition: service_healthy
@@ -45,6 +48,8 @@ services:
       - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - static_data:/srv/static:ro
+      - media_data:/srv/media:ro
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
@@ -54,6 +59,8 @@ services:
 
 volumes:
   meilisearch_data:
+  static_data:
+  media_data:
   caddy_data:
   caddy_config:
 

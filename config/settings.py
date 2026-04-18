@@ -260,8 +260,8 @@ if not DEBUG:
             CSRF_TRUSTED_ORIGINS.append(f'https://{_host}')
             CORS_ALLOWED_ORIGINS.append(f'https://{_host}')
 
-SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = os.environ.get('SESSION_COOKIE_SAMESITE', 'Lax')
+CSRF_COOKIE_SAMESITE = os.environ.get('CSRF_COOKIE_SAMESITE', 'Lax')
 CSRF_COOKIE_HTTPONLY = False  # JS needs to read the CSRF token
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = not DEBUG   # HTTPS en producción
