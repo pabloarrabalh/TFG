@@ -1,4 +1,4 @@
-﻿
+
 import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
@@ -12,11 +12,11 @@ TAM_VENTANA_RECIENTE = 3
 def eliminar_features_ruido(df: pd.DataFrame, position: str = 'ALL', verbose: bool = True) -> pd.DataFrame:
 
     FEATURES_RUIDO_COMUN = [
-        'duels_won_pct_ewma5',
-        'duels_won_roll5',
-        'duels_won_ewma5',
-        'elite_entradas_interact',
-        'ratio_roles_criticos',
+        'duels_won_pct_ewma5',      # 0 en Random Forest
+        'duels_won_roll5',           # 0 en Random Forest, XGBoost, Ridge
+        'duels_won_ewma5',           # 0 en Random Forest, XGBoost, Ridge  
+        'elite_entradas_interact',   # 0 en ElasticNet
+        'ratio_roles_criticos',      # 0 en ElasticNet
     ]
 
     FEATURES_RUIDO_GK = [
@@ -73,7 +73,7 @@ def eliminar_features_ruido(df: pd.DataFrame, position: str = 'ALL', verbose: bo
     
     if verbose:
         print("="*80)
-        print(f"ELIMINACIÃ“N DE FEATURES RUIDO ({position})")
+        print(f"ELIMINACIÓN DE FEATURES RUIDO ({position})")
         print("="*80)
         if features_a_eliminar:
             print(f"\n{len(features_a_eliminar)} features a eliminar:\n")
@@ -94,7 +94,7 @@ def eliminar_features_ruido(df: pd.DataFrame, position: str = 'ALL', verbose: bo
 def crear_features_fantasy_gk(df: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
     if verbose:
         print("=" * 80)
-        print("INGENIERÃA DE FEATURES PARA PORTEROS (GK) - SIN LEAKAGE")
+        print("INGENIERÍA DE FEATURES PARA PORTEROS (GK) - SIN LEAKAGE")
         print("=" * 80)
         print()
 
@@ -124,7 +124,7 @@ def crear_features_fantasy_gk(df: pd.DataFrame, verbose: bool = True) -> pd.Data
 
     if cs_components:
         df['cs_probability'] = pd.concat(cs_components, axis=1).mean(axis=1).fillna(0.5).clip(0, 1)
-        df['cs_expected_points'] = df['cs_probability'] * 4
+        df['cs_expected_points'] = df['cs_probability'] * 4  # 4 puntos por clean sheet
     else:
         df['cs_probability'] = 0.5
         df['cs_expected_points'] = 2
@@ -160,6 +160,7 @@ def crear_features_fantasy_gk(df: pd.DataFrame, verbose: bool = True) -> pd.Data
             + 0.2 * df.get("fixture_difficulty_effect", 0.5)
         )
         df["cs_probability"] = df["cs_probability"].clip(0, 1)
+        # Puntos esperados por CS (4 pts por puerta a cero)
         df["cs_expected_points"] = 4.0 * df["cs_probability"]
     else:
         df["cs_probability"] = 0.5
@@ -217,7 +218,7 @@ def crear_features_fantasy_gk(df: pd.DataFrame, verbose: bool = True) -> pd.Data
 def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
     if verbose:
         print("="*80)
-        print("INGENIERÃA DE FEATURES PARA DEFENSAS (DF) - SIN LEAKAGE")
+        print("INGENIERÍA DE FEATURES PARA DEFENSAS (DF) - SIN LEAKAGE")
         print("="*80)
         print()
     
@@ -226,6 +227,7 @@ def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) ->
     
     if 'opp_shots_ewma5' in df.columns:
         df['cs_probability'] = 1.0 / (1.0 + df['opp_shots_ewma5'].fillna(0) + 0.1)
+        
         if 'puntos_fantasy' in df.columns:
             df['cs_in_last_3'] = df.groupby('player')['puntos_fantasy'].transform(
                 lambda x: ((x >= -10) & (x <= 10)).shift().rolling(3, min_periods=1).sum()
@@ -234,8 +236,8 @@ def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) ->
             df['cs_rate_recent'] = df['cs_in_last_3'] / 3.0
         
         if verbose:
-            print("âœ… cs_probability (tiros rival inverso) - Sin leakage")
-            print("âœ… cs_rate_recent (Ãºltimos 3 partidos) - Sin leakage")
+            print(" cs_probability (tiros rival inverso) - Sin leakage")
+            print(" cs_rate_recent (últimos 3 partidos) - Sin leakage")
     
     if 'entradas' in df.columns and 'min_partido' in df.columns:
         df['entradas'] = pd.to_numeric(df['entradas'], errors='coerce').fillna(0)
@@ -244,13 +246,14 @@ def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) ->
         df['tackles_per_90'] = (
             df['entradas'] / (df['min_partido'] / 90.0 + 0.1)
         ).fillna(0)
+        
         df['tackles_per_90_ewma5'] = df.groupby('player')['tackles_per_90'].transform(
             lambda x: x.shift().ewm(span=5, adjust=False).mean()
         ).fillna(0)
         
         if verbose:
-            print("âœ… tackles_per_90 (normalizadas a 90 min) - Sin leakage")
-            print("âœ… tackles_per_90_ewma5 (media mÃ³vil) - Sin leakage")
+            print(" tackles_per_90 (normalizadas a 90 min) - Sin leakage")
+            print(" tackles_per_90_ewma5 (media móvil) - Sin leakage")
     
     if 'intercepciones' in df.columns and 'min_partido' in df.columns:
         df['intercepciones'] = pd.to_numeric(df['intercepciones'], errors='coerce').fillna(0)
@@ -264,8 +267,8 @@ def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) ->
         ).fillna(0)
         
         if verbose:
-            print("âœ… int_per_90 (normalizadas a 90 min) - Sin leakage")
-            print("âœ… int_per_90_ewma5 (media mÃ³vil) - Sin leakage")
+            print(" int_per_90 (normalizadas a 90 min) - Sin leakage")
+            print(" int_per_90_ewma5 (media móvil) - Sin leakage")
     
     if 'despejes' in df.columns and 'min_partido' in df.columns:
         df['despejes'] = pd.to_numeric(df['despejes'], errors='coerce').fillna(0)
@@ -275,12 +278,12 @@ def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) ->
         ).fillna(0)
         
         if verbose:
-            print("âœ… clearances_per_90 (normalizadas a 90 min) - Sin leakage")
+            print(" clearances_per_90 (normalizadas a 90 min) - Sin leakage")
     
     df['defensive_actions_total'] = (
         df.get('entradas', 0) + 
         df.get('intercepciones', 0) + 
-        df.get('despejes', 0) * 0.5
+        df.get('despejes', 0) * 0.5  
     )
     
     df['def_actions_per_90'] = (
@@ -292,29 +295,32 @@ def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) ->
     ).fillna(0)
     
     if verbose:
-        print("âœ… defensive_actions_total (tackles + int + clearances*0.5) - Sin leakage")
-        print("âœ… def_actions_per_90 (normalizadas) - Sin leakage")
-        print("âœ… def_actions_ewma5 (media mÃ³vil) - Sin leakage")
+        print(" defensive_actions_total (tackles + int + clearances*0.5) - Sin leakage")
+        print(" def_actions_per_90 (normalizadas) - Sin leakage")
+        print(" def_actions_ewma5 (media móvil) - Sin leakage")
     
+   
     if 'puntosFantasy' in df.columns:
         df['consistency_5games'] = df.groupby('player')['puntosFantasy'].transform(
             lambda x: 1.0 / (1.0 + x.shift().rolling(5, min_periods=2).std().fillna(0))
         ).fillna(0.5)
+        
         df['def_actions_volatility'] = df.groupby('player')['defensive_actions_total'].transform(
             lambda x: x.shift().rolling(5, min_periods=2).std()
         ).fillna(0)
         
         if verbose:
-            print("âœ… consistency_5games (inversa a volatilidad) - Sin leakage")
-            print("âœ… def_actions_volatility (desviaciÃ³n acciones) - Sin leakage")
+            print(" consistency_5games (inversa a volatilidad) - Sin leakage")
+            print(" def_actions_volatility (desviación acciones) - Sin leakage")
     
+  
     if 'tackles_ewma3' in df.columns and 'tackles_ewma5' in df.columns:
         df['tackles_momentum'] = (
             df['tackles_ewma3'] - df['tackles_ewma5']
         ).fillna(0)
         
         if verbose:
-            print("âœ… tackles_momentum (ewma3 - ewma5)")
+            print("tackles_momentum (ewma3 - ewma5)")
     
     if 'Intercepciones' in df.columns:
         df['int_momentum'] = df.groupby('player')['Intercepciones'].transform(
@@ -323,22 +329,24 @@ def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) ->
         ).fillna(0)
         
         if verbose:
-            print("âœ… int_momentum (trend de intercepciones) - Sin leakage")
+            print("int_momentum (trend de intercepciones) - Sin leakage")
     
+   
     if 'fixture_difficulty_home' in df.columns and 'is_home' in df.columns:
         df['defensive_context'] = (
             df['is_home'].fillna(0) * df['fixture_difficulty_home'].fillna(0.5)
         )
         
         if verbose:
-            print("âœ… defensive_context (is_home Ã— fixture_difficulty)")
+            print(" defensive_context (is_home × fixture_difficulty)")
+    
     if 'cs_probability' in df.columns and 'def_actions_per_90' in df.columns:
         df['cs_activity_alignment'] = (
             df['cs_probability'] * df['def_actions_per_90']
         ).fillna(0)
         
         if verbose:
-            print("âœ… cs_activity_alignment (CS prob Ã— activity)")
+            print(" cs_activity_alignment (CS prob × activity)")
     
     if 'minutes_pct_roll5' in df.columns:
         df['usage_change_recent'] = df.groupby('player')['minutes_pct_roll5'].transform(
@@ -346,23 +354,22 @@ def crear_features_fantasy_defensivos(df: pd.DataFrame, verbose: bool = True) ->
         ).fillna(0)
         
         if verbose:
-            print("âœ… usage_change_recent (cambio en minutos %) - Sin leakage")
+            print(" usage_change_recent (cambio en minutos %) - Sin leakage")
     
     if verbose:
-        print(f"\nâœ… Fase 2 completada - Features DF creados\n")
+        print(f"\n Fase 2 completada - Features DF creados\n")
     
     return df
 
+
 def crear_features_fantasy_mediocampista(df: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
-    
-    
     if verbose:
         print("\n" + "=" * 80)
         print("FEATURES MEDIOCAMPISTA (FANTASY SPECIFIC)")
         print("=" * 80)
     
     df = df.copy()
-    
+   
     if 'pases_totales' in df.columns and 'pases_completados_pct' in df.columns:
         df['pass_attempts_per_90'] = (
             df['pases_totales'] / (df['min_partido'] / 90.0 + 0.1)
@@ -373,8 +380,9 @@ def crear_features_fantasy_mediocampista(df: pd.DataFrame, verbose: bool = True)
         ).fillna(50)
         
         if verbose:
-            print("   âœ… Pass accuracy metrics")
+            print("   Pass accuracy metrics")
     
+  
     if 'regates' in df.columns and 'min_partido' in df.columns:
         df['dribbles_per_90'] = (
             df['regates'] / (df['min_partido'] / 90.0 + 0.1)
@@ -391,8 +399,9 @@ def crear_features_fantasy_mediocampista(df: pd.DataFrame, verbose: bool = True)
         ).fillna(0)
         
         if verbose:
-            print("   âœ… Offensive activity metrics")
+            print("   Offensive activity metrics")
     
+  
     if 'entradas' in df.columns and 'intercepciones' in df.columns:
         df['defensive_actions_total'] = df['entradas'] + df['intercepciones']
         
@@ -401,7 +410,9 @@ def crear_features_fantasy_mediocampista(df: pd.DataFrame, verbose: bool = True)
         ).fillna(0)
         
         if verbose:
-            print("   âœ… Defensive recovery metrics")
+            print("   Defensive recovery metrics")
+    
+    
     if 'pases_totales' in df.columns and 'entradas' in df.columns:
         df['creative_vs_defensive'] = (
             df.groupby('player')['pases_totales'].transform(lambda x: x.shift().rolling(5, min_periods=1).mean())
@@ -409,7 +420,8 @@ def crear_features_fantasy_mediocampista(df: pd.DataFrame, verbose: bool = True)
         ).fillna(0)
         
         if verbose:
-            print("   âœ… Creative impact index")
+            print("   Creative impact index")
+    
     
     if 'puntos_fantasy' in df.columns or 'puntos_fantasy' in df.columns:
         col_pf = 'puntos_fantasy'
@@ -423,7 +435,8 @@ def crear_features_fantasy_mediocampista(df: pd.DataFrame, verbose: bool = True)
             df['pf_consistency'] = 1.0 / (1.0 + df['pf_volatility_5'])
             
             if verbose:
-                print("   âœ… Consistency metrics")
+                print("   Consistency metrics")
+    
     
     if 'regates_completados' in df.columns and 'regates' in df.columns:
         total_dribbles = df['regates'] + 0.1
@@ -434,8 +447,9 @@ def crear_features_fantasy_mediocampista(df: pd.DataFrame, verbose: bool = True)
         ).fillna(50)
         
         if verbose:
-            print("   âœ… Dribble success metrics")
-    
+            print("   Dribble success metrics")
+            
+            
     activity_components = []
     
     if 'pases_totales' in df.columns:
@@ -454,25 +468,26 @@ def crear_features_fantasy_mediocampista(df: pd.DataFrame, verbose: bool = True)
         df['overall_activity'] = pd.concat(activity_components, axis=1).sum(axis=1)
         
         if verbose:
-            print("   âœ… Overall activity index")
-    
+            print("   Overall activity index")
     if 'minutes_pct_ewma5' in df.columns and 'pf_ewma5' in df.columns:
         df['playing_time_form_combo'] = (
             df['minutes_pct_ewma5'] * df['pf_ewma5']
         ).fillna(0)
         
         if verbose:
-            print("   âœ… Form adaptation metrics")
+            print("   Form adaptation metrics")
+    
+    # Rellenar NaNs con 0
     df = df.fillna(0).replace([np.inf, -np.inf], 0)
     
     if verbose:
-        print(f"\nâœ… Fase 2 completada - Features MC creados\n")
+        print(f"\nFase 2 completada - Features MC creados\n")
     
     return df
 
+
 def crear_features_fantasy_delantero(df: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
     
-
     if verbose:
         print("\n" + "=" * 80)
         print("FEATURES DELANTERO (FANTASY SPECIFIC - ST/FW)")
@@ -480,41 +495,49 @@ def crear_features_fantasy_delantero(df: pd.DataFrame, verbose: bool = True) -> 
 
     df = df.copy()
 
+
     if 'xg_partido' in df.columns and 'gol_partido' in df.columns:
         df['xg_partido'] = pd.to_numeric(df['xg_partido'], errors='coerce').fillna(0)
         df['gol_partido'] = pd.to_numeric(df['gol_partido'], errors='coerce').fillna(0)
+
+        # Over/under-performance vs xG en ventana reciente
         df['xg_overperformance'] = df.groupby('player').apply(
             lambda x: (x['gol_partido'] - x['xg_partido']).shift().rolling(5, min_periods=1).mean()
         ).reset_index(level=0, drop=True).fillna(0)
 
         if verbose:
-            print("   âœ… xg_overperformance (goles - xG rolling5) - Sin leakage")
+            print("   xg_overperformance (goles - xG rolling5) - Sin leakage")
 
+  
     if 'tiros' in df.columns and 'gol_partido' in df.columns:
         df['tiros'] = pd.to_numeric(df['tiros'], errors='coerce').fillna(0)
         df['gol_partido'] = pd.to_numeric(df['gol_partido'], errors='coerce').fillna(0)
+
+        # Ratio goles/tiro en los últimos 5 partidos
         df['shot_conversion_ewma5'] = df.groupby('player').apply(
             lambda g: (g['gol_partido'] / (g['tiros'] + 0.1)).shift().ewm(span=5, adjust=False).mean()
         ).reset_index(level=0, drop=True).fillna(0)
 
         if verbose:
-            print("   âœ… shot_conversion_ewma5 (goles/tiro) - Sin leakage")
+            print("   shot_conversion_ewma5 (goles/tiro) - Sin leakage")
 
+  
     if 'shots_roll5' in df.columns and 'xg_roll5' in df.columns:
         df['offensive_pressure_score'] = (
             df['shots_roll5'] * 0.4 + df['xg_roll5'] * 0.6
         ).fillna(0)
 
         if verbose:
-            print("   âœ… offensive_pressure_score (shots*0.4 + xg*0.6)")
+            print("   offensive_pressure_score (shots*0.4 + xg*0.6)")
 
+    
     if 'goals_roll5' in df.columns and 'goals_ewma5' in df.columns:
         df['scoring_stability'] = 1.0 / (
             1.0 + (df['goals_roll5'] - df['goals_ewma5']).abs().fillna(0)
         )
 
         if verbose:
-            print("   âœ… scoring_stability (consistencia goleadora)")
+            print("   scoring_stability (consistencia goleadora)")
 
     if 'xg_roll5' in df.columns and 'minutes_pct_ewma5' in df.columns:
         df['xg_per_minute_ewma'] = (
@@ -522,7 +545,7 @@ def crear_features_fantasy_delantero(df: pd.DataFrame, verbose: bool = True) -> 
         ).fillna(0)
 
         if verbose:
-            print("   âœ… xg_per_minute_ewma (xG por minuto disponible)")
+            print("   xg_per_minute_ewma (xG por minuto disponible)")
 
     if 'goals_roll5' in df.columns and 'minutes_pct_ewma5' in df.columns:
         df['goals_per_minute_ewma'] = (
@@ -530,7 +553,8 @@ def crear_features_fantasy_delantero(df: pd.DataFrame, verbose: bool = True) -> 
         ).fillna(0)
 
         if verbose:
-            print("   âœ… goals_per_minute_ewma (goles por minuto disponible)")
+            print("   goals_per_minute_ewma (goles por minuto disponible)")
+
 
     if 'prog_dribbles_roll5' in df.columns and 'prog_dist_roll5' in df.columns:
         df['progressive_threat'] = (
@@ -538,19 +562,19 @@ def crear_features_fantasy_delantero(df: pd.DataFrame, verbose: bool = True) -> 
         ).fillna(0)
 
         if verbose:
-            print("   âœ… progressive_threat (conducciones + distancia progresiva)")
+            print("   progressive_threat (conducciones + distancia progresiva)")
 
     if 'goals_ewma3' in df.columns and 'goals_ewma5' in df.columns:
         df['scoring_momentum'] = (df['goals_ewma3'] - df['goals_ewma5']).fillna(0)
 
         if verbose:
-            print("   âœ… scoring_momentum (ewma3 - ewma5, tendencia)")
+            print("   scoring_momentum (ewma3 - ewma5, tendencia)")
 
     if 'xg_ewma3' in df.columns and 'xg_ewma5' in df.columns:
         df['xg_momentum'] = (df['xg_ewma3'] - df['xg_ewma5']).fillna(0)
 
         if verbose:
-            print("   âœ… xg_momentum (tendencia xG reciente)")
+            print("   xg_momentum (tendencia xG reciente)")
 
     if 'puntos_fantasy' in df.columns:
         df['pf_volatility_fw'] = df.groupby('player')['puntos_fantasy'].transform(
@@ -560,13 +584,15 @@ def crear_features_fantasy_delantero(df: pd.DataFrame, verbose: bool = True) -> 
         df['pf_consistency_fw'] = 1.0 / (1.0 + df['pf_volatility_fw'])
 
         if verbose:
-            print("   âœ… pf_volatility_fw / pf_consistency_fw (estabilidad ST)")
+            print("   pf_volatility_fw / pf_consistency_fw (estabilidad ST)")
+
     df = df.fillna(0).replace([np.inf, -np.inf], 0)
 
     if verbose:
-        print(f"\nâœ… Features delantero creados correctamente\n")
+        print(f"\nFeatures delantero creados correctamente\n")
 
     return df
+
 
 def seleccionar_features_por_correlacion(
     X: pd.DataFrame, 
@@ -575,11 +601,10 @@ def seleccionar_features_por_correlacion(
     threshold: float = 0.03,
     verbose: bool = True
 ) -> Tuple[List[str], pd.DataFrame]:
-    
-    
+
     if verbose:
         print("="*80)
-        print(f"SELECCIÃ“N DE FEATURES POR CORRELACIÃ“N ({target_name})")
+        print(f"SELECCIÓN DE FEATURES POR CORRELACIÓN ({target_name})")
         print("="*80)
         print()
     
@@ -624,28 +649,28 @@ def seleccionar_features_por_correlacion(
                 'p_value': 1.0,
                 'abs_spearman': 0.0
             })
+    
     df_corr = pd.DataFrame(correlaciones).sort_values('abs_spearman', ascending=False)
-    features_validos = df_corr[
-        df_corr['abs_spearman'] >= threshold
-    ]['feature'].tolist()
+    
+    features_validos = df_corr[df_corr['abs_spearman'] >= threshold]['feature'].tolist()
+    
     features_muertos = (df_corr['spearman'] == 0.0).sum()
     features_bajo_threshold = ((df_corr['abs_spearman'] > 0) & (df_corr['abs_spearman'] < threshold)).sum()
     
     if verbose:
-        print(f"\n[CHART] Analisis de correlacion:\n")
-        print(f"  â€¢ Features muertos (r=0): {features_muertos}")
-        print(f"  â€¢ Features bajo threshold (<{threshold}): {features_bajo_threshold}")
-        print(f"  â€¢ Features validos (>={threshold}): {len(features_validos)}")
-        print(f"  â€¢ Total: {len(df_corr)}")
+        print(f"\nAnalisis de correlacion:\n")
+        print(f"  • Features muertos (r=0): {features_muertos}")
+        print(f"  • Features bajo threshold (<{threshold}): {features_bajo_threshold}")
+        print(f"  • Features validos (>={threshold}): {len(features_validos)}")
+        print(f"  • Total: {len(df_corr)}")
         
-        print(f"\n[TROPHY] TOP 20 Features por |Spearman|:\n")
+        print(f"\nTOP 20 Features por |Spearman|:\n")
         for idx, row in df_corr.head(20).iterrows():
             print(f"  {row['feature']:40s} r={row['spearman']:8.4f} (p={row['p_value']:.4f})")
     
     if verbose:
-        print(f"\n[OK] Seleccionados {len(features_validos)} features validos\n")
+        print(f"\nSeleccionados {len(features_validos)} features validos\n")
     
     return features_validos, df_corr
-
 
 
