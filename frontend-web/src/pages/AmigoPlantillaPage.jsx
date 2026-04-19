@@ -5,6 +5,7 @@ import HelpButton from '../components/ui/HelpButton'
 import CampoPlantilla from '../components/campo/CampoPlantilla'
 import { getAuthToken } from '../services/apiClient'
 import { backendUrl } from '../config/backend'
+import { DEFAULT_JORNADA, readStoredJornada } from '../utils/jornada'
 
 const normalizePhotoUrl = (photo) => {
   if (!photo) return null
@@ -82,8 +83,7 @@ export default function AmigoPlantillaPage() {
   const [plantillas, setPlantillas] = useState([])
   const [plantillaIdx, setPlantillaIdx] = useState(0)
   const [jornadaActual, setJornadaActual] = useState(() => {
-    const saved = localStorage.getItem('jornadaActual')
-    return saved ? parseInt(saved) : 18
+    return readStoredJornada('jornadaActual', DEFAULT_JORNADA)
   })
   const [predicciones, setPredicciones] = useState({})
   const [error, setError] = useState(null)

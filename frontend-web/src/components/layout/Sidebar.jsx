@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useState, useEffect, useRef } from 'react'
 import { backendUrl } from '../../config/backend'
 import { getAuthToken } from '../../services/apiClient'
+import { DEFAULT_JORNADA, readStoredJornada, writeStoredJornada } from '../../utils/jornada'
 
 async function cargarEventosJornada(jornada) {
   try {
@@ -26,18 +27,16 @@ const NAV_ITEMS = [
 export default function Sidebar({ open, onClose }) {
   const { pathname } = useLocation()
   const { user, logout } = useAuth()
-  const [jornada, setJornada] = useState(6)
-  const [inputJornada, setInputJornada] = useState('6')
+  const [jornada, setJornada] = useState(DEFAULT_JORNADA)
+  const [inputJornada, setInputJornada] = useState(String(DEFAULT_JORNADA))
+  const [showJornadaSelector, setShowJornadaSelector] = useState(false)
   const [showJornadaInput, setShowJornadaInput] = useState(false)
 
   // Cargar jornada del localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('jornada_global')
-    if (saved) {
-      const num = parseInt(saved)
-      setJornada(num)
-      setInputJornada(String(num))
-    }
+    const num = readStoredJornada('jornada_global', DEFAULT_JORNADA)
+    setJornada(num)
+    setInputJornada(String(num))
   }, [])
 
   // Guardar jornada en localStorage
@@ -46,7 +45,7 @@ export default function Sidebar({ open, onClose }) {
       const prev = jornada
       setJornada(newJornada)
       setInputJornada(String(newJornada))
-      localStorage.setItem('jornada_global', String(newJornada))
+      writeStoredJornada(newJornada)
       window.dispatchEvent(new CustomEvent('jornadaChanged', { detail: { jornada: newJornada } }))
       fetch(backendUrl(`/api/menu/top-jugadores/?jornada=${newJornada + 1}`)).catch(() => {})
       if (newJornada > prev) cargarEventosJornada(newJornada)
@@ -85,7 +84,14 @@ export default function Sidebar({ open, onClose }) {
               <h3 className="text-xs font-bold text-primary uppercase tracking-wide">Jornada</h3>
             </div>
             
-            {!showJornadaInput ? (
+            {!showJornadaSelector ? (
+              <button
+                onClick={() => setShowJornadaSelector(true)}
+                className="w-full px-4 py-3 bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-xl text-primary font-bold text-sm transition-colors"
+              >
+                Cambiar jornada
+              </button>
+            ) : !showJornadaInput ? (
               <>
                 <div className="flex items-center gap-2 mb-3">
                   <button
@@ -112,6 +118,12 @@ export default function Sidebar({ open, onClose }) {
                   className="w-full text-xs text-primary hover:text-primary/80 font-semibold py-1 transition-colors"
                 >
                   Introducir jornada
+                </button>
+                <button
+                  onClick={() => setShowJornadaSelector(false)}
+                  className="w-full mt-2 text-xs text-gray-400 hover:text-white font-semibold py-1 transition-colors"
+                >
+                  Cerrar
                 </button>
               </>
             ) : (

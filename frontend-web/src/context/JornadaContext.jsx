@@ -1,15 +1,15 @@
 import { createContext, useState, useEffect, useContext } from 'react'
+import { DEFAULT_JORNADA, readStoredJornada, writeStoredJornada } from '../utils/jornada'
 
 export const JornadaContext = createContext()
 
 export function JornadaProvider({ children }) {
   const [jornada, setJornada] = useState(() => {
-    const saved = localStorage.getItem('jornada_global')
-    return saved ? parseInt(saved) : 6
+    return readStoredJornada('jornada_global', DEFAULT_JORNADA)
   })
 
   useEffect(() => {
-    localStorage.setItem('jornada_global', String(jornada))
+    writeStoredJornada(jornada)
   }, [jornada])
 
   return (

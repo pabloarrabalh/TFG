@@ -12,6 +12,7 @@ import { useTour } from '../context/TourContext'
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
 import { backendUrl } from '../config/backend'
+import { DEFAULT_JORNADA, readStoredJornada } from '../utils/jornada'
 
 function formatTime(hora) {
   if (!hora) return 'Por definir'
@@ -94,8 +95,7 @@ export default function MenuPage() {
 
   useEffect(() => {
     // Cargar jornada inicial del localStorage
-    const saved = localStorage.getItem('jornada_global')
-    const jornadaInicial = saved ? parseInt(saved) : null
+    const jornadaInicial = readStoredJornada('jornada_global', DEFAULT_JORNADA)
     setJornada(jornadaInicial)
     loadMenuData(jornadaInicial)
     loadJugadoresDestacados(jornadaInicial)

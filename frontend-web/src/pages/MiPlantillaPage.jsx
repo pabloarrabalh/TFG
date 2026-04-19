@@ -10,6 +10,7 @@ import { useTour } from '../context/TourContext'
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
 import { BACKEND_URL, backendUrl } from '../config/backend'
+import { DEFAULT_JORNADA, readStoredJornada, writeStoredJornada } from '../utils/jornada'
 
 const FORMACIONES = {
   '4-3-3': { Portero: 1, Defensa: 4, Centrocampista: 3, Delantero: 3 },
@@ -212,7 +213,7 @@ export default function MiPlantillaPage() {
   const [loading, setLoading] = useState(true)
   // Inicializa jornadaActual correctamente: jornada_global + 1
   const [jornadaActual, setJornadaActual] = useState(() => {
-    const saved = parseInt(localStorage.getItem('jornada_global') || '6')
+    const saved = readStoredJornada('jornada_global', DEFAULT_JORNADA)
     return Math.min(saved + 1, 38)
   })
   const [jugadoresDisponibles, setJugadoresDisponibles] = useState(ALINEACION_VACIA)
@@ -286,7 +287,7 @@ export default function MiPlantillaPage() {
   // ── Init ──────────────────────────────────────────────────────────────────
   useEffect(() => {
     // Usar jornada_global + 1 para predecir la PRÓXIMA jornada, igual que el menú
-    const savedJornada = parseInt(localStorage.getItem('jornada_global') || '6')
+    const savedJornada = readStoredJornada('jornada_global', DEFAULT_JORNADA)
     const proximaJornada = Math.min(savedJornada + 1, 38)
     loadJornada(proximaJornada).then(() => loadPlantillas())
     modelosPrevRef.current = modelosPorPos
@@ -380,7 +381,7 @@ export default function MiPlantillaPage() {
         setPredicciones({})
         fetchingRef.current.clear()
         predictedRef.current.clear()
-        localStorage.setItem('jornadaActual', String(jornada))
+        writeStoredJornada(jornada, 'jornadaActual')
         
         // Extraer equipos únicos
         const eqMap = new Map()

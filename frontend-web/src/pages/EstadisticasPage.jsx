@@ -7,6 +7,7 @@ import TeamShield from '../components/ui/TeamShield'
 import HelpButton from '../components/ui/HelpButton'
 import ComparisonMetricsCards from '../components/comparison/ComparisonMetricsCards'
 import { COMPARISON_DOMAINS } from '../components/comparison/comparisonConfig'
+import { DEFAULT_JORNADA, readStoredJornada } from '../utils/jornada'
 import {
   ResponsiveContainer,
   RadarChart,
@@ -47,7 +48,7 @@ export default function EstadisticasPage() {
   const [search, setSearch] = useState('')
   const [temporada, setTemporada] = useState('25_26')
   const [jornada, setJornada] = useState(null)
-  const [jornadaActual, setJornadaActual] = useState(1)
+  const [jornadaActual, setJornadaActual] = useState(DEFAULT_JORNADA)
   const [currentPage, setCurrentPage] = useState(0)
   const [itemsPerPage, setItemsPerPage] = useState(20) // Cargar 20 del backend
   const [displayCount, setDisplayCount] = useState(10) // Mostrar solo 10 inicialmente
@@ -103,12 +104,9 @@ export default function EstadisticasPage() {
 
   // Leer jornada actual del sidebar (solo actualiza jornadaActual, no la selección)
   useEffect(() => {
-    const saved = localStorage.getItem('jornada_global')
-    if (saved) {
-      const num = parseInt(saved)
-      setJornadaActual(num)
-      // NO se setea jornada aquí para que el select muestre "Todas" por defecto
-    }
+    const num = readStoredJornada('jornada_global', DEFAULT_JORNADA)
+    setJornadaActual(num)
+    // NO se setea jornada aquí para que el select muestre "Todas" por defecto
   }, [])
 
   // Escuchar cambios de jornada desde el sidebar

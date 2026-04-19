@@ -7,6 +7,7 @@ import TeamShield from '../components/ui/TeamShield'
 import { useTour } from '../context/TourContext'
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
+import { DEFAULT_JORNADA, readStoredJornada } from '../utils/jornada'
 
 export default function ClasificacionPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -47,12 +48,10 @@ export default function ClasificacionPage() {
   // Inicializar jornada desde localStorage si no está en searchParams (solo al montar)
   useEffect(() => {
     if (!jornada) {
-      const saved = localStorage.getItem('jornada_global')
-      if (saved) {
-        const newParams = new URLSearchParams(searchParams)
-        newParams.set('jornada', saved)
-        setSearchParams(newParams, { replace: true })
-      }
+      const saved = readStoredJornada('jornada_global', DEFAULT_JORNADA)
+      const newParams = new URLSearchParams(searchParams)
+      newParams.set('jornada', String(saved))
+      setSearchParams(newParams, { replace: true })
     }
   }, []) // Empty dependencies - solo al montar
 
@@ -81,9 +80,7 @@ export default function ClasificacionPage() {
     const newParams = new URLSearchParams(searchParams)
     // If the user selected the empty value (Jornada Actual), read the sidebar/global jornada
     if (val === '') {
-      const saved = localStorage.getItem('jornada_global')
-      if (saved) newParams.set('jornada', saved)
-      else newParams.delete('jornada')
+      newParams.set('jornada', String(readStoredJornada('jornada_global', DEFAULT_JORNADA)))
     } else {
       newParams.set('jornada', val)
     }

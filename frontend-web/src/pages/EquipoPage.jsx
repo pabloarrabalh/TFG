@@ -4,6 +4,7 @@ import api from '../services/apiClient'
 import GlassPanel from '../components/ui/GlassPanel'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import TeamShield from '../components/ui/TeamShield'
+import { DEFAULT_JORNADA, readStoredJornada } from '../utils/jornada'
 
 // Caché de banderas
 const flagCache = JSON.parse(localStorage.getItem('flag_cache') || '{}')
@@ -68,7 +69,7 @@ export default function EquipoPage() {
   const [pastSeasonModalOpen, setPastSeasonModalOpen] = useState(false)
 
   const temporada = searchParams.get('temporada') || '25/26'
-  const jornada = searchParams.get('jornada') || localStorage.getItem('jornada_global') || null
+  const jornada = searchParams.get('jornada') || String(readStoredJornada('jornada_global', DEFAULT_JORNADA))
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -90,12 +91,10 @@ export default function EquipoPage() {
   // Sync jornada from sidebar (localStorage + event)
   useEffect(() => {
     if (!searchParams.get('jornada')) {
-      const saved = localStorage.getItem('jornada_global')
-      if (saved) {
-        const newParams = new URLSearchParams(searchParams)
-        newParams.set('jornada', saved)
-        setSearchParams(newParams, { replace: true })
-      }
+      const saved = readStoredJornada('jornada_global', DEFAULT_JORNADA)
+      const newParams = new URLSearchParams(searchParams)
+      newParams.set('jornada', String(saved))
+      setSearchParams(newParams, { replace: true })
     }
   }, []) // Only on mount
 
