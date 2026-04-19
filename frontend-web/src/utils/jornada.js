@@ -1,4 +1,4 @@
-export const DEFAULT_JORNADA = 19
+export const DEFAULT_JORNADA = 18
 
 export function readStoredJornada(key = 'jornada_global', fallback = DEFAULT_JORNADA) {
   try {

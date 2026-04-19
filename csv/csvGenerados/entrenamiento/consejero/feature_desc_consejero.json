@@ -1,0 +1,11 @@
+{
+  "pf_last5": "media de puntos de los ultimos 5 partidos",
+  "pf_last3": "media de puntos de los ultimos 3 partidos",
+  "min_last5": "minutos medios en los ultimos 5 partidos",
+  "starter_rate5": "ratio de titularidades en los ultimos 5 partidos",
+  "form_trend_3_8": "tendencia de forma corta frente a media (3 vs 8 partidos)",
+  "home_rate5": "proporcion de partidos recientes jugados como local",
+  "age_num": "edad del jugador",
+  "vs_pos_avg": "diferencia frente a la media esperada de su posicion",
+  "posicion_enc": "impacto base de la posicion del jugador"
+}

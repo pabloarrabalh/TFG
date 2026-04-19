@@ -1,0 +1,84 @@
+{
+  "accuracy": 0.7394,
+  "balanced_accuracy": 0.5932,
+  "accuracy_default_0_5": 0.6123,
+  "balanced_accuracy_default_0_5": 0.6053,
+  "n_train": 23373,
+  "n_test": 3926,
+  "feature_count": 9,
+  "features": [
+    "pf_last5",
+    "pf_last3",
+    "min_last5",
+    "starter_rate5",
+    "form_trend_3_8",
+    "home_rate5",
+    "age_num",
+    "vs_pos_avg",
+    "posicion_enc"
+  ],
+  "umbrales": {
+    "puntos_fichar": 7.5,
+    "prob_fichar": 0.58
+  },
+  "decision_prob_fichar": 0.58,
+  "calibration": {
+    "strategy": "balanced_accuracy_with_prior_penalty",
+    "prior_fichar_rate": 0.1956,
+    "predicted_fichar_rate": 0.203,
+    "balanced_accuracy": 0.5932,
+    "f1": 0.3463
+  },
+  "label_map": {
+    "0": "vender",
+    "1": "fichar"
+  },
+  "model_type": "logistic_regression",
+  "class_distribution_train": {
+    "0": 19066,
+    "1": 4307
+  },
+  "class_distribution_test": {
+    "0": 3158,
+    "1": 768
+  },
+  "split": {
+    "strategy": "temporal",
+    "train_ratio": 0.85,
+    "time_cut": 2503.0
+  },
+  "leakage_control": [
+    "features usan shift(1): solo informacion historica por jugador",
+    "target es puntos del siguiente partido (shift -1)",
+    "split temporal: train pasado, test futuro",
+    "fichar si target_next_points >= umbral absoluto; medias por posicion solo para features",
+    "decision final calibrada con umbral probabilistico para evitar sesgo a vender"
+  ],
+  "classification_report": {
+    "vender": {
+      "precision": 0.8411633109619687,
+      "recall": 0.8334388853704876,
+      "f1-score": 0.8372832829648481,
+      "support": 3158.0
+    },
+    "fichar": {
+      "precision": 0.34002509410288584,
+      "recall": 0.3528645833333333,
+      "f1-score": 0.3463258785942492,
+      "support": 768.0
+    },
+    "accuracy": 0.739429444727458,
+    "macro avg": {
+      "precision": 0.5905942025324273,
+      "recall": 0.5931517343519105,
+      "f1-score": 0.5918045807795487,
+      "support": 3926.0
+    },
+    "weighted avg": {
+      "precision": 0.7431311788815367,
+      "recall": 0.739429444727458,
+      "f1-score": 0.7412427107395246,
+      "support": 3926.0
+    }
+  }
+}

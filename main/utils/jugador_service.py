@@ -8,6 +8,31 @@ from predecir import predecir_puntos
 from ..models import EquipoJugadorTemporada, EstadisticasPartidoJugador, Jornada, PrediccionJugador, Temporada
 
 
+_MODELO_POR_POSICION = {
+    'PT': 'elasticnet',
+    'DF': 'ridge',
+    'MC': 'ridge',
+    'DT': 'elasticnet',
+}
+
+
+def _normalizar_posicion_code(value: str | None) -> str:
+    raw = (value or '').strip().lower()
+    if raw in {'pt', 'portero', 'gk', 'goalkeeper'}:
+        return 'PT'
+    if raw in {'df', 'defensa', 'defender', 'cb', 'rb', 'lb'}:
+        return 'DF'
+    if raw in {'mc', 'centrocampista', 'mediocampista', 'mf', 'cm', 'dm', 'am'}:
+        return 'MC'
+    if raw in {'dt', 'delantero', 'forward', 'fw', 'st', 'cf'}:
+        return 'DT'
+    return 'DT'
+
+
+def _modelo_preferido_por_posicion(posicion: str | None) -> str:
+    return _MODELO_POR_POSICION.get(_normalizar_posicion_code(posicion), 'elasticnet')
+
+
 def _safe_float(value, default=0.0):
     if value is None:
         return float(default)
@@ -22,7 +47,16 @@ def get_datos_temporada_completa(jugador, temporada):
     if not todas_jornadas.exists():
         return []
 
-    pred_qs = PrediccionJugador.objects.filter(jugador=jugador, jornada__temporada=temporada)
+    posicion = jugador.get_posicion_mas_frecuente() if hasattr(jugador, 'get_posicion_mas_frecuente') else None
+    modelo_preferido = _modelo_preferido_por_posicion(posicion)
+
+    pred_qs = PrediccionJugador.objects.filter(
+        jugador=jugador,
+        jornada__temporada=temporada,
+        modelo=modelo_preferido,
+    )
+    if not pred_qs.exists():
+        pred_qs = PrediccionJugador.objects.filter(jugador=jugador, jornada__temporada=temporada)
     pred_by_jornada = {p.jornada_id: p for p in pred_qs}
 
     stats_qs = EstadisticasPartidoJugador.objects.filter(
@@ -97,9 +131,16 @@ def get_ultimos_8_temporada_completa(jugador, temporada):
 
 
 def get_predicciones_jugador(jugador, temporada):
-    pred_qs = PrediccionJugador.objects.filter(jugador=jugador)
+    posicion = jugador.get_posicion_mas_frecuente() if hasattr(jugador, 'get_posicion_mas_frecuente') else None
+    modelo_preferido = _modelo_preferido_por_posicion(posicion)
+
+    pred_qs = PrediccionJugador.objects.filter(jugador=jugador, modelo=modelo_preferido)
     if temporada:
         pred_qs = pred_qs.filter(jornada__temporada=temporada)
+    if not pred_qs.exists():
+        pred_qs = PrediccionJugador.objects.filter(jugador=jugador)
+        if temporada:
+            pred_qs = pred_qs.filter(jornada__temporada=temporada)
     predictions = list(pred_qs.select_related("jornada__temporada"))
 
     pred_by_jornada_id = {p.jornada_id: p for p in predictions}
@@ -149,10 +190,11 @@ def generar_predicciones_faltantes(jugador, temporada):
 
         ejt = EquipoJugadorTemporada.objects.filter(jugador=jugador, temporada=temporada).first()
         posicion = ejt.posicion if ejt else (jugador.get_posicion_mas_frecuente() or "Delantero")
+        modelo_preferido = _modelo_preferido_por_posicion(posicion)
         jornadas = Jornada.objects.filter(temporada=temporada).order_by("numero_jornada")
 
         for jornada in jornadas:
-            if PrediccionJugador.objects.filter(jugador=jugador, jornada=jornada).exists():
+            if PrediccionJugador.objects.filter(jugador=jugador, jornada=jornada, modelo=modelo_preferido).exists():
                 continue
 
             try:
@@ -169,7 +211,7 @@ def generar_predicciones_faltantes(jugador, temporada):
                 if resultado and isinstance(resultado, dict) and not resultado.get("error"):
                     prediction = resultado.get("prediccion")
                     if prediction is not None:
-                        modelo_usado = "baseline" if jornada.numero_jornada <= 5 else "rf"
+                        modelo_usado = "baseline" if jornada.numero_jornada <= 5 else modelo_preferido
                         PrediccionJugador.objects.update_or_create(
                             jugador=jugador,
                             jornada=jornada,

@@ -235,10 +235,10 @@ export default function MiPlantillaPage() {
 
   // Selector de modelos por posición
   const [modelosPorPos, setModelosPorPos] = useState({
-    Portero: 'RF',
-    Defensa: 'RF',
+    Portero: 'ElasticNet',
+    Defensa: 'Ridge',
     Centrocampista: 'Ridge',
-    Delantero: 'Ridge',
+    Delantero: 'ElasticNet',
   })
   const [showModelDropdown, setShowModelDropdown] = useState(null) // null | posicion
   const [showModelPanel, setShowModelPanel] = useState(true) // Para expandir/contraer panel de modelos

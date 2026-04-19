@@ -352,7 +352,11 @@ export default function MenuPage() {
                     </td>
                   </tr>
                 )) : (
-                  <tr><td colSpan="3" className="px-6 py-8 text-center text-gray-500">Sin datos</td></tr>
+                  <tr>
+                    <td colSpan="3" className="px-6 py-8 text-center text-gray-500">
+                      Estás consultando una jornada futura y la clasificación no está disponible.
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>

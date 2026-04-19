@@ -5,8 +5,8 @@ import json
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, classification_report, f1_score
+from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -22,34 +22,11 @@ CONFIG = {
 }
 
 FEATURES = [
-    "pf_last3",
     "pf_last5",
-    "pf_last8",
-    "pf_std5",
-    "min_last3",
+    "pf_last3",
     "min_last5",
-    "starter_rate3",
     "starter_rate5",
-    "form_trend",
     "form_trend_3_8",
-    "goals_last5",
-    "assists_last5",
-    "xg_last5",
-    "xag_last5",
-    "shots_last5",
-    "sot_last5",
-    "passes_last5",
-    "pass_acc_last5",
-    "tackles_last5",
-    "duels_won_rate5",
-    "clears_last5",
-    "dribbles_succ_last5",
-    "prog_carries_last5",
-    "yellow_last5",
-    "red_last5",
-    "save_pct_last5",
-    "psxg_last5",
-    "gc_last5",
     "home_rate5",
     "age_num",
     "vs_pos_avg",
@@ -57,34 +34,11 @@ FEATURES = [
 ]
 
 FEATURE_DESC = {
-    "pf_last3": "media de puntos de los ultimos 3 partidos",
     "pf_last5": "media de puntos de los ultimos 5 partidos",
-    "pf_last8": "media de puntos de los ultimos 8 partidos",
-    "pf_std5": "variabilidad de puntos en los ultimos 5 partidos",
-    "min_last3": "minutos medios en los ultimos 3 partidos",
+    "pf_last3": "media de puntos de los ultimos 3 partidos",
     "min_last5": "minutos medios en los ultimos 5 partidos",
-    "starter_rate3": "ratio de titularidades en los ultimos 3 partidos",
     "starter_rate5": "ratio de titularidades en los ultimos 5 partidos",
-    "form_trend": "tendencia reciente de forma (ultimos 3 vs ultimos 5)",
     "form_trend_3_8": "tendencia de forma corta frente a media (3 vs 8 partidos)",
-    "goals_last5": "goles medios en los ultimos 5 partidos",
-    "assists_last5": "asistencias medias en los ultimos 5 partidos",
-    "xg_last5": "xG medio en los ultimos 5 partidos",
-    "xag_last5": "xAG medio en los ultimos 5 partidos",
-    "shots_last5": "tiros medios en los ultimos 5 partidos",
-    "sot_last5": "tiros a puerta medios en los ultimos 5 partidos",
-    "passes_last5": "pases totales medios en los ultimos 5 partidos",
-    "pass_acc_last5": "precision de pase media en los ultimos 5 partidos",
-    "tackles_last5": "entradas medias en los ultimos 5 partidos",
-    "duels_won_rate5": "porcentaje de duelos ganados reciente",
-    "clears_last5": "despejes medios en los ultimos 5 partidos",
-    "dribbles_succ_last5": "regates completados medios en los ultimos 5 partidos",
-    "prog_carries_last5": "conducciones progresivas medias en los ultimos 5 partidos",
-    "yellow_last5": "amarillas medias en los ultimos 5 partidos",
-    "red_last5": "rojas medias en los ultimos 5 partidos",
-    "save_pct_last5": "porcentaje de paradas medio en los ultimos 5 partidos",
-    "psxg_last5": "PSxG medio en los ultimos 5 partidos",
-    "gc_last5": "goles en contra medios en los ultimos 5 partidos",
     "home_rate5": "proporcion de partidos recientes jugados como local",
     "age_num": "edad del jugador",
     "vs_pos_avg": "diferencia frente a la media esperada de su posicion",
@@ -302,7 +256,8 @@ class ConsejeroTrainer(BaseTrainer):
         df["posicion_enc"] = df["pos_code"].map(POS_ENC).astype(float)
 
         puntos_fichar_umbral = float(CONFIG["puntos_fichar_umbral"])
-        df["target_class"] = np.where(df["target_next_points"] >= puntos_fichar_umbral, 1, 0)
+        umbral_relativo = np.maximum(df["pos_ref"], puntos_fichar_umbral)
+        df["target_class"] = np.where(df["target_next_points"] >= umbral_relativo, 1, 0)
 
         return df, pos_ref, global_ref
 
@@ -360,13 +315,11 @@ class ConsejeroTrainer(BaseTrainer):
             ("scaler", StandardScaler()),
             (
                 "clf",
-                ExtraTreesClassifier(
-                    n_estimators=1000,
-                    max_depth=None,
-                    min_samples_leaf=1,
+                LogisticRegression(
+                    max_iter=2000,
+                    class_weight="balanced",
+                    solver="liblinear",
                     random_state=42,
-                    class_weight="balanced_subsample",
-                    n_jobs=-1,
                 ),
             ),
         ])
@@ -401,6 +354,7 @@ class ConsejeroTrainer(BaseTrainer):
                 "f1": round(float(calibration_info.get("f1", 0.0)), 4),
             },
             "label_map": {str(k): v for k, v in LABEL_MAP.items()},
+            "model_type": "logistic_regression",
             "class_distribution_train": {
                 str(int(k)): int(v)
                 for k, v in pd.Series(y_train).value_counts().sort_index().items()

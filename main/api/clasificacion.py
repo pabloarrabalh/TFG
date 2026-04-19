@@ -1,4 +1,4 @@
-from django.db.models import Q, Sum, Count
+from django.db.models import Q, Sum, Count, Max
 from django.utils.timezone import now
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -38,8 +38,14 @@ class ClasificacionView(APIView):
                 for j in Jornada.objects.filter(temporada=temporada).order_by('numero_jornada')
             ]
             equipos_disponibles = [{'nombre': e.nombre} for e in Equipo.objects.order_by('nombre')]
+            jornada_max_clasificacion = (
+                ClasificacionJornada.objects.filter(temporada=temporada)
+                .aggregate(max_jornada=Max('jornada__numero_jornada'))
+                .get('max_jornada')
+            )
 
             jornada_obj = None
+            jornada_num_int = None
             if jornada_num:
                 jornada_num_int = parse_int(jornada_num, default=None, min_value=1)
                 try:
@@ -84,6 +90,16 @@ class ClasificacionView(APIView):
                         })
                     except Exception:
                         continue
+
+            clasificacion_disponible = len(clasificacion) > 0
+            es_jornada_futura = bool(
+                jornada_num_int
+                and jornada_max_clasificacion is not None
+                and jornada_num_int > int(jornada_max_clasificacion)
+            )
+            jornada_ultima_disponible = int(jornada_max_clasificacion) if jornada_max_clasificacion is not None else None
+            if es_jornada_futura and jornada_ultima_disponible is None and jornadas:
+                jornada_ultima_disponible = jornadas[-1]['numero']
 
             if mostrar_favoritos and request.user.is_authenticated:
                 try:
@@ -154,6 +170,9 @@ class ClasificacionView(APIView):
                 'temporada': temporada_display,
                 'temporadas': temporadas,
                 'jornada_actual': jornada_obj.numero_jornada if jornada_obj else 1,
+                'jornada_ultima_disponible': jornada_ultima_disponible,
+                'clasificacion_disponible': clasificacion_disponible,
+                'es_jornada_futura': es_jornada_futura,
                 'jornadas': jornadas,
                 'clasificacion': clasificacion,
                 'partidos_jornada': partidos_jornada,

@@ -33,34 +33,11 @@ _thresholds = {"puntos_fichar": 7.5, "prob_fichar": 0.25}
 _POSICION_ENC = {"PT": 0, "DF": 1, "MC": 2, "DT": 3}
 
 _FEATURES = [
-    "pf_last3",
     "pf_last5",
-    "pf_last8",
-    "pf_std5",
-    "min_last3",
+    "pf_last3",
     "min_last5",
-    "starter_rate3",
     "starter_rate5",
-    "form_trend",
     "form_trend_3_8",
-    "goals_last5",
-    "assists_last5",
-    "xg_last5",
-    "xag_last5",
-    "shots_last5",
-    "sot_last5",
-    "passes_last5",
-    "pass_acc_last5",
-    "tackles_last5",
-    "duels_won_rate5",
-    "clears_last5",
-    "dribbles_succ_last5",
-    "prog_carries_last5",
-    "yellow_last5",
-    "red_last5",
-    "save_pct_last5",
-    "psxg_last5",
-    "gc_last5",
     "home_rate5",
     "age_num",
     "vs_pos_avg",
@@ -157,8 +134,9 @@ def _cargar_modelo() -> bool:
 
         if _shap is not None and hasattr(_pipeline, "named_steps"):
             clf = _pipeline.named_steps.get("clf")
-            if clf is not None:
-                _explainer = _shap.TreeExplainer(clf)
+            if clf is not None and hasattr(clf, "coef_"):
+                background = np.zeros((1, len(_FEATURES)), dtype=float)
+                _explainer = _shap.LinearExplainer(clf, background)
         return True
     except Exception as exc:
         logger.error("No se pudo cargar el modelo Consejero: %s", exc)
@@ -284,34 +262,11 @@ def _computar_features(stats_temporada, jugador, posicion, rendimiento_full, med
     duels_won_rate5 = float(duels_won_last5 / duels_last5) if duels_last5 > 0 else 0.0
 
     feature_map = {
-        "pf_last3": pf_last3,
         "pf_last5": pf_last5,
-        "pf_last8": pf_last8,
-        "pf_std5": pf_std5,
-        "min_last3": min_last3,
+        "pf_last3": pf_last3,
         "min_last5": min_last5,
-        "starter_rate3": starter_rate3,
         "starter_rate5": starter_rate5,
-        "form_trend": form_trend,
         "form_trend_3_8": form_trend_3_8,
-        "goals_last5": _mean_attr(last5, "gol_partido"),
-        "assists_last5": _mean_attr(last5, "asist_partido"),
-        "xg_last5": _mean_attr(last5, "xg_partido"),
-        "xag_last5": _mean_attr(last5, "xag"),
-        "shots_last5": _mean_attr(last5, "tiros"),
-        "sot_last5": _mean_attr(last5, "tiro_puerta_partido"),
-        "passes_last5": _mean_attr(last5, "pases_totales"),
-        "pass_acc_last5": _mean_attr(last5, "pases_completados_pct"),
-        "tackles_last5": _mean_attr(last5, "entradas"),
-        "duels_won_rate5": duels_won_rate5,
-        "clears_last5": _mean_attr(last5, "despejes"),
-        "dribbles_succ_last5": _mean_attr(last5, "regates_completados"),
-        "prog_carries_last5": _mean_attr(last5, "conducciones_progresivas"),
-        "yellow_last5": _mean_attr(last5, "amarillas"),
-        "red_last5": _mean_attr(last5, "rojas"),
-        "save_pct_last5": _mean_attr(last5, "porcentaje_paradas"),
-        "psxg_last5": _mean_attr(last5, "psxg"),
-        "gc_last5": _mean_attr(last5, "goles_en_contra"),
         "home_rate5": home_rate5,
         "age_num": age_num,
         "vs_pos_avg": vs_pos_avg,
@@ -321,6 +276,30 @@ def _computar_features(stats_temporada, jugador, posicion, rendimiento_full, med
     ordered = [float(feature_map.get(name, 0.0) or 0.0) for name in _FEATURES]
 
     return np.array([ordered], dtype=float)
+
+
+def _calcular_estimacion_simple(feature_map, media_pos: float) -> float:
+    pf_last5 = float(feature_map.get("pf_last5", 0.0) or 0.0)
+    pf_last3 = float(feature_map.get("pf_last3", 0.0) or 0.0)
+    min_last5 = float(feature_map.get("min_last5", 0.0) or 0.0)
+    starter_rate5 = float(feature_map.get("starter_rate5", 0.0) or 0.0)
+    form_trend_3_8 = float(feature_map.get("form_trend_3_8", 0.0) or 0.0)
+    home_rate5 = float(feature_map.get("home_rate5", 0.0) or 0.0)
+
+    bonus_titularidad = max(0.0, min(1.0, starter_rate5)) * 0.55
+    bonus_minutos = max(0.0, min(1.0, min_last5 / 90.0)) * 0.65
+    ajuste_forma = max(-2.0, min(2.0, form_trend_3_8)) * 0.20
+    ajuste_local = max(0.0, min(1.0, home_rate5)) * 0.20
+
+    return (
+        (0.52 * pf_last5)
+        + (0.25 * pf_last3)
+        + (0.18 * media_pos)
+        + bonus_titularidad
+        + bonus_minutos
+        + ajuste_forma
+        + ajuste_local
+    )
 
 
 def _build_factors_with_shap(X_scaled, features_array, pred_idx):
@@ -461,9 +440,9 @@ def _generar_veredicto_ml(
     vs_promedio,
     titulares_3,
     minutos_3,
+    estimacion_simple,
 ):
     nombre = f"{jugador.nombre} {jugador.apellido}".strip()
-    umbral_pts = float(_thresholds.get("puntos_fichar", 7.5))
 
     try:
         conf_pct = float(confianza)
@@ -475,13 +454,12 @@ def _generar_veredicto_ml(
     prob_fichar_estimada = max(0.0, min(1.0, prob_fichar_estimada))
 
     if recomendacion == "fichar":
-        veredicto = "Fichalo. Proyecta buen rendimiento para la proxima jornada."
+        veredicto = f"Fichalo. La estimacion simple lo situa en {estimacion_simple:.2f} pts, por encima de la media de su posicion."
     else:
-        veredicto = "Vendelo. Proyecta rendimiento bajo para la proxima jornada."
+        veredicto = f"Vendelo. La estimacion simple se queda en {estimacion_simple:.2f} pts, por debajo de la media de su posicion."
 
     criterio_txt = (
-        f"La probabilidad estimada de superar {umbral_pts:.1f} puntos "
-        f"es del {prob_fichar_estimada * 100:.1f}%."
+        f"La probabilidad estimada de superar la media de su posicion es del {prob_fichar_estimada * 100:.1f}%."
     )
 
     if conf_pct > 0:
@@ -500,24 +478,23 @@ def _generar_veredicto_ml(
 
 def _fallback_veredicto(jugador, rendimiento, media_pos, vs_promedio, titulares_3, minutos_3):
     nombre = f"{jugador.nombre} {jugador.apellido}".strip()
-    umbral_pts = float(_thresholds.get("puntos_fichar", 7.5))
-    recomendacion = "fichar" if rendimiento >= umbral_pts else "vender"
+    estimacion_simple = float(rendimiento)
+    recomendacion = "fichar" if estimacion_simple >= media_pos else "vender"
 
     if recomendacion == "fichar":
         return (
             recomendacion,
-            "Fichalo. Proyecta buen rendimiento para la proxima jornada.",
-            f"{nombre} supera el umbral de buen rendimiento. "
-            f"Tiene {rendimiento:.1f} puntos frente al umbral de {umbral_pts:.1f}. "
+            f"Fichalo. La estimacion simple lo situa en {estimacion_simple:.1f} pts, por encima de la media de su posicion.",
+            f"{nombre} supera la media de su posicion. "
+            f"Tiene {estimacion_simple:.1f} puntos estimados frente a {media_pos:.1f}. "
             f"Ultimos 3 partidos: {titulares_3}/3 titularidades y {minutos_3} minutos.",
         )
 
     return (
         recomendacion,
-        "Vendelo. Proyecta rendimiento bajo para la proxima jornada.",
-        f"No alcanza el umbral de buen rendimiento. "
-        f"Tiene {rendimiento:.1f} puntos frente al umbral de {umbral_pts:.1f}. "
-        f"Ademas, esta {vs_promedio:+.1f} frente a la media de su posicion, que es {media_pos:.1f}.",
+        f"Vendelo. La estimacion simple se queda en {estimacion_simple:.1f} pts, por debajo de la media de su posicion.",
+        f"No alcanza la media de su posicion. Tiene {estimacion_simple:.1f} puntos estimados frente a {media_pos:.1f}. "
+        f"Ademas, esta {vs_promedio:+.1f} frente a la media de su posicion.",
     )
 
 
@@ -576,10 +553,12 @@ def analizar_consejero(jugador_id, accion_solicitada: str = "") -> dict:
     media_pos = _obtener_media_posicion(posicion, temporada)
     vs_promedio = float(rendimiento - media_pos)
     jornada_objetivo = _proxima_jornada(temporada, stats_temporada)
+    features = _computar_features(stats_temporada, jugador, posicion, rendimiento, media_pos, temporada)
+    feature_map = dict(zip(_FEATURES, features[0]))
+    estimacion_simple = _calcular_estimacion_simple(feature_map, media_pos)
 
     modelo_ok = _cargar_modelo()
     if modelo_ok:
-        features = _computar_features(stats_temporada, jugador, posicion, rendimiento, media_pos, temporada)
         recomendacion, confianza, factores = _predecir(features)
         veredicto, razon = _generar_veredicto_ml(
             jugador,
@@ -591,6 +570,7 @@ def analizar_consejero(jugador_id, accion_solicitada: str = "") -> dict:
             vs_promedio,
             titulares_3,
             minutos_3,
+            estimacion_simple,
         )
     else:
         confianza = 0
@@ -616,6 +596,7 @@ def analizar_consejero(jugador_id, accion_solicitada: str = "") -> dict:
         "recomendacion": recomendacion,
         "confianza": confianza,
         "factores": factores,
+        "prediccion_simple": round(float(estimacion_simple), 2),
         "fuente_explicacion": (factores[0].get("fuente") if factores else "heuristica"),
         "criterio_fichaje_puntos": float(_thresholds.get("puntos_fichar", 7.5)),
         "criterio_fichaje_prob": float(_thresholds.get("prob_fichar", 0.25)),

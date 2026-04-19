@@ -36,4 +36,3 @@ coverage.xml
 .scannerwork/
 
 # Large generated ML artifacts
-csv/csvGenerados/entrenamiento/consejero/

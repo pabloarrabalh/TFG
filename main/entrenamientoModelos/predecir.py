@@ -67,15 +67,15 @@ def normalizar_nombre(nombre):
 
 
 # Modelo elegido por posición según resultados de entrenamiento:
-#   PT → Random Forest  (mejor MAE en porteros)
-#   DF → Random Forest  (mejor MAE en defensas)
+#   PT → ElasticNet     (mejor MAE en porteros)
+#   DF → Ridge          (mejor MAE en defensas)
 #   MC → Ridge          (mejor MAE en mediocampistas)
-#   DT → Ridge          (mejor MAE en delanteros)
+#   DT → ElasticNet     (mejor MAE en delanteros)
 MODELO_POR_POSICION = {
-    'PT': 'RF',
-    'DF': 'RF',
+    'PT': 'ElasticNet',
+    'DF': 'Ridge',
     'MC': 'Ridge',
-    'DT': 'Ridge',
+    'DT': 'ElasticNet',
 }
 
 NOMBRE_MODELO_LEGIBLE = {

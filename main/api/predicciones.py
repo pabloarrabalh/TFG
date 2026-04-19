@@ -28,7 +28,7 @@ class PredecirPorteroView(APIView):
             data = request.data
             jugador_id = data.get('jugador_id')
             jornada = data.get('jornada', None)
-            modelo_tipo = data.get('modelo', 'RF')
+            modelo_tipo = data.get('modelo', None)
 
             if not jugador_id:
                 return Response(
@@ -261,11 +261,11 @@ class ExplicarPrediccionView(APIView):
                         'ELASTIC NET': 'elasticnet',
                         'BASELINE': 'baseline',
                     }
-                    _POS_DEFAULT = {'PT': 'rf', 'DF': 'rf', 'MC': 'ridge', 'DT': 'ridge'}
+                    _POS_DEFAULT = {'PT': 'elasticnet', 'DF': 'ridge', 'MC': 'ridge', 'DT': 'elasticnet'}
                     if modelo_tipo:
-                        modelo_bd = _MODEL_MAP.get(str(modelo_tipo).upper(), 'rf')
+                        modelo_bd = _MODEL_MAP.get(str(modelo_tipo).upper(), 'elasticnet')
                     else:
-                        modelo_bd = _POS_DEFAULT.get(posicion_code, 'rf')
+                        modelo_bd = _POS_DEFAULT.get(posicion_code, 'elasticnet')
                     temporada_actual = Temporada.objects.order_by('-nombre').first()
                     if temporada_actual:
                         try:
@@ -302,7 +302,7 @@ class PredecirJugadorView(APIView):
             jugador_id = data.get('jugador_id')
             jornada_num = data.get('jornada')
             posicion_param = data.get('posicion')
-            modelo_tipo = data.get('modelo', 'RF')
+            modelo_tipo = data.get('modelo', None)
 
             if not jugador_id or not jornada_num:
                 return Response(
@@ -328,8 +328,22 @@ class PredecirJugadorView(APIView):
 
             nombre_jugador = f"{jugador.nombre} {jugador.apellido}".strip()
 
+            if modelo_tipo:
+                modelo_busqueda = modelo_tipo.lower()
+            else:
+                _MAP_POS = {
+                    'portero': 'PT', 'pt': 'PT', 'gk': 'PT',
+                    'defensa': 'DF', 'df': 'DF', 'defensor': 'DF',
+                    'centrocampista': 'MC', 'mediocampista': 'MC', 'mc': 'MC', 'mf': 'MC',
+                    'delantero': 'DT', 'dt': 'DT', 'fw': 'DT', 'st': 'DT',
+                }
+                _POS_DEFAULT = {'PT': 'elasticnet', 'DF': 'ridge', 'MC': 'ridge', 'DT': 'elasticnet'}
+                posicion_busqueda = posicion_param or jugador.get_posicion_mas_frecuente() or 'DT'
+                posicion_code_busqueda = _MAP_POS.get(str(posicion_busqueda).lower(), str(posicion_busqueda).upper())
+                modelo_busqueda = _POS_DEFAULT.get(posicion_code_busqueda, 'elasticnet')
+
             prediccion_obj = PrediccionJugador.objects.filter(
-                jugador=jugador, jornada=jornada, modelo=modelo_tipo.lower()
+                jugador=jugador, jornada=jornada, modelo=modelo_busqueda
             ).first()
 
             if prediccion_obj:
@@ -339,7 +353,7 @@ class PredecirJugadorView(APIView):
                     'prediccion': round(float(prediccion_obj.prediccion), 2),
                     'jornada': jornada_num,
                     'posicion': posicion_param or jugador.get_posicion_mas_frecuente() or 'Desconocida',
-                    'modelo': modelo_tipo, 'fuente': 'prediccion_bd',
+                    'modelo': modelo_tipo or modelo_busqueda, 'fuente': 'prediccion_bd',
                 })
 
             if jornada_num <= 5:

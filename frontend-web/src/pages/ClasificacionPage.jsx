@@ -28,6 +28,8 @@ export default function ClasificacionPage() {
 
   const fetchData = useCallback(async () => {
     setLoading(true)
+    setData(null)
+    setExpandedPartido(null)
     const params = new URLSearchParams()
     params.set('temporada', temporada)
     if (jornada) params.set('jornada', jornada)
@@ -115,6 +117,14 @@ export default function ClasificacionPage() {
     setSearchParams(newParams)
   }
 
+  const irAUltimaJornadaConClasificacion = () => {
+    const jornadaDestino = data?.jornada_ultima_disponible || 18
+    const newParams = new URLSearchParams(searchParams)
+    newParams.set('jornada', String(jornadaDestino))
+    newParams.delete('equipo')
+    setSearchParams(newParams)
+  }
+
   // ── Tour guiado ──────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!tourActive || isPhaseCompleted('clasificacion') || loading) return
@@ -197,6 +207,9 @@ export default function ClasificacionPage() {
   const favoritosEquipos = data?.favoritos_equipos || data?.favoritos || data?.equipos_favoritos || []
 
   const currentJornada = parseInt(jornada) || jornada_actual
+  const esJornadaFutura = Boolean(data?.es_jornada_futura)
+  const clasificacionDisponible = data?.clasificacion_disponible !== false && clasificacion.length > 0
+  const jornadaPresente = data?.jornada_ultima_disponible || jornada_actual || 18
 
   const formatDate = (fecha) => {
     if (!fecha) return ''
@@ -598,10 +611,12 @@ export default function ClasificacionPage() {
                           </td>
                         </tr>
                       ))}
-                      {clasificacion.length === 0 && (
+                      {!clasificacionDisponible && (
                         <tr>
                           <td colSpan="11" className="px-4 py-8 text-center text-gray-500">
-                            Sin datos para esta jornada
+                            {esJornadaFutura
+                              ? 'Estás consultando una jornada en el futuro y la clasificación no está disponible.'
+                              : 'No hay datos de clasificación para esta jornada.'}
                           </td>
                         </tr>
                       )}
@@ -635,13 +650,27 @@ export default function ClasificacionPage() {
           </div>
         )}
 
-        {clasificacion.length === 0 && !equipo && (
+        {!clasificacionDisponible && (
           <div className="p-6 text-center">
             <div className="mb-4">
               <span className="material-symbols-outlined text-4xl text-gray-500">schedule</span>
             </div>
-            <p className="text-gray-400 text-lg mb-2">No hay datos de clasificación disponibles.</p>
-            <p className="text-gray-500 text-sm">Quizás estés viendo una jornada en el futuro.</p>
+            <p className="text-gray-400 text-lg mb-2">
+              {esJornadaFutura
+                ? 'Estás consultando una jornada en el futuro y la clasificación no está disponible.'
+                : 'No hay datos de clasificación disponibles.'}
+            </p>
+            <p className="text-gray-500 text-sm mb-4">
+              {esJornadaFutura
+                ? `Vuelve a la última jornada con clasificación disponible: J${jornadaPresente}.`
+                : 'Prueba con otra jornada disponible.'}
+            </p>
+            <button
+              onClick={irAUltimaJornadaConClasificacion}
+              className="px-4 py-2 rounded-lg bg-primary text-black font-bold hover:bg-primary-dark transition-colors"
+            >
+              Volver al presente
+            </button>
           </div>
         )}
       </GlassPanel>
