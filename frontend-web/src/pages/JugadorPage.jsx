@@ -84,9 +84,6 @@ export default function JugadorPage() {
   const [domain, setDomain] = useState('general')
   
   // Estados para expandir/colapsar secciones de defensa
-  const [expandDuelosTotales, setExpandDuelosTotales] = useState(false)
-  const [expandDuelosAereos, setExpandDuelosAereos] = useState(false)
-
   // AI Insight
   const [insights, setInsights] = useState([])
   const [insightsLoading, setInsightsLoading] = useState(false)
@@ -431,9 +428,6 @@ export default function JugadorPage() {
 
   const executeComparison = () => {
     if (!season1 || !season2 || !data) return
-
-    setExpandDuelosTotales(false)
-    setExpandDuelosAereos(false)
 
     const historicoData = data.historico || []
     const getSeasonStats = (season) => {
@@ -815,61 +809,10 @@ export default function JugadorPage() {
                       <span className="text-lg font-bold text-white">{stats.defensa?.despejes || 0}</span>
                     </div>
                     
-                    {/* Duelos Totales - Botón Colapsable */}
-                    <button
-                      onClick={() => setExpandDuelosTotales(!expandDuelosTotales)}
-                      className="w-full flex justify-between items-center bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg px-4 py-2 transition-colors"
-                    >
-                      <span className="text-sm text-gray-300">Duelos Totales</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-white">{stats.defensa?.duelos_totales || 0}</span>
-                        <span className={`material-symbols-outlined text-sm transition-transform ${expandDuelosTotales ? 'rotate-180' : ''}`}>expand_more</span>
-                      </div>
-                    </button>
-                    
-                    {expandDuelosTotales && (
-                      <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 ml-2 space-y-2">
-                        <p className="text-xs text-gray-400 font-bold">Detalle de Duelos</p>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-300">Ganados</span>
-                          <span className="text-lg font-bold text-green-400">{stats.defensa?.duelos_ganados || 0}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-300">Perdidos</span>
-                          <span className="text-lg font-bold text-red-400">{stats.defensa?.duelos_perdidos || 0}</span>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Duelos Aéreos - Botón Colapsable */}
-                    <button
-                      onClick={() => setExpandDuelosAereos(!expandDuelosAereos)}
-                      className="w-full flex justify-between items-center bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg px-4 py-2 transition-colors"
-                    >
-                      <span className="text-sm text-gray-300">Duelos Aéreos</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-white">{stats.defensa?.duelos_aereos_totales || 0}</span>
-                        <span className={`material-symbols-outlined text-sm transition-transform ${expandDuelosAereos ? 'rotate-180' : ''}`}>expand_more</span>
-                      </div>
-                    </button>
-                    
-                    {expandDuelosAereos && (
-                      <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 ml-2 space-y-2">
-                        <p className="text-xs text-gray-400 font-bold">Detalle de Duelos Aéreos</p>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-300">Ganados</span>
-                          <span className="text-lg font-bold text-green-400">{stats.defensa?.duelos_aereos_ganados || 0}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-300">Perdidos</span>
-                          <span className="text-lg font-bold text-red-400">{stats.defensa?.duelos_aereos_perdidos || 0}</span>
-                        </div>
-                        <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                          <span className="text-sm text-gray-400">Iguales</span>
-                          <span className="text-lg font-bold text-gray-300">{(stats.defensa?.duelos_aereos_totales || 0) - (stats.defensa?.duelos_aereos_ganados || 0) - (stats.defensa?.duelos_aereos_perdidos || 0)}</span>
-                        </div>
-                      </div>
-                    )}
+                    <div className="flex justify-between items-center bg-white/5 border border-white/10 rounded-lg px-4 py-2">
+                      <span className="text-sm text-gray-300">Duelos</span>
+                      <span className="text-lg font-bold text-white">{stats.defensa?.duelos_totales || 0}</span>
+                    </div>
                   </div>
                 </div>
               </div>

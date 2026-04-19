@@ -456,7 +456,7 @@ export default function EstadisticasPage() {
     )
     if (alreadySelected) return
 
-    updateCompareSlot(slotIdx, { searchLoading: true })
+    updateCompareSlot(slotIdx, { search: '', searchResults: [], searchLoading: true })
 
     try {
       const { data } = await api.get(`/api/jugador/${selectedPlayer.jugador_id}/`)
@@ -476,8 +476,6 @@ export default function EstadisticasPage() {
         availableSeasons: seasons,
         data: null,
         radar: null,
-        search: '',
-        searchResults: [],
         searchLoading: false,
       })
     } catch (error) {

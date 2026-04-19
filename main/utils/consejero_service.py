@@ -302,6 +302,82 @@ def _calcular_estimacion_simple(feature_map, media_pos: float) -> float:
     )
 
 
+def _construir_factores_respaldo(feature_map: dict, rendimiento: float, media_pos: float, titulares_3: int, minutos_3: int):
+    pf_last5 = float(feature_map.get("pf_last5", 0.0) or 0.0)
+    pf_last3 = float(feature_map.get("pf_last3", 0.0) or 0.0)
+    min_last5 = float(feature_map.get("min_last5", 0.0) or 0.0)
+    starter_rate5 = float(feature_map.get("starter_rate5", 0.0) or 0.0)
+    form_trend_3_8 = float(feature_map.get("form_trend_3_8", 0.0) or 0.0)
+    home_rate5 = float(feature_map.get("home_rate5", 0.0) or 0.0)
+    vs_pos_avg = float(feature_map.get("vs_pos_avg", rendimiento - media_pos) or 0.0)
+
+    factores = [
+        {
+            "nombre": "pf_last5",
+            "descripcion": "Forma reciente: media de puntos en los ultimos 5 partidos",
+            "impacto": round(abs(pf_last5 - media_pos), 3),
+            "impacto_signed": round(pf_last5 - media_pos, 3),
+            "impacto_rel_pct": 34.0,
+            "direccion": "positivo" if pf_last5 >= media_pos else "negativo",
+            "valor": round(pf_last5, 3),
+            "fuente": "heuristica",
+        },
+        {
+            "nombre": "min_last5",
+            "descripcion": "Carga de minutos en los ultimos 5 partidos",
+            "impacto": round(min_last5 / 90.0, 3),
+            "impacto_signed": round(min_last5 / 90.0, 3),
+            "impacto_rel_pct": 24.0,
+            "direccion": "positivo" if min_last5 >= 180 else "negativo",
+            "valor": round(min_last5, 3),
+            "fuente": "heuristica",
+        },
+        {
+            "nombre": "starter_rate5",
+            "descripcion": "Titularidades recientes",
+            "impacto": round(starter_rate5, 3),
+            "impacto_signed": round(starter_rate5, 3),
+            "impacto_rel_pct": 18.0,
+            "direccion": "positivo" if starter_rate5 >= 0.5 else "negativo",
+            "valor": round(starter_rate5, 3),
+            "fuente": "heuristica",
+        },
+        {
+            "nombre": "vs_pos_avg",
+            "descripcion": "Diferencia frente a la media de su posicion",
+            "impacto": round(abs(vs_pos_avg), 3),
+            "impacto_signed": round(vs_pos_avg, 3),
+            "impacto_rel_pct": 14.0,
+            "direccion": "positivo" if vs_pos_avg >= 0 else "negativo",
+            "valor": round(vs_pos_avg, 3),
+            "fuente": "heuristica",
+        },
+        {
+            "nombre": "form_trend_3_8",
+            "descripcion": "Tendencia reciente de forma",
+            "impacto": round(abs(form_trend_3_8), 3),
+            "impacto_signed": round(form_trend_3_8, 3),
+            "impacto_rel_pct": 10.0,
+            "direccion": "positivo" if form_trend_3_8 >= 0 else "negativo",
+            "valor": round(form_trend_3_8, 3),
+            "fuente": "heuristica",
+        },
+        {
+            "nombre": "home_rate5",
+            "descripcion": "Proporcion de partidos recientes como local",
+            "impacto": round(home_rate5, 3),
+            "impacto_signed": round(home_rate5, 3),
+            "impacto_rel_pct": 8.0,
+            "direccion": "positivo" if home_rate5 >= 0.5 else "negativo",
+            "valor": round(home_rate5, 3),
+            "fuente": "heuristica",
+        },
+    ]
+
+    factores = sorted(factores, key=lambda x: abs(float(x.get("impacto_signed", 0.0) or 0.0)), reverse=True)
+    return factores[:3]
+
+
 def _build_factors_with_shap(X_scaled, features_array, pred_idx):
     shap_values = _explainer.shap_values(X_scaled)
 
@@ -420,13 +496,16 @@ def _predecir(features_array):
 
 def _resumen_factores(factores):
     if not isinstance(factores, (list, tuple)) or not factores:
-        return "Sin factores explicativos suficientes."
+        return "Forma reciente, minutos y titularidades no han podido desglosarse con el modelo."
 
     frases = []
     for f in factores[:3]:
         desc = f.get("descripcion", f.get("nombre", "factor"))
         valor = f.get("valor", 0)
-        frases.append(f"{desc}: {valor}.")
+        direccion = f.get("direccion", "positivo")
+        impacto = f.get("impacto_signed", 0)
+        signo_txt = "empuja a fichar" if direccion == "positivo" else "empuja a vender"
+        frases.append(f"{desc}: {valor} ({signo_txt}, impacto {impacto:+.2f}).")
     return "\n• ".join(frases)
 
 
@@ -556,10 +635,22 @@ def analizar_consejero(jugador_id, accion_solicitada: str = "") -> dict:
     features = _computar_features(stats_temporada, jugador, posicion, rendimiento, media_pos, temporada)
     feature_map = dict(zip(_FEATURES, features[0]))
     estimacion_simple = _calcular_estimacion_simple(feature_map, media_pos)
+    factores_respaldo = _construir_factores_respaldo(feature_map, rendimiento, media_pos, titulares_3, minutos_3)
 
     modelo_ok = _cargar_modelo()
     if modelo_ok:
         recomendacion, confianza, factores = _predecir(features)
+        if not factores:
+            factores = factores_respaldo
+        else:
+            factores = factores[:3]
+            if len(factores) < 3:
+                vistos = {f.get("nombre") for f in factores if isinstance(f, dict)}
+                for factor in factores_respaldo:
+                    if factor.get("nombre") not in vistos:
+                        factores.append(factor)
+                    if len(factores) >= 3:
+                        break
         veredicto, razon = _generar_veredicto_ml(
             jugador,
             recomendacion,
@@ -574,7 +665,7 @@ def analizar_consejero(jugador_id, accion_solicitada: str = "") -> dict:
         )
     else:
         confianza = 0
-        factores = []
+        factores = factores_respaldo
         recomendacion, veredicto, razon = _fallback_veredicto(
             jugador,
             rendimiento,
