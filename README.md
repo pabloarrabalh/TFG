@@ -89,7 +89,7 @@ Acceso: **http://localhost:8000** (Django + Nginx)
 Para producción en Azure usa [docker-compose.prod.yml](docker-compose.prod.yml) y publica antes la imagen del backend en ACR o Docker Hub.
 
 ```powershell
-docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
 ```
 
 Ese compose levanta backend, Meilisearch y un proxy Caddy con HTTPS. Supabase, Upstash y Vercel quedan fuera y se conectan por variables de entorno.
@@ -126,7 +126,7 @@ sudo apt update && sudo apt upgrade -y
 6. Ejecuta:
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
 ```
 
 7. Comprueba que el backend responde en `https://api.<IP_DE_LA_VM>.sslip.io/` y que Meilisearch está accesible solo dentro de la red Docker.

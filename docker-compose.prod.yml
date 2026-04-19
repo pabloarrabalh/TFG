@@ -19,6 +19,9 @@ services:
       - app-network
 
   backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: ${BACKEND_IMAGE:-tfg-backend:latest}
     restart: unless-stopped
     env_file:
