@@ -16,7 +16,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /tmp
 
 COPY requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_DEFAULT_TIMEOUT=120
+
+RUN pip install --user --no-cache-dir --retries 10 --timeout 120 -r requirements.txt
 
 
 # ── Stage 2: Runtime ─────────────────────────────────────────────────────────
