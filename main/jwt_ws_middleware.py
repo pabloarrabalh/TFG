@@ -2,8 +2,6 @@ from urllib.parse import parse_qs
 
 from channels.db import database_sync_to_async
 from channels.middleware import BaseMiddleware
-from django.contrib.auth.models import AnonymousUser
-from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 class JWTAuthMiddleware(BaseMiddleware):
@@ -14,6 +12,9 @@ class JWTAuthMiddleware(BaseMiddleware):
 
     @database_sync_to_async
     def get_user(self, scope):
+        from django.contrib.auth.models import AnonymousUser
+        from rest_framework_simplejwt.authentication import JWTAuthentication
+
         query = parse_qs(scope.get('query_string', b'').decode())
         token = query.get('token', [None])[0]
         if not token:
