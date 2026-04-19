@@ -136,11 +136,13 @@ export default function AmigoPlantillaPage() {
     ...(alineacion.Delantero || []),
   ].filter(Boolean)
 
+  const jugadoresKey = todosLosJugadores.map((jug) => jug.id).join('|')
+
   useEffect(() => {
     if (todosLosJugadores.length > 0) {
       cargarPredicciones()
     }
-  }, [plantillaIdx, jornadaActual])
+  }, [jugadoresKey, jornadaActual])
 
   async function cargarPredicciones() {
     const nuevas = {}
